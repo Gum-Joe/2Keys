@@ -6,6 +6,22 @@
  * user guide available at https://docs.gradle.org/4.5.1/userguide/tutorial_java_projects.html
  */
 
+buildscript {
+    repositories {
+        // Use jcenter for resolving your dependencies.
+        // You can declare any Maven/Ivy/file repository here.
+        jcenter()
+        // Use the maven repo
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath 'com.kncept.junit5.reporter:junit-reporter:1.1.0'
+        classpath 'edu.sc.seis.gradle:launch4j:2.4.3'
+    }
+}
+
 plugins {
     // Apply the java plugin to add support for Java
     id 'java'
@@ -14,15 +30,27 @@ plugins {
     id 'application'
 }
 
+apply plugin: 'edu.sc.seis.launch4j' // For exe packaging
+// Plugins for testing
+apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'com.kncept.junit5.reporter'
+
 // Define the main class for the application
-mainClassName = 'App'
+mainClassName = 'com.gumjoe.twokeys.App'
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:23.0'
 
     // Use JUnit test framework
-    testCompile 'junit:junit:4.12'
+    testCompile group: 'org.junit.platform', name: 'junit-platform-gradle-plugin', version: '1.1.0'
+    testCompile group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.1.0'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.1.0'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.1.0'
+    testCompile group: 'org.junit.platform', name: 'junit-platform-console-standalone', version: '1.1.0'
+
+    // https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
 
     // Use Apache Commons CLI to parse cli commands
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
@@ -30,6 +58,10 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+
+    // For CLI colours
+    // https://mvnrepository.com/artifact/com.github.tomas-langer/chalk
+    compile group: 'com.github.tomas-langer', name: 'chalk', version: '1.0.2'
 
 }
 
@@ -39,8 +71,24 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     // Use the maven repo
+    mavenCentral()
 }
 
 run {
-    args = ["init", "--help"]
+    args = ["oobe", "-f"]
+}
+
+junitPlatform {
+    platformVersion '1.1.0' // optional, defaults to plugin version
+    reportsDir file('build/test-results/junit-platform') // this is the default
+    // enableStandardTestTask true
+    // selectors (optional)
+    // filters (optional)
+    // logManager (optional)
+}
+
+launch4j {
+  mainClassName = 'com.gumjoe.twokeys.App'
+  icon = "${projectDir}/icons/myApp.ico"
+  outfile = "2keys.exe"
 }
