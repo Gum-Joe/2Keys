@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -101,6 +103,20 @@ public class Init {
             }
         }
 
+        /**
+         * Install required software
+         * @param installPath Installation path (software.installPath)
+         */
+        public void installSoftware(String installPath) {
+            try {
+                URL AUTO_HOTKEY_URL = new URL("https", "autohotkey.com", "/download/ahk.zip"); // https://autohotkey.com/download/ahk.zip
+                Installer ahk = new Installer(AUTO_HOTKEY_URL, Paths.get(installPath, "ahk"), "ahk.zip");
+                ahk.run(Installer.TYPE_ZIP);
+            } catch (MalformedURLException err) {
+                System.err.println(err);
+            }
+        }
+
         // Run OOBE
         public void run() {
             Logger.info("Starting OOBE...");
@@ -113,6 +129,8 @@ public class Init {
             Logger.debug("Reading config...");
             Properties config = Config.readConfig(configFile.getAbsolutePath());
             // Get install location
+            String installPath = config.getProperty("software.installPath");
+            this.installSoftware(installPath);
         }
     }
 }

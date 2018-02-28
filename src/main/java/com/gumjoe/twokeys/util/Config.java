@@ -14,7 +14,13 @@ import java.util.Properties;
 
 import com.gumjoe.twokeys.util.Logger;
 
+
 public class Config {
+  /**
+  * Config properties:
+  * software.installPath: Install location for hotkey software (AutoHotKey etc)
+  */
+  
   // TODO: Add updateConfig() method
   public static Path defaultConfigPath = Paths.get(System.getProperty("user.home"), ".2keysrc.properties");
   /**
