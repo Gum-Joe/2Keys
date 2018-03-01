@@ -7,11 +7,18 @@ import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.apache.commons.lang3.ArrayUtils;
 import com.github.tomaslanger.chalk.Chalk;
+import com.gumjoe.twokeys.cli.CLI;
 
 public class Logger {
     public static boolean isEnabled(){
-        return true;
+        String[] args = CLI.getArgs();
+        if (ArrayUtils.contains(args, "--debug")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -39,6 +46,6 @@ public class Logger {
     }
 
     public static void err(Object out) {
-        Logger._log(Chalk.on("error").yellow(), out);
+        Logger._log(Chalk.on("error").red(), out);
     }
 }

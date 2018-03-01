@@ -59,5 +59,13 @@ public class Installer extends Downloader {
     private void zipInstall() {
         // Download zip
         this.download(this.url, Paths.get(this.installTo.toString(), this.filename));
+        // Extract
+        try {
+            Logger.info("Extracting " + this.filename + "...");
+            new Zip(Paths.get(this.installTo.toString(), this.filename).toString(), this.installTo.toString())
+                .unzip();
+        } catch (IOException error) {
+            error.printStackTrace();
+        }
     }
 }

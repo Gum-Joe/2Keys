@@ -11,13 +11,34 @@ import com.gumjoe.twokeys.commands.*;
 import com.gumjoe.twokeys.util.*;
 
 public class CLI {
+    // To get args externally
+    private static String[] savedArgs;
+    public static String[] getArgs() {
+        return savedArgs;
+    }
+
+    /**
+     * Default options
+     */
+    private Options getDefaultOptions() {
+        Options options = new Options();
+        options.addOption(OptionBuilder.withLongOpt("debug")
+            .withDescription( "Debug/verbose mode: logs all actions")
+            .create()
+        );
+        options.addOption(OptionBuilder.withLongOpt("help")
+            .withDescription("Print help (this message)")
+            .create()
+        );
+        return options;
+    }
     
     /**
      * Get init options
      */
-    Options getInitOpts() {
+    private Options getInitOpts() {
         // Create Options
-        Options options = new Options();
+        Options options = getDefaultOptions();
         options.addOption(OptionBuilder.hasArg()
             .withArgName("directory")
             .withLongOpt("dir")
@@ -30,31 +51,27 @@ public class CLI {
             .withDescription( "Location to install required software")
             .create()
         );
-        options.addOption(OptionBuilder.withLongOpt("help")
-            .withDescription("Print help (this message)")
-            .create()
-        );
         return options;
     }
     
     /**
      * Get OOBE options
      */
-    Options getOOBEOpts() {
+    private Options getOOBEOpts() {
         // Create Options
-        Options options = new Options();
+        Options options = getDefaultOptions();
         options.addOption(OptionBuilder.withLongOpt("force")
             .withDescription("Force creation of files, irreguardless of if they exist")
             .create("f")
+        );
+        options.addOption(OptionBuilder.withLongOpt("clean")
+            .withDescription("Cleans the .2Keys dir before OOBE")
+            .create("c")
         );
         options.addOption(OptionBuilder.hasArg()
             .withArgName("directory")
             .withLongOpt("install-apps-to")
             .withDescription( "Location to install required software")
-            .create()
-        );
-        options.addOption(OptionBuilder.withLongOpt("help")
-            .withDescription("Print help (this message)")
             .create()
         );
         return options;
@@ -131,6 +148,12 @@ public class CLI {
                 oobe.force();
             }
 
+            if (parsed.hasOption("clean")) {
+                Logger.debug("Clean option has been specified");
+                // Set install dir
+                oobe.clean();
+            }
+
             // Run
             oobe.run();
             
@@ -145,6 +168,8 @@ public class CLI {
      * @param args CLI args
      */
     public void startParse(String[] args) {
+        // Store args for access
+        savedArgs = args;
         // Step 1: Which commnd
         // First, is there any args
         if (args.length <= 0) {

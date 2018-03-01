@@ -39,14 +39,15 @@ public class Downloader extends ProgressBar {
       while ((count = input.read(data)) != -1) {
         total += count;
         // updateing the progress....
-        this.updateProgress((total / lenghtOfFile), lenghtOfFile);
+        this.updateProgress(total, lenghtOfFile);
 
         // writing data to file
         output.write(data, 0, count);
       }
 
       // flushing output
-      Logger.debug("\nSaving...");
+      System.out.println("");
+      Logger.debug("Saving...");
       output.flush();
 
       // closing streams

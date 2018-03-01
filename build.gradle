@@ -57,6 +57,7 @@ dependencies {
     // Use Apache Commons CLI to parse cli commands
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6' 
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
@@ -76,8 +77,8 @@ repositories {
     mavenCentral()
 }
 
-run {
-    args = ["oobe", "-f"]
+run { 
+    args = ["oobe", "-f", "-c", "--debug"]
 }
 
 junitPlatform {

@@ -8,6 +8,7 @@ package com.gumjoe.twokeys.util;
  */
 public class ProgressBar {
   private StringBuilder progress;
+  private int currentWorkChar = 0;
 
   /**
    * initialize progress bar properties.
@@ -15,6 +16,18 @@ public class ProgressBar {
   public ProgressBar() {
     initProgress();
   }
+
+  /**
+   * Increment the current work char array index to use
+   */
+  private void incrementCurrentWorkChar() {
+    if (this.currentWorkChar == 3) {
+      this.currentWorkChar = 0;
+    } else {
+      this.currentWorkChar++;
+    }
+  }
+
 
   /**
    * called whenever the progress bar needs to be updated.
@@ -33,8 +46,8 @@ public class ProgressBar {
     while (extrachars-- > 0) {
       progress.append(Character.toString((char) 219)); // Char: █ 219
     }
-
-    System.out.printf(format, percent, progress, workchars[done % workchars.length]);
+    System.out.printf(format, percent, progress, workchars[this.currentWorkChar]);
+    this.incrementCurrentWorkChar();
 
     if (done == total) {
       System.out.flush();

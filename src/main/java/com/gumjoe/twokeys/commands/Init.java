@@ -3,17 +3,17 @@ package com.gumjoe.twokeys.commands;
 import java.nio.file.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import com.gumjoe.twokeys.util.*;
 
 public class Init {
+
     // Setting methods
     public Path dir = Paths.get("./");
     public Path installPath = OOBE.defaultInstallPath;
@@ -50,10 +50,13 @@ public class Init {
      */
     public static class OOBE {
         // Constants
-        public static Path defaultInstallPath = Paths.get(System.getProperty("user.home"), ".2keys", "apps"); // For Install command
+        public static Path defaultHome = Paths.get(System.getProperty("user.home"), ".2keys");
+        public static Path defaultInstallPath = Paths.get(defaultHome.toString(), "apps"); // For Install command
+        private Properties config;
         // Vars
         public Path installPath;
         public boolean force = false;
+        public boolean clean = false;
 
         public OOBE(Path installPath) {
             this.installPath = installPath;
@@ -63,7 +66,14 @@ public class Init {
          * Force creation of files (bypass ifs)
          */
         public void force() {
-            this.force = true;
+            this.force = !this.force;
+        }
+
+        /**
+         * Clean 2Keys Home (general.home)
+         */
+        public void clean() {
+            this.clean = !this.clean;
         }
 
         /**
@@ -74,6 +84,7 @@ public class Init {
             Logger.debug("Generating config...");
             Properties config = new Properties();
             config.setProperty("software.installPath", this.installPath.toString());
+            config.setProperty("general.home", defaultHome.toString());
             return config;
         }
 
@@ -117,6 +128,20 @@ public class Init {
             }
         }
 
+        /**
+         * Cleans home dir
+         * @param home Home dir (config: general.home)
+         */
+        public void cleanHome(String home) {
+            Logger.info("Cleaning out 2Keys Home (" + config.getProperty("general.home") + ")...");
+            File homedir = new File(home);
+            try {
+                FileUtils.deleteDirectory(homedir);
+            } catch (IOException err) {
+                err.printStackTrace();
+            }
+        }
+
         // Run OOBE
         public void run() {
             Logger.info("Starting OOBE...");
@@ -127,7 +152,11 @@ public class Init {
                 this.createConfig(configFile.getAbsolutePath()); // Helped by https://www.mkyong.com/java/java-properties-file-examples/ 
             }
             Logger.debug("Reading config...");
-            Properties config = Config.readConfig(configFile.getAbsolutePath());
+            config = Config.readConfig(configFile.getAbsolutePath());
+            // Clean?
+            if (this.clean) {
+                this.cleanHome(config.getProperty("general.home"));
+            }
             // Get install location
             String installPath = config.getProperty("software.installPath");
             this.installSoftware(installPath);
