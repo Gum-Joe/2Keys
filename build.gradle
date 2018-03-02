@@ -37,6 +37,10 @@ apply plugin: 'com.github.johnrengelman.shadow' // For packaging
 apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'com.kncept.junit5.reporter'
 
+// For http://www.oblita.com/interception library
+apply plugin: 'cpp' 
+//apply plugin: 'google-test'
+
 // Define the main class for the application
 mainClassName = 'com.gumjoe.twokeys.App'
 
@@ -66,6 +70,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.tomas-langer/chalk
     compile group: 'com.github.tomas-langer', name: 'chalk', version: '1.0.2'
 
+    // JNA for c++ interface
+    compile 'net.java.dev.jna:jna:4.5.1'
+    compile 'net.java.dev.jna:jna-platform:4.5.1'
+
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -94,4 +102,32 @@ launch4j {
   mainClassName = 'com.gumjoe.twokeys.App'
   icon = "${projectDir}/icons/myApp.ico"
   outfile = "2keys.exe"
+}
+
+// C++ compile to use interception
+model { 
+    repositories {
+        libs(PrebuiltLibraries) { 
+            /**googleTest { 
+                headers.srcDir new File(projectDir, "3rdparty/googletest-master/googletest/include") 
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file(projectDir.getPath() + "/3rdparty/googletest-master/googletest/build/" + findGoogleTestStaticLib(targetPlatform)) 
+                }
+            }*/
+        }
+    }
+    components {
+        // twokeys(NativeLibrarySpec) { } 
+        // Let's try using the library
+        main(NativeLibrarySpec) {}
+    }
+
+
+    binaries {
+        withType(SharedLibraryBinarySpec) {
+            if (toolChain in VisualCpp) {
+                cppCompiler.define "DLL_EXPORT" 
+            }
+        }
+    }
 }

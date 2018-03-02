@@ -11,13 +11,4 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 
 public class CLITest {
     private CLI cli = new CLI();
-    @Test public void checkInitOptions() {    
-        Options init = this.cli.getInitOpts(); 
-        assertThat(init, instanceOf(Options.class));
-    }
-
-    @Test public void checkOOBEOptions() {      
-        Options oobe = this.cli.getOOBEOpts();
-        assertThat(oobe, instanceOf(Options.class));
-    }
 }
