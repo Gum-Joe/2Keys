@@ -15,8 +15,9 @@ To package the jar for publishing:
 `./gradlew shadowJar`
 
 To build the C++ library for [Interception](https://github.com/oblitum/Interception):
-`./gradlew mainStaticLibrary`
+`./gradlew mainSharedLibrary`
 
 ## Sofware used & inspiration
 To block keystrokes from the second keyboard: [Interception](https://github.com/oblitum/Interception), found in `./interception`
+
 Inspired by LTT editor Taran's second keyboard project: [https://github.com/TaranVH/2nd-keyboard](https://github.com/TaranVH/2nd-keyboard)

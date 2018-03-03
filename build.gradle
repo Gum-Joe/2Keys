@@ -114,6 +114,12 @@ model {
                     staticLibraryFile = file(projectDir.getPath() + "/3rdparty/googletest-master/googletest/build/" + findGoogleTestStaticLib(targetPlatform)) 
                 }
             }*/
+            interception { 
+                headers.srcDir new File(projectDir, "/lib/interception/library") 
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile = file(projectDir.getPath() + "/lib/interception/library/x86/interception.lib") 
+                }
+            }
         }
     }
     components {
@@ -126,8 +132,28 @@ model {
     binaries {
         withType(SharedLibraryBinarySpec) {
             if (toolChain in VisualCpp) {
+                lib library: "interception", linkage: "static"
                 cppCompiler.define "DLL_EXPORT" 
             }
         }
+    }
+
+    platforms {
+             windows_x86 {
+                 architecture "x86"
+                 operatingSystem "windows"
+             }
+             windows_x64 {
+                 architecture "amd64"
+                 operatingSystem "windows"
+             }
+    }
+}
+
+def findInterception(Platform p) {
+    if (p.architecture == "amd64") {
+        return "/x64/interception.dll"
+    } else {
+        return "/x86/interception.dll"
     }
 }
