@@ -160,6 +160,7 @@ public class Init {
             // Get install location
             String installPath = config.getProperty("software.installPath");
             this.installSoftware(installPath);
+            new Map().testMap();
         }
     }
 }

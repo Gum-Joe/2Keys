@@ -1,0 +1,5 @@
+D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\bin\x86\Debug\RawInput.dll
+D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\bin\x86\Debug\RawInput.pdb
+D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\obj\x86\Debug\RawInput.csproj.CoreCompileInputs.cache
+D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\obj\x86\Debug\RawInput.dll
+D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\obj\x86\Debug\RawInput.pdb

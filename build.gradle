@@ -20,6 +20,10 @@ buildscript {
         classpath 'com.kncept.junit5.reporter:junit-reporter:1.1.0'
         classpath 'edu.sc.seis.gradle:launch4j:2.4.3'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
+        // Generate JNA bindings
+        classpath "org.anarres.gradle:gradle-jnaerator-plugin:1.0.0"
+	    // https://github.com/etiennestuder/gradle-plugindev-plugin/issues/11
+        classpath "com.nativelibs4java:jnaerator:0.11"
     }
 }
 
@@ -40,6 +44,9 @@ apply plugin: 'com.kncept.junit5.reporter'
 // For http://www.oblita.com/interception library
 apply plugin: 'cpp' 
 //apply plugin: 'google-test'
+
+// For JNA bindings
+apply plugin: 'org.anarres.jnaerator'
 
 // Define the main class for the application
 mainClassName = 'com.gumjoe.twokeys.App'
@@ -86,7 +93,7 @@ repositories {
 }
 
 run { 
-    args = ["oobe", "-f", "-c", "--debug"]
+    args = ["map", "-f", "-c", "--debug"]
 }
 
 junitPlatform {
@@ -117,7 +124,7 @@ model {
             interception { 
                 headers.srcDir new File(projectDir, "/lib/interception/library") 
                 binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile = file(projectDir.getPath() + "/lib/interception/library/x86/interception.lib") 
+                    staticLibraryFile = file(projectDir.getPath() + "/lib/interception/library/x64/interception.lib") 
                 }
             }
         }
@@ -125,7 +132,9 @@ model {
     components {
         // twokeys(NativeLibrarySpec) { } 
         // Let's try using the library
-        main(NativeLibrarySpec) {}
+        main(NativeLibrarySpec) {
+            targetPlatform "x64"
+        }
     }
 
 
@@ -133,21 +142,33 @@ model {
         withType(SharedLibraryBinarySpec) {
             if (toolChain in VisualCpp) {
                 lib library: "interception", linkage: "static"
+                cppCompiler.args "-I${projectDir}/lib/interception/library"
+                cppCompiler.args "-I${projectDir}/lib/interception/library/x64"
+                //cppCompiler.args "-I${projectDir}/lib/interception/library/x86"
                 cppCompiler.define "DLL_EXPORT" 
             }
+        }
+
+        withType(StaticLibraryBinarySpec) {
+            buildable = false
         }
     }
 
     platforms {
-             windows_x86 {
-                 architecture "x86"
-                 operatingSystem "windows"
-             }
-             windows_x64 {
-                 architecture "amd64"
-                 operatingSystem "windows"
-             }
+        x64 {
+            architecture "amd64"
+            operatingSystem "windows"
+        }
     }
+}
+
+jnaerator {
+	libraryName 'cpp'
+	packageName 'com.gumjoe.twokeys.cpp'
+	headerFiles "${projectDir}/src/main/headers/get-keyboard-id.hpp"
+	// runtimeMode "JNAerator"
+	// define "FOO=bar", "ANSWER=42"
+	// extraArgs "-v", "-foo", "-bar"
 }
 
 def findInterception(Platform p) {

@@ -11,9 +11,19 @@ enum ScanCode {
   SCANCODE_ESC = 0x01
 };
 
-int getKeyboardId() {
+// Place this before to export:
+// extern "C" __declspec(dllexport) 
+
+void testLib() {
+  using namespace std;
+  cout << "Hi" << endl;
+}
+
+extern "C" __declspec(dllexport) int getKeyboardId() {
   // Allow strings usage
   using namespace std;
+
+  cout << "[CPP:DEBUG] Looking up keyboard id" << endl;
 
   // Init vars
   InterceptionContext context;
@@ -46,6 +56,7 @@ int getKeyboardId() {
     // Print it, really should return this
     if (length > 0 && length < sizeof(hardware_id))
       cout << hardware_id << endl;
+      return wcstol(hardware_id, 0, 10);
 
     // Don't block pressing of key
     interception_send(context, device, &stroke, 1);
@@ -53,6 +64,4 @@ int getKeyboardId() {
 
   // Stop interception
   interception_destroy_context(context);
-
-  return 0;
 }

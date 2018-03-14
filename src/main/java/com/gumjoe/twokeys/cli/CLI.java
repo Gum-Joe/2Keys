@@ -187,6 +187,9 @@ public class CLI {
             String[] newArgs = ArrayUtils.removeElement(args, args[0]);
             // Then we can hand over to Apache CLI
             this.parseOOBE(newArgs);
+        } else if (args[0].equals("map")) {
+            Logger.debug("Detected \"map\" as the command to run.  Parsing...");
+            Map.testMap();
         }
     }
 }

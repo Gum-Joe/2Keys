@@ -18,6 +18,8 @@ To build the C++ library for [Interception](https://github.com/oblitum/Intercept
 `./gradlew mainSharedLibrary`
 
 ## Sofware used & inspiration
-To block keystrokes from the second keyboard: [Interception](https://github.com/oblitum/Interception), found in `./interception`
+To block keystrokes from the second keyboard: [Interception](https://github.com/oblitum/Interception), found in `./lib/interception`
 
 Inspired by LTT editor Taran's second keyboard project: [https://github.com/TaranVH/2nd-keyboard](https://github.com/TaranVH/2nd-keyboard)
+
+To detect the keyboard being used: [https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard](https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard) (code downloaded).  Licensed under `LGPL3`, code has been modified to work for 2Keys.  Found in `./lib/rawinput`
