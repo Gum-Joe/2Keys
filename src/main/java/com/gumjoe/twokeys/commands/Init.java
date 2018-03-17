@@ -1,15 +1,14 @@
 package com.gumjoe.twokeys.commands;
 
+import java.io.*;
 import java.nio.file.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import com.esotericsoftware.yamlbeans.*;
+import com.gumjoe.twokeys.generators.*;
 import com.gumjoe.twokeys.util.*;
 
 public class Init {
@@ -17,6 +16,7 @@ public class Init {
     // Setting methods
     public Path dir = Paths.get("./");
     public Path installPath = OOBE.defaultInstallPath;
+    private boolean force = false;
 
     /**
      * Set the directory to init it
@@ -35,12 +35,43 @@ public class Init {
     }
 
     /**
+     * Force all parts of init to run
+     */
+    public void force() {
+        this.force = !this.force;
+    }
+
+    /**
+     * Generate local config
+     */
+    public void createLocalConfig() {
+        try {
+            YamlReader reader = new YamlReader(new FileReader("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\example\\config.yml"));
+            Object object = reader.read();
+            System.out.println(object);
+        } catch {
+            
+        }
+
+    }
+
+    /**
      * Initalises boilerplate code
      */
     public void run() {
-        // Verify programs
-        OOBE oobe = new Init.OOBE(this.installPath);
-        oobe.run();
+        // Run OOBE if needed
+        Config config = new Config(Config.defaultConfigPath.toString());
+        if (config.config.getProperty("general.oobe") == "true" || this.force) {
+            Logger.debug("Running OOBE...");
+            OOBE oobe = new Init.OOBE(this.installPath);
+            if (this.force) {
+                oobe.force();
+            }
+            oobe.run();
+        }
+
+        // Once OOBE done, detect keyboard
+        this.createLocalConfig();
     }
 
     /**
@@ -85,6 +116,7 @@ public class Init {
             Properties config = new Properties();
             config.setProperty("software.installPath", this.installPath.toString());
             config.setProperty("general.home", defaultHome.toString());
+            config.setProperty("general.oobe", "true"); // Is OOBE in progress
             return config;
         }
 
@@ -119,6 +151,7 @@ public class Init {
          * @param installPath Installation path (software.installPath)
          */
         public void installSoftware(String installPath) {
+            // Does AHK exist?
             try {
                 URL AUTO_HOTKEY_URL = new URL("https", "autohotkey.com", "/download/ahk.zip"); // https://autohotkey.com/download/ahk.zip
                 Installer ahk = new Installer(AUTO_HOTKEY_URL, Paths.get(installPath, "ahk"), "ahk.zip");
@@ -160,7 +193,13 @@ public class Init {
             // Get install location
             String installPath = config.getProperty("software.installPath");
             this.installSoftware(installPath);
-            new Map().testMap();
+
+            // Finalise
+            Logger.info("Finalising...");
+            Logger.debug("Finishing OOBE by editing config...");
+            Config config = new Config(Config.defaultConfigPath.toString());
+            config.config.setProperty("general.oobe", "false");
+            config.writeConfig();
         }
     }
 }
