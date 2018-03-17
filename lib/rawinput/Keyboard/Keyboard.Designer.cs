@@ -41,6 +41,7 @@
             this.lbKey = new System.Windows.Forms.Label();
             this.lbCaption = new System.Windows.Forms.Label();
             this.gbDetails = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.lbSource = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.lbDescription = new System.Windows.Forms.Label();
@@ -54,7 +55,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.lbHandle = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.gbDetails.SuspendLayout();
             this.SuspendLayout();
@@ -199,6 +199,15 @@
             this.gbDetails.TabStop = false;
             this.gbDetails.Text = "Device details";
             // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(341, 38);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(77, 13);
+            this.label11.TabIndex = 25;
+            this.label11.Text = "Just Released:";
+            // 
             // lbSource
             // 
             this.lbSource.AutoSize = true;
@@ -298,6 +307,7 @@
             this.label3.Size = new System.Drawing.Size(38, 13);
             this.label3.TabIndex = 2;
             this.label3.Text = "Name:";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // lbHandle
             // 
@@ -315,15 +325,6 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(479, 29);
             this.textBox1.TabIndex = 27;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(341, 38);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(77, 13);
-            this.label11.TabIndex = 25;
-            this.label11.Text = "Just Released:";
             // 
             // Keyboard
             // 

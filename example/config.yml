@@ -1,0 +1,7 @@
+!com.gumjoe.twokeys.types.LocalConfig
+keyboard: 
+   HID: HANDLED BY KEYBOARD.EXE
+   dir: .\example
+   root: index.ahk
+packs: {}
+type: single

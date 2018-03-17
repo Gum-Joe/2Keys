@@ -21,7 +21,7 @@ namespace Keyboard
         //private Dictionary<int, bool> oldKeys = new Dictionary<int, bool>();
         private bool AHK_MODE = true;
 
-        const bool CaptureOnlyInForeground = true;
+        const bool CaptureOnlyInForeground = false; // So that we don't have to switch to app to get keys
         // Todo: add checkbox to form when checked/uncheck create method to call that does the same as Keyboard ctor 
 
         public Keyboard()
@@ -160,6 +160,11 @@ namespace Keyboard
             Debug.WriteLine("Unhandled Exception: " + ex.Message);
             Debug.WriteLine("Unhandled Exception: " + ex);
             MessageBox.Show(ex.Message);
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

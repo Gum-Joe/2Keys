@@ -1,0 +1,25 @@
+type: multi
+
+keyboards:
+  Keyboard_1:
+    !com.gumjoe.twokeys.generators.config.Keyboard
+    HID: sajhdokjaosjdio
+    dir: ./Keyboard_1
+    root: "index.ahk"
+  Keyboard_2:
+    !com.gumjoe.twokeys.generators.config.Keyboard
+    HID: "ksxdjlkj"
+    dir: "./Keyboard_2"
+    map:
+      A: "Add_x.ahk" # Key: ahk_file.ahk
+
+packs: # Packs of macros
+  repos:
+    github: github.com
+    twokeys: repo.twokeys.com
+    npm: npm.com
+  install:
+    npm:
+      - 2Keys-program-JS
+      - 2Keys-video-edit-premiere
+      - 2Keys-standard-firefox

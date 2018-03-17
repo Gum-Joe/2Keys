@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Properties;
 
+import com.gumjoe.twokeys.types.LocalConfig;
 import org.apache.commons.io.FileUtils;
 import com.esotericsoftware.yamlbeans.*;
 import com.gumjoe.twokeys.generators.*;
@@ -44,19 +45,16 @@ public class Init {
     /**
      * Generate local config
      */
-    public void createLocalConfig() {
-        try {
-            YamlReader reader = new YamlReader(new FileReader("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\example\\config.yml"));
-            Object object = reader.read();
-            System.out.println(object);
-        } catch {
-            
-        }
-
+    public LocalConfig createLocalConfig() {
+        Logger.debug("Generating local, default config...");
+        LocalConfig config = GenerateLocalConfig.genDefaultConfig();
+        // Assign dir if specified
+        config.keyboard.dir = this.dir.toString();
+        return config;
     }
 
     /**
-     * Initalises boilerplate code
+     * Initialises boilerplate code
      */
     public void run() {
         // Run OOBE if needed
@@ -71,7 +69,26 @@ public class Init {
         }
 
         // Once OOBE done, detect keyboard
-        this.createLocalConfig();
+        try {
+            Logger.info("Creating a config...");
+            Logger.info("Assuming one keyboard...");
+            LocalConfig localConfig = this.createLocalConfig();
+            Logger.info("Config written.");
+            YamlWriter writer = new YamlWriter(new FileWriter(Paths.get(this.dir.toString(), "config.yml").toString()));
+            writer.write(localConfig);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Get keyboard
+        Logger.info("Now detecting keyboard...");
+        Logger.info("Running Keyboard.exe...");
+        Logger.info("A window will open asking you to press a key.");
+        Logger.info("Press a key on the keyboard (preferably one of the letter keys) so that a string appears in the box");
+        Logger.info("This is your keyboard's Hardware ID (HID) which will be used to detect if the second keyboard is in use");
+        Logger.info("Once you're done, click \"Confirm\" to add to HID to the config to track your keyboard");
+        // Run command "~/.2Keys/apps/2Keys/2KeysInput.exe Keyboard.Detect --config <dir>/config.yml
     }
 
     /**

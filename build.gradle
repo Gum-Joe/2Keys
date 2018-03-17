@@ -33,6 +33,9 @@ plugins {
 
     // Apply the application plugin to add support for building an application
     id 'application'
+
+    // Msbuild
+    id "com.ullink.msbuild" version "2.18"
 }
 
 apply plugin: 'edu.sc.seis.launch4j' // For exe packaging
@@ -78,8 +81,13 @@ dependencies {
     compile group: 'com.github.tomas-langer', name: 'chalk', version: '1.0.2'
 
     // JNA for c++ interface
-    compile 'net.java.dev.jna:jna:4.5.1'
-    compile 'net.java.dev.jna:jna-platform:4.5.1'
+    // compile 'net.java.dev.jna:jna:4.5.1'
+    // compile 'net.java.dev.jna:jna-platform:4.5.1'
+
+    // YAML parser
+    // https://mvnrepository.com/artifact/com.esotericsoftware.yamlbeans/yamlbeans
+    compile group: 'com.esotericsoftware.yamlbeans', name: 'yamlbeans', version: '1.13'
+
 
 }
 
@@ -93,7 +101,7 @@ repositories {
 }
 
 run { 
-    args = ["map", "-f", "-c", "--debug"]
+    args = ["init", "--debug", "-d", "./example"]
 }
 
 junitPlatform {
@@ -111,7 +119,7 @@ launch4j {
   outfile = "2keys.exe"
 }
 
-// C++ compile to use interception
+// C++ compile to use interceptionn 
 model { 
     repositories {
         libs(PrebuiltLibraries) { 
@@ -177,4 +185,36 @@ def findInterception(Platform p) {
     } else {
         return "/x86/interception.dll"
     }
+}
+
+msbuild {
+  // mandatory (one of those)
+  solutionFile = 'lib/rawinput/RawStuff.sln'
+  
+  // MsBuild project name (/p:Project=...)
+  projectName = project.name
+  
+  // targets to execute (/t:Clean;Rebuild, no default)
+  targets = ['Clean', 'Rebuild']
+  
+  // Below values can override settings from the project file
+  
+  // overrides project OutputPath
+  destinationDir = 'build/lib/rawinput/x64/bin'
+  
+  // overrides project IntermediaryOutputPath
+  intermediateDir = 'build/lib/rawinput/x64/obj'
+  
+  // Generates XML documentation file (from javadoc through custom DocLet)
+  generateDoc = false
+  
+  // Other msbuild options can be set:
+  // loggerAssembly, generateDoc, debugType, optimize, debugSymbols, configuration, platform, defineConstants ...
+  
+  // you can also provide properties by name (/p:SomeProperty=Value)
+  parameters.SomeProperty = 'Value'
+  
+  // Or, if you use built-in msbuild parameters that aren't directly available here,
+  // you can take advantage of the ExtensionAware interface
+  ext["flp1"] = "LogFile=" + file("${project.name}.errors.log").path + ";ErrorsOnly;Verbosity=diag"
 }

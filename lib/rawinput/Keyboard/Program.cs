@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace TestFactor
+namespace App
 {
     static class Program
     {
@@ -15,7 +15,7 @@ namespace TestFactor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Keyboard.Keyboard());
+            Application.Run(new Keyboard.KeyboardDetector());
         }
     }
 }

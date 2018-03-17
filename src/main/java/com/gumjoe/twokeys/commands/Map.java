@@ -1,4 +1,4 @@
-package com.gumjoe.twokeys.commands;
+/**package com.gumjoe.twokeys.commands;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -20,4 +20,4 @@ public class Map {
     //System.load("d:\\Users\\Kishan\\Documents\\Projects\\2Keys\\build\\libs\\main\\shared\\main.dll");
     System.out.println(Map.CLibrary.INSTANCE.getKeyboardId());
   }
-}
+}*/

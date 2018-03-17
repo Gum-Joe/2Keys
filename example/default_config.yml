@@ -1,0 +1,6 @@
+# Default config
+type: single
+
+keyboard:
+    HID: sajhdokjaosjdio
+    root: "index.ahk"

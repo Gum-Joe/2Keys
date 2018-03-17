@@ -19,6 +19,7 @@ public class Installer extends Downloader {
     public URL url; // URL
     public String filename;
     private boolean verify = true; // Verify download (Hashing)
+    private boolean force = false;
 
     public Installer(URL url, Path installPath, String filename) {
         // URL
@@ -28,6 +29,13 @@ public class Installer extends Downloader {
         Logger.debug("URL: " + url);
         Logger.debug("Install location: " + installTo);
         Logger.debug("Filename " + filename);
+    }
+
+    /**
+     * Force install
+     */
+    public void force() {
+        this.force = !this.force;
     }
 
     /**
@@ -58,14 +66,20 @@ public class Installer extends Downloader {
      */
     private void zipInstall() {
         // Download zip
-        this.download(this.url, Paths.get(this.installTo.toString(), this.filename));
-        // Extract
         try {
-            Logger.info("Extracting " + this.filename + "...");
-            new Zip(Paths.get(this.installTo.toString(), this.filename).toString(), this.installTo.toString())
-                .unzip();
-        } catch (IOException error) {
-            error.printStackTrace();
+            File downloadFile = new File(Paths.get(this.installTo.toString(), this.filename).toString());
+            if (!downloadFile.exists() || this.force) {
+                // download
+                this.download(this.url, Paths.get(this.installTo.toString(), this.filename));
+                // Extract
+                Logger.info("Extracting " + this.filename + "...");
+                new Zip(Paths.get(this.installTo.toString(), this.filename).toString(), this.installTo.toString())
+                        .unzip();
+            } else {
+                Logger.debug("App already downloaded. Using cached download & assume extracted.  Run with -f to force redownload and extraction.");
+            }
+        } catch (IOException err) {
+            err.printStackTrace();
         }
     }
 }

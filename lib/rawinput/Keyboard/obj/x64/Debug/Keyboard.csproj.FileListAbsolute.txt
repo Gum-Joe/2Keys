@@ -24,3 +24,4 @@ D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Key
 D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Keyboard.csproj.CopyComplete
 D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Keyboard.exe
 D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Keyboard.pdb
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Keyboard.KeyboardDetector.resources

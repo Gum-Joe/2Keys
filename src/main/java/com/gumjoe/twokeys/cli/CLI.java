@@ -43,13 +43,17 @@ public class CLI {
             .withArgName("directory")
             .withLongOpt("dir")
             .withDescription("Specifies the directory to copy the starter template to")
-            .create( "d" )
+            .create("d")
         );
         options.addOption(OptionBuilder.hasArg()
             .withArgName("directory")
             .withLongOpt("install-apps-to")
             .withDescription( "Location to install required software")
-            .create()
+            .create("installAppsTo")
+        );
+        options.addOption(OptionBuilder.withLongOpt("force")
+            .withDescription("Force creation of files, irreguardless of if they exist")
+            .create("force")
         );
         return options;
     }
@@ -62,17 +66,17 @@ public class CLI {
         Options options = getDefaultOptions();
         options.addOption(OptionBuilder.withLongOpt("force")
             .withDescription("Force creation of files, irreguardless of if they exist")
-            .create("f")
+            .create("force")
         );
         options.addOption(OptionBuilder.withLongOpt("clean")
             .withDescription("Cleans the .2Keys dir before OOBE")
-            .create("c")
+            .create("clean")
         );
         options.addOption(OptionBuilder.hasArg()
             .withArgName("directory")
             .withLongOpt("install-apps-to")
             .withDescription( "Location to install required software")
-            .create()
+            .create("installAppsTo")
         );
         return options;
     }
@@ -97,14 +101,18 @@ public class CLI {
 
             // No help, start generating
             Init init = new Init();
-            if (parsed.hasOption("directory")) {
+            if (parsed.hasOption("dir")) {
                 // Set dir
-                init.setDir(parsed.getOptionValue("directory"));
+                init.setDir(parsed.getOptionValue("dir"));
             }
 
-            if (parsed.hasOption("install-apps-to")) {
+            if (parsed.hasOption("installAppsTo")) {
                 // Set dir
-                init.setInstallDir(parsed.getOptionValue("install-apps-to"));
+                init.setInstallDir(parsed.getOptionValue("installAppsTo"));
+            }
+
+            if (parsed.hasOption("force")) {
+                init.force();
             }
 
             init.run();
@@ -134,10 +142,10 @@ public class CLI {
 
             Path installPath = Init.OOBE.defaultInstallPath;
 
-            if (parsed.hasOption("install-apps-to")) {
+            if (parsed.hasOption("installAppsTo")) {
                 Logger.debug("Install path has been specified");
                 // Set install dir
-                installPath = Paths.get(parsed.getOptionValue("install-apps-to"));
+                installPath = Paths.get(parsed.getOptionValue("installAppsTo"));
             }
 
             Init.OOBE oobe = new Init.OOBE(installPath);
@@ -189,7 +197,7 @@ public class CLI {
             this.parseOOBE(newArgs);
         } else if (args[0].equals("map")) {
             Logger.debug("Detected \"map\" as the command to run.  Parsing...");
-            Map.testMap();
+            // Map.testMap();
         }
     }
 }
