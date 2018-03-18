@@ -4,3 +4,9 @@ D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\obj\x64\Debug\RawInp
 D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\obj\x64\Debug\RawInput.dll
 D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\obj\x64\Debug\RawInput.pdb
 D:\Users\Kishan\Documents\Projects\rawinput latest\RawInput\obj\x64\Debug\RawInput.csprojResolveAssemblyReference.cache
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\bin\x64\Debug\RawInput.dll
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\bin\x64\Debug\RawInput.pdb
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\obj\x64\Debug\RawInput.csprojResolveAssemblyReference.cache
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\obj\x64\Debug\RawInput.csproj.CoreCompileInputs.cache
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\obj\x64\Debug\RawInput.dll
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\obj\x64\Debug\RawInput.pdb

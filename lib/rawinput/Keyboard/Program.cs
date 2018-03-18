@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
+using Util;
 
 namespace App
 {
@@ -11,11 +10,13 @@ namespace App
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
+            // Parse CLI args
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Keyboard.KeyboardDetector());
+            CLIParser parser = new CLIParser(args);
+            parser.run();
         }
     }
 }

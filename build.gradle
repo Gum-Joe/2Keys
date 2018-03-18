@@ -34,19 +34,25 @@ plugins {
     // Apply the application plugin to add support for building an application
     id 'application'
 
+    // For http://www.oblita.com/interception library
+    id 'cpp'
+    //id: 'google-test'
+
     // Msbuild
     id "com.ullink.msbuild" version "2.18"
 }
 
+// Base App
+apply plugin: 'java'
+apply plugin: 'application'
+
+// Packaging
 apply plugin: 'edu.sc.seis.launch4j' // For exe packaging
 apply plugin: 'com.github.johnrengelman.shadow' // For packaging
+
 // Plugins for testing
 apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'com.kncept.junit5.reporter'
-
-// For http://www.oblita.com/interception library
-apply plugin: 'cpp' 
-//apply plugin: 'google-test'
 
 // For JNA bindings
 apply plugin: 'org.anarres.jnaerator'
@@ -113,10 +119,13 @@ junitPlatform {
     // logManager (optional)
 }
 
+createExe.dependsOn shadowJar
+
 launch4j {
   mainClassName = 'com.gumjoe.twokeys.App'
-  icon = "${projectDir}/icons/myApp.ico"
+  icon = "${projectDir}/lib/icons/2Keys.ico"
   outfile = "2keys.exe"
+    jar = "${projectDir}/build/libs/2Keys-all.jar"
 }
 
 // C++ compile to use interceptionn 

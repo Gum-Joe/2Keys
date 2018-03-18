@@ -10,3 +10,19 @@ D:\Users\Kishan\Documents\Projects\rawinput latest\Keyboard\obj\x64\Release\Keyb
 D:\Users\Kishan\Documents\Projects\rawinput latest\Keyboard\obj\x64\Release\Keyboard.csproj.CoreCompileInputs.cache
 D:\Users\Kishan\Documents\Projects\rawinput latest\Keyboard\obj\x64\Release\Keyboard.exe
 D:\Users\Kishan\Documents\Projects\rawinput latest\Keyboard\obj\x64\Release\Keyboard.pdb
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Release\Keyboard.exe.config
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Release\Keyboard.exe
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Release\Keyboard.pdb
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Release\CommandLine.dll
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Release\RawInput.dll
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Release\RawInput.pdb
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Release\CommandLine.xml
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.csprojResolveAssemblyReference.cache
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.Keyboard.resources
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.KeyboardDetector.resources
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.Properties.Resources.resources
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.csproj.GenerateResource.cache
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.csproj.CoreCompileInputs.cache
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.csproj.CopyComplete
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.exe
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Release\Keyboard.pdb

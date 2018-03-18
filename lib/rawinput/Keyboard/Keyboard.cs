@@ -19,9 +19,9 @@ namespace Keyboard
         private Dictionary<int, bool> map = new Dictionary<int, bool>();
         //private String pressed = "";
         //private Dictionary<int, bool> oldKeys = new Dictionary<int, bool>();
-        private bool AHK_MODE = true;
+        private const bool AHK_MODE = true;
 
-        const bool CaptureOnlyInForeground = false; // So that we don't have to switch to app to get keys
+        private const bool CaptureOnlyInForeground = false; // So that we don't have to switch to app to get keys
         // Todo: add checkbox to form when checked/uncheck create method to call that does the same as Keyboard ctor 
 
         public Keyboard()

@@ -140,7 +140,7 @@ public class CLI {
                 System.exit(0);
             }
 
-            Path installPath = Init.OOBE.defaultInstallPath;
+            Path installPath = OOBE.defaultInstallPath;
 
             if (parsed.hasOption("installAppsTo")) {
                 Logger.debug("Install path has been specified");
@@ -148,7 +148,7 @@ public class CLI {
                 installPath = Paths.get(parsed.getOptionValue("installAppsTo"));
             }
 
-            Init.OOBE oobe = new Init.OOBE(installPath);
+            OOBE oobe = new OOBE(installPath);
 
             if (parsed.hasOption("force")) {
                 Logger.debug("Force option has been specified");
