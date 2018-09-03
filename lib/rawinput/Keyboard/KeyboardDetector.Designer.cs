@@ -74,6 +74,7 @@
             this.confirm.TabIndex = 5;
             this.confirm.Text = "Confirm";
             this.confirm.UseVisualStyleBackColor = true;
+            this.confirm.Click += new System.EventHandler(this.confirm_Click);
             // 
             // cancel
             // 
@@ -83,6 +84,7 @@
             this.cancel.TabIndex = 6;
             this.cancel.Text = "Cancel";
             this.cancel.UseVisualStyleBackColor = true;
+            this.cancel.Click += new System.EventHandler(this.cancel_Click);
             // 
             // KeyboardDetector
             // 

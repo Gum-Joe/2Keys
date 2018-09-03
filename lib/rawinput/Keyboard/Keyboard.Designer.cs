@@ -198,6 +198,7 @@
             this.gbDetails.TabIndex = 25;
             this.gbDetails.TabStop = false;
             this.gbDetails.Text = "Device details";
+            this.gbDetails.Enter += new System.EventHandler(this.gbDetails_Enter);
             // 
             // label11
             // 

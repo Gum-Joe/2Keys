@@ -49,7 +49,7 @@ public class Init {
         Logger.debug("Generating local, default config...");
         LocalConfig config = GenerateLocalConfig.genDefaultConfig();
         // Assign dir if specified
-        config.keyboard.dir = this.dir.toString();
+        // config.keyboard.dir = this.dir.toString();
         return config;
     }
 
@@ -73,13 +73,15 @@ public class Init {
             Logger.info("Creating a config...");
             Logger.info("Assuming one keyboard...");
             LocalConfig localConfig = this.createLocalConfig();
-            Logger.info("Config written.");
             YamlWriter writer = new YamlWriter(new FileWriter(Paths.get(this.dir.toString(), "config.yml").toString()));
             writer.write(localConfig);
             writer.close();
+            Logger.info("Config written.");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Write index.ahk
 
         // Get keyboard
         Logger.info("Now detecting keyboard...");
@@ -89,5 +91,20 @@ public class Init {
         Logger.info("This is your keyboard's Hardware ID (HID) which will be used to detect if the second keyboard is in use");
         Logger.info("Once you're done, click \"Confirm\" to add to HID to the config to track your keyboard");
         // Run command "~/.2Keys/apps/2Keys/2KeysInput.exe detect --config <dir>/config.yml
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            Process keyboardDetector = runtime.exec("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\lib\\rawinput\\Keyboard\\bin\\Release\\Keyboard.exe detect --config "+ Paths.get(this.dir.toString(), "config.yml").toString());
+            int exitVal = keyboardDetector.waitFor();
+            if (exitVal != 0) {
+                throw new Exception("Error: operation to detect keyboard to map failed.");
+            } else {
+                Logger.info("Keyboard mapping complete.");
+                Logger.info("");
+                Logger.info("To run your new keyboard, run:");
+                Logger.info("   2Keys.jar run");
+            }
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
     }
 }

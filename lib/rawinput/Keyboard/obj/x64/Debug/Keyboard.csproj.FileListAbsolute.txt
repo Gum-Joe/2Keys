@@ -27,3 +27,6 @@ D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Key
 D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Keyboard.KeyboardDetector.resources
 D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Debug\CommandLine.dll
 D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Debug\CommandLine.xml
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\obj\x64\Debug\Keyboard.DetectorWriter.resources
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Debug\YamlDotNet.dll
+D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\Keyboard\bin\x64\Debug\YamlDotNet.xml

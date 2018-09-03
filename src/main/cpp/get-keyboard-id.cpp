@@ -2,7 +2,7 @@
  * Map the keyboard using interception
  * Boilerplate from http://www.oblita.com/interception 
  */
-#include <iostream>
+/*#include <iostream>
 #include <windows.h>
 #include <interception.h>
 #include "get-keyboard-id.hpp"
@@ -64,4 +64,4 @@ extern "C" __declspec(dllexport) int getKeyboardId() {
 
   // Stop interception
   interception_destroy_context(context);
-}
+}*/ 

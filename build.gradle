@@ -138,10 +138,16 @@ model {
                     staticLibraryFile = file(projectDir.getPath() + "/3rdparty/googletest-master/googletest/build/" + findGoogleTestStaticLib(targetPlatform)) 
                 }
             }*/
-            interception { 
+            /** interception { 
                 headers.srcDir new File(projectDir, "/lib/interception/library") 
                 binaries.withType(StaticLibraryBinary) {
                     staticLibraryFile = file(projectDir.getPath() + "/lib/interception/library/x64/interception.lib") 
+                }
+            } */
+            hidapi { 
+                headers.srcDir new File(projectDir, "/lib/hidapi/hidapi") 
+                binaries.withType(SharedLibraryBinary) {
+                    sharedLibraryFile = file(projectDir.getPath() + "/lib/hidapi/windows/Release/hidapi.lib") 
                 }
             }
         }
@@ -149,8 +155,11 @@ model {
     components {
         // twokeys(NativeLibrarySpec) { } 
         // Let's try using the library
-        main(NativeLibrarySpec) {
-            targetPlatform "x64"
+        main(NativeExecutableSpec) {
+            targetPlatform "x86"
+            sources {
+                cpp.lib library: "hidapi" 
+            }    
         }
     }
 
@@ -158,9 +167,12 @@ model {
     binaries {
         withType(SharedLibraryBinarySpec) {
             if (toolChain in VisualCpp) {
-                lib library: "interception", linkage: "static"
-                cppCompiler.args "-I${projectDir}/lib/interception/library"
-                cppCompiler.args "-I${projectDir}/lib/interception/library/x64"
+                // lib library: "interception", linkage: "static"
+                lib library: "hidapi", linkage: "static"
+                //cppCompiler.args "-I${projectDir}/lib/interception/library"
+                //cppCompiler.args "-I${projectDir}/lib/interception/library/x64"
+                cppCompiler.args "-I${projectDir}/lib/hidapi/windows/Release/"
+                cppCompiler.args "-I${projectDir}/lib/hidapi/hidapi"
                 //cppCompiler.args "-I${projectDir}/lib/interception/library/x86"
                 cppCompiler.define "DLL_EXPORT" 
             }
@@ -174,6 +186,10 @@ model {
     platforms {
         x64 {
             architecture "amd64"
+            operatingSystem "windows"
+        }
+        x86 {
+            architecture "x86"
             operatingSystem "windows"
         }
     }

@@ -14,13 +14,15 @@ namespace Keyboard
     public partial class KeyboardDetector : Form
     {
         private readonly RawInput _rawinput;
+        private readonly string _configFile;
         const bool CaptureOnlyInForeground = false;
 
-        public KeyboardDetector()
+        public KeyboardDetector(string configFile)
         {
             InitializeComponent();
             // From Keyboard.cs
             _rawinput = new RawInput(Handle, CaptureOnlyInForeground);
+            _configFile = configFile;
 
             _rawinput.AddMessageFilter();   // Adding a message filter will cause keypresses to be handled
             Win32.DeviceAudit();            // Writes a file DeviceAudit.txt to the current directory
@@ -82,6 +84,18 @@ namespace Keyboard
         private void label1_Click_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void confirm_Click(object sender, EventArgs e)
+        {
+            // Write
+            new DetectorWriter(_configFile, hidText.Text).ShowDialog();
+        }
+
+        private void cancel_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Operation aborted.");
+            Environment.Exit(1);
         }
     }
 }

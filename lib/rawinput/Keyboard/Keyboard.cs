@@ -166,5 +166,10 @@ namespace Keyboard
         {
 
         }
+
+        private void gbDetails_Enter(object sender, EventArgs e)
+        {
+
+        }
     }
 }
