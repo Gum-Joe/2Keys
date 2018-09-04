@@ -10,20 +10,20 @@ import com.gumjoe.twokeys.types.config.*;
 public class GenerateLocalConfig {
     public static LocalConfig genDefaultConfig() {
         LocalConfig config = new LocalConfig();
-        config.type = "single";
-        config.keyboard = new Keyboard();
-        config.keyboard.HID = "HANDLED BY KEYBOARD.EXE";
-        config.keyboard.dir = "./";
-        config.keyboard.root = "index.ahk";
+        Keyboard default_keyboard = new Keyboard();
+        default_keyboard.path = "WAITING";
+        default_keyboard.dir = "./";
+        default_keyboard.root = "index.ahk";
+        config.keyboards.put("keyboard", default_keyboard);
         return config;
     }
 
     public static LocalConfig exampleConfig() {
         // Create new Config
         LocalConfig config = new LocalConfig();
-        config.type = "muli";
+        config.type = "multi";
         Keyboard keyboard1 = new Keyboard();
-        keyboard1.HID = "sadasd";
+        keyboard1.path = "sadasd";
         keyboard1.dir = "C:\\";
         keyboard1.root = "./K1";
         keyboard1.map.put("A", "Add.ahk");

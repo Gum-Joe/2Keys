@@ -84,7 +84,10 @@ public class Init {
         // Write index.ahk
 
         // Get keyboard
-        Logger.info("Now detecting keyboard...");
+        Logger.info("Time to configure the handler.");
+        Logger.info("Go onto the handler and run './oobe.py'")
+        Logger.info("When asked, enter your ipv4 address and the server port")
+        Logger.info("Starting server...");
         Logger.info("Running Keyboard.exe...");
         Logger.info("A window will open asking you to press a key.");
         Logger.info("Press a key on the keyboard (preferably one of the letter keys) so that a string appears in the box");

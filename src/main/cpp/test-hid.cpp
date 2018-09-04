@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <iostream>
 
 #include "hidapi.h"
 
-int main(int argc, char *argv[])
+using namespace std;
+
+int test_hid(int argc, char *argv[])
 {
   int res;
   unsigned char buf[65];
@@ -32,28 +35,23 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-int test_ahk(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  //Typedef the functions
-  typedef BOOL (*pahkReady)(void);
-  typedef BOOL (*pahkExec)(LPTSTR script);
-  typedef UINT (*pahkdll)(LPTSTR script, LPTSTR p1, LPTSTR p2);
+  typedef UINT (*pahktextdll)(LPTSTR script, LPTSTR opt, LPTSTR param); //typedef for a pointer to ahktextdll, used for calling an AHK function
 
-  // Load
-  HINSTANCE handle = LoadLibrary("C:\\Windows\\System32\\AutoHotkey.dll");
-
-  // pointers
-  pahkdll ahkdll = (pahkdll)GetProcAddress(handle, "ahkdll");
-  pahkReady ahkReady = (pahkReady)GetProcAddress(handle, "ahkReady");
-  pahkExec ahkExec = (pahkExec)GetProcAddress(handle, "ahkExec");
-
-  //free memory
-  ahkdll("", "", "");
-
-  // debug
-  while (!ahkReady())
-    Sleep(10);
-
-  ahkExec("Msgbox Hello ");
+  //Load AHK DLL
+  HINSTANCE handle = LoadLibrary("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\lib\\ahkdll-v1-release-master\\Win32a\\AutoHotkey.dll");
+  if (handle == NULL)
+  {
+    DWORD err = GetLastError();
+    cout << "Error: " << err; //Error opening the dll.
+  }
+  else
+  {
+    //Get pointers to specific part we'll use
+    pahktextdll ahktextdll = (pahktextdll)GetProcAddress(handle, "ahktextdll");
+    LPTSTR empty = "";
+    ahktextdll("MsgBox, 4,, Would you like to continue? (press Yes or No)", empty, empty);
+  }
   return 0;
 }

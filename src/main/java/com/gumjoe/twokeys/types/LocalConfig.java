@@ -9,5 +9,4 @@ public class LocalConfig {
     public String type;
     public Map<String, Keyboard> keyboards = new HashMap<String, Keyboard>();
     public Packs packs = new Packs();
-    public Keyboard keyboard = new Keyboard();
 }
