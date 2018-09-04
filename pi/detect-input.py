@@ -25,8 +25,8 @@ while event:
     (tv_sec, tv_usec, type, code, value) = struct.unpack(FORMAT, event)
     print(type)
 
-    # We only want event type 4, as that is a key press
-    if type == 4 or type == 0x4:
+    # We only want event type 1, as that is a key press
+    if type == 1 or type == 0x1:
       print("Key pressed. Code %u, value %u at %d.%d" %
             (code, value, tv_sec, tv_usec))
     elif type != 0 or code != 0 or value != 0:
