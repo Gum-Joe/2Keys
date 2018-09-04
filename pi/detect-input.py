@@ -29,7 +29,7 @@ while event:
     if type == 4 or type == 0x4:
       print("Key pressed. Code %u, value %u at %d.%d" %
             (code, value, tv_sec, tv_usec))
-    else if type != 0 or code != 0 or value != 0:
+    elif type != 0 or code != 0 or value != 0:
         print("Event type %u, code %u, value %u at %d.%d" % \
             (type, code, value, tv_sec, tv_usec))
     else:
