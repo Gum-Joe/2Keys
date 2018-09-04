@@ -31,7 +31,8 @@ while event:
     print(type)
 
     # We only want event type 1, as that is a key press
-    if type == 1 or type == 0x1:
+    # If key is already pressed, ignore event provided value not 0 (key unpressed)
+    if (type == 1 or type == 0x1) and (pressed_or_not[code] == False or value == 0):
       print("Key pressed. Code %u, value %u at %d.%d" %
             (code, value, tv_sec, tv_usec))
       # Set key in array
