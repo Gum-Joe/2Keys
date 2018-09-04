@@ -9,8 +9,10 @@
 import struct
 import time
 import sys
+from logger import Logger
 
 infile_path = "/dev/input/event" + (sys.argv[1] if len(sys.argv) > 1 else "0") # File for input that corresponds to the keyboard.  Should use human readable ones in /dev/input/by-id
+logger = Logger("detect")
 
 #long int, long int, unsigned short, unsigned short, unsigned int
 FORMAT = 'llHHI'
@@ -26,16 +28,24 @@ event = in_file.read(EVENT_SIZE) # Open input file
 # i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
 pressed_or_not = [False] * 256 # Linux lists key codes 0 to 255
 
+logger.info("Watching for key presses...")
 while event:
     (tv_sec, tv_usec, type, code, value) = struct.unpack(FORMAT, event)
     # We only want event type 1, as that is a key press
     # If key is already pressed, ignore event provided value not 0 (key unpressed)
     if (type == 1 or type == 0x1) and (pressed_or_not[code] == False or value == 0):
-      print("Key pressed. Code %u, value %u at %d.%d" %
+      logger.debug("Key pressed. Code %u, value %u at %d.%d" %
             (code, value, tv_sec, tv_usec))
       # Set key in array
       pressed_or_not[code] = not pressed_or_not[code]
-      # Now, need some way to prvent hot key execution over and over whilst keys held
+      # Here we add the hotkey fire request
+      # to /api/post/fire
+      # with { keyboard, keys }
+
+      # Need a way to detect difference between combo and single keys
+      # Should effectivly watch array of keys pressed for a change
+      # and see if it matches a hotkey
+      # then prevent itself from refiring
     #elif type != 0 or code != 0 or value != 0:
     #    print("Event type %u, code %u, value %u at %d.%d" % \
     #        (type, code, value, tv_sec, tv_usec))
