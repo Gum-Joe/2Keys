@@ -1,0 +1,8 @@
+#!/usr/env node
+const argv = require("yargs").argv;
+const serve = require("../lib/index").default;
+const { DEFAULT_PORT } = require("../lib/util/constants");
+
+if (typeof argv.dir !== "undefined") process.chdir(argv.dir);
+
+serve(typeof port === "number" ? parseInt(argv.port) : DEFAULT_PORT);

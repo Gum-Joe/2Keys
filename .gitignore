@@ -57,3 +57,6 @@ build
 *.exe
 *.out
 *.app
+
+# Python virtual env
+.env

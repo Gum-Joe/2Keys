@@ -1,3 +1,4 @@
 # Packages
 # For colour
 colorful
+requests
