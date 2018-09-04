@@ -19,7 +19,12 @@ EVENT_SIZE = struct.calcsize(FORMAT)
 #open file in binary mode
 in_file = open(infile_path, "rb")
 
-event = in_file.read(EVENT_SIZE)
+event = in_file.read(EVENT_SIZE) # Open input file
+
+# Array of pressed keys
+# is array of booleans, with the index = key code
+# i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
+pressed_or_not = [False] * 256 # Linux lists key codes 0 to 255
 
 while event:
     (tv_sec, tv_usec, type, code, value) = struct.unpack(FORMAT, event)
@@ -29,6 +34,9 @@ while event:
     if type == 1 or type == 0x1:
       print("Key pressed. Code %u, value %u at %d.%d" %
             (code, value, tv_sec, tv_usec))
+      # Set key in array
+      pressed_or_not[code] = not pressed_or_not[code]
+      # Now, need some way to prvent hot key execution over and over whilst keys held
     elif type != 0 or code != 0 or value != 0:
         print("Event type %u, code %u, value %u at %d.%d" % \
             (type, code, value, tv_sec, tv_usec))
