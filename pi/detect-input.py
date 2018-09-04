@@ -38,9 +38,9 @@ while event:
       # Set key in array
       pressed_or_not[code] = not pressed_or_not[code]
       # Now, need some way to prvent hot key execution over and over whilst keys held
-    elif type != 0 or code != 0 or value != 0:
-        print("Event type %u, code %u, value %u at %d.%d" % \
-            (type, code, value, tv_sec, tv_usec))
+    #elif type != 0 or code != 0 or value != 0:
+    #    print("Event type %u, code %u, value %u at %d.%d" % \
+    #        (type, code, value, tv_sec, tv_usec))
     else:
         # Events with code, type and value == 0 are "separator" events
         print("===========================================")
