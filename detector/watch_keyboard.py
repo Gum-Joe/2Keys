@@ -35,12 +35,12 @@ class Keyboard:
                 logger.debug("Key pressed. Code %u, value %u at %d.%d" %
                              (code, value, tv_sec, tv_usec))
                 # We've got a press, RETURN
-                in_file.close()
+                self.in_file.close()
                 return True
             event = self.in_file.read(KEYBOARD_EVENT_SIZE)  # Update file
         return False
     # Stop watching as it's no longer needed
-    def stop_watch():
+    def stop_watch(self):
         self.run = False
-        in_file.close()
+        self.in_file.close()
     

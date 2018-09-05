@@ -80,7 +80,7 @@ async def keyboard_watcher(index_in_array):
 
 jobs = [keyboard_watcher(i) for i in range(0, len(keyboards_events))]
 loop = asyncio.get_event_loop()
-loop.run_until_complete(asyncio.wait(futures))
+loop.run_until_complete(asyncio.wait(jobs))
 
 
 
