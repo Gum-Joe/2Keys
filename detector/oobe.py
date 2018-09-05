@@ -70,7 +70,8 @@ async def keyboard_watcher(index_in_array):
   detect_keyboard = await keyboards_events[index_in_array].watch_keyboard()
   if detect_keyboard:
     # Kill others
-    keyboard.stop_watch() for keyboard in keyboards_events
+    for keyboard in keyboards_events:
+      keyboard.stop_watch()
     # Proceed
     logger.info("Path: " + keyboards_events[index_in_array].keyboard)
     return 1
