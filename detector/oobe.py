@@ -6,8 +6,8 @@ from os import path
 import yaml
 from logger import Logger
 
-logger = Logger("oobe")
 KEYBOARDS_PATH = "/dev/input/by-id"
+logger = Logger("oobe")
 
 logger.info("Welcome to the OOBE for the detector!")
 logger.info("First we need to know where to find the server")
@@ -38,20 +38,20 @@ config = json.loads(config_json.text)
 # Save config
 logger.info("Saving config to " + os.getcwd() + "...")
 config_file = open("config.yml", "w")
-config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" + yaml.dump(config))
+config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
+                  yaml.dump(config, default_flow_style=False))
 
 # Then scan for keyboards
 logger.info("") # To make output look better
 logger.info("Scanning for keyboards...")
 if not path.isdir(KEYBOARDS_PATH): # Make sure there's something to detect
   logger.err("Couldn't scan for keyboards")
-  logger.err("Verify you have at least one keyboard plugged in and")
-  logger.err("The dir /dev/input/by-id exists")
+  logger.err("Verify you have at least one keyboard plugged in")
+  logger.err("and the dir /dev/input/by-id exists")
   exit()
 # Scan
 # From https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
-keyboards = [keyboard for keyboard in os.listdir(
-    KEYBOARDS_PATH) if path.isfile(path.join(KEYBOARDS_PATH, keyboard))]
+keyboards = os.listdir(KEYBOARDS_PATH)
 logger.debug("Keyboards:")
 logger.debug(keyboards)
 
