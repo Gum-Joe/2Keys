@@ -10,4 +10,8 @@ class Logger:
 
   def debug(self, text):
     print(colorful.magenta(self.name) + " " + colorful.cyan("debug") + " " + text)
+  def err(self, text):
+    print(colorful.magenta(self.name) + " " + colorful.red("err") + " " + text)
+  def warn(self, text):
+    print(colorful.magenta(self.name) + " " + colorful.yellow("warn") + " " + text)
     

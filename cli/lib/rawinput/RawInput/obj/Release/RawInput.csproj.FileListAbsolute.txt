@@ -1,5 +1,0 @@
-D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\bin\Release\RawInput.dll
-D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\bin\Release\RawInput.pdb
-D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\obj\Release\RawInput.csproj.CoreCompileInputs.cache
-D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\obj\Release\RawInput.dll
-D:\Users\Kishan\Documents\Projects\2Keys\lib\rawinput\RawInput\obj\Release\RawInput.pdb
