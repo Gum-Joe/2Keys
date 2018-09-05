@@ -4,14 +4,12 @@ import colorful
 class Logger:
   def __init__(self, name):
     self.name = name
-  
   def info(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.green("info") + " " + text)
-
+    print(colorful.magenta(self.name) + " " + colorful.green("info") + " " + str(text))
   def debug(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.cyan("debug") + " " + text)
+    print(colorful.magenta(self.name) + " " + colorful.cyan("debug") + " " + str(text))
   def err(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.red("err") + " " + text)
+    print(colorful.magenta(self.name) + " " + colorful.red("err") + " " + str(text))
   def warn(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.yellow("warn") + " " + text)
+    print(colorful.magenta(self.name) + " " + colorful.yellow("warn") + " " + str(text))
     

@@ -1,0 +1,6 @@
+# Config for 2Keys
+# ONLY FOR USE BY THE PROGRAM
+# To change the config, run "2Keys config-update"
+keyboards:
+  keyboard: {dir: ./, path: WAITING, root: index.ahk}
+packs: {}

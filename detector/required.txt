@@ -1,4 +1,9 @@
 # Packages
 # For colour
 colorful
+
+# For server requests
 requests
+
+# Parsing YAML config
+pyyaml
