@@ -2,11 +2,15 @@ import sys
 import requests
 import json
 import os
+import multiprocessing
+import time
 from os import path
+import asyncio
 import yaml
+from constants import KEYBOARDS_PATH_BASE
 from logger import Logger
+from watch_keyboard import Keyboard as KeyboardWatcher
 
-KEYBOARDS_PATH = "/dev/input/by-id"
 logger = Logger("oobe")
 
 logger.info("Welcome to the OOBE for the detector!")
@@ -44,17 +48,38 @@ config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To chang
 # Then scan for keyboards
 logger.info("") # To make output look better
 logger.info("Scanning for keyboards...")
-if not path.isdir(KEYBOARDS_PATH): # Make sure there's something to detect
+if not path.isdir(KEYBOARDS_PATH_BASE): # Make sure there's something to detect
   logger.err("Couldn't scan for keyboards")
   logger.err("Verify you have at least one keyboard plugged in")
   logger.err("and the dir /dev/input/by-id exists")
   exit()
 # Scan
 # From https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
-keyboards = os.listdir(KEYBOARDS_PATH)
+keyboards = os.listdir(KEYBOARDS_PATH_BASE)
 logger.debug("Keyboards:")
 logger.debug(keyboards)
 
 logger.info("Press a button on the keyboard you want to map to register it.")
 # Then watch all keyboards and ask for one to be pressed
+
 # Add paths, sync changes to server
+# Async helped by https://hackernoon.com/asynchronous-python-45df84b82434
+keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
+
+async def keyboard_watcher(index_in_array):
+  detect_keyboard = await keyboards_events[index_in_array].watch_keyboard()
+  if detect_keyboard:
+    # Kill others
+    keyboard.stop_watch() for keyboard in keyboards_events
+    # Proceed
+    logger.info("Path: " + keyboards_events[index_in_array].keyboard)
+    return 1
+  else:
+    return 0
+
+jobs = [keyboard_watcher(i) for i in range(0, len(keyboards_events))]
+loop = asyncio.get_event_loop()
+loop.run_until_complete(asyncio.wait(futures))
+
+
+

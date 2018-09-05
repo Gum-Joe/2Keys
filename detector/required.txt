@@ -7,3 +7,6 @@ requests
 
 # Parsing YAML config
 pyyaml
+
+# Async tasks
+gevent
