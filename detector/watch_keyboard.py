@@ -16,7 +16,7 @@ logger = Logger("detect")
 
 # str keyboard: Keyboard file in /dev/input/by-id
 class Keyboard:
-    __init__(self, keyboard):
+    def __init__(self, keyboard):
         # File for input that corresponds to the keyboard.
         self.keyboard = KEYBOARDS_PATH_BASE + "/" + keyboard
         # Open keyboard events file in binary mode
