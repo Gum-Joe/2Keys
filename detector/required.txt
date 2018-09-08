@@ -9,4 +9,5 @@ requests
 pyyaml
 
 # Async tasks
-gevent
+# gevent
+aiofiles
