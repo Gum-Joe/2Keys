@@ -100,7 +100,9 @@ async def keyboard_watcher(index_in_array):
 '''
 
 async def handler():
+  print("STOPPING WATCH")
   async for keyboard in keyboards_events:
+    print("STOPPING " + keyboard.keyboard)
     await keyboard.stop_watch()
     return
 

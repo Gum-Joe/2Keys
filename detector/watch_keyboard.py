@@ -30,10 +30,11 @@ class Keyboard:
             # Only triggers when key pressed
             while event and self.run:
                 print("[ASYNC DEBUG] Key pressed on " + self.keyboard)
+                await handler()
                 break;
             await in_file.close()
             # Stop all
-            await handler()
+            # await handler()
             return self.run
     # Stop watching as it's no longer needed
     async def stop_watch(self):
