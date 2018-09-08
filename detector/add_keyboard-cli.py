@@ -26,6 +26,8 @@ def gen_handler(keyboards):
         logger.debug("Writing config...")
         await config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                     yaml.dump(config, default_flow_style=False))
+        logger.info("Config writen")
+        exit()
       return
   return handler
 
