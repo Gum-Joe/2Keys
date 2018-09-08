@@ -1,6 +1,7 @@
 from add_keyboard import add_keyboard
 import sys
 from logger import Logger
+import yaml
 logger = Logger("add")
 
 KEYBOARD_NAME = sys.argv[1] if len(sys.argv) > 1 else "keyboard_1"
@@ -12,7 +13,14 @@ def gen_handler(keyboards):
     for keyboard_stop in keyboards:
       print("[DEBUG] ROOT: STOPPING " + keyboard_stop.keyboard)
       await keyboard_stop.stop_watch()
-      logger.info("Writing keyboard " + keyboard + " to " + KEYBOARD_NAME)
+      logger.info("Writing keyboard " + keyboard + " as " + KEYBOARD_NAME)
+      logger.debug("Opening config...")
+      config_file = open("config.yml", "r+")
+      config = yaml.load(config_file.read())
+      config.keyboards[KEYBOARD_NAME].path = keyboard
+      logger.debug("Writing config...")
+      config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
+                  yaml.dump(config, default_flow_style=False))
       return
   return handler
 
