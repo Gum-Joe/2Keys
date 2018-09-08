@@ -2,16 +2,11 @@ import sys
 import requests
 import json
 import os
-import multiprocessing
-import time
 from os import path
-import asyncio
-import aiofiles
 import yaml
 import colorful
-from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, SCRIPTS_ROOT
+from constants import SCRIPTS_ROOT
 from logger import Logger
-from watch_keyboard import Keyboard as KeyboardWatcher
 
 logger = Logger("oobe")
 
@@ -59,65 +54,6 @@ logger.info("Running scripts to add path for keyboard input...")
 for key, value in config["keyboards"].items():
   logger.info("Running script to add keyboard for keyboard " + colorful.cyan(key) + "...")
   ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/add_keyboard-cli.py"
+  print("") # Padding
   os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " " + key)
-
-logger.info("") # To make output look better
-logger.info("Scanning for keyboards...")
-if not path.isdir(KEYBOARDS_PATH_BASE): # Make sure there's something to detect
-  logger.err("Couldn't scan for keyboards")
-  logger.err("Verify you have at least one keyboard plugged in")
-  logger.err("and the dir /dev/input/by-id exists")
-  exit()
-# Scan
-# From https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
-keyboards = os.listdir(KEYBOARDS_PATH_BASE)
-logger.debug("Keyboards:")
-logger.debug(keyboards)
-
-logger.info("Press a button on the keyboard you want to map to register it.")
-# Then watch all keyboards and ask for one to be pressed
-
-# Add paths, sync changes to server
-# Async helped by https://hackernoon.com/asynchronous-python-45df84b82434
-# keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
-# IMPORTANT: Don't use non async functions in this.  That includes the logger
-'''
-async def keyboard_watcher(keyboard):
-  async with aiofiles.open(KEYBOARDS_PATH_BASE + "/" + keyboard, "rb") as in_file:
-    event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
-    # Only triggers when key pressed
-    while event:
-      print("[ASYNC DEBUG] Key pressed on " + keyboard)
-      await in_file.close()
-      break; # Without break, this can be used for regular watching
-
-#async for keyboard in keyboards_events:
-'''
-
-'''
-async def keyboard_watcher(index_in_array):
-  detect_keyboard = await keyboards_events[index_in_array].watch_keyboard()
-  if detect_keyboard == "yes":
-    # Kill others
-    for keyboard in keyboards_events:
-      keyboard.stop_watch()
-    # Proceed
-    logger.info("Path: " + keyboards_events[index_in_array].keyboard)
-    return 1
-  else:
-    return 0
-
-
-
-'''
-
-async def handler():
-  print("[DEBUG] STOPPING WATCH")
-  for keyboard in keyboards_events:
-    print("[DEBUG] ROOT: STOPPING " + keyboard.keyboard)
-    await keyboard.stop_watch()
-    return
-
-#jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))]
-#loop = asyncio.get_event_loop()
-#loop.run_until_complete(asyncio.wait(jobs))
+  print("") # Padding

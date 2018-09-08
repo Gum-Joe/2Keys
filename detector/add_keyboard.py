@@ -1,8 +1,7 @@
 # Function to detect a keyboard
 import asyncio
-import aiofiles
 from os import path, listdir
-from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
+from constants import KEYBOARDS_PATH_BASE
 from logger import Logger
 from watch_keyboard import Keyboard as KeyboardWatcher
 logger = Logger("detect")
