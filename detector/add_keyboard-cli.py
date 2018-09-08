@@ -17,6 +17,7 @@ def gen_handler(keyboards):
       logger.info("Writing keyboard " + keyboard + " as " + KEYBOARD_NAME)
       logger.debug("Opening config...")
       async with aiofiles.open("config.yml", mode="r+") as config_file:
+        logger.debug("ASYNC FILE OPS")
         config = yaml.load(config_file.read())
         config.keyboards[KEYBOARD_NAME].path = keyboard
         logger.debug("Writing config...")
