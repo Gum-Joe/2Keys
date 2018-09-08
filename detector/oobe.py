@@ -67,7 +67,7 @@ logger.info("Press a button on the keyboard you want to map to register it.")
 
 # Add paths, sync changes to server
 # Async helped by https://hackernoon.com/asynchronous-python-45df84b82434
-keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
+# keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
 # IMPORTANT: Don't use non async functions in this.  That includes the logger
 '''
 async def keyboard_watcher(keyboard):
@@ -106,6 +106,6 @@ async def handler():
     await keyboard.stop_watch()
     return
 
-jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))]
-loop = asyncio.get_event_loop()
-loop.run_until_complete(asyncio.wait(jobs))
+#jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))]
+#loop = asyncio.get_event_loop()
+#loop.run_until_complete(asyncio.wait(jobs))
