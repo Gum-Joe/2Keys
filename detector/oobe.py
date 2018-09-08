@@ -69,7 +69,7 @@ async def keyboard_watcher():
   async with open(KEYBOARDS_PATH_BASE + "/" + keyboard, "rb") as in_file:
     event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
     #logger.debug("Watching for key presses at " + self.keyboard + "...")
-    async while event:
+    while event:
             (tv_sec, tv_usec, type, code, value) = struct.unpack(
                 KEYBOARD_EVENT_FORMAT, event)
             # We only want event type 1, as that is a key press
@@ -83,7 +83,7 @@ async def keyboard_watcher():
             event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Update file
         #return False
 
-async for keyboard in keyboards_events:
+#async for keyboard in keyboards_events:
   
 
 '''
