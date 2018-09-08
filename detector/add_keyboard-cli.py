@@ -1,11 +1,14 @@
 from add_keyboard import add_keyboard
 import sys
+import os
+import signal
 import aiofiles
 from logger import Logger
 import yaml
 logger = Logger("add")
 
 KEYBOARD_NAME = sys.argv[1] if len(sys.argv) > 1 else "keyboard_1"
+PID = os.getpid()
 
 # IMPORTANT: Don't use non async functions in this.  That includes the logger
 def gen_handler(keyboards):
@@ -28,6 +31,7 @@ def gen_handler(keyboards):
           await config_write.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                       yaml.dump(config, default_flow_style=False))
           logger.info("Config writen")
+          os.kill(PID, signal.SIGTERM)
         exit()
       return
   return handler
