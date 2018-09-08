@@ -69,7 +69,7 @@ keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboard
 async def keyboard_watcher(keyboard):
   async with aiofiles.open(KEYBOARDS_PATH_BASE + "/" + keyboard, "rb") as in_file:
     event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
-    await logger.debug("Watching for key presses at " + self.keyboard + "...")
+    print("[DEBUG] Watching for key presses at " + keyboard + "...")
     # Only triggers when key pressed
     while event:
       print("Key pressed on " + keyboard)
