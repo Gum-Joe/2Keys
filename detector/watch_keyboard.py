@@ -38,5 +38,6 @@ class Keyboard:
     # Stop watching as it's no longer needed
     async def stop_watch(self):
         self.run = False
+        return
         #await self.in_file.close()
     
