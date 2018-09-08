@@ -8,7 +8,7 @@ from os import path
 import asyncio
 import aiofiles
 import yaml
-from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
+from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, SCRIPTS_ROOT
 from logger import Logger
 from watch_keyboard import Keyboard as KeyboardWatcher
 
@@ -52,6 +52,10 @@ config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To chang
 # Since running directly from here causes issues with async not stopping etc, holding everything up
 # run 2Keys add
 # (essentially run in another process)
+logger.debug("Running script to add keyboard...")
+ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/add_keyboard-cli.py"
+os.system(ADD_KEYBOARD_CLI + " keyboard")
+
 logger.info("") # To make output look better
 logger.info("Scanning for keyboards...")
 if not path.isdir(KEYBOARDS_PATH_BASE): # Make sure there's something to detect

@@ -7,7 +7,6 @@ from logger import Logger
 import yaml
 logger = Logger("add")
 
-print(sys.argv[0])
 KEYBOARD_NAME = sys.argv[1] if len(sys.argv) > 1 else "keyboard_1"
 PID = os.getpid()
 
