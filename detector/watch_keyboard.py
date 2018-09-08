@@ -38,6 +38,7 @@ class Keyboard:
             return self.run
     # Stop watching as it's no longer needed
     async def stop_watch(self):
+        print("[DEBUG] CLASS: STOPPING " + self.keyboard)
         self.run = False
         return
         #await self.in_file.close()
