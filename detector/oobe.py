@@ -67,6 +67,7 @@ logger.info("Press a button on the keyboard you want to map to register it.")
 # Async helped by https://hackernoon.com/asynchronous-python-45df84b82434
 keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
 # IMPORTANT: Don't use non async functions in this.  That includes the logger
+'''
 async def keyboard_watcher(keyboard):
   async with aiofiles.open(KEYBOARDS_PATH_BASE + "/" + keyboard, "rb") as in_file:
     event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
@@ -74,10 +75,10 @@ async def keyboard_watcher(keyboard):
     while event:
       print("[ASYNC DEBUG] Key pressed on " + keyboard)
       await in_file.close()
-      break; # Without this can be used for regular watching
+      break; # Without break, this can be used for regular watching
 
 #async for keyboard in keyboards_events:
-  
+'''
 
 '''
 async def keyboard_watcher(index_in_array):
@@ -95,6 +96,6 @@ async def keyboard_watcher(index_in_array):
 
 
 '''
-jobs = [keyboard_watcher(keyboards[i]) for i in range(0, len(keyboards))]
+jobs = [keyboards_events[i].keyboard_watcher() for i in range(0, len(keyboards))]
 loop = asyncio.get_event_loop()
 loop.run_until_complete(asyncio.wait(jobs))

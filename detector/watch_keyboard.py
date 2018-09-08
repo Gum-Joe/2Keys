@@ -9,6 +9,7 @@
 import struct
 import time
 import sys
+import aiofiles
 from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
 from logger import Logger
 
@@ -23,22 +24,15 @@ class Keyboard:
         self.in_file = open(self.keyboard, "rb")
         # Run checker
         self.run = True
-    def watch_keyboard(self):
-        event = self.in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
-        logger.debug("Watching for key presses at " + self.keyboard + "...")
-        while event and self.run:
-            (tv_sec, tv_usec, type, code, value) = struct.unpack(
-                KEYBOARD_EVENT_FORMAT, event)
-            # We only want event type 1, as that is a key press
-            # If key is already pressed, ignore event provided value not 0 (key unpressed)
-            if (type == 1 or type == 0x1):
-                logger.debug("Key pressed. Code %u, value %u at %d.%d" %
-                             (code, value, tv_sec, tv_usec))
-                # We've got a press, RETURN
-                self.in_file.close()
-                return "yes"
-            event = self.in_file.read(KEYBOARD_EVENT_SIZE)  # Update file
-        return False
+    async def keyboard_watcher(self):
+        async with aiofiles.open(self.keyboard, "rb") as in_file:
+            event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
+            # Only triggers when key pressed
+            while event and self.run:
+                print("[ASYNC DEBUG] Key pressed on " + self.keyboard)
+                break;
+            await in_file.close()
+            return self.run
     # Stop watching as it's no longer needed
     def stop_watch(self):
         self.run = False
