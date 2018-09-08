@@ -53,9 +53,12 @@ config_file.flush() # Needed so that add keyboard can read it
 # Since running directly from here causes issues with async not stopping etc, holding everything up
 # run 2Keys add
 # (essentially run in another process)
-logger.debug("Running script to add keyboard...")
-ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/add_keyboard-cli.py"
-os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " keyboard")
+# Do for each keyboard in config.keyboards
+logger.info("Running scripts to add path for keyboard input...")
+for key, value in config["keyboards"]:
+  logger.info("Running script to add keyboard for keyboard " + key + "...")
+  ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/add_keyboard-cli.py"
+  os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " " + key)
 
 logger.info("") # To make output look better
 logger.info("Scanning for keyboards...")

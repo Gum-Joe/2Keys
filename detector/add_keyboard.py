@@ -22,25 +22,11 @@ def add_keyboard(name, gen_handler):
 
   logger.info("Press a button on the keyboard you want to map to register it.")
   # Then watch all keyboards and ask for one to be pressed
-  keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
-  keyboard_handlers = [] # Needed as we can't specifiy have args in async for some reason
-  # IMPORTANT: Don't use non async functions in this.  That includes the logger
-  # for i in range(0, len(keyboards)):
-  #   keyboard_handlers.append(gen_handler(keyboards_events, keyboards[i]))
+  keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards] # Keyboard watch classes for each input
 
-  handler = gen_handler(keyboards_events)
-  '''
-  async def handler():
-    print("[DEBUG] STOPPING WATCH")
-    for keyboard in keyboards_events:
-      print("[DEBUG] ROOT: STOPPING " + keyboard.keyboard)
-      await keyboard.stop_watch()
-      return
-  '''
+  handler = gen_handler(keyboards_events) # The handler needs access to keyboards_events, which it won't on exe in the watcher
   
   # Run
-  jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))]
+  jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))] # Create jobs list
   loop = asyncio.get_event_loop()
   loop.run_until_complete(asyncio.wait(jobs))
-
-  print("DOES THIS EXE ADD_KEY?")
