@@ -27,8 +27,9 @@ def gen_handler(keyboards):
         await config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                     yaml.dump(config, default_flow_style=False))
         logger.info("Config writen")
-        return
+        exit()
       return
   return handler
 
 add_keyboard(KEYBOARD_NAME, gen_handler)
+print("DOES THIS EXE?")
