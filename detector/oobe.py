@@ -67,6 +67,7 @@ logger.info("Press a button on the keyboard you want to map to register it.")
 # Async helped by https://hackernoon.com/asynchronous-python-45df84b82434
 keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
 async def keyboard_watcher(keyboard):
+  print(keyboard)
   async with aiofiles.open(KEYBOARDS_PATH_BASE + "/" + keyboard, "rb") as in_file:
     event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
     #logger.debug("Watching for key presses at " + self.keyboard + "...")
