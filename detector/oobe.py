@@ -96,6 +96,12 @@ async def keyboard_watcher(index_in_array):
 
 
 '''
-jobs = [keyboards_events[i].keyboard_watcher() for i in range(0, len(keyboards))]
+
+def handler():
+  for keyboard in keyboards_events:
+    keyboard.stop_watch()
+
+jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))]
 loop = asyncio.get_event_loop()
 loop.run_until_complete(asyncio.wait(jobs))
+print("DONE!")

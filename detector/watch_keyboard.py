@@ -24,7 +24,7 @@ class Keyboard:
         self.in_file = open(self.keyboard, "rb")
         # Run checker
         self.run = True
-    async def keyboard_watcher(self):
+    async def keyboard_watcher(self, handler):
         async with aiofiles.open(self.keyboard, "rb") as in_file:
             event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
             # Only triggers when key pressed
@@ -32,6 +32,8 @@ class Keyboard:
                 print("[ASYNC DEBUG] Key pressed on " + self.keyboard)
                 break;
             await in_file.close()
+            # Stop all
+            handler()
             return self.run
     # Stop watching as it's no longer needed
     def stop_watch(self):
