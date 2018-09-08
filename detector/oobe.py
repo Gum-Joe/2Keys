@@ -49,6 +49,9 @@ config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To chang
                   yaml.dump(config, default_flow_style=False))
 
 # Then scan for keyboards
+# Since running directly from here causes issues with async not stopping etc, holding everything up
+# run 2Keys add
+# (essentially run in another process)
 logger.info("") # To make output look better
 logger.info("Scanning for keyboards...")
 if not path.isdir(KEYBOARDS_PATH_BASE): # Make sure there's something to detect
