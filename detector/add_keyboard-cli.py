@@ -20,11 +20,11 @@ def gen_handler(keyboards):
         logger.debug("ASYNC FILE OPS")
         config_contents = await config_file.read()
         logger.debug("Contents:\n" + config_contents)
-        config = await yaml.load(config_contents)
+        config = yaml.load(config_contents)
         logger.debug("Parsed contents")
         config.keyboards[KEYBOARD_NAME].path = keyboard
         logger.debug("Writing config...")
-        config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
+        await config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                     yaml.dump(config, default_flow_style=False))
       return
   return handler
