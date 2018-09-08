@@ -55,7 +55,7 @@ config_file.flush() # Needed so that add keyboard can read it
 # (essentially run in another process)
 # Do for each keyboard in config.keyboards
 logger.info("Running scripts to add path for keyboard input...")
-for key, value in config["keyboards"]:
+for key, value in config["keyboards"].items():
   logger.info("Running script to add keyboard for keyboard " + key + "...")
   ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/add_keyboard-cli.py"
   os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " " + key)
