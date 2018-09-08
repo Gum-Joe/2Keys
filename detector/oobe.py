@@ -54,7 +54,7 @@ config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To chang
 # (essentially run in another process)
 logger.debug("Running script to add keyboard...")
 ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/add_keyboard-cli.py"
-os.system(ADD_KEYBOARD_CLI + " keyboard")
+os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " keyboard")
 
 logger.info("") # To make output look better
 logger.info("Scanning for keyboards...")
