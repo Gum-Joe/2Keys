@@ -1,5 +1,6 @@
 from add_keyboard import add_keyboard
 import sys
+import aiofiles
 from logger import Logger
 import yaml
 logger = Logger("add")
@@ -15,12 +16,12 @@ def gen_handler(keyboards):
       await keyboard_stop.stop_watch()
       logger.info("Writing keyboard " + keyboard + " as " + KEYBOARD_NAME)
       logger.debug("Opening config...")
-      config_file = open("config.yml", "r+")
-      config = yaml.load(config_file.read())
-      config.keyboards[KEYBOARD_NAME].path = keyboard
-      logger.debug("Writing config...")
-      config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
-                  yaml.dump(config, default_flow_style=False))
+      async with aiofiles.open("config.yml", mode="r+") as config_file:
+        config = yaml.load(config_file.read())
+        config.keyboards[KEYBOARD_NAME].path = keyboard
+        logger.debug("Writing config...")
+        config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
+                    yaml.dump(config, default_flow_style=False))
       return
   return handler
 
