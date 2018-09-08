@@ -25,8 +25,8 @@ def add_keyboard(name, gen_handler):
   keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
   keyboard_handlers = [] # Needed as we can't specifiy have args in async for some reason
   # IMPORTANT: Don't use non async functions in this.  That includes the logger
-  for i in range(0, len(keyboards)):
-    keyboard_handlers.append(gen_handler(keyboards_events, keyboards[i]))
+  # for i in range(0, len(keyboards)):
+  #   keyboard_handlers.append(gen_handler(keyboards_events, keyboards[i]))
 
   handler = gen_handler(keyboards_events)
   '''
