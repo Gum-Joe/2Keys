@@ -32,3 +32,5 @@ def gen_handler(keyboards):
   return handler
 
 add_keyboard(KEYBOARD_NAME, gen_handler)
+# Since above appears to run in own thread, exit here
+exit()
