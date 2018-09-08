@@ -4,4 +4,8 @@ keyboards:
       dir: ./
       path: WAITING
       root: index.ahk
+   keyboard_2: !com.gumjoe.twokeys.types.config.Keyboard
+      dir: ./
+      path: WAITING
+      root: index.ahk
 packs: {}

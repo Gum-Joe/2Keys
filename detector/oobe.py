@@ -8,6 +8,7 @@ from os import path
 import asyncio
 import aiofiles
 import yaml
+import colorful
 from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, SCRIPTS_ROOT
 from logger import Logger
 from watch_keyboard import Keyboard as KeyboardWatcher
@@ -56,7 +57,7 @@ config_file.flush() # Needed so that add keyboard can read it
 # Do for each keyboard in config.keyboards
 logger.info("Running scripts to add path for keyboard input...")
 for key, value in config["keyboards"].items():
-  logger.info("Running script to add keyboard for keyboard " + key + "...")
+  logger.info("Running script to add keyboard for keyboard " + colorful.cyan(key) + "...")
   ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/add_keyboard-cli.py"
   os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " " + key)
 
