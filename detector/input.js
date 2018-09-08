@@ -4,6 +4,7 @@
 const { readFile } = require("fs");
 const struct = require('python-struct');
 
+console.log("READING")
 while (true) {
   readFile("/dev/input/event0", (err, data) => {
     if (err) throw err;
