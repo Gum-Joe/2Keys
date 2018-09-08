@@ -16,7 +16,7 @@ def gen_handler(keyboards):
       await keyboard_stop.stop_watch()
       logger.info("Writing keyboard " + keyboard + " as " + KEYBOARD_NAME)
       logger.debug("Opening config...")
-      async with aiofiles.open("config.yml", mode="w") as config_file:
+      async with aiofiles.open("config.yml", mode="r") as config_file:
         logger.debug("ASYNC FILE OPS")
         config_contents = await config_file.read()
         logger.debug("Contents:\n" + config_contents)
@@ -24,9 +24,10 @@ def gen_handler(keyboards):
         logger.debug("Parsed contents")
         config["keyboards"][KEYBOARD_NAME]["path"] = keyboard
         logger.debug("Writing config...")
-        await config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
-                    yaml.dump(config, default_flow_style=False))
-        logger.info("Config writen")
+        async with aiofiles.open("config.yml", mode="w") as config_write:
+          await config_write.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
+                      yaml.dump(config, default_flow_style=False))
+          logger.info("Config writen")
         exit()
       return
   return handler
