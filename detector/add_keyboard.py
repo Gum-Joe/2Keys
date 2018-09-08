@@ -42,3 +42,5 @@ def add_keyboard(name, gen_handler):
   jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))]
   loop = asyncio.get_event_loop()
   loop.run_until_complete(asyncio.wait(jobs))
+
+  print("DOES THIS EXE ADD_KEY?")
