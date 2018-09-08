@@ -74,6 +74,7 @@ async def keyboard_watcher(keyboard):
     while event:
       print("Key pressed on " + keyboard)
       await in_file.close()
+      break;
 
 #async for keyboard in keyboards_events:
   
