@@ -72,7 +72,7 @@ async def keyboard_watcher(keyboard):
     #logger.debug("Watching for key presses at " + self.keyboard + "...")
     print(keyboard)
     while event:
-      print("W" + keyboard)
+            print("W" + keyboard)
             (tv_sec, tv_usec, type, code, value) = struct.unpack(
                 KEYBOARD_EVENT_FORMAT, event)
             # We only want event type 1, as that is a key press
