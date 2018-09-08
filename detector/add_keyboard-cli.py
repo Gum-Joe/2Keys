@@ -10,7 +10,7 @@ def gen_handler(keyboards, keyboard):
       await keyboard_stop.stop_watch()
       return
   async def handler():
-    base_handler()
+    await base_handler()
     print("Writing " + keyboard)
   return handler
 
