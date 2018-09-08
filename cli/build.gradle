@@ -129,7 +129,7 @@ launch4j {
 }
 
 // C++ compile to use interceptionn 
-/** model { 
+model { 
     repositories {
         libs(PrebuiltLibraries) { 
             /**googleTest { 
@@ -144,7 +144,7 @@ launch4j {
                     staticLibraryFile = file(projectDir.getPath() + "/lib/interception/library/x64/interception.lib") 
                 }
             } */
-            /** hidapi { 
+            hidapi { 
                 headers.srcDir new File(projectDir, "/lib/hidapi/hidapi") 
                 binaries.withType(SharedLibraryBinary) {
                     sharedLibraryFile = file(projectDir.getPath() + "/lib/hidapi/windows/Release/hidapi.lib") 
@@ -193,7 +193,7 @@ launch4j {
             operatingSystem "windows"
         }
     }
-} */
+}
 
 jnaerator {
 	libraryName 'cpp'

@@ -7,7 +7,7 @@ import time
 from os import path
 import asyncio
 import yaml
-from constants import KEYBOARDS_PATH_BASE
+from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
 from logger import Logger
 from watch_keyboard import Keyboard as KeyboardWatcher
 
@@ -66,9 +66,28 @@ logger.info("Press a button on the keyboard you want to map to register it.")
 # Async helped by https://hackernoon.com/asynchronous-python-45df84b82434
 keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
 
+async for keyboard in keyboards_events:
+  async with open(KEYBOARDS_PATH_BASE + "/" + keyboard, "rb") as in_file:
+    event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
+    #logger.debug("Watching for key presses at " + self.keyboard + "...")
+    async while event:
+            (tv_sec, tv_usec, type, code, value) = struct.unpack(
+                KEYBOARD_EVENT_FORMAT, event)
+            # We only want event type 1, as that is a key press
+            # If key is already pressed, ignore event provided value not 0 (key unpressed)
+            if (type == 1 or type == 0x1):
+                logger.debug("Key pressed. Code %u, value %u at %d.%d" %
+                             (code, value, tv_sec, tv_usec))
+                # We've got a press, RETURN
+                await in_file.close()
+                #return "yes"
+            event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Update file
+        #return False
+
+'''
 async def keyboard_watcher(index_in_array):
   detect_keyboard = await keyboards_events[index_in_array].watch_keyboard()
-  if detect_keyboard:
+  if detect_keyboard == "yes":
     # Kill others
     for keyboard in keyboards_events:
       keyboard.stop_watch()
@@ -82,5 +101,5 @@ jobs = [keyboard_watcher(i) for i in range(0, len(keyboards_events))]
 loop = asyncio.get_event_loop()
 loop.run_until_complete(asyncio.wait(jobs))
 
-
+'''
 

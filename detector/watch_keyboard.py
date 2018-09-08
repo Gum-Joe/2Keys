@@ -36,7 +36,7 @@ class Keyboard:
                              (code, value, tv_sec, tv_usec))
                 # We've got a press, RETURN
                 self.in_file.close()
-                return True
+                return "yes"
             event = self.in_file.read(KEYBOARD_EVENT_SIZE)  # Update file
         return False
     # Stop watching as it's no longer needed

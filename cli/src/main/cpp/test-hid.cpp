@@ -35,23 +35,32 @@ int test_hid(int argc, char *argv[])
   return 0;
 }
 
+// This works
 int main(int argc, char *argv[])
 {
-  typedef UINT (*pahktextdll)(LPTSTR script, LPTSTR opt, LPTSTR param); //typedef for a pointer to ahktextdll, used for calling an AHK function
 
-  //Load AHK DLL
-  HINSTANCE handle = LoadLibrary("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\lib\\ahkdll-v1-release-master\\Win32a\\AutoHotkey.dll");
-  if (handle == NULL)
-  {
-    DWORD err = GetLastError();
-    cout << "Error: " << err; //Error opening the dll.
-  }
-  else
-  {
-    //Get pointers to specific part we'll use
-    pahktextdll ahktextdll = (pahktextdll)GetProcAddress(handle, "ahktextdll");
-    LPTSTR empty = "";
-    ahktextdll("MsgBox, 4,, Would you like to continue? (press Yes or No)", empty, empty);
-  }
+  // From https://autohotkey.com/board/topic/96666-tutorial-c-and-autohotkey/
+
+  //Typedef the functions
+  typedef BOOL (*pahkReady)(void);
+  typedef BOOL (*pahkExec)(LPTSTR script);
+  typedef UINT (*pahkdll)(LPTSTR script, LPTSTR p1, LPTSTR p2);
+
+  // Load
+  HINSTANCE handle = LoadLibrary("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\Win32a\\AutoHotkey.dll");
+
+  // pointers
+  pahkdll ahkdll = (pahkdll)GetProcAddress(handle, "ahkdll");
+  pahkReady ahkReady = (pahkReady)GetProcAddress(handle, "ahkReady");
+  pahkExec ahkExec = (pahkExec)GetProcAddress(handle, "ahkExec");
+
+  //free memory
+  ahkdll("", "", "");
+
+  // debug
+  while (!ahkReady())
+    Sleep(10);
+
+  ahkExec("Msgbox IT WORKS ");
   return 0;
 }
