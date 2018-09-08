@@ -32,7 +32,7 @@ class Keyboard:
             event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
             while event and self.run:
                 print("[ASYNC DEBUG] Key pressed on " + self.keyboard)
-                callback(self.keyboard)
+                callback()
                 break;
             await in_file.close()
             # Stop all
