@@ -69,22 +69,11 @@ keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboard
 async def keyboard_watcher(keyboard):
   async with aiofiles.open(KEYBOARDS_PATH_BASE + "/" + keyboard, "rb") as in_file:
     event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
-    #logger.debug("Watching for key presses at " + self.keyboard + "...")
-    print(keyboard)
+    await logger.debug("Watching for key presses at " + self.keyboard + "...")
+    # Only triggers when key pressed
     while event:
-            print("W" + keyboard)
-            (tv_sec, tv_usec, type, code, value) = struct.unpack(
-                KEYBOARD_EVENT_FORMAT, event)
-            # We only want event type 1, as that is a key press
-            # If key is already pressed, ignore event provided value not 0 (key unpressed)
-            if (type == 1 or type == 0x1):
-                print("Key pressed. Code %u, value %u at %d.%d" %
-                             (code, value, tv_sec, tv_usec))
-                # We've got a press, RETURN
-                await in_file.close()
-                #return "yes"
-            event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Update file
-        #return False
+      print("Key pressed on " + keyboard)
+      await in_file.close()
 
 #async for keyboard in keyboards_events:
   
