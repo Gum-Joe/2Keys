@@ -24,11 +24,11 @@ def add_keyboard(name, gen_handler):
   # Then watch all keyboards and ask for one to be pressed
   keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards]
   # IMPORTANT: Don't use non async functions in this.  That includes the logger
-  async def handler():
+  def handler():
     print("[DEBUG] STOPPING WATCH")
     for keyboard in keyboards_events:
       print("[DEBUG] ROOT: STOPPING " + keyboard.keyboard)
-      await keyboard.stop_watch()
+      keyboard.stop_watch()
       return
   '''
   async def handler():

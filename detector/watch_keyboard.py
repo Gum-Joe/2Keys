@@ -32,14 +32,14 @@ class Keyboard:
             event = await in_file.read(KEYBOARD_EVENT_SIZE)  # Open input file
             while event and self.run:
                 print("[ASYNC DEBUG] Key pressed on " + self.keyboard)
-                await callback(self.keyboard)
+                callback(self.keyboard)
                 break;
             await in_file.close()
             # Stop all
             await callback()
             return self.run
     # Stop watching as it's no longer needed
-    async def stop_watch(self):
+    def stop_watch(self):
         print("[DEBUG] CLASS: STOPPING " + self.keyboard)
         self.run = False
         return
