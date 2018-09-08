@@ -32,6 +32,7 @@ class Keyboard:
                 print("[ASYNC DEBUG] Key pressed on " + self.keyboard)
                 await handler()
                 break;
+            print("[DEBUG] WATCH: END FOR " + self.keyboard)
             await in_file.close()
             # Stop all
             # await handler()
