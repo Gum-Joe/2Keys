@@ -47,7 +47,7 @@ logger.info("Saving config to " + os.getcwd() + "...")
 config_file = open("config.yml", "w")
 config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                   yaml.dump(config, default_flow_style=False))
-config_file.flush()
+config_file.flush() # Needed so that add keyboard can read it
 
 # Then scan for keyboards
 # Since running directly from here causes issues with async not stopping etc, holding everything up
