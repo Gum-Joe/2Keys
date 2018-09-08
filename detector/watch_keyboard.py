@@ -35,7 +35,7 @@ class Keyboard:
                 break;
             await in_file.close()
             # Stop all
-            await callback(self.keyboard)
+            await callback(self.keyboard) if self.run
             return self.run
     # Stop watching as it's no longer needed
     async def stop_watch(self):
