@@ -35,10 +35,10 @@ class Keyboard:
                 break;
             await in_file.close()
             # Stop all
-            await callback()
+            await callback(self.keyboard)
             return self.run
     # Stop watching as it's no longer needed
-    def stop_watch(self):
+    async def stop_watch(self):
         print("[DEBUG] CLASS: STOPPING " + self.keyboard)
         self.run = False
         return

@@ -27,13 +27,8 @@ def add_keyboard(name, gen_handler):
   # IMPORTANT: Don't use non async functions in this.  That includes the logger
   for i in range(0, len(keyboards)):
     keyboard_handlers.append(gen_handler(keyboards_events, keyboards[i]))
-  
-  def handler():
-    print("[DEBUG] STOPPING WATCH")
-    for keyboard in keyboards_events:
-      print("[DEBUG] ROOT: STOPPING " + keyboard.keyboard)
-      keyboard.stop_watch()
-      return
+
+  handler = gen_handler(keyboards_events)
   '''
   async def handler():
     print("[DEBUG] STOPPING WATCH")
@@ -44,6 +39,6 @@ def add_keyboard(name, gen_handler):
   '''
   
   # Run
-  jobs = [keyboards_events[i].keyboard_watcher(keyboard_handlers[i]) for i in range(0, len(keyboards))]
+  jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))]
   loop = asyncio.get_event_loop()
   loop.run_until_complete(asyncio.wait(jobs))

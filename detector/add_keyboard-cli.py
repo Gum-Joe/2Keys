@@ -2,8 +2,8 @@ from add_keyboard import add_keyboard
 import sys
 
 # IMPORTANT: Don't use non async functions in this.  That includes the logger
-def gen_handler(keyboards, keyboard):
-  async def handler():
+def gen_handler(keyboards):
+  async def handler(keyboard):
     print("[DEBUG] STOPPING WATCH")
     for keyboard_stop in keyboards:
       print("[DEBUG] ROOT: STOPPING " + keyboard_stop.keyboard)
