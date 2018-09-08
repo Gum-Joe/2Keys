@@ -31,6 +31,7 @@ def gen_handler(keyboards):
         async with aiofiles.open("config.yml", mode="w") as config_write:
           await config_write.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                       yaml.dump(config, default_flow_style=False))
+          await config_write.flush()
           logger.info("Config writen")
           os.kill(PID, signal.SIGTERM)
         exit()
