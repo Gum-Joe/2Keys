@@ -57,3 +57,5 @@ for key, value in config["keyboards"].items():
   print("") # Padding
   os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " " + key)
   print("") # Padding
+
+# Sync changes

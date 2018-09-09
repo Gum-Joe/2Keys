@@ -21,6 +21,7 @@ To build the C++ library for [Interception](https://github.com/oblitum/Intercept
 **Server**: The device running the hot keys sever, i.e. where the hot keys will be run
 **Handler**: Device that handles keyboard presses and sends them to the Server
 **Detecter**: Device that handles detection of key presses & which keyboard it is
+
 ## Sofware used & inspiration
 To block keystrokes from the second keyboard: [Interception](https://github.com/oblitum/Interception), found in `./lib/interception`
 

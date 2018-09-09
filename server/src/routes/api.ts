@@ -29,4 +29,17 @@ router.get("/get/config", (req, res, next) => {
   });
 });
 
+/**
+ * Trigger a hotkey
+ * Info to send:
+ * - keyboard: The keyboard name that has been pressed
+ * - key: set of keys that have been pressed
+ */
+router.post("/post/trigger", (req, res, next) => {
+  /**
+   * 1: Get hotkey function from config
+   * 2: Execute C++ bindings with #Include <root of keyboard>; function()
+   */
+});
+
 export default router;
