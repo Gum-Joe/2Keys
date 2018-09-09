@@ -4,6 +4,8 @@
     "files.associations": {
         "*.jsx": "javascriptreact",
         "iostream": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "xlocale": "cpp",
+        "xutility": "cpp"
     }
 }

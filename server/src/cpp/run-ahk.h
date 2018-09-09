@@ -5,5 +5,5 @@
 #include <windows.h>
 
 namespace twokeys {
-  void run_ahk_text(LPTSTR text, LPCWSTR library);
+void run_ahk_text(LPCWSTR text, LPCWSTR library);
 }
