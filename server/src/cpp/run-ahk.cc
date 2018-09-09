@@ -2,10 +2,9 @@
  * @overview C++ script to pass text to AutoHotKey to run
  * Used to run functions for hot keys
  */
+#include "define.h" // Definitons
 
-#ifndef UNICODE
-#define UNICODE
-#endif
+// External stuff
 #include <iostream>
 #include <windows.h>
 
@@ -17,7 +16,7 @@ using namespace std;
 // @param: text {LPTSTR} a non-const TCHAR string that is the script to run
 // @param: library {LPCWSTR} Const string that says where AutoHtkey_H is stored
 namespace twokeys {
-void run_ahk_text(LPCWSTR text, LPCWSTR library)
+void run_ahk_text(LPCWSTR library, LPCWSTR text)
 {
 
   // From https://autohotkey.com/board/topic/96666-tutorial-c-and-autohotkey/
@@ -29,7 +28,6 @@ void run_ahk_text(LPCWSTR text, LPCWSTR library)
 
   // Load
   // HINSTANCE handle = LoadLibrary("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\Win32a\\AutoHotkey.dll");
-  wcout << library << "\n";
   HINSTANCE handle = LoadLibrary(library);
 
   if (handle == NULL)

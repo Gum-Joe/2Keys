@@ -1,9 +1,9 @@
 /**
  * Header file for ahk runner
  */
-
 #include <windows.h>
+#include <node.h>
 
 namespace twokeys {
-void run_ahk_text(LPCWSTR library, LPCWSTR text);
+LPCWSTR convert_to_LPCWSTR(v8::Local<v8::Value> argument);
 }

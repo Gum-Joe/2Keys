@@ -2,10 +2,14 @@
  * Entry point for C++ bindings
  * Uses N-API
  */
+#include "define.h" // Definitons
+
+// External stuff
 #include <tchar.h>
 #include <node.h>
 
 // Own files
+#include "convert.h"
 #include "run-ahk.h"
 
 namespace twokeys {
@@ -38,20 +42,14 @@ void RunAHKText(const FunctionCallbackInfo<Value> &args)
     return;
   }
 
-  // Run
-  v8::String::Utf8Value s(args[0]);
-  std::string str(*s, s.length());
-  std::wstring stemp = std::wstring(str.begin(), str.end());
-  LPCWSTR ahk_path = stemp.c_str();
-
-  v8::String::Utf8Value abc(args[1]);
-  std::string strabc(*abc, abc.length());
-  std::wstring stemp2 = std::wstring(strabc.begin(), strabc.end());
-  LPCWSTR run_text = stemp2.c_str();
+  // Variables
+  LPCWSTR ahk_path = convert_to_LPCWSTR(args[0]);
+  LPCWSTR run_text = convert_to_LPCWSTR(args[1]);
 
   //LPCWSTR ahk_path = L"D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\x64w\\AutoHotkey.dll";
   // LPTSTR run_text = L"Msgbox IT WORKS ";
-  run_ahk_text(run_text, ahk_path);
+  // Run
+  run_ahk_text(ahk_path, run_text);
   }
 
   void Init(Local<Object> exports)
