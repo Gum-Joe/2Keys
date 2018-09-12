@@ -1,11 +1,12 @@
-!com.gumjoe.twokeys.types.LocalConfig
+
 keyboards: 
-   keyboard: !com.gumjoe.twokeys.types.config.Keyboard
+   keyboard: 
       dir: ./
       path: WAITING
       root: index.ahk
       hotkeys:
-         ^!7: MsgBox
+        A: TestFunc
+        ^!7: MsgBox
     
       
 packs: {}

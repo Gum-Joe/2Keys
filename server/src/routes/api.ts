@@ -5,7 +5,10 @@ import { Router } from "express";
 import { readFile } from "fs";
 import { join } from "path";
 import YAML from "yaml";
+import { config_loader } from "../util/config";
 import Logger from "../util/logger";
+import { Config } from "../util/interfaces";
+import { run_hotkey } from "../util/ahk";
 
 const logger: Logger = new Logger({
   name: "api",
@@ -35,11 +38,26 @@ router.get("/get/config", (req, res, next) => {
  * - keyboard: The keyboard name that has been pressed
  * - key: set of keys that have been pressed
  */
-router.post("/post/trigger", (req, res, next) => {
+router.post("/post/trigger", async (req, res, next) => {
   /**
    * 1: Get hotkey function from config
    * 2: Execute C++ bindings with #Include <root of keyboard>; function()
    */
+  // Get vars
+  const keyboard = req.body.keyboard;
+  const hotkey_code = req.body.hotkey;
+  // Parse config
+  const config: Config = await config_loader();
+
+  // Get hotkey func
+  const hotkey_func = config.keyboards[keyboard].hotkeys[hotkey_code];
+  const file = join(config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
+
+  // Handle
+  run_hotkey(file, hotkey_func);
+
+  res.statusCode = 200;
+  res.send("OK")
 });
 
 export default router;
