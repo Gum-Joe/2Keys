@@ -7,9 +7,9 @@
 // External stuff
 #include <tchar.h>
 #include <node.h>
+#include <iostream>
 
 // Own files
-#include "convert.h"
 #include "run-ahk.h"
 
 namespace twokeys {
@@ -21,6 +21,7 @@ using v8::Number;
 using v8::Object;
 using v8::String;
 using v8::Value;
+using namespace std;
 void RunAHKText(const FunctionCallbackInfo<Value> &args)
 {
   Isolate *isolate = args.GetIsolate();
@@ -43,8 +44,18 @@ void RunAHKText(const FunctionCallbackInfo<Value> &args)
   }
 
   // Variables
-  LPCWSTR ahk_path = convert_to_LPCWSTR(args[0]);
-  LPCWSTR run_text = convert_to_LPCWSTR(args[1]);
+  // Ideally, we'd use one convert function but that creates issues
+  // And pointers/references
+
+  v8::String::Utf8Value ahk_v8String(args[0]);
+  std::string ahk_str(*ahk_v8String, ahk_v8String.length());
+  std::wstring ahk_wstr = std::wstring(ahk_str.begin(), ahk_str.end());
+  LPCWSTR ahk_path = ahk_wstr.c_str();
+
+  v8::String::Utf8Value run_text_v8String(args[1]);
+  std::string run_text_str(*run_text_v8String, run_text_v8String.length());
+  std::wstring run_text_wstr = std::wstring(run_text_str.begin(), run_text_str.end());
+  LPCWSTR run_text = run_text_wstr.c_str();
 
   //LPCWSTR ahk_path = L"D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\x64w\\AutoHotkey.dll";
   // LPTSTR run_text = L"Msgbox IT WORKS ";

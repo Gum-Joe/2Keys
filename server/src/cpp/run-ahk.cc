@@ -28,7 +28,7 @@ void run_ahk_text(LPCWSTR library, LPCWSTR text)
 
   // Load
   // HINSTANCE handle = LoadLibrary("D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\Win32a\\AutoHotkey.dll");
-  HINSTANCE handle = LoadLibrary(library);
+  HINSTANCE handle = LoadLibraryW(library);
 
   if (handle == NULL)
   {

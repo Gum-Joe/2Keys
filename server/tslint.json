@@ -10,7 +10,8 @@
     "ordered-imports": false,
     "member-ordering": true,
     "no-console": false,
-    "no-var-requires": false
+    "no-var-requires": false,
+    "indent": false,
   },
   "rulesDirectory": []
 }

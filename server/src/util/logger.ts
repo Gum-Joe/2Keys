@@ -24,11 +24,10 @@ export default class Logger {
    * @param level {String} Log Level
    * @param colour {String} colour of string
    * @param text {String} Text to log
-   * @param type {WINDOW_TYPE|PROCESS_TYPE} What sent the log (window or main process)
    * @param args {LoggerArgs} Logger args
    * @private
    */
-  private _log(level: string, colour: string, text: string, type: string = this.type, args: LoggerArgs = this.args) {
+  private _log(level: string, colour: string, text: string, args: LoggerArgs = this.args) {
     if (!this.argv.includes("--silent")) {
       // Add prefix
       let prefix = "";
@@ -108,14 +107,16 @@ export default class Logger {
   public throw_noexit(err: Error) {
     if (!this.argv.includes("--silent")) {
       this.err("");
-      this.err(`${err.stack.split("\n")[0]}`);
+      this.err(`${err.message}`);
       this.err("");
       if (this.isDebug || process.env.NODE_ENV !== "production") {
-        this.err("Full error:");
-        this.err("");
-        let e: any = 0;
-        for (e of err.stack.split("\n")) {
-          this.err(e);
+        if (typeof err.stack !== "undefined") {
+          this.err("Full error:");
+          this.err("");
+          let e: any = 0;
+          for (e of err.stack.split("\n")) {
+            this.err(e);
+          }
         }
       }
       this.err("");

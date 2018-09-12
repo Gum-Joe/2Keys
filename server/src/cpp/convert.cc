@@ -10,6 +10,7 @@
 #include "convert.h"
 
 namespace twokeys {
+  // Really should use pointers
 LPCWSTR convert_to_LPCWSTR(v8::Local<v8::Value> argument)
 {
   v8::String::Utf8Value v8String(argument);

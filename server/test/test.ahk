@@ -1,0 +1,3 @@
+TestFunc() {
+  MsgBox "It works!"
+}

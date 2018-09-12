@@ -9,3 +9,7 @@ export interface LoggerTypes {
   text: string;
   args: Logger;
 }
+
+export interface Config {
+  
+}
