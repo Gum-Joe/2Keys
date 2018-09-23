@@ -22,6 +22,18 @@ To build the C++ library for [Interception](https://github.com/oblitum/Intercept
 **Handler**: Device that handles keyboard presses and sends them to the Server
 **Detecter**: Device that handles detection of key presses & which keyboard it is
 
+## Config notes
+Symbols, based of AHK:
+| Symbol |                                                                                                                                  |
+|--------|----------------------------------------------------------------------------------------------------------------------------------|
+| !      | Alt (Use /!/ for !)                                                                                                              |
+| ^      | Control                                                                                                                          |
+|  +     | Shift                                                                                                                            |
+| <      | Left key (i.e. left control (`<^`), left shift (`<+`))                                                                                         |
+| >      | Right key (i.e. right control (`^>`), right Alt/AltGr (`!>`))                                                                                  |
+| #      |                                                                                                                                  |
+| /key/  | Used to denote special keys, such as UP, DOWN, RIGHT, LEFT arrow keys; CAPS (Caps Lock), TAB. Replace key with key name in caps  |
+NOTE: Slash issues
 ## Sofware used & inspiration
 To block keystrokes from the second keyboard: [Interception](https://github.com/oblitum/Interception), found in `./lib/interception`
 

@@ -1,9 +1,9 @@
 # Function to detect a keyboard
 import asyncio
 from os import path, listdir
-from constants import KEYBOARDS_PATH_BASE
+from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
 from logger import Logger
-from watch_keyboard import Keyboard as KeyboardWatcher
+from watch_keyboard import AsyncKeyboard as AsyncKeyboardWatcher
 logger = Logger("detect")
 
 def add_keyboard(name, gen_handler):
@@ -21,7 +21,7 @@ def add_keyboard(name, gen_handler):
 
   logger.info("Press a button on the keyboard you want to map to register it.")
   # Then watch all keyboards and ask for one to be pressed
-  keyboards_events = [KeyboardWatcher(keyboard_path) for keyboard_path in keyboards] # Keyboard watch classes for each input
+  keyboards_events = [AsyncKeyboardWatcher(keyboard_path) for keyboard_path in keyboards] # Keyboard watch classes for each input
 
   handler = gen_handler(keyboards_events) # The handler needs access to keyboards_events, which it won't on exe in the watcher
   
