@@ -165,7 +165,7 @@ class Keyboard:
                 # Step 2: Check if chars are equal
                 split_hotkey = list(key) # Split into array for easy checking
                 split_current_keys = list(combo)
-                if set(split_hotkey).issubset(self.keys) or set(self.keys).issubset(split_hotkey):
+                if set(split_hotkey).issubset(set(split_current_keys)) or set(split_current_keys).issubset(set(split_hotkey)):
                     return key # Candidate and hotkey matches, return hotkey location
             
         # If none are true, then this isn't the right one (function yet to return)
