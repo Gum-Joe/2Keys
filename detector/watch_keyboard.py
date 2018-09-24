@@ -59,12 +59,12 @@ class Keyboard:
             (tv_sec, tv_usec, type, code, value) = struct.unpack(KEYBOARD_EVENT_FORMAT, self.event)
             # We only want event type 1, as that is a key press
             # If key is already pressed, ignore event provided value not 0 (key unpressed)
-            if (type == 1 or type == 0x1) and (self.pressed_or_not[code] == False or value == 0):
+            if (type == 1 or type == 0x1):
                 logger.debug("Key pressed. Code %u, value %u at %d.%d. Mapping: %s" %
                         (code, value, tv_sec, tv_usec, self.map[code]))
     
                 # Set key in array
-                self.change_key_state(code)
+                self.change_key_state(code, value)
                 logger.debug(self.keys)
 
                 # Run alogrithm to check keys against hotkey
@@ -95,8 +95,8 @@ class Keyboard:
     # Handle change of state (down/up) of key code
     # down = True
     # Up (as in not pressed) = False
-    def change_key_state(self, code):
-        if not self.pressed_or_not[code]:
+    def change_key_state(self, code, value):
+        if value == 1:
             # Key not yet pressed
             self.pressed_or_not[code] = True
             # Add to self.keys string
@@ -110,7 +110,7 @@ class Keyboard:
                     for mapping in self.map[code]:
                         new_keys.append(combo + mapping)
                 self.keys = new_keys   
-        else:
+        elif value == 0:
             # Key unpressed, remove
             self.pressed_or_not[code] = False
             # Remove from combos
@@ -122,8 +122,6 @@ class Keyboard:
                 for combo in self.keys:
                     for mapping in self.map[code]:
                         new_keys.append(combo.replace(mapping, "")) # Remove from each
-        # Flip state
-        self.pressed_or_not[code] = not self.pressed_or_not[code]
     
     # Standardise hotkey config
     # hotkey = hotkeys mappings
