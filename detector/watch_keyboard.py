@@ -20,6 +20,7 @@ logger = Logger("detect")
 class Keyboard:
     # keyboard: Keyboard config
     def __init__(self, keyboard):
+        logger.debug("Got keyboard: " str(keyboard))
         self.keyboard = keyboard
         # File for input that corresponds to the keyboard.
         self.keyboard_path = keyboard.path
