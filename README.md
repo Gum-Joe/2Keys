@@ -2,10 +2,10 @@
 A easy to setup second keyboard, designed for everyone.
 
 ### Support
-Only Windows is supported, though you might be able to get this working with `Wine`
+Windows is supported only as the server (where thje hotkeys will run) and a raspberry pi is required to run the detector
 
 ## WARNING
-This will install the [Interception](https://github.com/oblitum/Interception) drivers on your PC, as well as downloading [AutoHotkey](https://github.com/AutoHotkey/)
+This will download a copy of [AutoHotkey](https://github.com/AutoHotkey/)
 
 ## Building
 To build the jar:
@@ -13,9 +13,6 @@ To build the jar:
 
 To package the jar for publishing:
 `./gradlew shadowJar`
-
-To build the C++ library for [Interception](https://github.com/oblitum/Interception):
-`./gradlew mainSharedLibrary`
 
 ## Devices
 **Server**: The device running the hot keys sever, i.e. where the hot keys will be run
@@ -34,7 +31,7 @@ Symbols, based of AHK:
 | <      | Left key (i.e. left control (`<^`), left shift (`<+`))                                                                           |
 | >      | Right key (i.e. right control (`^>`), right Alt/AltGr (`!>`))                                                                    |
 | #      |                                                                                                                                  |
-| /key/  | Used to denote special keys, such as UP, DOWN, RIGHT, LEFT arrow keys; CAPS (Caps Lock), TAB. Replace key with key name in caps  |
+| $key$  | Used to denote special keys, such as UP, DOWN, RIGHT, LEFT arrow keys; CAPS (Caps Lock), TAB. Replace key with key name in caps  |
 
 
 NOTE: Slash issues.  Key 127 is useful as a mode key.  DO NOT BLOCK 99. 125 and 126 are Windows Keys
