@@ -130,6 +130,9 @@ class Keyboard:
                                 new_keys.append(new_combo) # Remove from each
                         index += 1
                     self.keys = new_keys
+                # If keys array is empty, make sure to add somewhere for next set
+                if len(self.keys) > 1:
+                    self.keys = [""]
     
     # Standardise hotkey config
     # hotkey = hotkeys mappings
