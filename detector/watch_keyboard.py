@@ -119,8 +119,8 @@ class Keyboard:
             else:
                 # Array
                 new_keys = []
-                for combo in self.keys:
-                    for mapping in self.map[code]:
+                for mapping in self.map[code]:
+                    for combo in self.keys:
                         if mapping in combo: # Only should run if in, to avoid duplicates
                             new_combo = combo.replace(mapping, "")
                             # Only do this if new combo > 0
