@@ -148,8 +148,8 @@ class Keyboard:
                 if len(key) != len(combo):
                     continue
                 # Step 2: Check if chars are equal
-                split_hotkey = key.split("") # Split into array for easy checking
-                split_current_keys = combo.split("")
+                split_hotkey = list(key) # Split into array for easy checking
+                split_current_keys = list(combo)
                 if set(split_hotkey).issubset(self.keys) or set(self.keys).issubset(split_hotkey):
                     return key # Candidate and hotkey matches, return hotkey location
             
