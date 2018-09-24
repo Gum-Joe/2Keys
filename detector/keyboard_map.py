@@ -657,5 +657,6 @@ keys[248] = custom_name("MICMUTE") # Microphone mute
 #define KEY_MIN_INTERESTING KEY_MUTE  # From original c code  
 # i.e. KEY_MUTE is the minimum interesting one
 # Have no idea if this is correct
-keys[0x300] = None # MAX keys is 0x2ff
+# NOTE: Should be 0x300
+keys[MAX_KEY_MAPS - 1] = None # MAX keys is 0x2ff
 #define KEY_CNT (KEY_MAX+1) # No ides what this is
