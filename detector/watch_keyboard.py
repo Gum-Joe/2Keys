@@ -23,7 +23,7 @@ class Keyboard:
         logger.debug("Got keyboard: " + str(keyboard))
         self.keyboard = keyboard
         # File for input that corresponds to the keyboard.
-        self.keyboard_path = keyboard.path
+        self.keyboard_path = keyboard["path"]
         # Open keyboard events file in binary mode
         self.in_file = open(self.keyboard_path, "rb")
         self.event = None
