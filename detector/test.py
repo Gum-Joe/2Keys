@@ -6,6 +6,6 @@ config = yaml.load(config_file.read())
 print(config)
 print(config["keyboards"])
 print(config["keyboards"]["keyboard"])
-keyboard = Keyboard(config["keyboards"]["keyboard"])
+keyboard = Keyboard(config["keyboards"]["keyboard"], "keyboard")
 
 keyboard.watch_keyboard()

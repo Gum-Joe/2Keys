@@ -19,9 +19,11 @@ logger = Logger("detect")
 
 class Keyboard:
     # keyboard: Keyboard config
-    def __init__(self, keyboard):
+    # name: Name of keyboard
+    def __init__(self, keyboard, name):
         logger.debug("Got keyboard: " + str(keyboard))
         self.keyboard = keyboard
+        self.name = name
         # File for input that corresponds to the keyboard.
         self.keyboard_path = keyboard["path"]
         # Open keyboard events file in binary mode
