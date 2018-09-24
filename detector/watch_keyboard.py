@@ -122,6 +122,7 @@ class Keyboard:
                 for combo in self.keys:
                     for mapping in self.map[code]:
                         new_keys.append(combo.replace(mapping, "")) # Remove from each
+                self.keys = new_keys 
     
     # Standardise hotkey config
     # hotkey = hotkeys mappings
