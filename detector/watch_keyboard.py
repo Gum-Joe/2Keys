@@ -11,25 +11,44 @@ import struct
 import time
 import sys
 import aiofiles
-from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
+from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
+from keyboard_map import keys as KEY_MAP
 from logger import Logger
 
 logger = Logger("detect")
 
 class Keyboard:
+    # keyboard: Keyboard config
     def __init__(self, keyboard):
         self.keyboard = keyboard
         # File for input that corresponds to the keyboard.
-        self.keyboard_path = KEYBOARDS_PATH_BASE + "/" + keyboard
+        self.keyboard_path = keyboard.path
         # Open keyboard events file in binary mode
         self.in_file = open(self.keyboard_path, "rb")
         self.event = None
         # Array of pressed keys
         # is array of booleans, with the index = key code
         # i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
-        self.pressed_or_not = [False] * 256 # Linux lists key codes 0 to 255
+        self.pressed_or_not = [False] * MAX_KEY_MAPS
         # Current keys being pressed
         self.keys = ""
+        # Local stores of key mappings
+        self.map = KEY_MAP
+        # Apply mappings
+        if "map" in self.keyboard:
+            self.apply_mappings(self.keyboard.map)
+        # Store hotkeys list
+        self.hotkeys = self.standardise_hotkeys(keyboard.hotkeys)
+        # Store array of hotkeys split into chars as this makes checking easier
+    
+    # Custom mapping
+    # Takes in key/value of key: code and adds to map array
+    def apply_mappings(self, maps):
+        for key, code in maps.items():
+            logger.debug("Mapped " + key + " as (" + key + ") to code " + str(code))
+            self.map[code] = "(" + key + ")"
+    
+    # Keyboard watcher
     def watch_keyboard(self):
         logger.info("Watching for key presses on " + self.keyboard + "...")
         self.event = self.in_file.read(KEYBOARD_EVENT_SIZE) # Open input file
@@ -38,11 +57,17 @@ class Keyboard:
             # We only want event type 1, as that is a key press
             # If key is already pressed, ignore event provided value not 0 (key unpressed)
             if (type == 1 or type == 0x1) and (self.pressed_or_not[code] == False or value == 0):
-                logger.debug("Key pressed. Code %u, value %u at %d.%d" %
-                        (code, value, tv_sec, tv_usec))
+                logger.debug("Key pressed. Code %u, value %u at %d.%d. Mapping: %s" %
+                        (code, value, tv_sec, tv_usec, self.map[code]))
                 # Set key in array
                 self.change_key_state(code)
 
+                # Run alogrithm to check keys against hotkey
+                checked_hotkey = self.check_for_hotkey()
+                if checked_hotkey != False:
+                    logger.info("Registered hotkey:")
+                    logger.info(checked_hotkey)
+                    logger.info(self.hotkeys[checked_hotkey])
                 # 
                 # Here we add the hotkey fire request
                 # to /api/post/fire
@@ -59,7 +84,7 @@ class Keyboard:
                 # Events with code, type and value == 0 are "separator" events
                  print("===========================================")
 
-            event = self.in_file.read(EVENT_SIZE)
+            self.event = self.in_file.read(EVENT_SIZE)
         self.in_file.close()
     
     # Handle change of state (down/up) of key code
@@ -69,9 +94,47 @@ class Keyboard:
         if not self.pressed_or_not[code]:
             # Key not yet pressed
             # Add to self.keys string
+            self.keys += self.map[code]
+        else:
+            # Key pressed, remove
+            self.keys = self.keys.replace(self.map[code], "")
+        # Flip state
+        self.pressed_or_not[code] = not self.pressed_or_not[code]
+    
+    # Standardise hotkey config
+    # hotkey = hotkeys mappings
+    # Standard config:
+    #   type: down
+    #   func: Function
+    def standardise_hotkeys(self, hotkeys):
+        new_hotkeys = hotkeys
+        for key, value in new_hotkeys.items():
+            if isinstance(value, str):
+                # Only has function
+                new_hotkeys[key] = {
+                    "type": "down",
+                    "func": value
+                }
+            # Else it has to be a regular one as ups require type: up
+        return new_hotkeys
+    
+    # Hotkey detector algorithm
+    # Return the key of the hotkey if hotkey
+    def check_for_hotkey(self):
+        for key, mapping in self.hotkeys.items():
+            # Step 1: Check length.  If lengths are different, hotkeys can't match
+            if len(key) != len(self.keys):
+                continue
+            # Step 2: Check if chars are equal
+            split_hotkey = key.split("") # Split into array for easy checking
+            split_current_keys = self.keys.split("")
+            if set(split_hotkey).issubset(self.keys) or set(self.keys).issubset(split_hotkey):
+                return key
+            
+        # If none are true, then this isn't the right one
+        return False
             
 
-        self.pressed_or_not[code] = not self.pressed_or_not[code]
 
 # str keyboard: Keyboard file in /dev/input/by-id
 class AsyncKeyboard:

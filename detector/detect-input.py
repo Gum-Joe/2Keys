@@ -11,6 +11,7 @@ import time
 import sys
 from logger import Logger
 from keyboard_map import keys as KEYS
+from constants import MAX_KEY_MAPS
 
 infile_path = "/dev/input/event" + (sys.argv[1] if len(sys.argv) > 1 else "0") # File for input that corresponds to the keyboard.  Should use human readable ones in /dev/input/by-id
 logger = Logger("detect")
@@ -27,7 +28,7 @@ event = in_file.read(EVENT_SIZE) # Open input file
 # Array of pressed keys
 # is array of booleans, with the index = key code
 # i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
-pressed_or_not = [False] * 256 # Linux lists key codes 0 to 255
+pressed_or_not = [False] * MAX_KEY_MAPS # Linux lists key codes 0 to 255
 
 logger.info("Watching for key presses...")
 while event:
