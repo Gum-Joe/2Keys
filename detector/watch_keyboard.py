@@ -156,6 +156,7 @@ class Keyboard:
     def check_for_hotkey(self):
         # Check each candidate
         for combo in self.keys:
+            logger.debug("Checking hotkey in combo " + combo)
             for key, mapping in self.hotkeys.items():
                 # Check each candidate
                 # Step 1: Check length.  If lengths are different, hotkeys can't match
