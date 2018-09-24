@@ -7,6 +7,7 @@ from watch_keyboard import AsyncKeyboard as AsyncKeyboardWatcher
 logger = Logger("detect")
 
 def add_keyboard(name, gen_handler):
+  logger.info("Mapping keyboard " + name)
   logger.info("Scanning for keyboards...")
   if not path.isdir(KEYBOARDS_PATH_BASE): # Make sure there's something to detect
     logger.err("Couldn't scan for keyboards")
