@@ -62,8 +62,10 @@ class Keyboard:
             if (type == 1 or type == 0x1) and (self.pressed_or_not[code] == False or value == 0):
                 logger.debug("Key pressed. Code %u, value %u at %d.%d. Mapping: %s" %
                         (code, value, tv_sec, tv_usec, self.map[code]))
+    
                 # Set key in array
                 self.change_key_state(code)
+                logger.debug(self.keys)
 
                 # Run alogrithm to check keys against hotkey
                 checked_hotkey = self.check_for_hotkey()
