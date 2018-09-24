@@ -123,6 +123,7 @@ class Keyboard:
                     logger.debug("Checking mapping " + str(mapping))
                     for combo in self.keys:
                         logger.debug("Checking combo " + str(combo))
+                        print(combo.find(mapping))
                         if combo.find(mapping) >= 0 or combo == mapping: # Only should run if in, to avoid duplicates
                             new_combo = combo.replace(mapping, "")
                             # Only do this if new combo > 0
