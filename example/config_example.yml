@@ -20,7 +20,7 @@ keyboards:
       +$UP$: MoveCursorNextLayer
       +>$ENTER$: SomeFunction
       $ENTER$: GitCommitVSCODE
-      $G1$:
+      (G1):
         type: up
         func: RunACMD
       $PRTSC$:
