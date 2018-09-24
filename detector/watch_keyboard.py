@@ -125,7 +125,7 @@ class Keyboard:
                             new_combo = combo.replace(mapping, "")
                             # Only do this if new combo > 0
                             if len(new_combo) > 0:
-                                new_keys.append() # Remove from each
+                                new_keys.append(new_combo) # Remove from each
                 self.keys = new_keys
     
     # Standardise hotkey config
