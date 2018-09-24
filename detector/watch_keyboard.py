@@ -126,10 +126,11 @@ class Keyboard:
                         print(combo.find(mapping))
                         if combo.find(mapping) >= 0 or combo == mapping: # Only should run if in, to avoid duplicates
                             new_combo = combo.replace(mapping, "")
+                            print(new_combo)
                             # Only do this if new combo > 0
                             if len(new_combo) > 0:
                                 new_keys.append(new_combo) # Remove from each
-                                print(new_keys)
+                                #print(new_keys)
                 self.keys = new_keys
     
     # Standardise hotkey config
