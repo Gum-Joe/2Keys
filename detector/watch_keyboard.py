@@ -87,7 +87,7 @@ class Keyboard:
                 # Events with code, type and value == 0 are "separator" events
                  print("===========================================")
 
-            self.event = self.in_file.read(EVENT_SIZE)
+            self.event = self.in_file.read(KEYBOARD_EVENT_SIZE)
         self.in_file.close()
     
     # Handle change of state (down/up) of key code
