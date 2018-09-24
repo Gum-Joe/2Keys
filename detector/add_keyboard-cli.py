@@ -30,7 +30,7 @@ def gen_handler(keyboards):
       config_contents = await config_file.read() # Read config
       logger.debug("Contents:\n" + config_contents)
       config = yaml.load(config_contents) # Parse it into python obj
-      logger.debug("Parsed contents")
+      logger.debug("Parsed contents: " + str(config))
       config["keyboards"][KEYBOARD_NAME]["path"] = keyboard # Update keyboard with path in /dev/input
       logger.debug("Writing config...")
       # r+ appends, so we have to create a new stream so we cam write
