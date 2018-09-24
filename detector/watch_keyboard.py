@@ -120,12 +120,15 @@ class Keyboard:
                 # Array
                 new_keys = []
                 for mapping in self.map[code]:
+                    logger.debug("Checking mapping " + str(mapping))
                     for combo in self.keys:
+                        logger.debug("Checking combo " + str(combo))
                         if mapping in combo: # Only should run if in, to avoid duplicates
                             new_combo = combo.replace(mapping, "")
                             # Only do this if new combo > 0
                             if len(new_combo) > 0:
                                 new_keys.append(new_combo) # Remove from each
+                                print(new_keys)
                 self.keys = new_keys
     
     # Standardise hotkey config
