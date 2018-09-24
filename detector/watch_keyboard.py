@@ -5,6 +5,7 @@
 #
 # See https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h for codes 
 # and https://www.kernel.org/doc/Documentation/input/event-codes.txt for meanings
+# Notes: Code 99 should not be interrupted
 
 import struct
 import time
