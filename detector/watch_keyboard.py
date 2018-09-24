@@ -98,6 +98,7 @@ class Keyboard:
     def change_key_state(self, code):
         if not self.pressed_or_not[code]:
             # Key not yet pressed
+            self.pressed_or_not[code] = True
             # Add to self.keys string
             if isinstance(self.map[code], str):
                 self.keys = [combo + self.map[code] for combo in self.keys] # Add to each candidate combo                  
@@ -111,6 +112,8 @@ class Keyboard:
                 self.keys = new_keys   
         else:
             # Key unpressed, remove
+            self.pressed_or_not[code] = False
+            # Remove from combos
             if isinstance(self.map[code], str):
                 self.keys = [combo.replace(self.map[code], "") for combo in self.keys] # Remove from each combo
             else:
