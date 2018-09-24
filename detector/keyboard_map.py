@@ -131,7 +131,7 @@ keys[88] = "F12"
 keys[96] = custom_name("NUM_ENTER") # KPENTER; _ used for readability
 keys[97] = ["^>", "^"] # RIGHTCTRL; _ used for readability
 keys[98] = custom_name("NUM_/") # KPSLASH
-keys[99] = None # SYSREQ. Used for recovery.  Thus, throw an error if the user tries to use so the system can be recovered
+keys[99] = ["PRINT_SCR"] # Print Screen & SYSREQ. SYSREQ is used for recovery.  Thus, should throw an error if the user tries to use so the system can be recovered
 keys[100] = ["!>", "!"]
 keys[101] = custom_name("LINE_FEED") # New line char, backwards-compatibility; _ used for readability
 keys[102] = custom_name("HOME")
@@ -159,8 +159,8 @@ keys[121] = custom_name("NUM_,") # KP Comma
 #define KEY_HANGUEL KEY_HANGEUL # Leftover from Linux
 keys[123] = "HANJA" # IC
 keys[124] = "YEN" # IC
-keys[125] = "LEFTMETA" # IC
-keys[126] = "RIGHTMETA" # IC
+keys[125] = ["LEFTMETA", "#", "<#"] # IC, Windows key
+keys[126] = ["RIGHTMETA", "#", "#>"] # IC, Windows key
 keys[127] = "COMPOSE" # Compose two chars, useful as a mode key
 
 keys[128] = "$STOP" # Stop key, don't know what for

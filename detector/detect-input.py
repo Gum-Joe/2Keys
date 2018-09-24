@@ -35,8 +35,9 @@ while event:
     # We only want event type 1, as that is a key press
     # If key is already pressed, ignore event provided value not 0 (key unpressed)
     if (type == 1 or type == 0x1) and (pressed_or_not[code] == False or value == 0):
-        logger.debug("Key pressed. Code %u, value %u at %d.%d.  Mapping: %s" %
-                (code, value, tv_sec, tv_usec, KEYS[code]))
+        logger.debug("Key pressed. Code %u, value %u at %d.%d." %
+                (code, value, tv_sec, tv_usec))
+		logger.debug("Mapping: " + KEYS[code])
 
         # Set key in array
         pressed_or_not[code] = not pressed_or_not[code]

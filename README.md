@@ -37,7 +37,7 @@ Symbols, based of AHK:
 | /key/  | Used to denote special keys, such as UP, DOWN, RIGHT, LEFT arrow keys; CAPS (Caps Lock), TAB. Replace key with key name in caps  |
 
 
-NOTE: Slash issues.  Key 127 is useful as a mode key
+NOTE: Slash issues.  Key 127 is useful as a mode key.  DO NOT BLOCK 99. 125 and 126 are Windows Keys
 
 The following keys are disabled:
 
