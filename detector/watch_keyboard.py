@@ -37,9 +37,9 @@ class Keyboard:
         self.map = KEY_MAP
         # Apply mappings
         if "map" in self.keyboard:
-            self.apply_mappings(self.keyboard.map)
+            self.apply_mappings(self.keyboard["map"])
         # Store hotkeys list
-        self.hotkeys = self.standardise_hotkeys(keyboard.hotkeys)
+        self.hotkeys = self.standardise_hotkeys(keyboard["hotkeys"])
         # Store array of hotkeys split into chars as this makes checking easier
     
     # Custom mapping
