@@ -31,7 +31,7 @@ class Keyboard:
         # i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
         self.pressed_or_not = [False] * MAX_KEY_MAPS
         # Current keys being pressed
-        self.keys = ""
+        self.keys = [""]
         # Local stores of key mappings
         self.map = KEY_MAP
         # Apply mappings
@@ -94,10 +94,26 @@ class Keyboard:
         if not self.pressed_or_not[code]:
             # Key not yet pressed
             # Add to self.keys string
-            self.keys += self.map[code]
+            if isinstance(self.map[code], str):
+                self.keys = [combo + self.map[code] for combo in self.keys] # Add to each candidate combo                  
+            else:
+                # Array in use
+                # Add as different candidates
+                new_keys = []
+                for combo in self.keys:
+                    for mapping in self.map[code]:
+                        new_keys.append(combo + mapping)
+                self.keys = new_keys   
         else:
-            # Key pressed, remove
-            self.keys = self.keys.replace(self.map[code], "")
+            # Key unpressed, remove
+            if isinstance(self.map[code], str):
+                self.keys = [combo.replace(self.map[code], "") for combo in self.keys] # Remove from each combo
+            else:
+                # Array
+                new_keys = []
+                for combo in self.keys:
+                    for mapping in self.map[code]:
+                        new_keys.append(combo.replace(mapping, "")) # Remove from each
         # Flip state
         self.pressed_or_not[code] = not self.pressed_or_not[code]
     
@@ -121,17 +137,20 @@ class Keyboard:
     # Hotkey detector algorithm
     # Return the key of the hotkey if hotkey
     def check_for_hotkey(self):
-        for key, mapping in self.hotkeys.items():
-            # Step 1: Check length.  If lengths are different, hotkeys can't match
-            if len(key) != len(self.keys):
-                continue
-            # Step 2: Check if chars are equal
-            split_hotkey = key.split("") # Split into array for easy checking
-            split_current_keys = self.keys.split("")
-            if set(split_hotkey).issubset(self.keys) or set(self.keys).issubset(split_hotkey):
-                return key
+        # Check each candidate
+        for combo in self.keys:
+            for key, mapping in self.hotkeys.items():
+                # Check each candidate
+                # Step 1: Check length.  If lengths are different, hotkeys can't match
+                if len(key) != len(combo):
+                    continue
+                # Step 2: Check if chars are equal
+                split_hotkey = key.split("") # Split into array for easy checking
+                split_current_keys = combo.split("")
+                if set(split_hotkey).issubset(self.keys) or set(self.keys).issubset(split_hotkey):
+                    return key # Candidate and hotkey matches, return hotkey location
             
-        # If none are true, then this isn't the right one
+        # If none are true, then this isn't the right one (function yet to return)
         return False
             
 
