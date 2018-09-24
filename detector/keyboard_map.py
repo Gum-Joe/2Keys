@@ -18,14 +18,14 @@ None = invalid key
 An array of key mapping means multiple keys can correspond to it
 Currently 249 keys are mapped
 """
-
+from constants import MAX_KEY_MAPS
 # Applies custom tag to key names
 def custom_name(name):
     return "$" + name + "$"
 
 #define KEY_(.*?) (0?[xX]?[0-9a-fA-F]+)(.*) # RegExp to convert everything in VSCode
 #keys[$2] = "$1" # Replacement RegExp to convert everything in VSCode
-keys = [] # Index correspondes to code
+keys = [""] * MAX_KEY_MAPS # Index correspondes to code
 keys[0] = None # RESERVED
 keys[1] = custom_name("ESC")
 keys[2] = "1"

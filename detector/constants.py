@@ -8,6 +8,9 @@ KEYBOARDS_PATH_BASE = "/dev/input/by-id"
 KEYBOARD_EVENT_FORMAT = 'llHHI'
 KEYBOARD_EVENT_SIZE = struct.calcsize(KEYBOARD_EVENT_FORMAT)
 
+# Max key maps
+MAX_KEY_MAPS = 250
+
 # Script root
 SCRIPTS_ROOT = os.path.dirname(os.path.realpath(__file__))
 
