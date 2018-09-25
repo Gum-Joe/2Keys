@@ -46,18 +46,26 @@ router.post("/post/trigger", async (req, res, next) => {
   // Get vars
   const keyboard = req.body.keyboard;
   const hotkey_code = req.body.hotkey;
+  logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}`);
+  console.log(req)
   // Parse config
-  const config: Config = await config_loader();
+  try {
+    const config: Config = await config_loader();
 
-  // Get hotkey func
-  const hotkey_func = config.keyboards[keyboard].hotkeys[hotkey_code];
-  const file = join(config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
+    // Get hotkey func
+    const hotkey_func = config.keyboards[keyboard].hotkeys[hotkey_code];
+    const file = join(config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
 
-  // Handle
-  run_hotkey(file, hotkey_func);
+    // Handle
+    run_hotkey(file, hotkey_func);
 
-  res.statusCode = 200;
-  res.send("OK")
+    res.statusCode = 200;
+    res.send("OK")
+  } catch (err) {
+    logger.throw_noexit(err);
+    res.statusCode = 500
+    res.send(err.stack.toString());
+  }
 });
 
 export default router;

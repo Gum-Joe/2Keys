@@ -13,6 +13,7 @@ import time
 import sys
 import aiofiles
 import requests
+import json
 from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
 from keyboard_map import keys as KEY_MAP
 from config import load_config
@@ -176,7 +177,8 @@ class Keyboard:
     def send_hotkey(self, hotkey):
         logger.info("Sending hotkey %s to server..." % hotkey)
         try:
-            requests.post("http://" + config["server"]["ipv4"] + ":" + config["server"]["port"] + "/api/post/trigger", data={ "keyboard": self.name, "hotkey": hotkey })
+            data_hotkey = { "keyboard": self.name, "hotkey": hotkey }
+            requests.post("http://" + config["server"]["ipv4"] + ":" + config["server"]["port"] + "/api/post/trigger", data=json.dumps(data_hotkey))
         except requests.exceptions.ConnectionError:
             logger.err("Couldn't estanblish a connection to the server.")
             logger.err("Please check your internet connection.")
