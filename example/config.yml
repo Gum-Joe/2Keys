@@ -5,7 +5,7 @@ keyboards:
       path: WAITING
       root: index.ahk
       hotkeys:
-        A: TestFunc
+        +A: TestFunc
         ^!7: MsgBox
     
       

@@ -13,11 +13,9 @@ logger = Logger("oobe")
 logger.info("Welcome to the OOBE for the detector!")
 logger.info("First we need to know where to find the server")
 logger.info("Enter the ipv4 address of the server below:")
-#ipv4 = input("")
-ipv4 = "192.168.0.4"
+ipv4 = input("")
 logger.info("Enter the port of the server below:")
-#port = input("")
-port = "9090"
+port = input("")
 
 # Make request, get config in JSON format
 # TODO: Error handling
