@@ -69,11 +69,13 @@ class Keyboard:
                 logger.debug(self.keys)
 
                 # Run alogrithm to check keys against hotkey
-                checked_hotkey = self.check_for_hotkey()
-                if checked_hotkey != False:
-                    logger.info("Registered hotkey:")
-                    logger.info(checked_hotkey)
-                    logger.info(self.hotkeys[checked_hotkey])
+                # Only run though if value is 0 or 1 to prevent duplicate hotkeys
+                if value < 2:
+                    checked_hotkey = self.check_for_hotkey()
+                    if checked_hotkey != False:
+                        logger.info("Registered hotkey:")
+                        logger.info(checked_hotkey)
+                        logger.info(self.hotkeys[checked_hotkey])
                 # 
                 # Here we add the hotkey fire request
                 # to /api/post/fire
