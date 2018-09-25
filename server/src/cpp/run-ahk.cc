@@ -7,8 +7,9 @@
 // External stuff
 #include <iostream>
 #include <windows.h>
-
+#include <direct.h>
 // Own files
+#include "current-dir.h"
 #include "run-ahk.h"
 
 using namespace std;
@@ -19,6 +20,8 @@ namespace twokeys {
 void run_ahk_text(LPCWSTR library, LPCWSTR text)
 {
 
+  // Keep a copy of current dir for later
+  std::string cwd = GetCurrentWorkingDir();
   // From https://autohotkey.com/board/topic/96666-tutorial-c-and-autohotkey/
 
   //Typedef the functions
@@ -51,6 +54,9 @@ void run_ahk_text(LPCWSTR library, LPCWSTR text)
       Sleep(10);
 
     ahkExec(text);
+    
+    // Chdir
+    _chdir(cwd.c_str());
   }
 }
 }

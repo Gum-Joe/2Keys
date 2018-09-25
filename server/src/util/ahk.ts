@@ -17,6 +17,7 @@ const access = promisify(fs.access);
  * @param func {String} Function to run from that file
  */
 export async function run_hotkey(file: string, func: string): Promise<void> {
+  const old_cwd: string = process.cwd()
   // 1: Santise file input to prevent code injection
   // Check it exists
   try {
@@ -30,7 +31,13 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
     if (regexp.test(func)) {
       // Yay! run the hotkey
       logger.debug(`#Include ${file}; ${func}()`);
-      ahk.run_ahk_text(AHK_LIB_PATH, `#Include ${file}\n${func}()`);
+      try {
+        ahk.run_ahk_text(AHK_LIB_PATH, `#Include ${file}\n${func}()`);
+        // Change back to old CWD
+        process.chdir(old_cwd);
+      } catch (err) {
+        logger.throw_noexit(err);
+      }
     } else {
       logger.err(`Function ${func} is invalid for regexp "${regexp}"`);
     }

@@ -53,7 +53,7 @@ router.post("/post/trigger", async (req, res, next) => {
 
     // Get hotkey func
     const hotkey_func = config.keyboards[keyboard].hotkeys[hotkey_code];
-    const file = join(config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
+    const file = join(process.cwd(), config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
 
     // Handle
     run_hotkey(file, hotkey_func);
