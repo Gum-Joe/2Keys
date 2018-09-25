@@ -47,7 +47,6 @@ router.post("/post/trigger", async (req, res, next) => {
   const keyboard = req.body.keyboard;
   const hotkey_code = req.body.hotkey;
   logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}`);
-  console.log(req)
   // Parse config
   try {
     const config: Config = await config_loader();
