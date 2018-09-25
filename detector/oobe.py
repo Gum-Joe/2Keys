@@ -40,7 +40,15 @@ config = json.loads(config_json.text)
 
 # Save config
 logger.info("Saving config to " + os.getcwd() + "...")
+# Add IP to config
+logger.debug("Storing server address with config...")
+config["server"] = {
+  "ipv4": ipv4,
+  "port": port
+}
+logger.debug("Opening config...")
 config_file = open("config.yml", "w")
+logger.debug("Writing config...")
 config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                   yaml.dump(config, default_flow_style=False))
 config_file.flush() # Needed so that add keyboard can read it

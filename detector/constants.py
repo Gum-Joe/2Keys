@@ -14,5 +14,8 @@ MAX_KEY_MAPS = 250
 # Script root
 SCRIPTS_ROOT = os.path.dirname(os.path.realpath(__file__))
 
+# Config file
+CONFIG_FILE = "config.yml"
+
 
 

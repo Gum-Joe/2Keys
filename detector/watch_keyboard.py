@@ -12,11 +12,14 @@ import struct
 import time
 import sys
 import aiofiles
+import requests
 from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
 from keyboard_map import keys as KEY_MAP
+from config import load_config
 from logger import Logger
 
 logger = Logger("detect")
+config = load_config()
 
 class Keyboard:
     # keyboard: Keyboard config
@@ -76,15 +79,8 @@ class Keyboard:
                         logger.info("Registered hotkey:")
                         logger.info(checked_hotkey)
                         logger.info(self.hotkeys[checked_hotkey])
-                # 
-                # Here we add the hotkey fire request
-                # to /api/post/fire
-                # with { keyboard, keys }
+                        self.send_hotkey(checked_hotkey)
 
-                # Need a way to detect difference between combo and single keys
-                # Should effectivly watch array of keys pressed for a change
-                # and see if it matches a hotkey
-                # then prevent itself from refiring
                 #elif type != 0 or code != 0 or value != 0:
                 #    print("Event type %u, code %u, value %u at %d.%d" % \
                 #        (type, code, value, tv_sec, tv_usec))
@@ -173,7 +169,17 @@ class Keyboard:
             
         # If none are true, then this isn't the right one (function yet to return)
         return False
-            
+    
+    # Hotkey sender
+    # Send hotkey runner command -> server
+    # hotkey = hotkey ref in config
+    def send_hotkey(hotkey):
+        logger.info("Sending hotkey %s to server..." % hotkey)
+        try:
+            requests.post("http://" + config["server"]["ipv4"] + ":" + config["server"]["port"] + "/api/post/trigger", data={ "keyboard": self.name, "hotkey": hotkey })
+        except requests.exceptions.ConnectionError:
+            logger.err("Couldn't estanblish a connection to the server.")
+            logger.err("Please check your internet connection.")
 
 
 # str keyboard: Keyboard file in /dev/input/by-id
