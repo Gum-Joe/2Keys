@@ -178,7 +178,7 @@ class Keyboard:
         logger.info("Sending hotkey %s to server..." % hotkey)
         try:
             data_hotkey = { "keyboard": self.name, "hotkey": hotkey }
-            requests.post("http://" + config["server"]["ipv4"] + ":" + config["server"]["port"] + "/api/post/trigger", data=json.dumps(data_hotkey))
+            requests.post("http://" + config["server"]["ipv4"] + ":" + config["server"]["port"] + "/api/post/trigger", data=json.dumps(data_hotkey), headers={"Content-Type": "application/json"})
         except requests.exceptions.ConnectionError:
             logger.err("Couldn't estanblish a connection to the server.")
             logger.err("Please check your internet connection.")
