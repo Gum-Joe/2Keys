@@ -173,7 +173,7 @@ class Keyboard:
     # Hotkey sender
     # Send hotkey runner command -> server
     # hotkey = hotkey ref in config
-    def send_hotkey(hotkey):
+    def send_hotkey(self, hotkey):
         logger.info("Sending hotkey %s to server..." % hotkey)
         try:
             requests.post("http://" + config["server"]["ipv4"] + ":" + config["server"]["port"] + "/api/post/trigger", data={ "keyboard": self.name, "hotkey": hotkey })
