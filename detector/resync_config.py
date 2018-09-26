@@ -30,6 +30,12 @@ config = json.loads(config_json.text)
 
 
 # Save config
+# Add IP to config
+logger.debug("Storing server address with config...")
+config["server"] = {
+  "ipv4": config["server"]["ipv4"],
+  "port": config["server"]["port"]
+}
 logger.info("Saving config to " + os.getcwd() + "...")
 # Add IP to config
 logger.debug("Opening config...")
