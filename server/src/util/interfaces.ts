@@ -10,6 +10,19 @@ export interface LoggerTypes {
   args: Logger;
 }
 
+export interface Hotkey {
+  type: "down" | "up";
+  func: string;
+}
+
+export interface Keyboard {
+  path: string; // Path to watch on pi
+  dir: string; // Dir of hotkeys
+  root: string; // Root AHK file with all hotkeys
+  map?: Map<string, number>;
+  hotkeys: Hotkey[] | string;
+}
+
 export interface Config {
-  
+  keyboards: Keyboard[];
 }

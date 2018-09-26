@@ -7,7 +7,7 @@ import { join } from "path";
 import YAML from "yaml";
 import { config_loader } from "../util/config";
 import Logger from "../util/logger";
-import { Config } from "../util/interfaces";
+import { Config, Hotkey } from "../util/interfaces";
 import { run_hotkey } from "../util/ahk";
 
 const logger: Logger = new Logger({
@@ -52,11 +52,18 @@ router.post("/post/trigger", async (req, res, next) => {
     const config: Config = await config_loader();
 
     // Get hotkey func
-    const hotkey_func = config.keyboards[keyboard].hotkeys[hotkey_code];
+    let func;
+    const hotkey: string | Hotkey = config.keyboards[keyboard].hotkeys[hotkey_code];
+    if (typeof hotkey !== "string") {
+      // Object type
+      func = hotkey.func;
+    } else {
+      func = hotkey;
+    }
     const file = join(process.cwd(), config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
 
     // Handle
-    run_hotkey(file, hotkey_func);
+    run_hotkey(file, func);
 
     res.statusCode = 200;
     res.send("OK")

@@ -48,6 +48,9 @@ class Keyboard:
         # Store hotkeys list
         self.hotkeys = self.standardise_hotkeys(keyboard["hotkeys"])
         # Store array of hotkeys split into chars as this makes checking easier
+        # current hotkey, used for when watching for an up event
+        self.current_hotkey_up = None
+        self.last_hotkey = None
     
     # Custom mapping
     # Takes in key/value of key: code and adds to map array
@@ -69,18 +72,35 @@ class Keyboard:
                         (code, value, tv_sec, tv_usec, self.map[code]))
     
                 # Set key in array
-                self.change_key_state(code, value)
-                logger.debug(self.keys)
+                # Only done if value 1 so as to not conflict with ups
+                if value == 1:
+                    self.change_key_state(code, value)
+                    logger.debug(self.keys)
 
                 # Run alogrithm to check keys against hotkey
                 # Only run though if value is 0 or 1 to prevent duplicate hotkeys
                 if value < 2:
-                    checked_hotkey = self.check_for_hotkey()
+                    # Proceed with regular hotkey logic
+                    checked_hotkey = self.check_for_hotkey(self.keys)
                     if checked_hotkey != False:
+                        hotkey = self.hotkeys[checked_hotkey]
                         logger.info("Registered hotkey:")
                         logger.info(checked_hotkey)
-                        logger.info(self.hotkeys[checked_hotkey])
-                        self.send_hotkey(checked_hotkey)
+                        logger.info(hotkey)
+                        # Is is an up function?
+                        if hotkey.type == "down" and value == 1:
+                            self.send_hotkey(checked_hotkey)
+                        elif hotkey.type == "up" and value == 0:
+                            self.current_hotkey_up = hotkey
+                            self.last_hotkey = self.keys
+                        else:
+                            logger.err("Invalid hotkey type! Only \"up\" and \"down\" are allowed!")
+                
+                # Set key in array
+                # Only done if value 0 so as to not conflict with downs
+                if value == 0:
+                    self.change_key_state(code, value)
+                    logger.debug(self.keys)
 
                 #elif type != 0 or code != 0 or value != 0:
                 #    print("Event type %u, code %u, value %u at %d.%d" % \
@@ -153,9 +173,10 @@ class Keyboard:
     
     # Hotkey detector algorithm
     # Return the key of the hotkey if hotkey
-    def check_for_hotkey(self):
+    # candidate = array of hotkey strings to check
+    def check_for_hotkey(self, candidates):
         # Check each candidate
-        for combo in self.keys:
+        for combo in candidates:
             logger.debug("Checking hotkey in combo " + combo)
             for key, mapping in self.hotkeys.items():
                 # Check each candidate
