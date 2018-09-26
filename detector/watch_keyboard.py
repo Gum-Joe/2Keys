@@ -92,6 +92,8 @@ class Keyboard:
                             self.send_hotkey(checked_hotkey)
                         elif hotkey["type"] == "up" and value == 0:
                             self.send_hotkey(checked_hotkey)
+                        else:
+                            logger.warn("Hotkey not send as it's type " + hotkey["type"])
                 
                 # Set key in array
                 # Only done if value 0 so as to not conflict with downs
