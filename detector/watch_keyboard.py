@@ -88,9 +88,9 @@ class Keyboard:
                         logger.info(checked_hotkey)
                         logger.info(hotkey)
                         # Is is an up function?
-                        if hotkey.type == "down" and value == 1:
+                        if hotkey["type"] == "down" and value == 1:
                             self.send_hotkey(checked_hotkey)
-                        elif hotkey.type == "up" and value == 0:
+                        elif hotkey["type"] == "up" and value == 0:
                             self.current_hotkey_up = hotkey
                             self.last_hotkey = self.keys
                         else:
