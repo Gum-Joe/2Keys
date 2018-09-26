@@ -91,10 +91,7 @@ class Keyboard:
                         if hotkey["type"] == "down" and value == 1:
                             self.send_hotkey(checked_hotkey)
                         elif hotkey["type"] == "up" and value == 0:
-                            self.current_hotkey_up = hotkey
-                            self.last_hotkey = self.keys
-                        else:
-                            logger.err("Invalid hotkey type! Only \"up\" and \"down\" are allowed!")
+                            self.send_hotkey(checked_hotkey)
                 
                 # Set key in array
                 # Only done if value 0 so as to not conflict with downs
