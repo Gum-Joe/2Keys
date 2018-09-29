@@ -5,7 +5,7 @@ A easy to setup second keyboard, designed for everyone.
 Windows is supported only as the server (where thje hotkeys will run) and a raspberry pi is required to run the detector
 
 ## WARNING
-This will download a copy of [AutoHotkey](https://github.com/AutoHotkey/)
+This will download a copy of [AutoHotkey_H](https://hotkeyit.github.io/v2/), a DLL version of [AutoHotkey](http://autohotkey.com/)
 
 ## Building
 To build the jar:
@@ -36,15 +36,12 @@ Symbols, based of AHK:
 
 NOTE: Slash issues.  Key 127 is useful as a mode key.  DO NOT BLOCK 99. 125 and 126 are Windows Keys
 
-The following keys are disabled:
+The following keys are not blocked by 2Keys, but can still be remapped:
 
 - SysReq key, so you can recover the system
 - Power key so you can power the system down
 
 
 ## Sofware used & inspiration
-To block keystrokes from the second keyboard: [Interception](https://github.com/oblitum/Interception), found in `./lib/interception`
-
 Inspired by LTT editor Taran's second keyboard project: [https://github.com/TaranVH/2nd-keyboard](https://github.com/TaranVH/2nd-keyboard)
-
-To detect the keyboard being used: [https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard](https://www.codeproject.com/Articles/17123/Using-Raw-Input-from-C-to-handle-multiple-keyboard) (code downloaded).  Licensed under `LGPL3`, code has been modified to work for 2Keys.  Found in `./lib/rawinput`
+Uses AutoHotkey_H (a DLL version of AutoHotkey): [https://hotkeyit.github.io/v2/][https://hotkeyit.github.io/v2/]

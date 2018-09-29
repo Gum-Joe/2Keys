@@ -11,6 +11,9 @@ logger = Logger("sync")
 config = load_config()
 address = "http://" + config["server"]["ipv4"] + ":" + config["server"]["port"] + "/api/get/config"
 
+logger.err("Script not ready yet. Will overwrite all config")
+exit()
+
 logger.info("Syncing config...")
 logger.debug("GET " + address)
 try:
@@ -30,6 +33,12 @@ config = json.loads(config_json.text)
 
 
 # Save config
+# Add IP to config
+logger.debug("Storing server address with config...")
+config["server"] = {
+  "ipv4": config["server"]["ipv4"],
+  "port": config["server"]["port"]
+}
 logger.info("Saving config to " + os.getcwd() + "...")
 # Add IP to config
 logger.debug("Opening config...")
