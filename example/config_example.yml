@@ -1,4 +1,6 @@
-type: multi
+permissions:
+  ssh: true # Allows us to ssh into the raspberry pi to execute command to map keys to allow easy setup
+  variables: true # Allows AHK scripts to interface with each other
 
 keyboards:
   Keyboard_1:
@@ -27,15 +29,9 @@ keyboards:
         type: down
         from: npm/vscode/editor # Load npm pack 2Keys-vscode and load the editor directory hotkeys in it
         func: CopyAll
-      $LEFT$: # Key name
-        type: down
-        func: npm.premiere/preview-window:FiveFramesForward
       $LEFT$:
         type: down
         func: npm/premiere/preview-window:FiveFramesForward
-      $LEFT$:
-        type: down
-        func: npm.premiere.preview-window:FiveFrameForward
     Keyboard_2:
       !com.gumjoe.twokeys.generators.config.Keyboard
       path: /dev/input/by-id/xyz

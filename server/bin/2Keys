@@ -1,8 +1,39 @@
 #!/usr/bin/env node
-const argv = require("yargs").argv;
+const yargs = require("yargs");
 const serve = require("../lib/index").default;
 const { DEFAULT_PORT } = require("../lib/util/constants");
+const oobe = require("../lib/oobe").default;
 
-if (typeof argv.dir !== "undefined") process.chdir(argv.dir);
+// const argv = yargs.argv;
 
-serve(typeof port === "number" ? parseInt(argv.port) : DEFAULT_PORT);
+yargs
+  .command("serve", "Start the 2Keys server", yarg => {
+    yarg.option("port", {
+      alias: "p",
+      default: DEFAULT_PORT
+    });
+    yarg.option("dir", {
+      alias: "d",
+      default: process.cwd()
+    });
+  }, argv => {
+    process.chdir(argv.dir);
+    serve(typeof argv.port === "number" ? parseInt(argv.port) : DEFAULT_PORT);
+  })
+  .command("oobe", "Runs OOBE; i.e. donwloads required components", yarg => {
+    yarg.option("force", {
+      alias: "f",
+      description: "Force the creation of file, even if they exist"
+    });
+    yarg.option("install-apps-to", {
+      description: "Specify the location to install components to"
+    });
+    yarg.option("ahk-v2", {
+      description: "Use AutoHotkey v2 (alpha) as the runner for hotkeys"
+    });
+  }, argv => {
+    oobe(argv);
+  })
+  .command("init", "Initialise a new 2Keys config")
+  .command("add", "Setup a new keyboard (and map it, only works if permission ssh is enabled)")
+  .argv

@@ -17,7 +17,7 @@ app.use("/api", api)
 
 const server: (port: number) => void = (port: number = DEFAULT_PORT) => {
   app.listen(port, () => {
-    logger.info("Server now listenning");
+    logger.info("Server now listenning on port " + port);
   });
 };
 
