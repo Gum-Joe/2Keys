@@ -26,3 +26,23 @@ export interface Keyboard {
 export interface Config {
   keyboards: Keyboard[];
 }
+
+/**
+ * For default app paths in constants.DEFAULT_APP_PATHS
+ * @interface AppPath
+ * @param root Absolute root path for app, where all of the app is
+ * @param dll (Optional) Relative path to a DLL to load
+ * @param exe (Optional) Relative path to a EXE to run
+ */
+export interface AppPath {
+  root: string,
+  dll?: string,
+  exe?: string
+}
+
+/**
+ * Index type of constants.DEFAULT_APP_PATH
+ */
+export interface AppPaths {
+  [index: string]: AppPath
+}

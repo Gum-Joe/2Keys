@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 const yargs = require("yargs");
 const serve = require("../lib/index").default;
-const { DEFAULT_PORT } = require("../lib/util/constants");
+const { DEFAULT_PORT, DEFAULT_APP_PATHS } = require("../lib/util/constants");
 const oobe = require("../lib/oobe").default;
+const init = require("../lib/init").default;
 
 // const argv = yargs.argv;
 
@@ -10,11 +11,13 @@ yargs
   .command("serve", "Start the 2Keys server", yarg => {
     yarg.option("port", {
       alias: "p",
-      default: DEFAULT_PORT
+      default: DEFAULT_PORT,
+      description: "Specify a port to run the server on"
     });
     yarg.option("dir", {
       alias: "d",
-      default: process.cwd()
+      default: process.cwd(),
+      description: "Specify the root directory, where the config is located"
     });
   }, argv => {
     process.chdir(argv.dir);
@@ -25,8 +28,9 @@ yargs
       alias: "f",
       description: "Force the creation of file, even if they exist"
     });
-    yarg.option("install-apps-to", {
-      description: "Specify the location to install components to"
+    yarg.option("install-components-to", {
+      description: "Specify the location to install components to",
+      default: DEFAULT_APP_PATHS
     });
     yarg.option("ahk-v2", {
       description: "Use AutoHotkey v2 (alpha) as the runner for hotkeys"
@@ -34,6 +38,29 @@ yargs
   }, argv => {
     oobe(argv);
   })
-  .command("init", "Initialise a new 2Keys config")
+  .command("init", "Initialises a new 2Keys config", yarg => {
+    yarg.option("force", {
+      alias: "f",
+      description: "Forcibly run OOBE"
+    });
+    yarg.option("install-components-to", {
+      description: "Specify the location to install components to during OOBE"
+    });
+    yarg.option("local", {
+      alias: "l",
+      description: "Install components locally, in ./.2Keys/",
+    })
+    yarg.option("ahk-v2", {
+      description: "Use AutoHotkey v2 (alpha) as the runner for hotkeys"
+    });
+    yarg.option("dir", {
+      alias: "d",
+      default: process.cwd(),
+      description: "Specify the directory to initalise in"
+    });
+  }, argv => {
+    process.chdir(argv.dir); // If needed
+    init(argv);
+  })
   .command("add", "Setup a new keyboard (and map it, only works if permission ssh is enabled)")
   .argv
