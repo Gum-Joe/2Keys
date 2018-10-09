@@ -3,7 +3,7 @@
  */
 import { readFile as readFileRaw } from "fs";
 import { join } from "path";
-import * as yaml from "js-yaml";
+import YAML from "yaml";
 import { promisify } from "util";
 
 import { CONFIG_FILE } from "./constants";
@@ -16,7 +16,7 @@ const logger: Logger = new Logger({ name: "config" });
 export async function config_loader(): Config {
 	try {
 		const config: Buffer = await readFile(join(process.cwd(), CONFIG_FILE));
-		const parsed_config: Config = yaml.safeLoad(config.toString());
+		const parsed_config: Config = YAML.parse(config.toString());
 		return parsed_config;
 	} catch (err) {
 		logger.throw_noexit(err);

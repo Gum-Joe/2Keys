@@ -4,9 +4,11 @@
 import * as fs from "fs";
 import { promisify } from "util";
 import { Arguments } from "yargs";
+import YAML from "yaml";
 import Logger from "../util/logger";
 import { CONFIG_FILE } from "../util/constants";
 import get_config from "./get-config";
+import { Config } from "../util/interfaces";
 
 const logger: Logger = new Logger({
   name: "init"
@@ -19,9 +21,12 @@ const access = promisify(fs.access);
  * Function to initalise 2Keys config
  * @param argv Arguments from yargs
  */
-const run_init: (argv: Arguments) => void = (argv: Arguments) => {
+const run_init: (argv: Arguments) => void = async (argv: Arguments) => {
   logger.info("Starting to initalise a new 2Keys config...");
-  get_config();
+  const config: Config = await get_config();
+  const yaml_config = YAML.stringify(config);
+  logger.debug("Config:");
+  logger.debug(yaml_config);
 }
 
 export default async function (argv: Arguments) {

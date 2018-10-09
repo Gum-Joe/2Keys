@@ -1,6 +1,6 @@
 import { join } from "path";
 import { homedir } from "os";
-import { AppPath, AppPaths } from "./interfaces";
+import { AppPath, AppPaths, Keyboard } from "./interfaces";
 
 /**
  * @overview Constants for 2Keys
@@ -22,3 +22,4 @@ export const DEFAULT_APP_PATHS: AppPaths = {
   }
 }
 export const CONFIG_NAME: string = "config.yml";
+export const DEFAULT_HOTKEY_FILE_ROOT: string = "index.ahk";

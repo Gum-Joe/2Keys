@@ -25,6 +25,13 @@ export interface Keyboard {
 
 export interface Config {
   keyboards: Keyboard[];
+  addresses: { // IPv4 addresses
+    server: string;
+    detector: string;
+  }
+  perms?: { // Permissions
+    ssh: boolean; // Allow us to auto run setup and startup and 2Keys command on the pi via SSH
+  }
 }
 
 /**
