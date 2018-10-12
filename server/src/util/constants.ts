@@ -21,5 +21,4 @@ export const DEFAULT_APP_PATHS: AppPaths = {
     exe: "./x64w/AutoHotkey.exe"  
   }
 }
-export const CONFIG_NAME: string = "config.yml";
 export const DEFAULT_HOTKEY_FILE_ROOT: string = "index.ahk";

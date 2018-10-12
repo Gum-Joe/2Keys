@@ -24,7 +24,9 @@ export interface Keyboard {
 }
 
 export interface Config {
-  keyboards: Keyboard[];
+  keyboards: {
+    [propName: string]: Keyboard;
+  };
   addresses: { // IPv4 addresses
     server: string;
     detector: string;

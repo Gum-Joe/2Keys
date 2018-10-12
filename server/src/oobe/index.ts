@@ -10,4 +10,6 @@ const logger = new Logger({
 
 export default function run_oobe(argv: Arguments) {
   logger.info("Starting OOBE...");
+  logger.debug("Checking if OOBE has already been ran...");
+  
 }

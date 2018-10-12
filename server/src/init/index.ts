@@ -16,6 +16,7 @@ const logger: Logger = new Logger({
 
 // Util
 const access = promisify(fs.access);
+const write = promisify(fs.writeFile);
 
 /**
  * Function to initalise 2Keys config
@@ -23,10 +24,17 @@ const access = promisify(fs.access);
  */
 const run_init: (argv: Arguments) => void = async (argv: Arguments) => {
   logger.info("Starting to initalise a new 2Keys config...");
-  const config: Config = await get_config();
+  const config: Config = await get_config(argv);
   const yaml_config = YAML.stringify(config);
   logger.debug("Config:");
-  logger.debug(yaml_config);
+  console.log(yaml_config);
+  logger.info("Writing config...");
+  try {
+    await write(CONFIG_FILE, yaml_config);
+  } catch (err) {
+    logger.throw(err);
+  }
+  logger.debug("Running OOBE...")
 }
 
 export default async function (argv: Arguments) {

@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"files.associations": {
+			"*.jsx": "javascriptreact",
+			"iostream": "cpp",
+			"xstring": "cpp",
+			"xlocale": "cpp",
+			"xutility": "cpp"
+		}
+	}
+}
