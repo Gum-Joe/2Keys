@@ -1,0 +1,36 @@
+# Example config for 2Keys
+# stored in home/.2keys.yml
+oobe: true # OOBE done
+paths:
+  root: C:\ # Absolute path to root 2Keys userspace storage (default: user folder/.2Keys)
+  software: C:\Software
+packs:
+  paths: # Paths to packs
+    - path: ./packs
+      register: ./register.json # Store installed packages
+  sources: # Sources/repos for packages
+    - npm
+    - pip
+    - git: https://github.com/Gum-Joe/custom-packages
+
+
+software:
+  ahk:
+    version: 1.0.0 # Set by Version prop
+    paths:
+      root: ./ahk # Relative to general.root
+      dll: ./ # Path to dll ro load, relative to paths.root
+      exe: ./ahk.exe # Path to ahk root
+  yarn:
+    version: 10.0.0
+    paths:
+      root: C:\Program File
+      exe: ./yarn.bat # Can be batch file i.e. to wrap around the app
+  pip:
+      version: 3.0.0
+      paths:
+        root: C:\Python3\pip
+        exe: ./pip.bat
+
+libs: # Libaries to import into AHK on load for all scripts
+  - pack://2Keys-base # Loads in dir, parts can then be called by i.e. #Include <2Keys-base/vars/index.ahk>

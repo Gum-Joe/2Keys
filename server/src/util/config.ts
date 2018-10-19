@@ -5,9 +5,8 @@ import { readFile as readFileRaw } from "fs";
 import { join } from "path";
 import YAML from "yaml";
 import { promisify } from "util";
-
-import { CONFIG_FILE } from "./constants";
-import { Config } from "./interfaces";
+import { CONFIG_FILE, DEFAULT_USERSPACE_CONFIG } from "./constants";
+import { Config, UserspaceConfig } from "./interfaces";
 import Logger from "./logger";
 
 const readFile = promisify(readFileRaw); // For easier handling with async
@@ -19,7 +18,17 @@ export async function config_loader(): Config {
 		const parsed_config: Config = YAML.parse(config.toString());
 		return parsed_config;
 	} catch (err) {
-		logger.throw_noexit(err);
-		throw err;
+		throw err; // Handled by callback
 	}
 }
+
+export async function userspace_config_loader(): Promise<UserspaceConfig> {
+	try {
+		const config: Buffer = await readFile(DEFAULT_USERSPACE_CONFIG);
+		const parsed_config: UserspaceConfig = YAML.parse(config.toString());
+		return parsed_config;
+	} catch (err) {
+		throw err; // Handled by callback
+	}
+}
+

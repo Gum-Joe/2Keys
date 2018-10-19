@@ -55,3 +55,26 @@ export interface AppPath {
 export interface AppPaths {
   [index: string]: AppPath
 }
+
+export interface UserspaceConfigSoftwareConfig {
+  version: string | number;
+  paths: {
+    root: string; // Root of where software contents are, relative to paths.software
+    dll?: string; // Path to DLL to use from software, relative to this.paths.root
+    exe?: string; // Path to EXE to use from software, relative to this.paths.root
+  };
+}
+/**
+ * Config for Userspace
+ * See /example/config_userspace.yml
+ */
+export interface UserspaceConfig {
+  oobe: boolean; // Has OOBE been done?
+  paths: {
+    root: string; // Absolute path to 2Keys usersapce root.  Default: /home/.2Keys (where home is user folder)
+    software: string; // Relative to root, is where downloaded software is
+  };
+  software: {
+    [index: string]: UserspaceConfigSoftwareConfig;
+  };
+}

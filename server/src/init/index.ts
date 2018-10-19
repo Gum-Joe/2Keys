@@ -24,17 +24,23 @@ const write = promisify(fs.writeFile);
  */
 const run_init: (argv: Arguments) => void = async (argv: Arguments) => {
   logger.info("Starting to initalise a new 2Keys config...");
-  const config: Config = await get_config(argv);
-  const yaml_config = YAML.stringify(config);
-  logger.debug("Config:");
-  console.log(yaml_config);
-  logger.info("Writing config...");
+  let config: Config;
   try {
-    await write(CONFIG_FILE, yaml_config);
+    config = await get_config(argv);
   } catch (err) {
     logger.throw(err);
+  } finally {
+    const yaml_config = YAML.stringify(config);
+    logger.debug("Config:");
+    console.log(yaml_config);
+    logger.info("Writing config...");
+    try {
+      await write(CONFIG_FILE, yaml_config);
+    } catch (err) {
+      logger.throw(err);
+    }
+    logger.debug("Running OOBE...");
   }
-  logger.debug("Running OOBE...")
 }
 
 export default async function (argv: Arguments) {
