@@ -5,7 +5,12 @@
       'msvs_configuration_attributes': {
         'CharacterSet': 1
       },
-      "sources": [ "./src/cpp/main.cc", "./src/cpp/run-ahk.cc", "./src/cpp/current-dir.cc" ]
+      "sources": [
+        "./src/cpp/main.cc",
+        "./src/cpp/run-ahk.cc",
+        "./src/cpp/current-dir.cc",
+        "./src/cpp/convert.cc"
+      ],
     }
   ]
 }

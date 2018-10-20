@@ -32,7 +32,12 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
       // Yay! run the hotkey
       logger.debug(`#Include ${file}; ${func}()`);
       try {
-        ahk.run_ahk_text(AHK_LIB_PATH, `#Include ${file}\n${func}()`);
+        const ahk_run = ahk.run_ahk_text(AHK_LIB_PATH, `#Include ${file}\n${func}()`);
+        if (typeof ahk_run != null) {
+          // ERROR!
+          const error: Error = new Error(`Error running AutoHotkey: ${ahk_run.message}.  Code: ${ahk_run.code}`)
+          logger.throw_noexit(error);
+        }
         // Change back to old CWD
         process.chdir(old_cwd);
       } catch (err) {

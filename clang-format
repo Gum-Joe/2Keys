@@ -1,0 +1,30 @@
+﻿---
+BasedOnStyle: Mozilla
+AlignAfterOpenBracket: AlwaysBreak
+AlignTrailingComments: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: 'true'
+AllowShortLoopsOnASingleLine: 'true'
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: 'true'
+AlwaysBreakTemplateDeclarations: 'false'
+BinPackParameters: 'false'
+BreakBeforeBraces: Attach
+BreakStringLiterals: 'false'
+Cpp11BracedListStyle: 'false'
+IndentWrappedFunctionNames: 'false'
+Language: Cpp
+NamespaceIndentation: All
+PointerAlignment: Right
+SpaceBeforeAssignmentOperators: 'true'
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: 'false'
+SpacesInAngles: 'false'
+SpacesInParentheses: 'false'
+Standard: Cpp11
+UseTab: Never
+
+...
