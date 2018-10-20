@@ -10,10 +10,11 @@ import { join } from "path";
  * Downloader
  * @param argv Args from CLI
  */
-export default function fetch_software(argv: Arguments) {
+export default async function fetch_software(argv: Arguments) {
   // fetch(ahk_url)
   // Extract
   // Copy
-  const ahk = new ZipDownloader("ahk", AHK_DOWNLOAD_PATH, join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`));
-  ahk.fetch_file();
+  const ahk = new ZipDownloader("ahk", AHK_DOWNLOAD_PATH, join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`), argv);
+  await ahk.fetch_file(`ahk-${AHK_VERSION}`);
+  await ahk.extract();
 }

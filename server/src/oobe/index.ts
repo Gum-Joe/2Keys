@@ -40,7 +40,7 @@ export default async function run_oobe(argv: Arguments) {
     } else {
       // Run OOBE
       // Step 1: Fetch Software
-      fetch_software(argv);
+      await fetch_software(argv);
     }
   }
 }

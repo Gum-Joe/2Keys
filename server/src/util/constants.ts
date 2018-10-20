@@ -10,7 +10,7 @@ export const DEFAULT_PORT: number = 9090;
 export const CONFIG_FILE: string = "config.yml";
 //export const AHK_LIB_PATH: string = "D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\x64w\\AutoHotkey.dll";
 export const AHK_LIB_PATH: string = "D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v2-release-master\\x64w\\AutoHotkey.dll";
-export const AHK_DOWNLOAD_PATH = "https://github.com/HotKeyIt/ahkdll-v2-release/archive/master.zip";
+export const AHK_DOWNLOAD_PATH = "https://codeload.github.com/HotKeyIt/ahkdll-v2-release/zip/master";
 export const AHK_VERSION = "2.0.0-alpha"
 
 // Default paths
