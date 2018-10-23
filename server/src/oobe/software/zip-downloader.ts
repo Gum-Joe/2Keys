@@ -6,6 +6,7 @@ import https from "https";
 import mkdirpRaw from "mkdirp";
 import ProgressBar from "progress";
 import { Arguments } from "yargs";
+import yauzl from "yauzl";
 import Logger from "../../util/logger";
 import { promisify } from "util";
 import { join } from "path";
@@ -42,75 +43,105 @@ export default class ZipDownloader {
    * Download the file
    * @param saveLoc File name to save zip to.
    */
-  async fetch_file(saveName: string | undefined = this.name + ".zip") {
-    this.logger.info(`Downloading package from url ${this.url} to ${this.saveTo} as ${saveName}.zip...`);
-    this.fullPath = join(this.saveTo, saveName) + ".zip"; // Save full path
+  fetch_file(saveName: string | undefined = this.name + ".zip"): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      this.logger.info(`Downloading package from url ${this.url} to ${this.saveTo} as ${saveName}.zip...`);
+      this.fullPath = join(this.saveTo, saveName) + ".zip"; // Save full path
 
-    // Make dirs
-    try { await mkdirp(this.saveTo) } catch (err) { 
-      this.logger.err("Error making download dirs!");
-      this.logger.throw_noexit(err);
-      return;
-    };
-    this.logger.debug("Creating dirs.");
-
-    // See if exists
-    // Only needed if not forcing
-    if (!this.argv.force) {
-      let file_number: number;
-      try {
-        file_number = await open(this.fullPath, "wx");
-      } catch (err) {
-        if (err.code === "EEXIST") {
-          this.logger.err(`${this.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
-        } else {
-          this.logger.err(`Error opening file to save to!`);
-          this.logger.throw(err);
-        }
+      // Make dirs
+      try { await mkdirp(this.saveTo) } catch (err) {
+        this.logger.err("Error making download dirs!");
+        this.logger.throw_noexit(err);
         return;
+      };
+      this.logger.debug("Created dirs.");
+
+      // See if exists
+      // Only needed if not forcing
+      if (!this.argv.force) {
+        let file_number: number;
+        try {
+          file_number = await open(this.fullPath, "wx");
+        } catch (err) {
+          if (err.code === "EEXIST") {
+            this.logger.err(`${this.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
+          } else {
+            this.logger.err(`Error opening file to save to!`);
+            this.logger.throw(err);
+          }
+          return;
+        }
       }
-    }
 
-    // Create request
-    const req = https.request({
-      host: this.url.split("/")[2],
-      port: 443,
-      path: this.url.slice(`https://${this.url.split("/")[2]}`.length)
-    });
-
-    req.on("response", res => {
-      const len = parseInt(res.headers["content-length"], 10);
-      let downloaded = "";
-
-      const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
-        complete: '▓',
-        incomplete: '░',
-        width: 50,
-        total: isNaN(len) ? 6403580 : len
+      // Create request
+      const req = https.request({
+        host: this.url.split("/")[2],
+        port: 443,
+        path: this.url.slice(`https://${this.url.split("/")[2]}`.length)
       });
-      res.on('data', chunk => {
-        progress_bar.tick(chunk.length);
-        // Would prefer stream or open() file descripter
-        appendFile(this.fullPath, chunk, err => {
-          if (err) this.logger.throw_noexit(err);
+
+      req.on("response", res => {
+        const len = parseInt(res.headers["content-length"], 10);
+        let downloaded = "";
+
+        const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
+          complete: '▓',
+          incomplete: '░',
+          width: 50,
+          total: isNaN(len) ? 6403580 : len
+        });
+        res.on('data', chunk => {
+          progress_bar.tick(chunk.length);
+        });
+        res.pipe(createWriteStream(this.fullPath)); // Pipe to writer
+        res.on('end', () => {
+          this.logger.info("Download complete.");
+          resolve();
         });
       });
 
-      res.on('end', () => {
-        this.logger.info("Download complete.");
-      });
+      req.end();
     });
-
-    req.end();
   }
 
   /**
    * Extract the zip folder
    */
-  async extract() {
+  extract() {
     this.logger.info("Extracting...");
-    if (typeof this.fullPath !== "undefined") {
+    if (typeof this.fullPath === "undefined") {
       this.logger.err("Error! Zip file not fetched.");
     }
+    // DO IT
+    // From https://github.com/thejoshwolfe/yauzl
+    yauzl.open(this.fullPath, { lazyEntries: true }, (err, zipfile) => {
+      if (err) throw err;
+      const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
+        complete: '▓',
+        incomplete: '░',
+        width: 50,
+        total: zipfile.fileSize
+      });
+      zipfile.readEntry();
+      zipfile.on("entry", (entry) => {
+        if (/\/$/.test(entry.fileName)) {
+          // Directory file names end with '/'.
+          // Note that entires for directories themselves are optional.
+          // An entry's fileName implicitly requires its parent directories to exist.
+          mkdirp(join(this.saveTo, entry.fileName));
+          zipfile.readEntry();
+        } else {
+          // file entry
+          zipfile.openReadStream(entry, (err, readStream) => {
+            if (err) throw err;
+            readStream.on("end", function () {
+              zipfile.readEntry();
+              progress_bar.tick(entry.compressedSize);
+            });
+            readStream.pipe(createWriteStream(join(this.saveTo, entry.fileName)));
+          });
+        }
+      });
+    });
   }
 }

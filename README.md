@@ -16,8 +16,8 @@ To package the jar for publishing:
 
 ## Devices
 **Server**: The device running the hot keys sever, i.e. where the hot keys will be run
-**Handler**: Device that handles keyboard presses and sends them to the Server
-**Detecter**: Device that handles detection of key presses & which keyboard it is
+
+**Detecter**: Device that handles detection of key presses & which keyboard it is and sends this to the server
 
 ## Config notes
 Symbols, based of AHK:
@@ -25,7 +25,7 @@ Symbols, based of AHK:
 
 | Symbol |                                                                                                                                  |
 |--------|----------------------------------------------------------------------------------------------------------------------------------|
-| !      | Alt (Use `+1` for !)                                                                                                             |
+| !      | Alt                                                                                                                              |
 | ^      | Control                                                                                                                          |
 |  +     | Shift                                                                                                                            |
 | <      | Left key (i.e. left control (`<^`), left shift (`<+`))                                                                           |

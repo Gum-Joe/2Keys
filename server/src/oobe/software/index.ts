@@ -3,8 +3,9 @@
  */
 import { Arguments } from "yargs";
 import ZipDownloader from "./zip-downloader";
-import { AHK_DOWNLOAD_PATH, DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, AHK_VERSION } from "../../util/constants";
+import { AHK_DOWNLOAD_PATH, DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, AHK_VERSION, DEFAULT_USERSPACE_SOFTWARE_PATHS } from "../../util/constants";
 import { join } from "path";
+import copy_contents from "../../util/copy-contents";
 
 /**
  * Downloader
@@ -16,5 +17,6 @@ export default async function fetch_software(argv: Arguments) {
   // Copy
   const ahk = new ZipDownloader("ahk", AHK_DOWNLOAD_PATH, join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`), argv);
   await ahk.fetch_file(`ahk-${AHK_VERSION}`);
-  await ahk.extract();
+  ahk.extract();
+  copy_contents(ahk.saveTo, join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
 }
