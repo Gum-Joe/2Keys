@@ -95,7 +95,7 @@ export default class ZipDownloader {
         });
         res.pipe(createWriteStream(this.fullPath)); // Pipe to writer
         res.on('end', () => {
-          this.logger.info("Download complete.");
+          this.logger.info("\nDownload complete.");
           resolve();
         });
       });
@@ -108,40 +108,47 @@ export default class ZipDownloader {
    * Extract the zip folder
    */
   extract() {
-    this.logger.info("Extracting...");
-    if (typeof this.fullPath === "undefined") {
-      this.logger.err("Error! Zip file not fetched.");
-    }
-    // DO IT
-    // From https://github.com/thejoshwolfe/yauzl
-    yauzl.open(this.fullPath, { lazyEntries: true }, (err, zipfile) => {
-      if (err) throw err;
-      const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
-        complete: '▓',
-        incomplete: '░',
-        width: 50,
-        total: zipfile.fileSize
-      });
-      zipfile.readEntry();
-      zipfile.on("entry", (entry) => {
-        if (/\/$/.test(entry.fileName)) {
-          // Directory file names end with '/'.
-          // Note that entires for directories themselves are optional.
-          // An entry's fileName implicitly requires its parent directories to exist.
-          mkdirp(join(this.saveTo, entry.fileName));
-          zipfile.readEntry();
-        } else {
-          // file entry
-          zipfile.openReadStream(entry, (err, readStream) => {
-            if (err) throw err;
-            readStream.on("end", function () {
-              zipfile.readEntry();
-              progress_bar.tick(entry.compressedSize);
+    return new Promise((resolve, reject) => {
+      this.logger.info("Extracting...");
+      if (typeof this.fullPath === "undefined") {
+        this.logger.err("Error! Zip file not fetched.");
+        reject(new Error("Zip file not downloaded.  Please run ZipDownloader.fetch_file()"));
+      }
+      // DO IT
+      // From https://github.com/thejoshwolfe/yauzl
+      yauzl.open(this.fullPath, { lazyEntries: true }, (err, zipfile) => {
+        if (err) throw err;
+        const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
+          complete: '▓',
+          incomplete: '░',
+          width: 50,
+          total: zipfile.fileSize
+        });
+        zipfile.readEntry();
+        zipfile.on("entry", (entry) => {
+          if (/\/$/.test(entry.fileName)) {
+            // Directory file names end with '/'.
+            // Note that entires for directories themselves are optional.
+            // An entry's fileName implicitly requires its parent directories to exist.
+            mkdirp(join(this.saveTo, entry.fileName), err => { if (err) reject(err) });
+            zipfile.readEntry();
+          } else {
+            // file entry
+            zipfile.openReadStream(entry, (err, readStream) => {
+              if (err) reject(err);
+              readStream.on("end", function () {
+                zipfile.readEntry();
+                progress_bar.tick(entry.compressedSize);
+              });
+              readStream.pipe(createWriteStream(join(this.saveTo, entry.fileName)));
             });
-            readStream.pipe(createWriteStream(join(this.saveTo, entry.fileName)));
-          });
-        }
+          }
+        });
+        zipfile.on("end", () => {
+          resolve();
+        })
       });
     });
   }
+  
 }

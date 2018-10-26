@@ -78,3 +78,10 @@ export interface UserspaceConfig {
     [index: string]: UserspaceConfigSoftwareConfig;
   };
 }
+
+/**
+ * Options for file copiers
+ */
+export interface FileCopyOpts {
+  ignore?: RegExp[] // Array of regexps to match if ignoring a file
+}

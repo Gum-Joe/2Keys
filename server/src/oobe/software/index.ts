@@ -17,6 +17,6 @@ export default async function fetch_software(argv: Arguments) {
   // Copy
   const ahk = new ZipDownloader("ahk", AHK_DOWNLOAD_PATH, join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`), argv);
   await ahk.fetch_file(`ahk-${AHK_VERSION}`);
-  ahk.extract();
-  copy_contents(ahk.saveTo, join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
+  await ahk.extract();
+  await copy_contents(ahk.saveTo, join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
 }
