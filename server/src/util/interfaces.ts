@@ -80,8 +80,16 @@ export interface UserspaceConfig {
 }
 
 /**
- * Options for file copiers
+ * Interface for each section of the file tree
  */
-export interface FileCopyOpts {
-  ignore?: RegExp[] // Array of regexps to match if ignoring a file
+export interface FileTreeNode {
+  type: "file" | "dir" // File or dir?
+  path: string // Full path to the file
+}
+
+/**
+ * Interface for files
+ */
+export interface FileTreeDir extends FileTreeNode {
+  contents: FileTreeNode[];
 }
