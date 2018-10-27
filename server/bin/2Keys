@@ -56,12 +56,12 @@ yargs
     yarg.option("ahk-v2", {
       description: "Use AutoHotkey v2 (alpha) as the runner for hotkeys"
     });
+    */
     yarg.option("dir", {
       alias: "d",
       default: process.cwd(),
       description: "Specify the directory to initalise in"
     });
-    */
   }, argv => {
     process.chdir(argv.dir); // If needed
     init(argv);

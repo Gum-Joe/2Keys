@@ -28,7 +28,10 @@ export interface Config {
     [propName: string]: Keyboard;
   };
   addresses: { // IPv4 addresses
-    server: string;
+    server: {
+      ipv4: string;
+      port: number;  // Port number
+    };
     detector: string;
   }
   perms?: { // Permissions

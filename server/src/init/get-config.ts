@@ -6,7 +6,7 @@ import { Arguments } from "yargs";
 import Logger from "../util/logger";
 import { networkInterfaces, NetworkInterfaceInfo } from "os";
 import { Config, Keyboard } from "../util/interfaces";
-import { DEFAULT_HOTKEY_FILE_ROOT } from "../util/constants";
+import { DEFAULT_HOTKEY_FILE_ROOT, DEFAULT_PORT } from "../util/constants";
 
 const logger: Logger = new Logger({
   name: "init"
@@ -70,6 +70,25 @@ export default function (argv: Arguments): Promise<Config> {
       message: "What is the ipv4 addres the detector should use to contact this PC?  NOTE: You'll need this for setup on the pi later.  If in doubt, ignore anything that says vEthernet",
       choices: ip_choices,
     }); // Push to array
+
+    // Add port Q
+    questions.push({
+      type: "input",
+      name: "local_port",
+      message: "What port should we run the server on. If in doubt, just hit Enter to use the default.",
+      default: DEFAULT_PORT,
+      validate: input => {
+        return new Promise((resolve, reject) => {
+          if (isNaN(input)) {
+            reject("Invalid port number. Port must be a number.");
+          } else {
+            resolve(true);
+          }
+        })
+      }
+    });
+
+    // Inquire
     const answers: inquirer.Answers = await inquirer.prompt(questions);
 
     // Validate keyboards
@@ -97,11 +116,15 @@ export default function (argv: Arguments): Promise<Config> {
     const answers_keyboards: inquirer.Answers = await inquirer.prompt(questions_keyboard);
 
     logger.info("Thanks for that.  Generating config...");
+    console.log(answers.local_port)
     const config: Config = {
       keyboards: {},
       addresses: {
         detector: answers.detector_ip,
-        server: answers.local_ip.split(", ")[1] // Might be buggy
+        server: { 
+          ipv4: answers.local_ip.split(", ")[1], // Might be buggy
+          port: parseInt(answers.local_port),
+        }
       },
       perms: {
         ssh: answers.allow_ssh,
