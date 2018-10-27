@@ -32,6 +32,7 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
       // Yay! run the hotkey
       logger.debug(`#Include ${file}; ${func}()`);
       try {
+        // TODO: Replace AHK_LIB_PATH with a getAhkDLL()
         const ahk_run = ahk.run_ahk_text(AHK_LIB_PATH, `#Include ${file}\n${func}()`);
         if (typeof ahk_run != null) {
           // ERROR!

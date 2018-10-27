@@ -9,6 +9,8 @@ import Logger from "../util/logger";
 import { CONFIG_FILE } from "../util/constants";
 import get_config from "./get-config";
 import { Config } from "../util/interfaces";
+import run_oobe from "../oobe";
+import gen_files from "./gen-files";
 
 const logger: Logger = new Logger({
   name: "init"
@@ -27,9 +29,6 @@ const run_init: (argv: Arguments) => void = async (argv: Arguments) => {
   let config: Config;
   try {
     config = await get_config(argv);
-  } catch (err) {
-    logger.throw(err);
-  } finally {
     const yaml_config = YAML.stringify(config);
     logger.debug("Config:");
     console.log(yaml_config);
@@ -39,7 +38,12 @@ const run_init: (argv: Arguments) => void = async (argv: Arguments) => {
     } catch (err) {
       logger.throw(err);
     }
+    logger.info("Generating files...");
+    await gen_files(config);
     logger.debug("Running OOBE...");
+    await run_oobe(argv);
+  } catch (err) {
+    logger.throw(err);
   }
 }
 

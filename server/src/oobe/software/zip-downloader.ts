@@ -95,6 +95,7 @@ export default class ZipDownloader {
         });
         res.pipe(createWriteStream(this.fullPath)); // Pipe to writer
         res.on('end', () => {
+          console.log("");
           this.logger.info("Download complete.");
           resolve();
         });

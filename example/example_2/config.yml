@@ -1,0 +1,10 @@
+keyboards:
+  keyboard_1:
+    path: WAITING FROM DETECTOR
+    dir: ./Keyboard_1
+    root: index.ahk
+addresses:
+  detector: 192.168.0.100
+  server: 192.168.0.12
+perms:
+  ssh: true

@@ -34,13 +34,18 @@ export default async function run_oobe(argv: Arguments) {
     }
   } finally {
     // Verify OOBE
-    if (config.oobe) {
+    if (config.oobe && !argv.force) {
       // Run before
       logger.info("OOBE has been run before.");
     } else {
       // Run OOBE
       // Step 1: Fetch Software
       await fetch_software(argv);
+      logger.info("OOBE done!");
+      // DONE!
+      config.oobe = true;
+      logger.debug("Updating userspace config...")
+      await writeFile(DEFAULT_USERSPACE_CONFIG, YAML.stringify(default_userspace_config));
     }
   }
 }

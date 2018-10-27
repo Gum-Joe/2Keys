@@ -145,6 +145,7 @@ export default async function copy_contents(root: string, destination: string): 
         incomplete: '░',
         width: 50,
         total,
+        callback: () => resolve(),
       });
       let counter: number = 0;
 
@@ -176,8 +177,6 @@ export default async function copy_contents(root: string, destination: string): 
       // We're done!
     } catch (err) {
       reject(err);
-    } finally {
-      resolve();
     }
   });
 }

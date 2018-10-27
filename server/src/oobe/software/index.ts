@@ -18,15 +18,15 @@ const logger = new Logger({
  * @param argv Args from CLI
  */
 export default async function fetch_software(argv: Arguments) {
-  // fetch(ahk_url)
-  // Extract
-  // Copy
-  try {
-    const ahk = new ZipDownloader("ahk", AHK_DOWNLOAD_PATH, join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`), argv);
-    await ahk.fetch_file(`ahk-${AHK_VERSION}`);
-    await ahk.extract();
-    await copy_contents(join(ahk.saveTo, `ahkdll-v${AHK_VERSION.split(".")[0]}-release-master`), join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
-  } catch (err) {
-    logger.throw(err);
-  }
+  return new Promise(async (resolve, reject) => {
+    try {
+      const ahk = new ZipDownloader("ahk", AHK_DOWNLOAD_PATH, join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`), argv);
+      await ahk.fetch_file(`ahk-${AHK_VERSION}`);
+      await ahk.extract();
+      await copy_contents(join(ahk.saveTo, `ahkdll-v${AHK_VERSION.split(".")[0]}-release-master`), join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
+      resolve();
+    } catch (err) {
+      logger.throw(err);
+    }
+  })
 }
