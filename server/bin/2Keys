@@ -28,6 +28,7 @@ yargs
       alias: "f",
       description: "Force the creation of file, even if they exist"
     });
+    /*
     yarg.option("install-components-to", {
       description: "Specify the location to install components to",
       default: DEFAULT_APP_PATHS
@@ -35,14 +36,16 @@ yargs
     yarg.option("ahk-v2", {
       description: "Use AutoHotkey v2 (alpha) as the runner for hotkeys"
     });
+    */
   }, argv => {
     oobe(argv);
   })
   .command("init", "Initialises a new 2Keys config", yarg => {
     yarg.option("force", {
       alias: "f",
-      description: "Forcibly run OOBE"
+      description: "Forcibly run OOBE & Init"
     });
+    /**
     yarg.option("install-components-to", {
       description: "Specify the location to install components to during OOBE"
     });
@@ -58,6 +61,7 @@ yargs
       default: process.cwd(),
       description: "Specify the directory to initalise in"
     });
+    */
   }, argv => {
     process.chdir(argv.dir); // If needed
     init(argv);
