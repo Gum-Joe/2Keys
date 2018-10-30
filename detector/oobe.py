@@ -38,12 +38,6 @@ config = json.loads(config_json.text)
 
 # Save config
 logger.info("Saving config to " + os.getcwd() + "...")
-# Add IP to config
-logger.debug("Storing server address with config...")
-config["server"] = {
-  "ipv4": ipv4,
-  "port": port
-}
 logger.debug("Opening config...")
 config_file = open("config.yml", "w")
 logger.debug("Writing config...")

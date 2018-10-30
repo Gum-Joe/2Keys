@@ -199,7 +199,7 @@ class Keyboard:
         try:
             data_hotkey = { "keyboard": self.name, "hotkey": hotkey }
             TYPE_JSON = {"Content-Type": "application/json"} # So the server can interpret it
-            requests.post("http://" + config["server"]["ipv4"] + ":" + str(config["server"]["port"]) + "/api/post/trigger", data=json.dumps(data_hotkey), headers=TYPE_JSON)
+            requests.post("http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + "/api/post/trigger", data=json.dumps(data_hotkey), headers=TYPE_JSON)
         except requests.exceptions.ConnectionError:
             logger.err("Couldn't estanblish a connection to the server.")
             logger.err("Please check your internet connection.")

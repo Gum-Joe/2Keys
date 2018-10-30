@@ -1,6 +1,7 @@
 /**
  * @overview Gets user to answer some question for init, i.e. how many keyboard
  */
+import { basename } from "path";
 import inquirer from "inquirer";
 import { Arguments } from "yargs";
 import Logger from "../util/logger";
@@ -13,6 +14,12 @@ const logger: Logger = new Logger({
 });
 
 const questions: inquirer.Questions = [
+  {
+    type: "input",
+    name: "name",
+    message: "Enter a name for this 2Keys project.  This will be used to name the services for the detector and server.",
+    default: basename(process.cwd()),
+  },
   {
     type: "input",
     name: "numberKeyboards",
@@ -42,7 +49,7 @@ const questions: inquirer.Questions = [
 ]
 
 export default function (argv: Arguments): Promise<Config> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     // Add Q about ip address of local PC here
     // From https://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
     const ifaces = networkInterfaces();
@@ -116,8 +123,8 @@ export default function (argv: Arguments): Promise<Config> {
     const answers_keyboards: inquirer.Answers = await inquirer.prompt(questions_keyboard);
 
     logger.info("Thanks for that.  Generating config...");
-    console.log(answers.local_port)
     const config: Config = {
+      name: answers.name,
       keyboards: {},
       addresses: {
         detector: answers.detector_ip,
@@ -149,7 +156,8 @@ export default function (argv: Arguments): Promise<Config> {
         config.keyboards[current_keyboard_name] = {
           path: "WAITING FROM DETECTOR",
           dir: current_keyboard_dir,
-          root: DEFAULT_HOTKEY_FILE_ROOT
+          root: DEFAULT_HOTKEY_FILE_ROOT,
+          hotkeys: {},
         }
       }
       // Check if at end

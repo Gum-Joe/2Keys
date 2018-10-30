@@ -4,6 +4,8 @@ const serve = require("../lib/index").default;
 const { DEFAULT_PORT, DEFAULT_APP_PATHS } = require("../lib/util/constants");
 const oobe = require("../lib/oobe").default;
 const init = require("../lib/init").default;
+const { stop_daemon, start_daemon } = require("../lib/init/daemon");
+const { config_loader } = require("../lib/util/config");
 
 // const argv = yargs.argv;
 
@@ -20,7 +22,9 @@ yargs
       description: "Specify the root directory, where the config is located"
     });
   }, argv => {
+    const config = config_loader();
     process.chdir(argv.dir);
+    const port = typeof argv.port === "number" ? parseInt(argv.port) : (config.addresses.server.hasOwnProperty("port") ? config.addresses.server.port : DEFAULT_PORT)
     serve(typeof argv.port === "number" ? parseInt(argv.port) : DEFAULT_PORT);
   })
   .command("oobe", "Runs OOBE; i.e. donwloads required components", yarg => {
@@ -67,4 +71,35 @@ yargs
     init(argv);
   })
   .command("add", "Setup a new keyboard (and map it, only works if permission ssh is enabled)")
+  .command("stop", "Stops 2Keys daemon server.", yarg => {
+    yarg.option("dir", {
+      alias: "d",
+      default: process.cwd(),
+      description: "Specify the directory to initalise in"
+    });
+  }, argv => {
+    process.chdir(argv.dir); // If needed
+    stop_daemon();
+  })
+  .command("start", "Starts 2Keys daemon server.", yarg => {
+    yarg.option("dir", {
+      alias: "d",
+      default: process.cwd(),
+      description: "Specify the directory to initalise in"
+    });
+  }, argv => {
+    process.chdir(argv.dir); // If needed
+    start_daemon();
+  })
+  .command("restart", "Restarts 2Keys daemon server.", yarg => {
+    yarg.option("dir", {
+      alias: "d",
+      default: process.cwd(),
+      description: "Specify the directory to initalise in"
+    });
+  }, argv => {
+    process.chdir(argv.dir); // If needed
+    stop_daemon()
+      .then(() => start_daemon());
+  })
   .argv

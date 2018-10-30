@@ -15,15 +15,20 @@ export interface Hotkey {
   func: string;
 }
 
+export interface Hotkeys {
+  [key: string]: Hotkey[] | string;
+}
+
 export interface Keyboard {
   path: string; // Path to watch on pi
   dir: string; // Dir of hotkeys
   root: string; // Root AHK file with all hotkeys
   map?: Map<string, number>;
-  hotkeys: Hotkey[] | string;
+  hotkeys: Hotkeys
 }
 
 export interface Config {
+  name: string; // Used for naming startup services
   keyboards: {
     [propName: string]: Keyboard;
   };

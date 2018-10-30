@@ -75,3 +75,11 @@ SetWorkingDir A_ScriptDir  ; Ensures a consistent starting directory.
 ; i.e. #Include "run-apps.ahk"
 
 `
+
+// Default Service prefix
+export const WINDOWS_DAEMON_PREFIX: string = "2Keys-";
+export const WINDOWS_DAEMON_FILE: string = "daemon.js";
+export const WINDOWS_DAEMON_PID_FILE = "daemon.pid"
+
+// Local project stuff
+export const DEFAULT_LOCAL_2KEYS: string = ".2Keys";  // Where local 2Keys files are, i.e. windows service files
