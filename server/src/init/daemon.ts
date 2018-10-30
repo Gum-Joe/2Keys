@@ -134,12 +134,16 @@ export default function add_to_startup(name: string) {
 
   const VBS_SCRIPT = join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`);
   // Create service file
-  logger.debug(`Creating daemon startup js file ${WINDOWS_DAEMON_PREFIX}${name}...`);
-  writeFileSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE), gen_startup_js(name));
-  
-  logger.debug("Adding a .vbs script to user startup folder to run 2Keys daemon...")
-  writeFileSync(join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`), gen_startup_vbs());
+  try {
+    logger.debug(`Creating daemon startup js file ${WINDOWS_DAEMON_PREFIX}${name}...`);
+    writeFileSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE), gen_startup_js(name));
 
-  logger.debug("Symlinking...")
-  symlinkSync(VBS_SCRIPT, join(process.cwd(), DEFAULT_LOCAL_2KEYS, `daemon.vbs`));
+    logger.debug("Adding a .vbs script to user startup folder to run 2Keys daemon...")
+    writeFileSync(join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`), gen_startup_vbs());
+
+    logger.debug("Symlinking...");
+    symlinkSync(VBS_SCRIPT, join(process.cwd(), DEFAULT_LOCAL_2KEYS, `daemon.vbs`));
+  } catch (err) {
+    logger.throw(err);
+  }
 }
