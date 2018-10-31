@@ -16,7 +16,7 @@ export interface Hotkey {
 }
 
 export interface Hotkeys {
-  [key: string]: Hotkey[] | string;
+  [key: string]: Hotkey | string;
 }
 
 export interface Keyboard {
@@ -100,4 +100,12 @@ export interface FileTreeNode {
  */
 export interface FileTreeDir extends FileTreeNode {
   contents: FileTreeNode[];
+}
+
+/**
+ * Fetch hotkey interface
+ */
+export interface FetchHotkey {
+  file: string,
+  func: string
 }

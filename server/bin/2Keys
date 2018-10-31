@@ -6,6 +6,12 @@ const oobe = require("../lib/oobe").default;
 const init = require("../lib/init").default;
 const { stop_daemon, start_daemon } = require("../lib/init/daemon");
 const { config_loader } = require("../lib/util/config");
+const { fetch_hotkey, run_hotkey } = require("../lib/util/ahk");
+const Logger = require("../lib/util/logger").default;
+
+const logger = new Logger({
+  name: "cli",
+})
 
 // const argv = yargs.argv;
 
@@ -101,5 +107,17 @@ yargs
     process.chdir(argv.dir); // If needed
     stop_daemon()
       .then(() => start_daemon());
+  })
+  .command("fire <keyboard> <hotkey>", "Fires a hotkey, as in it runs the function that corresponds to it", yarg => {
+    yarg.positional("keyboard", {
+      describe: "Keyboard to \"fire\" from",
+    })
+    yarg.positional("hotkey", {
+      describe: "Hotkey string to fire (i.e. ^C or $UP$)",
+    })  
+  }, argv => {
+    fetch_hotkey(argv.keyboard, argv.hotkey)
+      .then(data => run_hotkey(data.file, data.func))
+      .catch(err => logger.throw(err));
   })
   .argv

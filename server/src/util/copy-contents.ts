@@ -1,10 +1,10 @@
-import Logger from "./logger";
-import { FileTreeNode, FileTreeDir } from "./interfaces";
 import mkdirp from "mkdirp";
 import path from "path";
 import ProgressBar from "progress";
 import fs, { readdir as readdirRaw, access as accessRaw, stat as statRaw, read } from "fs";
 import { promisify } from "util";
+import Logger from "./logger";
+import { FileTreeNode, FileTreeDir } from "./interfaces";
 
 const readdir = promisify(readdirRaw);
 const stat = promisify(statRaw);
@@ -170,8 +170,6 @@ export default async function copy_contents(root: string, destination: string): 
             dest: path.relative(root, path.join(destination, path.relative(root, file))),
           });
         });
-        writer.close();
-        reader.close();
       }
 
       // We're done!

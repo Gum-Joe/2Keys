@@ -3,16 +3,45 @@
  */
 import * as fs from "fs";
 import { promisify } from "util";
+import { Hotkey, Config, FetchHotkey } from "./interfaces";
+import { config_loader, userspace_config_loader } from "./config";
 import { AHK_LIB_PATH } from "./constants";
 import Logger from "./logger";
-
+import { join } from "path";
 
 const ahk = require("../../build/Release/twokeys");
 const logger: Logger = new Logger({ name: "ahk" });
 const access = promisify(fs.access);
 
+export async function fetch_hotkey(keyboard: string, hotkey_code: string): Promise<FetchHotkey> {
+  const config: Config = await config_loader();
+
+  // Get hotkey func
+  let func;
+  if (!config.keyboards.hasOwnProperty(keyboard)) { // Validate
+    throw new ReferenceError(`Keyboard ${keyboard} was not found!`);
+  } else if (!config.keyboards[keyboard].hotkeys.hasOwnProperty(hotkey_code)) {
+    throw new ReferenceError(`Hotkey ${hotkey_code} was not found in keyboard ${keyboard}!`);
+  }
+  const hotkey: string | Hotkey = config.keyboards[keyboard].hotkeys[hotkey_code];
+  if (typeof hotkey !== "string") {
+    // Object type
+    func = hotkey.func;
+  } else {
+    func = hotkey;
+  }
+
+  // Get file
+  const file = join(process.cwd(), config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
+
+  return {
+    file,
+    func
+  }
+}
+
 /**
- * 
+ * Run a hotkey by sending execution string to C++ addon
  * @param file {String} File to get hotkeys from
  * @param func {String} Function to run from that file
  */
@@ -31,10 +60,10 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
     if (regexp.test(func)) {
       // Yay! run the hotkey
       logger.debug(`#Include ${file}; ${func}()`);
-      try {
-        // TODO: Replace AHK_LIB_PATH with a getAhkDLL()
-        const ahk_run = ahk.run_ahk_text(AHK_LIB_PATH, `#Include ${file}\n${func}()`);
-        if (typeof ahk_run != null) {
+      try { 
+        const userspace_config = await userspace_config_loader();
+        const ahk_run = ahk.run_ahk_text(join(userspace_config.paths.software, userspace_config.software.ahk.paths.root, userspace_config.software.ahk.paths.dll), `#Include ${file}\n${func}()`);
+        if (typeof ahk_run !== "undefined") {
           // ERROR!
           const error: Error = new Error(`Error running AutoHotkey: ${ahk_run.message}.  Code: ${ahk_run.code}`)
           logger.throw_noexit(error);
