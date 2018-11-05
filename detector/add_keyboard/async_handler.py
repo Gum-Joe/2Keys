@@ -1,10 +1,10 @@
 # wrapper, designed for adding a keyboard from CLI
-from add_keyboard import add_keyboard
+from .add_keyboard import add_keyboard
 import sys
 import os
 import signal
 import aiofiles
-from logger import Logger
+from util import Logger
 import yaml
 logger = Logger("add")
 
