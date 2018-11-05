@@ -1,3 +1,4 @@
+# wrapper, designed for adding a keyboard from CLI
 from add_keyboard import add_keyboard
 import sys
 import os
@@ -12,7 +13,7 @@ PID = os.getpid()
 
 # IMPORTANT: Don't use non async functions in this.  That includes the logger
 # EXCEPTIONS ARE NOT CAUGHT
-def gen_handler(keyboards):
+def gen_async_handler(keyboards):
   async def handler(keyboard):
     print("[DEBUG] STOPPING WATCH")
     # Stop each keyboard object one by one, then write config
@@ -43,5 +44,3 @@ def gen_handler(keyboards):
       exit() # So only one ^C is needed to end the program
       return
   return handler
-
-add_keyboard(KEYBOARD_NAME, gen_handler)

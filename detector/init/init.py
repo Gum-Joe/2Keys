@@ -8,9 +8,9 @@ import colorful
 from util.constants import SCRIPTS_ROOT
 from util.logger import Logger
 
-logger = Logger("oobe")
+logger = Logger("init")
 
-logger.info("Welcome to the OOBE for the detector!")
+logger.info("Welcome to the INIT for the detector!")
 logger.info("First we need to know where to find the server")
 logger.info("Enter the ipv4 address of the server below:")
 ipv4 = input("")

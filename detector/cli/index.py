@@ -5,6 +5,7 @@ import click
 import sys
 from watcher import Keyboard
 from util import Logger, load_config
+from add import gen_async_handler, add_keyboard
 
 logger = Logger("cli")
 
@@ -21,8 +22,12 @@ def sync():
     click.echo('Syncing')
 
 @cli.command()
-def add():
-    click.echo('ADD')
+@click.argument("keyboard")
+def add(keyboard):
+  if keyboard == "":
+    logger.err("Please provide a keyboard to add.")
+    exit()
+  add_keyboard(keyboard, gen_async_handler)
 
 @cli.command()
 @click.argument("keyboard")
