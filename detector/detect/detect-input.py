@@ -9,9 +9,9 @@
 import struct
 import time
 import sys
-from logger import Logger
-from keyboard_map import keys as KEYS
-from constants import MAX_KEY_MAPS
+from util.logger import Logger
+from util.keyboard_map import keys as KEYS
+from util.constants import MAX_KEY_MAPS
 
 infile_path = "/dev/input/event" + (sys.argv[1] if len(sys.argv) > 1 else "0") # File for input that corresponds to the keyboard.  Should use human readable ones in /dev/input/by-id
 logger = Logger("detect")

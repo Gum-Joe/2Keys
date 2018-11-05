@@ -5,8 +5,8 @@ import os
 from os import path
 import yaml
 import colorful
-from constants import SCRIPTS_ROOT
-from logger import Logger
+from util.constants import SCRIPTS_ROOT
+from util.logger import Logger
 
 logger = Logger("oobe")
 

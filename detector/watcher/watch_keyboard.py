@@ -14,18 +14,18 @@ import sys
 import aiofiles
 import requests
 import json
-from constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
-from keyboard_map import keys as KEY_MAP
-from config import load_config
-from logger import Logger
+from util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
+from util.keyboard_map import keys as KEY_MAP
+from util.config import load_config
+from util.logger import Logger
 
 logger = Logger("detect")
-config = load_config()
 
 class Keyboard:
     # keyboard: Keyboard config
     # name: Name of keyboard
     def __init__(self, keyboard, name):
+        self.config = load_config()
         logger.debug("Got keyboard: " + str(keyboard))
         self.keyboard = keyboard
         self.name = name
@@ -199,7 +199,7 @@ class Keyboard:
         try:
             data_hotkey = { "keyboard": self.name, "hotkey": hotkey }
             TYPE_JSON = {"Content-Type": "application/json"} # So the server can interpret it
-            requests.post("http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + "/api/post/trigger", data=json.dumps(data_hotkey), headers=TYPE_JSON)
+            requests.post("http://" + self.config["addresses"]["server"]["ipv4"] + ":" + str(self.config["addresses"]["server"]["port"]) + "/api/post/trigger", data=json.dumps(data_hotkey), headers=TYPE_JSON)
         except requests.exceptions.ConnectionError:
             logger.err("Couldn't estanblish a connection to the server.")
             logger.err("Please check your internet connection.")
