@@ -5,7 +5,7 @@ import click
 import sys
 from watcher import Keyboard
 from util import Logger, load_config
-from add import gen_async_handler, add_keyboard
+from add_keyboard import gen_async_handler, add_keyboard
 
 logger = Logger("cli")
 
