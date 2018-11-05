@@ -24,7 +24,7 @@ def add_keyboard(name, gen_handler):
   # Then watch all keyboards and ask for one to be pressed
   keyboards_events = [AsyncKeyboardWatcher(keyboard_path) for keyboard_path in keyboards] # Keyboard watch classes for each input
 
-  handler = gen_handler(keyboards_events) # The handler needs access to keyboards_events, which it won't on exe in the watcher
+  handler = gen_handler(keyboards_events, name) # The handler needs access to keyboards_events, which it won't on exe in the watcher, as well as keyboard name
   
   # Run
   jobs = [keyboards_events[i].keyboard_watcher(handler) for i in range(0, len(keyboards))] # Create jobs list
