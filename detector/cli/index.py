@@ -6,6 +6,7 @@ import sys
 from watcher import Keyboard
 from util import Logger, load_config
 from add_keyboard import gen_async_handler, add_keyboard
+from init import init as init_cli
 
 logger = Logger("cli")
 
@@ -15,7 +16,7 @@ def cli():
 
 @cli.command()
 def init():
-    click.echo('INIT')
+    init_cli()
 
 @cli.command()
 def sync():
