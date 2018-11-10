@@ -1,6 +1,7 @@
 # Sync keyboard path to server
 import aiohttp
-from util import UPDATE_KEYBOARD_PATH, load_config
+from util import load_config
+from util.constants import UPDATE_KEYBOARD_PATH
 
 async def update_server_keyboard_path(name, keyboard_path):
   config = await load_config()
