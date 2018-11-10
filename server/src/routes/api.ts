@@ -2,7 +2,7 @@
  * @overview Main routes of 2Keys server
  */
 import { Router } from "express";
-import { readFile } from "fs";
+import { readFile, readSync } from "fs";
 import { join } from "path";
 import YAML from "yaml";
 import { config_loader } from "../util/config";
@@ -62,5 +62,15 @@ router.post("/post/trigger", async (req, res, next) => {
     res.send(err.stack.toString());
   }
 });
+
+/**
+ * Handles keyboard path update
+ */
+router.post("/post/update-keyboard-path", (req, res, next) => {
+  logger.info(`Got update for ${req.params.keyboard}, path ${req.params.path}`)
+  res.statusCode = 200;
+  res.send("OK");
+  res.end();
+})
 
 export default router;

@@ -6,6 +6,7 @@ import signal
 import aiofiles
 from util import Logger
 import yaml
+from .sync_keyboard_path import update_server_keyboard_path
 logger = Logger("add")
 
 PID = os.getpid()
@@ -38,7 +39,9 @@ def gen_async_handler(keyboards, keyboard_name):
         await config_write.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                     yaml.dump(config, default_flow_style=False)) # Write it
         await config_write.close() # Close so other programs can use
-        logger.info("Config writen")
+        logger.info("Config writen.")
+        logger.info("Updating path on keyboard....")
+        await update_server_keyboard_path(keyboard_name, keyboard)
         os.kill(PID, signal.SIGTERM) # Exit() does't work, so we have to self kill the script
       exit() # So only one ^C is needed to end the program
       return

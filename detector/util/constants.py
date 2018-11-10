@@ -17,5 +17,8 @@ SCRIPTS_ROOT = os.path.dirname(os.path.realpath(__file__))
 # Config file
 CONFIG_FILE = "config.yml"
 
+# REquest dir for sync
+UPDATE_KEYBOARD_PATH = "/api/post/update-keyboard-path"
+
 
 
