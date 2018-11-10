@@ -11,3 +11,6 @@ pyyaml
 # Async tasks
 # gevent
 aiofiles
+
+# For systemd service
+pystache

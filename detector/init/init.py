@@ -7,6 +7,7 @@ import yaml
 import colorful
 from util.constants import SCRIPTS_ROOT
 from util.logger import Logger
+from util.config import load_config
 
 logger = Logger("init")
 
@@ -58,3 +59,8 @@ def init():
     print("") # Padding
 
   # Sync changes
+  logger.info("Syncing changes to server...")
+  config_file_new = load_config()
+  for key, value in config["keyboards"].items():
+    path_to_keyboard = value["path"]
+    logger.info(path_to_keyboard)
