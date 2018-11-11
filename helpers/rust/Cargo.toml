@@ -1,0 +1,7 @@
+[package]
+name = "2Keys-helper-server"
+version = "0.1.0"
+authors = ["Kishan <kishansambhi@hotmail.co.uk>"]
+
+[dependencies]
+colored = "1.6"

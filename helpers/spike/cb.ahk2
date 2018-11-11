@@ -1,0 +1,4 @@
+#Include ../ahk/callbacks/generate.ahk
+
+Global call_sd := GenerateCallback("f062de12")
+call_sd()
