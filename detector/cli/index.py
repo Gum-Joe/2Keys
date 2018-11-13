@@ -15,7 +15,11 @@ def cli():
   return
 
 @cli.command()
-def init():
+@click.option("--address", "-a", help="Specify the IPv4 address of the server")
+@click.option("--port", "-p", help="Specify the port the server is running on")
+def init(address, port):
+    print(address)
+    print(port)
     init_cli()
 
 @cli.command()
