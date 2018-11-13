@@ -46,8 +46,9 @@ systemctl daemon-reload
 echo Adding script for {}...
 echo Chmodding with 644...
 chmod 644 {}
+echo Adding...
 systemctl enable {}
-    """.format(keyboard, LOCAL_ROOT + "/" + UNIT_FILE_NAME, UNIT_FILE_NAME)
+    """.format(keyboard, LOCAL_ROOT + "/" + UNIT_FILE_NAME, LOCAL_ROOT + "/" + UNIT_FILE_NAME)
     # Add start command
     shStarters += """
 echo Starting {} service...
@@ -57,7 +58,7 @@ systemctl start {}
   script = shScript + "\n" + shStarters
   logger.info("Writing...")
   open(LOCAL_ROOT + "/register.sh", "w").write(script)
-  logger.info("Making esxecutable...")
+  logger.info("Making executable...")
   # From https://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
   st = os.stat(LOCAL_ROOT + "/" + UNIT_FILE_NAME)
   os.chmod(LOCAL_ROOT + "/" + UNIT_FILE_NAME, st.st_mode | stat.S_IEXEC)
@@ -65,6 +66,6 @@ systemctl start {}
   logger.info("")
   logger.info("Generated unit files to start 2Keys on startup!")
   logger.info("To install the services for use, please run:")
-  logger.info(" sudo ./.2Keys/register.sh")
+  logger.info(" sudo bash ./.2Keys/register.sh")
 
   
