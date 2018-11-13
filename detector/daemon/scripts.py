@@ -1,4 +1,5 @@
 import sys
+import os
 import pystache
 from util.logger import Logger
 from util.constants import DAEMON_TEMPLATE_PATH, SCRIPTS_ROOT
@@ -16,6 +17,7 @@ def generate_daemon(name, keyboards):
       "index_path": SCRIPTS_ROOT + "/cli/index.py",
       "keyboard": keyboard,
       "detector_path": SCRIPTS_ROOT,
-      "version": str(sys.version_info[0]) + "." + str(sys.version_info[1])
+      "version": str(sys.version_info[0]) + "." + str(sys.version_info[1]),
+      "pwd": os.getcwd()
     }))
   
