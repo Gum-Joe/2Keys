@@ -67,6 +67,7 @@ router.post("/post/trigger", async (req, res, next) => {
  * Handles keyboard path update
  */
 router.post("/post/update-keyboard-path", (req, res, next) => {
+  console.log(req)
   logger.info(`Got update for ${req.params.keyboard}, path ${req.params.path}`)
   res.statusCode = 200;
   res.send("OK");
