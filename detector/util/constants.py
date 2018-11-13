@@ -26,3 +26,6 @@ DEFAULT_PORT = 9090
 # Systemd unit file location
 DAEMON_TEMPLATE_PATH = SCRIPTS_ROOT + "/assets/service.service"
 
+# Local root
+LOCAL_ROOT = os.getcwd() + "/.2Keys"
+

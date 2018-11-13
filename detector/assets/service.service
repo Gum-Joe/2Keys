@@ -5,12 +5,9 @@ After=multi-user.target
 
 [Service]
 Type=idle
-# ExecStart=/usr/bin/python3  {{ index_path }} watch {{ keyboard }} 
-# Environment=PYTHONPATH={{ detector_path }}:/usr/local/lib/python{{ version }}/dist-packages:/home/pi/.local/lib/python{{ version }}/site-packages
-# WorkingDirectory={{ pwd }}
-ExecStart=/usr/bin/python3 /home/pi/Documents/Projects/2Keys/detector/cli/index.py watch premiere
-Environment=PYTHONPATH=/home/pi/Documents/Projects/2Keys/detector:/usr/local/lib/python3.5/dist-packages:/home/pi/.local/lib/python3.5/site-packages
-WorkingDirectory=/home/pi/Documents/Projects/2Keys/example/pi
+ExecStart=/usr/bin/python3  {{ index_path }} watch {{ keyboard }} 
+Environment=PYTHONPATH={{ detector_path }}:/usr/local/lib/python{{ version }}/dist-packages:/home/pi/.local/lib/python{{ version }}/site-packages
+WorkingDirectory={{ pwd }}
 
 [Install]
 WantedBy=multi-user.target
