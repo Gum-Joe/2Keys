@@ -62,7 +62,7 @@ systemctl start {}
   st = os.stat(LOCAL_ROOT + "/" + UNIT_FILE_NAME)
   os.chmod(LOCAL_ROOT + "/" + UNIT_FILE_NAME, st.st_mode | stat.S_IEXEC)
 
-  logger.infO("")
+  logger.info("")
   logger.info("Generated unit files to start 2Keys on startup!")
   logger.info("To install the services for use, please run:")
   logger.info(" sudo ./.2Keys/register.sh")
