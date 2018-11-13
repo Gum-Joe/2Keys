@@ -20,4 +20,5 @@ def generate_daemon(name, keyboards):
       "version": str(sys.version_info[0]) + "." + str(sys.version_info[1]),
       "pwd": os.getcwd()
     }))
+    
   
