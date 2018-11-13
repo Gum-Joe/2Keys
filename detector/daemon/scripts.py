@@ -41,17 +41,17 @@ def generate_daemon(name, keyboards):
     unitFile.write(script)   
     logger.info("Adding command to a .sh script to add service/unit script...")
     # Add command to add service
-    shScript += f"""
-    echo Adding script for {name}...
+    shScript += """
+    echo Adding script for {}...
     echo Chmodding with 644...
-    chmod {LOCAL_ROOT + "/" + UNIT_FILE_NAME}
-    systemctl enable {"/" + UNIT_FILE_NAME}
-    """
+    chmod {}
+    systemctl enable {}
+    """.format(name, LOCAL_ROOT + "/" + UNIT_FILE_NAME, "/" + UNIT_FILE_NAME)
     # Add start command
-    shStarters += f"""
-    echo Starting {name}...
-    systemctl start {UNIT_FILE_NAME}
-    """
+    shStarters += """
+    echo Starting {}...
+    systemctl start {}
+    """.format(name, UNIT_FILE_NAME)
   logger.info("Creating unit files/service register script...")
   script = shScript + "\n" + shStarters
   logger.info("Writing...")
