@@ -12,7 +12,7 @@ import Logger from "./logger";
 const readFile = promisify(readFileRaw); // For easier handling with async
 const logger: Logger = new Logger({ name: "config" });
 
-export async function config_loader(): Config {
+export async function config_loader(): Promise<Config> {
 	try {
 		const config: Buffer = await readFile(join(process.cwd(), CONFIG_FILE));
 		const parsed_config: Config = YAML.parse(config.toString());

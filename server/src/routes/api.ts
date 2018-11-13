@@ -2,13 +2,14 @@
  * @overview Main routes of 2Keys server
  */
 import { Router } from "express";
-import { readFile, readSync } from "fs";
+import { readFile, writeFile } from "fs";
 import { join } from "path";
 import YAML from "yaml";
 import { config_loader } from "../util/config";
 import Logger from "../util/logger";
 import { Config, Hotkey } from "../util/interfaces";
 import { run_hotkey, fetch_hotkey } from "../util/ahk";
+import { CONFIG_FILE } from "../util/constants";
 
 const logger: Logger = new Logger({
   name: "api",
@@ -67,11 +68,25 @@ router.post("/post/trigger", async (req, res, next) => {
  * Handles keyboard path update
  */
 router.post("/post/update-keyboard-path", (req, res, next) => {
-  console.log(req)
-  logger.info(`Got update for ${req.params.keyboard}, path ${req.params.path}`)
-  res.statusCode = 200;
-  res.send("OK");
-  res.end();
+  const { keyboard, path } = req.body;
+  logger.info(`Got update for ${keyboard}, path ${path}`);
+  config_loader()
+    .then((config) => {
+        // Make changes
+        config.keyboards[keyboard].path = path;
+        // Write
+        logger.debug("Writing config...");
+        writeFile(CONFIG_FILE, YAML.stringify(config), (err) => {
+          if (err) {
+            res.statusCode = 500;
+            res.send(err.stack.toString());
+          } else {
+            res.statusCode = 200;
+            res.send("OK");
+          }
+          res.end();
+        })
+    })
 })
 
 export default router;
