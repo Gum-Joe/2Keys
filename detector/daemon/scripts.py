@@ -36,7 +36,7 @@ def generate_daemon(name, keyboards):
     
     UNIT_FILE_NAME = "2Keys-%s.service" % keyboard
     logger.info("Creating unit file {}...".format(UNIT_FILE_NAME))
-    unitFile = open(LOCAL_ROOT, "/" + UNIT_FILE_NAME, "w")
+    unitFile = open(LOCAL_ROOT + "/" + UNIT_FILE_NAME, "w")
     logger.info("Writing...")
     unitFile.write(script)   
     logger.info("Adding command to a .sh script to add service/unit script...")
