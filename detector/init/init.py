@@ -71,4 +71,4 @@ def init(**args):
     print("") # Padding
 
   # Add daemons
-  generate_daemon(config.name, config.keyboards.keys())
+  generate_daemon(config["name"], config["keyboards"].keys())
