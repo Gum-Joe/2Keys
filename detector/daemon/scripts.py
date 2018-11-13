@@ -34,9 +34,9 @@ def generate_daemon(name, keyboards):
       logger.info("Making local root ./.2Keys")
       os.makedirs(LOCAL_ROOT)
     
-    UNIT_FILE_NAME = f"2Keys-{keyboard}.service"
+    UNIT_FILE_NAME = "2Keys-%s.service" % keyboard
     logger.info(f"Creating unit file {UNIT_FILE_NAME}...")
-    unitFile = open(LOCAL_ROOT, f"/{UNIT_FILE_NAME}", "w")
+    unitFile = open(LOCAL_ROOT, "/" + UNIT_FILE_NAME, "w")
     logger.info("Writing...")
     unitFile.write(script)   
     logger.info("Adding command to a .sh script to add service/unit script...")
@@ -44,8 +44,8 @@ def generate_daemon(name, keyboards):
     shScript += f"""
     echo Adding script for {name}...
     echo Chmodding with 644...
-    chmod {LOCAL_ROOT + f"/{UNIT_FILE_NAME}"}
-    systemctl enable {LOCAL_ROOT + f"/{UNIT_FILE_NAME}"}
+    chmod {LOCAL_ROOT + "/" + UNIT_FILE_NAME}
+    systemctl enable {"/" + UNIT_FILE_NAME}
     """
     # Add start command
     shStarters += f"""
@@ -56,5 +56,5 @@ def generate_daemon(name, keyboards):
   script = shScript + "\n" + shStarters
   logger.info("Writing...")
   open(LOCAL_ROOT + "register.sh", "w").write(script)
-  
+
   
