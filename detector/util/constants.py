@@ -12,7 +12,7 @@ KEYBOARD_EVENT_SIZE = struct.calcsize(KEYBOARD_EVENT_FORMAT)
 MAX_KEY_MAPS = 250
 
 # Script root
-SCRIPTS_ROOT = os.path.dirname(os.path.realpath(__file__))
+SCRIPTS_ROOT = os.path.dirname(os.path.realpath(__file__)) + "/.."
 
 # Config file
 CONFIG_FILE = "config.yml"
@@ -23,5 +23,6 @@ UPDATE_KEYBOARD_PATH = "/api/post/update-keyboard-path"
 # Default port
 DEFAULT_PORT = 9090
 
-
+# Systemd unit file location
+DAEMON_TEMPLATE_PATH = SCRIPTS_ROOT + "/assets/service.service"
 

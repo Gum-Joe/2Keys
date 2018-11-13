@@ -1,1 +1,1 @@
- 
+from .scripts import generate_daemon
