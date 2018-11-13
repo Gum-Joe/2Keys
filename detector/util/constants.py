@@ -20,5 +20,8 @@ CONFIG_FILE = "config.yml"
 # REquest dir for sync
 UPDATE_KEYBOARD_PATH = "/api/post/update-keyboard-path"
 
+# Default port
+DEFAULT_PORT = 9090
+
 
 

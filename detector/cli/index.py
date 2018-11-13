@@ -20,7 +20,7 @@ def cli():
 def init(address, port):
     print(address)
     print(port)
-    init_cli()
+    init_cli(address=address, port=port)
 
 @cli.command()
 def sync():

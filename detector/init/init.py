@@ -5,19 +5,30 @@ import os
 from os import path
 import yaml
 import colorful
-from util.constants import SCRIPTS_ROOT
+from util.constants import SCRIPTS_ROOT, DEFAULT_PORT
 from util.logger import Logger
 from util.config import load_config
 
 logger = Logger("init")
 
-def init():
+def init(**args):
   logger.info("Welcome to the INIT for the detector!")
-  logger.info("First we need to know where to find the server")
-  logger.info("Enter the ipv4 address of the server below:")
-  ipv4 = input("")
-  logger.info("Enter the port of the server below:")
-  port = input("")
+  ipv4 = None
+  port = DEFAULT_PORT
+  # Use opts if we can
+  if args["address"] == None:
+    logger.info("First we need to know where to find the server")
+    logger.info("Enter the ipv4 address of the server below:")
+    ipv4 = input("")
+  else:
+    ipv4 = args["address"]
+  
+  # Port arg
+  if args["port"] == None:
+    logger.info("Enter the port of the server below:")
+    port = input("")
+  else:
+    port = args["port"]
 
   # Make request, get config in JSON format
   logger.info("Fetching config...")
