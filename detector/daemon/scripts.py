@@ -1,5 +1,6 @@
 import sys
 import os
+import stat
 import pystache
 from util.logger import Logger
 from util.constants import DAEMON_TEMPLATE_PATH, SCRIPTS_ROOT, LOCAL_ROOT
@@ -31,7 +32,7 @@ def generate_daemon(name, keyboards):
       "pwd": os.getcwd()
     })
     if not os.path.exists(LOCAL_ROOT):
-      logger.info("Making local root ./.2Keys")
+      logger.info("Making local root ./.2Keys...")
       os.makedirs(LOCAL_ROOT)
     
     UNIT_FILE_NAME = "2Keys-%s.service" % keyboard
@@ -44,17 +45,26 @@ def generate_daemon(name, keyboards):
     shScript += """
     echo Adding script for {}...
     echo Chmodding with 644...
-    chmod {}
+    chmod 644 {}
     systemctl enable {}
-    """.format(name, LOCAL_ROOT + "/" + UNIT_FILE_NAME, "/" + UNIT_FILE_NAME)
+    """.format(keyboard, LOCAL_ROOT + "/" + UNIT_FILE_NAME, UNIT_FILE_NAME)
     # Add start command
     shStarters += """
-    echo Starting {}...
+    echo Starting {} service...
     systemctl start {}
-    """.format(name, UNIT_FILE_NAME)
+    """.format(keyboard, UNIT_FILE_NAME)
   logger.info("Creating unit files/service register script...")
   script = shScript + "\n" + shStarters
   logger.info("Writing...")
-  open(LOCAL_ROOT + "register.sh", "w").write(script)
+  open(LOCAL_ROOT + "/register.sh", "w").write(script)
+  logger.info("Making esxecutable...")
+  # From https://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
+  st = os.stat(LOCAL_ROOT + "/" + UNIT_FILE_NAME)
+  os.chmod(LOCAL_ROOT + "/" + UNIT_FILE_NAME, st.st_mode | stat.S_IEXEC)
+
+  logger.infO("")
+  logger.info("Generated unit files to start 2Keys on startup!")
+  logger.info("To install the services for use, please run:")
+  logger.info(" sudo ./.2Keys/register.sh")
 
   
