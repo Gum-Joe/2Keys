@@ -13,14 +13,14 @@ def generate_daemon(name, keyboards):
   logger.info("Creating systemd unit scripts...")
   template = open(DAEMON_TEMPLATE_PATH, "r").read() # Open template
   shScript = """
-  # Script to auto add services
-  # Please run using sudo
-  echo Reloading daemons....
-  systemctl daemon-reload
+# Script to auto add services
+# Please run using sudo
+echo Reloading daemons....
+systemctl daemon-reload
   """ # Used so we don't have to raise this process
   shStarters = """
-  # Start them
-  systemctl daemon-reload
+# Start them
+systemctl daemon-reload
   """
   for keyboard in keyboards:
     script = pystache.render(template, {
@@ -43,15 +43,15 @@ def generate_daemon(name, keyboards):
     logger.info("Adding command to a .sh script to add service/unit script...")
     # Add command to add service
     shScript += """
-    echo Adding script for {}...
-    echo Chmodding with 644...
-    chmod 644 {}
-    systemctl enable {}
+echo Adding script for {}...
+echo Chmodding with 644...
+chmod 644 {}
+systemctl enable {}
     """.format(keyboard, LOCAL_ROOT + "/" + UNIT_FILE_NAME, UNIT_FILE_NAME)
     # Add start command
     shStarters += """
-    echo Starting {} service...
-    systemctl start {}
+echo Starting {} service...
+systemctl start {}
     """.format(keyboard, UNIT_FILE_NAME)
   logger.info("Creating unit files/service register script...")
   script = shScript + "\n" + shStarters
