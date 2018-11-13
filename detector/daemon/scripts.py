@@ -16,6 +16,6 @@ def generate_daemon(name, keyboards):
       "index_path": SCRIPTS_ROOT + "/cli/index.py",
       "keyboard": keyboard,
       "detector_path": SCRIPTS_ROOT,
-      "version": f'{sys.version_info[0]}.{sys.version_info[1]}'
+      "version": sys.version_info[0] + "." + sys.version_info[1]
     }))
   
