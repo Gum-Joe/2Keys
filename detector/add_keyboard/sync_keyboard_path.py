@@ -20,6 +20,6 @@ async def update_server_keyboard_path(name, keyboard_path):
         async with aiohttp.ClientSession() as session:
           async with session.post("http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + UPDATE_KEYBOARD_PATH,
                     json={ "keyboard": name, "path": keyboard_path }) as resp:
-            print(resp)
+            print(resp.status);
       except aiohttp.Error as err:
         logger.err(err)
