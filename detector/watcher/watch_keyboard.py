@@ -33,9 +33,8 @@ class Keyboard:
         self.name = name
         # File for input that corresponds to the keyboard.
         self.keyboard_path = keyboard["path"]
-        # Open keyboard events file in binary mode
-        self.in_file = open(self.keyboard_path, "rb")
-        self.event = None
+        # Device from evdev storage
+        self.keyboard_device = InputDevice(self.keyboard_path)
         # Array of pressed keys
         # is array of booleans, with the index = key code
         # i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
@@ -62,12 +61,10 @@ class Keyboard:
             self.map[code] = "(" + key + ")"
     
     # Keyboard watcher
+    # TODO: Use const from evdev instead of manually checking for cleaner code and no magic numbers
     def watch_keyboard(self):
         logger.info("Watching for key presses on " + self.name + "...")
-        # self.event = self.in_file.read(KEYBOARD_EVENT_SIZE) # Open input file
-        # Set device and LOCK it
         for event in self.keyboard_device.read_loop():
-            #(tv_sec, tv_usec, type, code, value) = struct.unpack(KEYBOARD_EVENT_FORMAT, self.event)
             type = event.type
             code = event.code
             value = event.value
@@ -113,9 +110,6 @@ class Keyboard:
             else:
                 # Events with code, type and value == 0 are "separator" events
                  print("===========================================")
-
-            # self.event = self.in_file.read(KEYBOARD_EVENT_SIZE)
-        # self.in_file.close()
     
     # Handle change of state (down/up) of key code
     # down = True
@@ -213,7 +207,7 @@ class Keyboard:
     # Locks (grabs) keyboard
     def lock(self):
         logger.info("Locking keyboard....")
-        self.keyboard_device = lock_keyboard(self.keyboard_path)
+        self.keyboard_device.grab()
     # Unlocks (ungrabs) keyboard
     def unlock(self):
         logger.info("Unlocking keyboard...")
