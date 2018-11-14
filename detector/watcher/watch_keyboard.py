@@ -19,7 +19,6 @@ from util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_
 from util.keyboard_map import keys as KEY_MAP
 from util.config import load_config
 from util.logger import Logger
-from .lock_keyboard import lock_keyboard
 
 logger = Logger("detect")
 
