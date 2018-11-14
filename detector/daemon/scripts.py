@@ -53,4 +53,6 @@ def generate_daemon(name, keyboards):
   logger.info("")
   logger.info("Generated unit files to start 2Keys on startup!")
   logger.info("To install the services for use, please run:")
-  logger.info(" sudo bash ./.2Keys/register.sh")
+  logger.info(" sudo bash ./.2Keys/register.sh register")
+  logger.info("For help on how to use the script:")
+  logger.info(" sudo bash ./.2Keys/register.sh help")
