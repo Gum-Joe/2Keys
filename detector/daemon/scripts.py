@@ -3,7 +3,7 @@ import os
 import stat
 import pystache
 from util.logger import Logger
-from util.constants import DAEMON_TEMPLATE_PATH, SCRIPTS_ROOT, LOCAL_ROOT
+from util.constants import DAEMON_TEMPLATE_PATH, SCRIPTS_ROOT, LOCAL_ROOT, DAEMON_TEMPLATE_SCRIPT_PATH
 
 logger = Logger("daemon")
 # Generates a systemd unit file
@@ -12,16 +12,6 @@ logger = Logger("daemon")
 def generate_daemon(name, keyboards):
   logger.info("Creating systemd unit scripts...")
   template = open(DAEMON_TEMPLATE_PATH, "r").read() # Open template
-  shScript = """
-# Script to auto add services
-# Please run using sudo
-echo Reloading daemons....
-systemctl daemon-reload
-  """ # Used so we don't have to raise this process
-  shStarters = """
-# Start them
-systemctl daemon-reload
-  """
   for keyboard in keyboards:
     script = pystache.render(template, {
       "name": name,
@@ -40,32 +30,31 @@ systemctl daemon-reload
     unitFile = open(LOCAL_ROOT + "/" + UNIT_FILE_NAME, "w")
     logger.info("Writing...")
     unitFile.write(script)   
-    logger.info("Adding command to a .sh script to add service/unit script...")
-    # Add command to add service
-    shScript += """
-echo Adding script for {}...
-echo Chmodding with 644...
-chmod 644 {}
-echo Adding...
-systemctl enable {}
-    """.format(keyboard, LOCAL_ROOT + "/" + UNIT_FILE_NAME, LOCAL_ROOT + "/" + UNIT_FILE_NAME)
-    # Add start command
-    shStarters += """
-echo Starting {} service...
-systemctl start {}
-    """.format(keyboard, UNIT_FILE_NAME)
-  logger.info("Creating unit files/service register script...")
-  script = shScript + "\n" + shStarters
-  logger.info("Writing...")
-  open(LOCAL_ROOT + "/register.sh", "w").write(script)
+
+  logger.info("Writing a shell script to manage the unit files (services/daemons)...")
+  shTemplate = open(DAEMON_TEMPLATE_SCRIPT_PATH, "r").read()
+  keyboard_string = "("
+  # Create array of keyboards
+  for keyboard in keyboards:
+    keyboard_string += keyboard
+    if keyboard != keyboards[-1]:
+      # Add a space
+      keyboard_string += " "
+    else:
+      # End the array
+      keyboard_string += ")"
+  # Render mustache template
+  shScript = pystache.render(shTemplate, {
+      "keyboards": keyboard_string
+  })
+  shScriptFile = open(LOCAL_ROOT + "/register.sh", "w")
+  shScriptFile.write(shScript)
   logger.info("Making executable...")
   # From https://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
-  st = os.stat(LOCAL_ROOT + "/" + UNIT_FILE_NAME)
-  os.chmod(LOCAL_ROOT + "/" + UNIT_FILE_NAME, st.st_mode | stat.S_IEXEC)
+  st = os.stat(LOCAL_ROOT + "/register.sh")
+  os.chmod(LOCAL_ROOT + "/register.sh", st.st_mode | stat.S_IEXEC)
 
   logger.info("")
   logger.info("Generated unit files to start 2Keys on startup!")
   logger.info("To install the services for use, please run:")
   logger.info(" sudo bash ./.2Keys/register.sh")
-
-  
