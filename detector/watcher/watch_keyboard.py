@@ -14,6 +14,7 @@ import sys
 import aiofiles
 import requests
 import json
+import evdev
 from util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
 from util.keyboard_map import keys as KEY_MAP
 from util.config import load_config
@@ -64,8 +65,12 @@ class Keyboard:
     def watch_keyboard(self):
         logger.info("Watching for key presses on " + self.name + "...")
         self.event = self.in_file.read(KEYBOARD_EVENT_SIZE) # Open input file
-        while self.event:
-            (tv_sec, tv_usec, type, code, value) = struct.unpack(KEYBOARD_EVENT_FORMAT, self.event)
+        for event in self.keyboard_device.read_loop():
+            #(tv_sec, tv_usec, type, code, value) = struct.unpack(KEYBOARD_EVENT_FORMAT, self.event)
+            type = event.type
+            code = event.code
+            value = event.value
+            print(event)
             # We only want event type 1, as that is a key press
             # If key is already pressed, ignore event provided value not 0 (key unpressed)
             if (type == 1 or type == 0x1):
