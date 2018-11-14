@@ -33,8 +33,9 @@ def add(keyboard):
   add_keyboard(keyboard, gen_async_handler)
 
 @cli.command()
+@click.option("-n", "--no-lock", "Don't lock the keyboard")
 @click.argument("keyboard")
-def watch(keyboard):
+def watch(mo_lock, keyboard):
   if keyboard == "":
     logger.err("Please provide a keyboard to watch.")
     exit()
@@ -42,12 +43,15 @@ def watch(keyboard):
   # Keyboard specified, watch it
   config = load_config()
   keyboard = Keyboard(config["keyboards"][keyboard], keyboard)
-  try:
-    keyboard.lock() # Grabs keyboard
+  if not no_lock:
+    try:
+      keyboard.lock() # Grabs keyboard
+      keyboard.watch_keyboard()
+    except (KeyboardInterrupt, SystemExit, OSError):
+      keyboard.unlock()
+      exit(0)
+  else:
     keyboard.watch_keyboard()
-  except (KeyboardInterrupt, SystemExit, OSError):
-    keyboard.unlock()
-    exit(0)
 
 if __name__ == '__main__':
     cli()
