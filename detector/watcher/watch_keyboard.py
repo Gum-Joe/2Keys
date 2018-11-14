@@ -14,7 +14,7 @@ import sys
 import aiofiles
 import requests
 import json
-import evdev
+from evdev import InputDevice
 from util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
 from util.keyboard_map import keys as KEY_MAP
 from util.config import load_config
@@ -65,7 +65,8 @@ class Keyboard:
     def watch_keyboard(self):
         logger.info("Watching for key presses on " + self.name + "...")
         self.event = self.in_file.read(KEYBOARD_EVENT_SIZE) # Open input file
-        for event in self.keyboard_device.read_loop():
+        device = InputDevice(self.keyboard_path)
+        for event in device.read_loop():
             #(tv_sec, tv_usec, type, code, value) = struct.unpack(KEYBOARD_EVENT_FORMAT, self.event)
             print(event)
             type = event.type
