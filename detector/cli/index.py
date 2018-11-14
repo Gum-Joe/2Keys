@@ -34,7 +34,7 @@ def add(keyboard):
 
 @cli.command()
 @click.argument("keyboard")
-@click.option("-n", "--no-lock", help="Don't lock the keyboard")
+@click.option("-n", "--no-lock", is_flag=True, help="Don't lock the keyboard")
 def watch(keyboard, no_lock):
   if keyboard == "":
     logger.err("Please provide a keyboard to watch.")
