@@ -42,7 +42,12 @@ def watch(keyboard):
   # Keyboard specified, watch it
   config = load_config()
   keyboard = Keyboard(config["keyboards"][keyboard], keyboard)
-  keyboard.watch_keyboard()
+  try:
+    keyboard.lock() # Grabs keyboard
+    keyboard.watch_keyboard()
+  except (KeyboardInterrupt, SystemExit, OSError):
+    keyboard.unlock()
+    exit(0)
 
 if __name__ == '__main__':
     cli()

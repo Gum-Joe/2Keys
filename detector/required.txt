@@ -15,3 +15,6 @@ aiohttp
 
 # For systemd service
 pystache
+
+# Keyboard locking
+evdev

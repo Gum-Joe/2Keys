@@ -18,6 +18,7 @@ from util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_
 from util.keyboard_map import keys as KEY_MAP
 from util.config import load_config
 from util.logger import Logger
+from .lock_keyboard import lock_keyboard
 
 logger = Logger("detect")
 
@@ -203,6 +204,15 @@ class Keyboard:
         except requests.exceptions.ConnectionError:
             logger.err("Couldn't estanblish a connection to the server.")
             logger.err("Please check your internet connection.")
+
+    # Locks (grabs) keyboard
+    def lock(self):
+        logger.info("Locking keyboard....")
+        self.keyboard_device = lock_keyboard(self.keyboard_path)
+    # Unlocks (ungrabs) keyboard
+    def unlock(self):
+        logger.info("Unlocking keyboard...")
+        self.keyboard_device.ungrab()
 
 
 # str keyboard: Keyboard file in /dev/input/by-id
