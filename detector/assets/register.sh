@@ -24,6 +24,7 @@ register() {
 
 disable() {
   echo Disabling services...
+  stop
   for keyboard in ${keyboards};
   do
   echo "Disabling script for ${keyboard}..."
@@ -38,7 +39,7 @@ enable_scripts()  {
   for keyboard in ${keyboards};
   do
   echo "Enabling script for ${keyboard}..."
-  systemctl enabe $PWD/.2Keys/2Keys-${keyboard}.service
+  systemctl enable $PWD/.2Keys/2Keys-${keyboard}.service
   done
 }
 
@@ -102,7 +103,7 @@ case $1 in
     ;;
   stop)
     stop
-    ::
+    ;;
   restart)
     restart
     ;;
@@ -118,6 +119,7 @@ case $1 in
     echo stop: Stop services
     echo restart: Restarts services
     echo status: Gets statuses of all services
+    ;; 
   *)
     echo Invalid command.
     exit 1

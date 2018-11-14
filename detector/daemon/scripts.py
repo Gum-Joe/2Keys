@@ -39,7 +39,6 @@ def generate_daemon(name, keyboards):
     keyboard_string += keyboard + " "
   # End array
   keyboard_string = keyboard_string[0:-1] + ")"
-  print(keyboard_string)
   # Render mustache template
   shScript = pystache.render(shTemplate, {
       "keyboards": keyboard_string
