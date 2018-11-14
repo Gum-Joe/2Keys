@@ -33,9 +33,9 @@ def add(keyboard):
   add_keyboard(keyboard, gen_async_handler)
 
 @cli.command()
-@click.option("-n", "--no-lock", help="Don't lock the keyboard")
 @click.argument("keyboard")
-def watch(mo_lock, keyboard):
+@click.option("-n", "--no-lock", help="Don't lock the keyboard")
+def watch(keyboard, no_lock):
   if keyboard == "":
     logger.err("Please provide a keyboard to watch.")
     exit()
