@@ -64,6 +64,7 @@ class Keyboard:
     # Keyboard watcher
     def watch_keyboard(self):
         logger.info("Watching for key presses on " + self.name + "...")
+        print(self.keyboard_device)
         self.event = self.in_file.read(KEYBOARD_EVENT_SIZE) # Open input file
         for event in self.keyboard_device.read_loop():
             #(tv_sec, tv_usec, type, code, value) = struct.unpack(KEYBOARD_EVENT_FORMAT, self.event)
