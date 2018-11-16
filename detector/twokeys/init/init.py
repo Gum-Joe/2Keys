@@ -5,10 +5,10 @@ import os
 from os import path
 import yaml
 import colorful
-from util.constants import SCRIPTS_ROOT, DEFAULT_PORT
-from util.logger import Logger
-from util.config import load_config
-from daemon import generate_daemon
+from ..util.constants import SCRIPTS_ROOT, DEFAULT_PORT
+from ..util.logger import Logger
+from ..util.config import load_config
+from ..daemon import generate_daemon
 
 logger = Logger("init")
 

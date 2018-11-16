@@ -1,7 +1,5 @@
 # Code originally from https://stackoverflow.com/questions/5060710/format-of-dev-input-event
 # I don't know how to handle structs, so i'm just leaving as is (i.e. in Python)
-# Would be better if in Java (like rest of project), C++/C (native code), JS (like server)
-# as it means rest of pi side might have to be in python 
 #
 # See https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h for codes 
 # and https://www.kernel.org/doc/Documentation/input/event-codes.txt for meanings
@@ -15,10 +13,10 @@ import aiofiles
 import requests
 import json
 from evdev import InputDevice
-from util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
-from util.keyboard_map import keys as KEY_MAP
-from util.config import load_config
-from util.logger import Logger
+from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
+from ..util.keyboard_map import keys as KEY_MAP
+from ..util.config import load_config
+from ..util.logger import Logger
 
 logger = Logger("detect")
 

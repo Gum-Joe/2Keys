@@ -3,11 +3,11 @@
 # I'm just making my own since that's easier for me to understand
 import click
 import sys
-from watcher import Keyboard
-from util import Logger, load_config
-from add_keyboard import gen_async_handler, add_keyboard
-from init import init as init_cli
-from sync import sync_config
+from ..watcher import Keyboard
+from ..util import Logger, load_config
+from ..add_keyboard import gen_async_handler, add_keyboard
+from ..init import init as init_cli
+from ..sync import sync_config
 
 logger = Logger("cli")
 
