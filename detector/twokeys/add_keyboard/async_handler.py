@@ -4,7 +4,7 @@ import sys
 import os
 import signal
 import aiofiles
-from util import Logger
+from ..util import Logger
 import yaml
 from .sync_keyboard_path import update_server_keyboard_path
 logger = Logger("add")

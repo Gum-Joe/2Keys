@@ -2,8 +2,8 @@ import sys
 import os
 import stat
 import pystache
-from util.logger import Logger
-from util.constants import DAEMON_TEMPLATE_PATH, SCRIPTS_ROOT, LOCAL_ROOT, DAEMON_TEMPLATE_SCRIPT_PATH
+from ..util.logger import Logger
+from ..util.constants import DAEMON_TEMPLATE_PATH, SCRIPTS_ROOT, LOCAL_ROOT, DAEMON_TEMPLATE_SCRIPT_PATH
 
 logger = Logger("daemon")
 # Generates a systemd unit file

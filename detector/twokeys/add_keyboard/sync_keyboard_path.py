@@ -3,8 +3,8 @@ import aiohttp
 import aiofiles
 import os
 import yaml
-from util import load_config, Logger
-from util.constants import UPDATE_KEYBOARD_PATH
+from ..util import load_config, Logger
+from ..util.constants import UPDATE_KEYBOARD_PATH
 
 logger = Logger("sync")
 async def update_server_keyboard_path(name, keyboard_path):

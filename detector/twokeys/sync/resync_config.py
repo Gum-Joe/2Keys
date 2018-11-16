@@ -3,9 +3,9 @@ import requests
 import json
 import yaml
 import os
-from util.logger import Logger
-from util.config import load_config
-from util.constants import CONFIG_FILE
+from ..util.logger import Logger
+from ..util.config import load_config
+from ..util.constants import CONFIG_FILE
 
 logger = Logger("sync")
 config = load_config()

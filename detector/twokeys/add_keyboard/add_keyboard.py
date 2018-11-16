@@ -1,9 +1,9 @@
 # Function to detect a keyboard
 import asyncio
 from os import path, listdir
-from util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
-from util.logger import Logger
-from watcher import AsyncKeyboard as AsyncKeyboardWatcher
+from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
+from ..util.logger import Logger
+from ..watcher import AsyncKeyboard as AsyncKeyboardWatcher
 logger = Logger("detect")
 
 def add_keyboard(name, gen_handler):
