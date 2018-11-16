@@ -5,7 +5,7 @@ import os
 from os import path
 import yaml
 import colorful
-from ..util.constants import SCRIPTS_ROOT, DEFAULT_PORT
+from ..util.constants import SCRIPTS_ROOT, DEFAULT_PORT, MODULE_NAME
 from ..util.logger import Logger
 from ..util.config import load_config
 from ..daemon import generate_daemon
@@ -65,9 +65,9 @@ def init(**args):
   logger.info("Running scripts to add path for keyboard input...")
   for key, value in config["keyboards"].items():
     logger.info("Running script to add keyboard for keyboard " + colorful.cyan(key) + "...")
-    ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/cli/index.py"
+    ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/__main__.py"
     print("") # Padding
-    os.system("cd " + os.getcwd() + " && python3 "+ ADD_KEYBOARD_CLI + " add " + key)
+    os.system("cd " + os.getcwd() + " && python -m " + MODULE_NAME + " add " + key)
     print("") # Padding
 
   # Add daemons
