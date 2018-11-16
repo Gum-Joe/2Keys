@@ -7,6 +7,7 @@ from watcher import Keyboard
 from util import Logger, load_config
 from add_keyboard import gen_async_handler, add_keyboard
 from init import init as init_cli
+from sync import sync_config
 
 logger = Logger("cli")
 
@@ -22,7 +23,10 @@ def init(address, port):
 
 @cli.command()
 def sync():
-    click.echo('Syncing')
+    logger.warn("This will overwrite the copy of the config on the detector. Proceed? [Y/n]")
+    proceed = input("").lower()
+    if proceed == "y":
+      sync_config()
 
 @cli.command()
 @click.argument("keyboard")

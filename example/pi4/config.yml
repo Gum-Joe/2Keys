@@ -1,0 +1,21 @@
+name: pi4
+keyboards:
+  logitech:
+    path: /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-kbd
+    dir: logitech
+    root: index.ahk
+    hotkeys:
+      M: SendN
+  lenovo:
+    path: /dev/input/by-id/usb-CHICONY_USB_NetVista_Full_Width_Keyboard-event-kbd
+    dir: lenovo
+    root: index.ahk
+    hotkeys:
+      N: SendN
+addresses:
+  detector: 192.168.0.100
+  server:
+    ipv4: 192.168.0.14
+    port: 9090
+perms:
+  ssh: true
