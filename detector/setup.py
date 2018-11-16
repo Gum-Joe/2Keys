@@ -1,6 +1,6 @@
 # Setup script
 # https://python-packaging.readthedocs.io/en/latest/everything.html
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def readme():
@@ -25,7 +25,8 @@ setup(name="2Keys",
       author_email="kishansambhi@hotmail.co.uk",
       keywords="hid ahk autohotkey macros 2cdkeyboard keyboards",
       license="GPLv3",
-      packages=["twokeys"],
+      packages=find_packages(),
+      script=["bin/2Keys"],
       install_requires=get_required(),
       classifiers=[
           "Development Status :: 2 - Pre-Alpha",
