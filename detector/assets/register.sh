@@ -9,7 +9,7 @@ keyboards={{ keyboards }} # Please use format (keyboard keyboard keyboard)
 # Functions
 register() {
   echo Registering services...
-  for keyboard in ${keyboards};
+  for keyboard in ${keyboards[@]};
   do
   echo "Adding script for ${keyboard}..."
   echo "Chmodding with 644..."
@@ -25,7 +25,7 @@ register() {
 disable() {
   echo Disabling services...
   stop
-  for keyboard in ${keyboards};
+  for keyboard in ${keyboards[@]};
   do
   echo "Disabling script for ${keyboard}..."
   systemctl disable 2Keys-${keyboard}.service
@@ -36,7 +36,7 @@ disable() {
 
 enable_scripts()  {
   echo Enabling services...
-  for keyboard in ${keyboards};
+  for keyboard in ${keyboards[@]};
   do
   echo "Enabling script for ${keyboard}..."
   systemctl enable $PWD/.2Keys/2Keys-${keyboard}.service
@@ -46,7 +46,7 @@ enable_scripts()  {
 
 start() {
   echo Starting services...
-  for keyboard in ${keyboards};
+  for keyboard in ${keyboards[@]};
   do
   echo "Starting script for ${keyboard}..."
   systemctl start 2Keys-${keyboard}.service
@@ -55,7 +55,7 @@ start() {
 
 stop() {
   echo Stopping services...
-  for keyboard in ${keyboards};
+  for keyboard in ${keyboards[@]};
   do
   echo "Stopping script for ${keyboard}..."
   systemctl stop 2Keys-${keyboard}.service
@@ -64,7 +64,7 @@ stop() {
 
 restart() {
   echo Restarting services...
-  for keyboard in ${keyboards};
+  for keyboard in ${keyboards[@]};
   do
   echo "Restarting script for ${keyboard}..."
   systemctl restart 2Keys-${keyboard}.service
@@ -73,7 +73,7 @@ restart() {
 
 status() {
   echo Getting statuses of services...
-  for keyboard in ${keyboards};
+  for keyboard in ${keyboards[@]};
   do
   echo "Get status of ${keyboard}..."
   systemctl status 2Keys-${keyboard}.service
