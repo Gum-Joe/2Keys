@@ -8,11 +8,11 @@ from ..util.config import load_config
 from ..util.constants import CONFIG_FILE
 
 logger = Logger("sync")
-config = load_config()
-address = "http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + "/api/get/config"
 
 def sync_config():
   logger.info("Syncing config...")
+  config = load_config()
+  address = "http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + "/api/get/config"
   logger.debug("GET " + address)
   try:
     config_json = requests.get(address)
