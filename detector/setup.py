@@ -26,7 +26,6 @@ setup(name="2Keys",
       keywords="hid ahk autohotkey macros 2cdkeyboard keyboards",
       license="GPLv3",
       packages=["twokeys"],
-      script=["bin/2Keys"],
       install_requires=get_required(),
       classifiers=[
           "Development Status :: 2 - Pre-Alpha",
