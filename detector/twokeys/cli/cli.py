@@ -56,6 +56,3 @@ def watch(keyboard, no_lock):
       exit(0)
   else:
     keyboard.watch_keyboard()
-
-if __name__ == '__main__':
-    cli()
