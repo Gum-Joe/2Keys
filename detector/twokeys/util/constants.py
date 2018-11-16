@@ -24,8 +24,8 @@ UPDATE_KEYBOARD_PATH = "/api/post/update-keyboard-path"
 DEFAULT_PORT = 9090
 
 # Systemd unit file location
-DAEMON_TEMPLATE_PATH = SCRIPTS_ROOT + "/assets/service.service"
-DAEMON_TEMPLATE_SCRIPT_PATH = SCRIPTS_ROOT + "/assets/register.sh"
+DAEMON_TEMPLATE_PATH = os.path.join(SCRIPTS_ROOT, "../assets/service.service")
+DAEMON_TEMPLATE_SCRIPT_PATH = os.path.join(SCRIPTS_ROOT, "../assets/register.sh")
 
 # Local root
 LOCAL_ROOT = os.getcwd() + "/.2Keys"
