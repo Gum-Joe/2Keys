@@ -138,15 +138,18 @@ export default function (argv: Arguments): Promise<Config> {
       }
     }
 
+    console.log(answers_keyboards);
+
     let i: number = 0;
     let current_keyboard_dir: string = "";
     let current_keyboard_name: string | undefined = "";
     while (i < questions_keyboard.length) {
       if (i % 2 == 0) {
-        // On a keyboard dir
-        const keyboard = questions_keyboard[i];
-        logger.debug(`Added keyboard ${keyboard.name}...`)
-        current_keyboard_name = keyboard.name;
+        // On a keyboard name
+        const keyboard_q = questions_keyboard[i];
+        const name = answers_keyboards[keyboard_q.name]; // Get answer user provided for name
+        logger.debug(`Added keyboard ${name} (from q ${keyboard_q.name})...`)
+        current_keyboard_name = name;
       } else {
         // On a dir
         const keyboard = questions_keyboard[i];

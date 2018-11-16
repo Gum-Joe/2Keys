@@ -61,7 +61,7 @@ export default async function run_init(argv: Arguments): Promise<void> {
     await gen_files(config);
 
     logger.info("Adding 2Keys server daemon to startup folder...");
-    add_to_startup(config.name);
+    add_to_startup(config.name, argv);
 
     logger.debug("Running OOBE...");
     await run_oobe(argv);
