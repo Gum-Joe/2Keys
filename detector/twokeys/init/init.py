@@ -67,7 +67,7 @@ def init(**args):
     logger.info("Running script to add keyboard for keyboard " + colorful.cyan(key) + "...")
     ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/__main__.py"
     print("") # Padding
-    os.system("cd " + os.getcwd() + " && python -m " + MODULE_NAME + " add " + key)
+    os.system("cd " + os.getcwd() + " && python3 -m " + MODULE_NAME + " add " + key)
     print("") # Padding
 
   # Add daemons
