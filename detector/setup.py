@@ -33,5 +33,5 @@ setup(name="2Keys",
           "Operating System :: POSIX :: Linux",
           "Programming Language :: Python :: 3.5",
           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
-      ]
+      ],
       zip_safe=False)
