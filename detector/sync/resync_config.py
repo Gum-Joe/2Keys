@@ -9,7 +9,7 @@ from util.constants import CONFIG_FILE
 
 logger = Logger("sync")
 config = load_config()
-address = "http://" + config["addresses"]["server"]["ipv4"] + ":" + config["addresses"]["server"]["port"] + "/api/get/config"
+address = "http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + "/api/get/config"
 
 def sync_config():
   logger.info("Syncing config...")
@@ -23,7 +23,7 @@ def sync_config():
   if config_json.status_code >= 400: # i.e. 404 or 500
     logger.err("ERROR: Request for config unsucessful!")
     logger.err("Got status code " + str(config_json.status_code) + " with response:")
-    ogger.err(config_json.text)
+    logger.err(config_json.text)
     logger.debug("Headers: ")
     logger.debug(config_json.headers)
     exit()
