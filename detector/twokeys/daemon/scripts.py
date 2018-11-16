@@ -15,7 +15,7 @@ def generate_daemon(name, keyboards):
   for keyboard in keyboards:
     script = pystache.render(template, {
       "name": name,
-      "index_path": SCRIPTS_ROOT + "/cli/index.py",
+      "index_path": "2Keys",
       "keyboard": keyboard,
       "detector_path": SCRIPTS_ROOT,
       "version": str(sys.version_info[0]) + "." + str(sys.version_info[1]),
