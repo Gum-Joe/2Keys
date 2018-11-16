@@ -1,0 +1,4 @@
+include ../README.md
+include ../LICENSE
+include ./assets/register.sh
+include ./assets/service.service
