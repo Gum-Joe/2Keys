@@ -30,3 +30,5 @@ DAEMON_TEMPLATE_SCRIPT_PATH = SCRIPTS_ROOT + "/assets/register.sh"
 # Local root
 LOCAL_ROOT = os.getcwd() + "/.2Keys"
 
+# Module name
+MODULE_NAME = "twokeys"
