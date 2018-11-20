@@ -116,7 +116,7 @@ export default function add_to_startup(name: string, argv: Arguments) {
     logger.debug("Adding a .vbs script to .2Keys to start daemon in the background...")
     // writeFileSync(join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`), gen_startup_vbs());
     writeFileSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), gen_startup_vbs(name));
-    console.log(argv.startup)
+    
     if (!argv.hasOwnProperty("startup")) { // If --no-startup given, startup set to false.  Is undefined if not
       logger.debug("Symlinking this .vbs script into user startup folder...");
       symlinkSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT);
