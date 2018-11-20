@@ -34,7 +34,7 @@ setup(name="2Keys",
           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
       ],
       data_files=[
-        ("assets", ["twokeys/assets/register.sh"], ["twokeys/assets/service.service"])
+        ("assets", ["twokeys/assets/register.sh", "twokeys/assets/service.service"])
       ],
       entry_points={
         "console_scripts": ["2Keys = twokeys.cli:cli"]
