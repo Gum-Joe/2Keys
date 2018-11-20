@@ -1,4 +1,3 @@
 include ./LICENSE
-include ./assets/register.sh
-include ./assets/service.service
+include ./twokeys/assets/*
 include ./required.txt
