@@ -73,6 +73,10 @@ yargs
       alias: "f",
       description: "Forcibly run OOBE & Init"
     });
+    yarg.option("no-startup", {
+      description: "Don't add 2Keys server to startup.  Daemon file will still be generated, just not added to startup",
+      type: "boolean",
+    });
     /**
     yarg.option("install-components-to", {
       description: "Specify the location to install components to during OOBE"

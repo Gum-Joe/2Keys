@@ -1,7 +1,7 @@
 name: pi7
 keyboards:
   logitech_plastic:
-    path: WAITING FROM DETECTOR
+    path: /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-kbd
     dir: logitech_plastic
     root: index.ahk
     hotkeys:
