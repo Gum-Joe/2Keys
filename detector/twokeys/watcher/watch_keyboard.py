@@ -1,6 +1,21 @@
-# Code originally from https://stackoverflow.com/questions/5060710/format-of-dev-input-event
-# I don't know how to handle structs, so i'm just leaving as is (i.e. in Python)
-#
+"""
+Copyright 2018 Kishan Sambhi
+
+This file is part of 2Keys.
+
+2Keys is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+2Keys is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+"""
 # See https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h for codes 
 # and https://www.kernel.org/doc/Documentation/input/event-codes.txt for meanings
 # Notes: Code 99 should not be interrupted
