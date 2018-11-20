@@ -33,6 +33,9 @@ setup(name="2Keys",
           "Programming Language :: Python :: 3.5",
           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
       ],
+      data_files=[
+        ("assets", ["twokeys/assets/register.sh"], ["twokeys/assets/service.service"])
+      ]
       entry_points={
         "console_scripts": ["2Keys = twokeys.cli:cli"]
       },

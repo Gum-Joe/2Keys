@@ -1,0 +1,15 @@
+name: pi7
+keyboards:
+  logitech_plastic:
+    path: WAITING FROM DETECTOR
+    dir: logitech_plastic
+    root: index.ahk
+    hotkeys:
+      M: SendN
+addresses:
+  detector: 192.168.0.100
+  server:
+    ipv4: 192.168.0.14
+    port: 9090
+perms:
+  ssh: true
