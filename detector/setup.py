@@ -17,7 +17,7 @@ def get_required():
     return packages
 
 setup(name="2Keys",
-      version="0.2.5",
+      version="0.3.0",
       description="A easy to setup second keyboard, designed for everyone. ",
       long_description=readme(),
       url="https://github.com/Gum-Joe/2Keys",
