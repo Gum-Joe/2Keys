@@ -35,7 +35,7 @@ setup(name="2Keys",
       ],
       data_files=[
         ("assets", ["twokeys/assets/register.sh"], ["twokeys/assets/service.service"])
-      ]
+      ],
       entry_points={
         "console_scripts": ["2Keys = twokeys.cli:cli"]
       },
