@@ -110,15 +110,17 @@ export default function add_to_startup(name: string, argv: Arguments) {
   const VBS_SCRIPT = join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`);
   // Create service file
   try {
-    logger.debug(`Creating daemon startup js file ${WINDOWS_DAEMON_PREFIX}${name}...`);
+    logger.debug(`Creating daemon startup js file to start the server as ${WINDOWS_DAEMON_PREFIX}${name}...`);
     writeFileSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE), gen_startup_js(name));
 
-    logger.debug("Adding a .vbs script to .2Keys fore startup...")
+    logger.debug("Adding a .vbs script to .2Keys to start daemon in the background...")
     // writeFileSync(join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`), gen_startup_vbs());
     writeFileSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), gen_startup_vbs(name));
-    logger.debug("Symlinking this .vbs script into user startup folder...");
-
-    symlinkSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT);
+    console.log(argv.startup)
+    if (!argv.hasOwnProperty("startup")) { // If --no-startup given, startup set to false.  Is undefined if not
+      logger.debug("Symlinking this .vbs script into user startup folder...");
+      symlinkSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT);
+    }
   } catch (err) {
     if (err.code === "EEXIST") {
       // Writing auto removes file, so only symlink could throw EEXIST
