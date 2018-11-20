@@ -17,7 +17,7 @@ def get_required():
     return packages
 
 setup(name="2Keys",
-      version="0.2.2",
+      version="0.2.3",
       description="A easy to setup second keyboard, designed for everyone. ",
       long_description=readme(),
       url="https://github.com/Gum-Joe/2Keys",
@@ -33,9 +33,7 @@ setup(name="2Keys",
           "Programming Language :: Python :: 3.5",
           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
       ],
-      data_files=[
-        ("assets", ["twokeys/assets/register.sh", "twokeys/assets/service.service"])
-      ],
+      include_package_data=True,
       entry_points={
         "console_scripts": ["2Keys = twokeys.cli:cli"]
       },
