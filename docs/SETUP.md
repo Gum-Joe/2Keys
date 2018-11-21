@@ -24,7 +24,7 @@ As such, you'll need:
 ### 1.1 Installing 2Keys on the server
 ### 1.2 Creating your first project
 ### 1.3 Starting 2Keys on startup (server)
-#### 1.4 If you an't restart the process
+#### 1.4 If you can't restart the process
 ## 2. Adding your detector
 ### 2.1 Installing 2Keys on the detector
 ### 2.2 Adding your project

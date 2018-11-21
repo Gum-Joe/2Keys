@@ -37,19 +37,18 @@ yargs
   .command("serve", "Start the 2Keys server", yarg => {
     yarg.option("port", {
       alias: "p",
-      default: DEFAULT_PORT,
-      description: "Specify a port to run the server on"
+      description: "Specify a port to run the server on (default: 9090)"
     });
     yarg.option("dir", {
       alias: "d",
       default: process.cwd(),
       description: "Specify the root directory, where the config is located"
     });
-  }, argv => {
-    const config = config_loader();
+  }, async argv => {
+    const config = await config_loader();
     process.chdir(argv.dir);
     const port = typeof argv.port === "number" ? parseInt(argv.port) : (config.addresses.server.hasOwnProperty("port") ? config.addresses.server.port : DEFAULT_PORT)
-    serve(typeof argv.port === "number" ? parseInt(argv.port) : DEFAULT_PORT);
+    serve(port);
   })
   .command("oobe", "Runs OOBE; i.e. donwloads required components", yarg => {
     yarg.option("force", {
