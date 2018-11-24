@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "repository": "https://github.com/Gum-Joe/2Keys",
   "author": "Gum-Joe",
-  "license": "MIT",
+  "license": "GPLv3",
   "private": true,
   "bin": {
     "2Keys": "./bin/2Keys"
