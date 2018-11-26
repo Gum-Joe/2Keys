@@ -131,13 +131,13 @@ case $1 in
     ;;
   help)
     echo Valid comands:
-    echo register: Registers and enables services
-    echo disable: Dsibales services
+    echo "register: Registers and enables (starts on startup) services for use"
+    echo "disable: Disbales services (stops them being started on startup)"
     echo "enable: Enables services (used after disabled has been run)"
-    echo start: Starts services
-    echo stop: Stops services
-    echo restart: Restarts services
-    echo status: Gets statuses of all services
+    echo "start: Starts services"
+    echo "stop: Stops services"
+    echo "restart: Restarts services"
+    echo "status: Gets statuses of all services"
     ;; 
   *)
     echo Invalid command.

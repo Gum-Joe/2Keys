@@ -9,7 +9,7 @@ SetWorkingDir A_ScriptDir  ; Ensures a consistent starting directory.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 ; CONVERSION NOTICE 1
-; All your hotkeys need to changed to functions
+; All your hotkeys need to be changed to functions
 ; Then, include the function to run in your config under the key mapping.
 ; The script with the function in should then be included below.
 ; See https://github.com/Gum-Joe/2Keys for help

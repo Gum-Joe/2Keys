@@ -3,8 +3,14 @@ This document will guide you through the process of setting up 2Keys
 
 THIS DOCUMENT IS INCOMPLETE.
 
+## Assumptions
+- You know how to use command shells (such as CMD, PowerSheel or bash)
+- You know how to use a command line interface
+- You are familiar with running commands on a raspberry pi (or other linux device) in bash
+
+
 ## Prerequisites
-2Keys is divded into 2 parts:
+2Keys is divided into 2 parts:
 
 - The server, where hotkeys will be ran
 - The detector, which will have the keyboards plugged into it.  It'll detect hotkeys and forward them to the server, where the hotkeys will be ran via [AutoHotkey](https://www.autohotkey.com/)
@@ -57,6 +63,8 @@ $ 2Keys init --no-startup
 ```
 Note that this will still create files that allow 2Keys to be ran in the background.
 
+<!-- TODO: Add which network to use -->
+
 Answer the questions as they come up. The stuff in brackets after the questions is the default value, which can be used by entering nothing as input.
 
 Once you're done, you can run the 2Keys server by running:
@@ -76,13 +84,13 @@ As was just mentioned, 2Keys automatically sets itself up for startup, specifica
 
 You can find logs in the `.2Keys` folder in your project root. You'll also see a file called `daemon.vbs`; this is the daemon starter file that was linked to in `shell:startup`.
 
-##### 1.3.1.1 If you ever want to stop 2Keys on startup
+##### 1.3.1.1 If you ever want to stop 2Keys from starting on startup
 <!-- TODO: Add a pic -->
 Go into `shell:startup` and delete the `.vbs` file.  This won't remove the daemon itself, but stops it from running on startup.  
 
 It's highly recommended to not delete the `.2Keys` folder in the project root, as otherwise you can never start 2Keys in daemon mode.
 
-##### 1.3.1.2 Adding daemon to startup if you remove it
+##### 1.3.1.2 Readding daemon to startup if you remove it
 TODO
 
 #### 1.3.2 How the daemon works
@@ -97,6 +105,10 @@ Startup is made up of 3 parts
 `daemon.js` is a wrapper around the 2Keys server that is ran by `daemon.vbs` that handles logging and management of the daemon
 
 The 2Keys server is the actual server that handles hotkey execution.
+
+### 1.3.3 Daemon logs
+The 2Keys daemon stores logs in the `.2Keys` project root. 
+You may notice more verbose output in the logs.  To achieve this directly running `2Keys serve`, set the environment variable in your sheel `DEBUG` to `*` (this differs for each shell, so i'm not going to try to explain it here.)
 
 ### 1.3.3 Daemon commands
 You can manually control the daemon using `2Keys`.  In the project root, you can use these commands:
@@ -116,13 +128,84 @@ To restart it:
 $ 2Keys restart
 ```
 
-
 #### 1.4 If you can't restart the process
+The 2Keys daemon sometimes doesn't stop correctly (see #12).
+
+If you end up like this:
+(Use taskmanager to terminate it, TODO as needs pics).
 ## 2. Adding your detector
 ### 2.1 Installing 2Keys on the detector
+Simple run, via SSH:
+```
+$ sudo pip3 install 2Keys
+```
+
+This will install 2Keys using python's package manager, `pip` for use with python 3.  It will also add 2Keys to the command line.
+
+You can verify 2Keys was installed by running `2Keys --version` which should print the version of 2Keys installed, i.e.:
+```shell
+$ 2Keys --version
+0.3.0
+```
 ### 2.2 Adding your project
+First, make sure the 2Keys server is running.  Then, create a new directory to store you project in in a location of your choice (`mkdir path/to/dir`)
+
+Then, run:
+```
+$ 2Keys init
+```
+
+Answer the questions as they come up, supplying the same values for port and IP Address as you did in 1.
+
+You can see your 2Keys project is setup by running:
+```
+$ ls
+```
+Output:
+```
+config.yml
+```
+
+You can watch a keyboard and start watching for hotkeys and sending them to the server with:
+```
+$ 2Keys watch keyboard
+```
+Where `keyboard` is the keyboard name in the config.
+### 2.2.1 Config changes
+If you make a config change on the server, sync it to the pi using:
+```
+$ 2Keys sync
+```
+DON'T update the config directly on the Pi, as it will be overwritten at the next sync.
 ### 2.3 Starting 2Keys on startup (detector)
+On the detector we can't automatically add 2Keys to startup, as such you'll need to run the following command:
+```
+$ sudo bash ./.2Keys/register.sh
+```
+This adds a systemd script for each keyboard (found in `.2Keys` on the detector) that start 2Keys when the detector starts.
+
+#### 2.3.1 Additional commands
+`register.sh` has some useful commands.  Run `sudo bash ./.2Keys/register.sh help` for information.
+
+#### 2.3.2 Notes
+2Keys will effectively lock the keyboard it's watching, which means only 2Keys can use it.  This is so you don't accidentally type things into the detector (i.e. accidentally running commands in a terminal) and there is no escape key from this (see #6).
+
 ## 3. Writing hotkeys
+Ok, so your 2Keys project is now setup, time to write some hotkeys
+### 3.1 How 2Keys works
+2Keys works like so:
+
+1. Detector watches and keeps track of keys pressed, and when a combi matches a hotkey it sends a request to the server telling it which keyboard the press was on and which hotkey to fire.
+2. Server recieves this request and directly links to AutoHotkey and runs the follwing:
+```autohotkey
+#Include path/to/root.ahk ; I.e keyboard_1/index.ahk
+MyFunction() ; The function you want to execute that runs the macro/hotkey
+```
+
+As such, your macros must exist as functions.
+
+Go ahead and open the `index.ahk` in one of your keyboard dirs that you setup in 1.  For simplicity, i'm going to assume the keyboard dir and name is `keyboard_1`.  Read what's written there.
+
 ### 3.1 Your first hotkey
 ### 3.2 How to make hotkey changes
 ### 3.3 Workaround so you don't have to rewrite scripts in AutoHotkey v2
