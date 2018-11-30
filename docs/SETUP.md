@@ -129,7 +129,7 @@ $ 2Keys restart
 ```
 
 #### 1.4 If you can't restart the process
-The 2Keys daemon sometimes doesn't stop correctly (see #12).
+The 2Keys daemon sometimes doesn't stop correctly (see [#12](https://github.com/Gum-Joe/2Keys/issues/12)).
 
 If you end up like this:
 (Use taskmanager to terminate it, TODO as needs pics).
@@ -148,7 +148,8 @@ $ 2Keys --version
 0.3.0
 ```
 ### 2.2 Adding your project
-First, make sure the 2Keys server is running.  Then, create a new directory to store you project in in a location of your choice (`mkdir path/to/dir`)
+First, make sure the 2Keys server is running.  Then, create a new directory to store you project in in a location of your choice (`mkdir path/to/dir`) and enter it (`cd path/to/dir`), replacing `path/to/dir` with a path to the directory (folder) to set 2Keys up in
+**Note**: The command `mkdir` makes a new directory (folder) and `cd` sets the current dir (directory) to the path specifed
 
 Then, run:
 ```
@@ -188,7 +189,7 @@ This adds a systemd script for each keyboard (found in `.2Keys` on the detector)
 `register.sh` has some useful commands.  Run `sudo bash ./.2Keys/register.sh help` for information.
 
 #### 2.3.2 Notes
-2Keys will effectively lock the keyboard it's watching, which means only 2Keys can use it.  This is so you don't accidentally type things into the detector (i.e. accidentally running commands in a terminal) and there is no escape key from this (see #6).
+2Keys will effectively lock the keyboard it's watching, which means only 2Keys can use it.  This is so you don't accidentally type things into the detector (i.e. accidentally running commands in a terminal) and there is no escape key from this (see [#6](https://github.com/Gum-Joe/2Keys/issues/6)).
 
 ## 3. Writing hotkeys
 Ok, so your 2Keys project is now setup, time to write some hotkeys
@@ -206,7 +207,125 @@ As such, your macros must exist as functions.
 
 Go ahead and open the `index.ahk` in one of your keyboard dirs that you setup in 1.  For simplicity, i'm going to assume the keyboard dir and name is `keyboard_1`.  Read what's written there.
 
-### 3.1 Your first hotkey
-### 3.2 How to make hotkey changes
-### 3.3 Workaround so you don't have to rewrite scripts in AutoHotkey v2
-### 3.4 Helpers
+### 3.2 Your first hotkey
+#### 3.2.1 The hotkey
+As in tardition in programming, we're going to write a simple Hello World program.  Create a new file called `hello.ahk` in `keyboard_1` and add the following contents:
+```autohotkey
+HelloWorld() {
+  MsgBox "Hello World!"
+}
+```
+**Note:** I recommend writing your hotkeys like this, in separte files with function for each hotkey.  If multiple hotkeys can be grouped together (i.e. hotkeys that run for a specific application) put them in a sub folder together.
+
+Now, open `index.ahk` and find these lines:
+```autohotkey
+; Include all your AutoHotkey scripts here
+; i.e. #Include "run-apps.ahk"
+```
+
+Underneath import `hello.ahk`:
+```autohotkey
+; Include all your AutoHotkey scripts here
+; i.e. #Include "run-apps.ahk"
+#Include hello.ahk
+```
+**Note:** Since 2Keys uses AutoHotkey V2 relative imports are allowed.
+
+This will add `hello.ahk` to the root, which is loaded by 2Keys, thus allowing the hotkey function to be assigned.
+
+#### 3.2.2 How hotkeys are assigned
+Hotkeys are assigned in the `hotkeys` section of config in the format:
+```yml
+key_code: FunctionName
+# For example
+A: HelloWorld # Runs our hello world function when the A key is pressed
+```
+
+Additionally, you can specify whether the hotkey should fire on up or down of a key, like so:
+```yml
+C:
+  type: up # Default: down
+  func: HelloWorld
+```
+Which would run our HelloWorld function when the C key goes up (is unpressed)
+
+<!-- TODO: Add link -->
+For the list of key codes & additional information (such as how to use `ctrl` etc. or keys such as the ones on the numpad) see `MAPPING.md`
+
+#### 3.2.3 Assigning our hotkeys
+Now, open `config.yml` and find the hotkeys line:
+```yml
+keyboards:
+  keyboard_1:
+    # ...rest of config...
+    hotkeys: {}
+```
+We're going to remap `HelloWorld` to the `H` key:
+```yml
+keyboards:
+  keyboard_1:
+    # ...rest of config...
+    hotkeys:
+      H: HelloWorld
+```
+
+You can test if the hotkey works by running:
+```shell
+$ 2Keys fire keyboard_1 H
+```
+**Note:** `2Keys fire` is very useful command for testing hotkeys with the format `2Keys fire <keyboard> <key_code>`.  Note that in shells such as PowerShell keycodes may not be communicated correctly and escape characters may need to be used.
+
+### 3.2.4 Enabling hotkey changes
+You've just gone and written and assigned your first hotkey.  However, as the detector is a separate computer it doesn't know about the assignment as the detector runs on a separate computer.  Go ahead an ssh into your raspberry pi and go to the directory that you setup 2Keys in.  Run these commands:
+```
+$ 2Keys sync
+$ sudo bash ./.2Keys/register.sh restart
+```
+The first downloads the updated config from the server and the second restarts the 2Keys daemon on the detector.
+
+Now, just hit `H` on `keyboard_1` and you should see the following:
+<!-- TODO: Insert picture -->
+PIC
+
+## 4. Additional notes
+### 4.1 Workaround so you don't have to rewrite scripts in AutoHotkey v2
+2Keys uses AutoHotkey v2 by default (and likely won't work with AutoHotkey v1) which uses slightly different syntax to v1.  As such, it might take a while to migrate AHK scripts to v2, so here's a hack to get around it (based off how TaranVH's second keyboard works):
+
+###### Wrap your hotkeys in a key such as F24
+So this:
+```autohotkey
+^!+A::
+  DoStuff()
+Return
+```
+becomes this:
+```autohotkey
+F24^!+A::
+  DoStuff()
+Return
+```
+Run this script at startup.
+
+##### Add trigger functions
+For each hotkey, create a trigger function for it, like so:
+```autohotkey
+FireDoStuffHotkey() {
+  Send "{F24}{Ctrl}{Alt}{Shift}A
+}
+```
+and add these to your root file.
+
+##### Assign functions
+Then assign these function in `config.yml`
+```yml
+keyboards:
+  keyboard_1:
+    hotkeys:
+      ^!+A: FireDoStuffHotkey
+```
+
+##### Run it
+Update the config on the detector and restart the daemon on the detector, as in 3.2.4.
+
+## 5. Helpers
+Since the detector is on a separate computer, functions such as `GetKeyState` won't work.  As such, I plan to implement helpers to replace these function. See [#2](https://github.com/Gum-Joe/2Keys/issues/2)
