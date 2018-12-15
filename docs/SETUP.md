@@ -28,6 +28,7 @@ When you connect to a network, the router automatically assign assign an IP addr
 
 ##### 0.1.1.2 Change it
 On Windows 10: `Settings > Network and Internet > Change Connection Properties`
+
 On Windows 8.1 or lower: `Control Panel > Network and Internet > Network and Sharing Centre > Change Adapter Settings`
 
 Find the adapter corresponding to you internet connection.  For me this is the `Network Bridge`, for you it may be one labelled Ethernet.  Ignore any where the 3rd line is something like `Hyper-V` or `Virtual Box`.  Right click the adapter and select `Properties`.  You should see something like this:
