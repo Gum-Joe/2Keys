@@ -23,8 +23,24 @@ As such, you'll need:
 ## 0. Setup
 ### 0.1 Setting up the server
 #### 0.1.1 Assigning a static IP address
+##### 0.1.1.1 Why?
+When you connect to a network, the router automatically assign assign an IP address (a way of a router knowing where to send data) to your computer.  2Keys uses this to identify which device the server (the part where hotkeys are executed) is and to send requests to it.  Unfortunately, these addresses usually change, meaning the config on the detector would have to be updated everytime your IP address changed.  As such, we're going to set a special type of IP address, called a static IP address.
+
+##### 0.1.1.2 Change it
+On Windows 10: `Settings > Network and Internet > Change Connection Properties`
+On Windows 8.1 or lower: `Control Panel > Network and Internet > Network and Sharing Centre > Change Adapter Settings`
+
+Find the adapter corresponding to you internet connection.  For me this is the `Network Bridge`, for you it may be one labelled Ethernet.  Ignore any where the 3rd line is something like `Hyper-V` or `Virtual Box`.  Right click the adapter and select `Properties`.  You should see something like this:
+<PIC>
+
 #### 0.1.2 Installing Nodejs and setting up build tools 
-NOTE: ref NodeJS as node
+In order to use 2Keys, you'll need [NodeJS](https://nodejs.org/en/).  Make sure to download the LTS release (at the time of writing `10.x.x`).
+Download the installer from the site and run it.  During install don't tick the box to automatically install the tools for native modules (see below); we'll use a Microsoft provided tool for that.
+
+Once installed, go to the directory you want to install 2Keys in and then go File > Open Windows Powershell/Command Prompt as Administrator.  If you're running Windows 7 or below, search for `cmd` in the start menu, right click `cmd.exe` and then select "Run as Administrator"
+
+Once inside, run `npm install --global windows-build-tools`.  This will install a Microsoft provided tool to install dependencies to build native addons.  Native addons are bits of code not written in JavaScript (what NodeJS runs), such as code that interfaces with Windows functions (i.e. opening a DLL).  2Keys uses native modules for it's executor of AutoHotkey code, by using a special version of AutoHotkey, [AutoHotkey_H](https://hotkeyit.github.io/v2/), that provides a DLL version of AutoHotkey that 2Keys can interface with.
+
 ### 0.2 Setting up the detector
 #### 0.2.1 Setting pi-config
 #### 0.2.2 Assigning a static IP address
@@ -35,11 +51,11 @@ Go to the folder that you want to setup your 2Keys project in, and holding SHIFT
 
 Them run the following command:
 ```shell
-$ npm install -g 2Keys
+$ npm install --global 2Keys
 ```
 **NOTE:** the `$` at the start is not part of the command, and represents what comes before the command input (i.e. for CMD this could be something like `C:\>`)
 
-This will, using node's built in package manager `npm` download 2Keys from the internet and install it for use via CMD or PowerShell (specified by the `-g` flag).
+This will, using node's built in package manager `npm`, download 2Keys from the internet and install it for use via CMD or PowerShell (specified by the `--global` flag).
 
 You can verify 2Keys was installed by running `2Keys --version` which should print the version of 2Keys installed, i.e.:
 ```shell
@@ -289,43 +305,14 @@ PIC
 
 ## 4. Additional notes
 ### 4.1 Workaround so you don't have to rewrite scripts in AutoHotkey v2
-2Keys uses AutoHotkey v2 by default (and likely won't work with AutoHotkey v1) which uses slightly different syntax to v1.  As such, it might take a while to migrate AHK scripts to v2, so here's a hack to get around it (based off how TaranVH's second keyboard works):
-
-###### Wrap your hotkeys in a key such as F24
-So this:
+Just run the script using AHK V1 (installed and set to the default program for `.ahk` files) directly:
 ```autohotkey
-^!+A::
-  DoStuff()
-Return
-```
-becomes this:
-```autohotkey
-F24^!+A::
-  DoStuff()
-Return
-```
-Run this script at startup.
-
-##### Add trigger functions
-For each hotkey, create a trigger function for it, like so:
-```autohotkey
-FireDoStuffHotkey() {
-  Send "{F24}{Ctrl}{Alt}{Shift}A
+MyFunction() {
+  Run "path/to/the/authotkey/script.ahK"
 }
 ```
-and add these to your root file.
 
-##### Assign functions
-Then assign these function in `config.yml`
-```yml
-keyboards:
-  keyboard_1:
-    hotkeys:
-      ^!+A: FireDoStuffHotkey
-```
-
-##### Run it
-Update the config on the detector and restart the daemon on the detector, as in 3.2.4.
+I'll be adding support for AHK v1 later, via a method similar to this (AutoHotkey_H V1 doesn't play nice with 2Keys)
 
 ## 5. Helpers
 Since the detector is on a separate computer, functions such as `GetKeyState` won't work.  As such, I plan to implement helpers to replace these function. See [#2](https://github.com/Gum-Joe/2Keys/issues/2)
