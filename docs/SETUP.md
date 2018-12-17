@@ -2,6 +2,7 @@
 This document will guide you through the process of setting up 2Keys
 
 THIS DOCUMENT IS INCOMPLETE.
+PI and DETECTOR are used interchangably
 
 ## Assumptions
 - You know how to use command shells (such as CMD, PowerSheel or bash)
@@ -26,26 +27,96 @@ As such, you'll need:
 ##### 0.1.1.1 Why?
 When you connect to a network, the router automatically assign assign an IP address (a way of a router knowing where to send data) to your computer.  2Keys uses this to identify which device the server (the part where hotkeys are executed) is and to send requests to it.  Unfortunately, these addresses usually change, meaning the config on the detector would have to be updated everytime your IP address changed.  As such, we're going to set a special type of IP address, called a static IP address.
 
-##### 0.1.1.2 Change it
+##### 0.1.1.2 Select an adapter
 On Windows 10: `Settings > Network and Internet > Change Connection Properties`
 
 On Windows 8.1 or lower: `Control Panel > Network and Internet > Network and Sharing Centre > Change Adapter Settings`
 
 Find the adapter corresponding to you internet connection.  For me this is the `Network Bridge`, for you it may be one labelled Ethernet.  Ignore any where the 3rd line is something like `Hyper-V` or `Virtual Box`.  Right click the adapter and select `Properties`.  You should see something like this:
-<PIC>
+![https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/Adapter.png](https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/Adapter.png)
+
+Highlight `Internet Protocol Version 4 (TCP/IPv4)` and select properties.  Then select `Use the following IP address`.
+
+### 0.1.1.3 Select an IP
+Now open a command prompt admin windows (search for `cmd` then right click and select `Run as Administrator`) and run `ipconfig`.  Find the network adapter you selected in 0.1.1.2 and copy the IPv4 address and subnet mask into their corresponding fields in the properties window you opened at the end of 0.1.1.2.
+
+Then click `OK` then `OK` again then close the properties window, control panel and command prompt window.
 
 #### 0.1.2 Installing Nodejs and setting up build tools 
 In order to use 2Keys, you'll need [NodeJS](https://nodejs.org/en/).  Make sure to download the LTS release (at the time of writing `10.x.x`).
 Download the installer from the site and run it.  During install don't tick the box to automatically install the tools for native modules (see below); we'll use a Microsoft provided tool for that.
 
-Once installed, go to the directory you want to install 2Keys in and then go File > Open Windows Powershell/Command Prompt as Administrator.  If you're running Windows 7 or below, search for `cmd` in the start menu, right click `cmd.exe` and then select "Run as Administrator"
+Once installed, go to the directory you want to install 2Keys in and then go File > Open Windows Powershell/Command Prompt as Administrator.  If you're running Windows 7 or below, search for `cmd` in the start menu, right click `cmd.exe` and then select `Run as Administrator`
 
 Once inside, run `npm install --global windows-build-tools`.  This will install a Microsoft provided tool to install dependencies to build native addons.  Native addons are bits of code not written in JavaScript (what NodeJS runs), such as code that interfaces with Windows functions (i.e. opening a DLL).  2Keys uses native modules for it's executor of AutoHotkey code, by using a special version of AutoHotkey, [AutoHotkey_H](https://hotkeyit.github.io/v2/), that provides a DLL version of AutoHotkey that 2Keys can interface with.
 
+#### 0.1.3 Installing Git Bash
+For this tutorial you'll need `ssh` (I'll explain what this is in 0.2.1).  This can be found with Git Bash for Windows. Go to [https://git-scm.com/downloads](https://git-scm.com/downloads) and download the latest release.  During install ensure that you select the option to add the tools to `PATH`.
 ### 0.2 Setting up the detector
 #### 0.2.1 Setting pi-config
+If you already know how to use pi-config, just ensure SSH is enabled and that auto-login t desktop is enabled.  If you don't know how to do any of those, follow below, else, skip to 0.2.2
+
+These steps should be carried out on the raspberry pi's GUI (i.e. with it plugged into a screen), instead of via SSH (we'll get to what that is soon) etc. I'll be showing screenshots via SSH though, as that's easier to document.
+
+**Wait, what's SSH?** SSH (Secure Shell Host) is a secure way of us remotely opening a command shell on a different machine, in this case the raspberry pi.  It's useful as it means we can still use our main computer whilst running a task on the raspberry pi (or any other machine with SSH)
+
+1. Open pi config by running `sudo raspi-config`.  Use the arrow keys to change the highlighted option and enter to select the highlighted option.
+2. Select `Interfacing Options`
+3. Select `SSH`
+4. Select `Yes`
+5. Hit enter once done
+6. It's also highly advised now to change the default password.  Select `Change User Password` and follow the onscreen instructions to enter a new password (`Enter new UNIX password:`).  Note that the lack of anything showing what you're typing (or if you're typing at all) is puposeful.
+7. Now just select finish.
+
+**DO NOT REBOOT THE RASPBERRY PI JUST YET.** We are first going to setup a static ip address for the raspberry pi
 #### 0.2.2 Assigning a static IP address
+##### 0.2.2.1 Find current settings
+Run `ip route | grep default`.  Copy down the first IP address shown, this is the default gateway.
+
+Run `ip route | grep wlan0` if using wireless networking or `ip route | grep eth0` if using ethernet.  Copy down the IP address shown at the start of the line shown, including the `/xx` part.   This is what we will set as your IP address.
+
+##### 0.2.2.2 Set settings
+Run `sudo nano /etc/dhcpcd.conf` to open an editor
+At the bottom of the file, add this (pay attenmtion to the comments, text starting with `#`):
+```conf
+interface wlan0 # Replace wlan0 with eth0 if using ethernet
+
+static routers=192.168.0.1 # Replace with what you got for the default gateway
+static ip_address=192.168.0.2/24 # Replace with the other IP you got in 0.2.2.1
+static domain_name_servers=1.1.1.1 1.0.0.1 192.168.0.1 # Replace the last IP address with the default gatway.  The 2 address before are cloudflare's DNS.
+```
+
+Now reboot your raspberry pi with `sudo reboot`
+
+#### 0.2.3 SSH
+Now we can SSH into the raspberry pi.  Open a Git Bash window and type `ssh pi@0.0.0.0`, replacing `0.0.0.0` with the ip you set in 0.2.2.2, minus the `/xx` bit.  Enter your password when prompted.
+
+From now on i'll assume you'll run commands on the raspberry pi through SSH.
+
 #### 0.2.3 Installing python & pip
+##### 0.2.3.1 Do you already have it?
+Run these commands on the detector:
+```
+$ python3 --version
+$ python3 -m pip --version
+$ pip3 --version
+```
+If all commands work skip this section.
+
+If only the last command returns with a command not found, when you see `pip3` use `python3 -m pip` instead and skip this section
+
+if command 2 fails but command 3 does not, you can safely skip this section.
+
+Else, follow along with this section.
+
+##### 0.2.3.2 Install python 3 and pip for python3
+Run:
+```
+$ sudo apt update
+$ sudo apt install python3 python3-pip
+```
+
+Use the commands in 0.2.3.1 to verify you have `python3` and `pip3`
 ## 1. Creating your first 2Keys project (server)
 ### 1.1 Installing 2Keys on the server
 Go to the folder that you want to setup your 2Keys project in, and holding SHIFT right click in an empty space.  Select "Open PowerShell window here" or "Open command window here".
@@ -125,7 +196,7 @@ The 2Keys server is the actual server that handles hotkey execution.
 
 ### 1.3.3 Daemon logs
 The 2Keys daemon stores logs in the `.2Keys` project root. 
-You may notice more verbose output in the logs.  To achieve this directly running `2Keys serve`, set the environment variable in your sheel `DEBUG` to `*` (this differs for each shell, so i'm not going to try to explain it here.)
+You may notice more verbose output in the logs.  To achieve this directly running `2Keys serve`, set the environment variable in your shell `DEBUG` to `*` (this differs for each shell, so i'm not going to try to explain it here.)
 
 ### 1.3.3 Daemon commands
 You can manually control the daemon using `2Keys`.  In the project root, you can use these commands:
@@ -165,7 +236,7 @@ $ 2Keys --version
 0.3.0
 ```
 ### 2.2 Adding your project
-First, make sure the 2Keys server is running.  Then, create a new directory to store you project in in a location of your choice (`mkdir path/to/dir`) and enter it (`cd path/to/dir`), replacing `path/to/dir` with a path to the directory (folder) to set 2Keys up in
+First, make sure the 2Keys server is running.  Then, create a new directory to store you project in a location of your choice (`mkdir path/to/dir`) and enter it (`cd path/to/dir`), replacing `path/to/dir` with a path to the directory (folder) to set 2Keys up in
 **Note**: The command `mkdir` makes a new directory (folder) and `cd` sets the current dir (directory) to the path specifed
 
 Then, run:
@@ -198,7 +269,7 @@ DON'T update the config directly on the Pi, as it will be overwritten at the nex
 ### 2.3 Starting 2Keys on startup (detector)
 On the detector we can't automatically add 2Keys to startup, as such you'll need to run the following command:
 ```
-$ sudo bash ./.2Keys/register.sh
+$ sudo bash ./.2Keys/register.sh register
 ```
 This adds a systemd script for each keyboard (found in `.2Keys` on the detector) that start 2Keys when the detector starts.
 
@@ -222,11 +293,11 @@ MyFunction() ; The function you want to execute that runs the macro/hotkey
 
 As such, your macros must exist as functions.
 
-Go ahead and open the `index.ahk` in one of your keyboard dirs that you setup in 1.  For simplicity, i'm going to assume the keyboard dir and name is `keyboard_1`.  Read what's written there.
+Go ahead and open the `index.ahk` in one of your keyboard dirs that you setup in 1.  For simplicity, i'm going to assume the keyboard dir and name is `keyboard_1`.  Read what's written in `index.ahk`
 
 ### 3.2 Your first hotkey
 #### 3.2.1 The hotkey
-As in tardition in programming, we're going to write a simple Hello World program.  Create a new file called `hello.ahk` in `keyboard_1` and add the following contents:
+As is tradition in programming, we're going to write a simple Hello World program.  Create a new file called `hello.ahk` in `keyboard_1` and add the following contents:
 ```autohotkey
 HelloWorld() {
   MsgBox "Hello World!"
@@ -293,7 +364,7 @@ $ 2Keys fire keyboard_1 H
 **Note:** `2Keys fire` is very useful command for testing hotkeys with the format `2Keys fire <keyboard> <key_code>`.  Note that in shells such as PowerShell keycodes may not be communicated correctly and escape characters may need to be used.
 
 ### 3.2.4 Enabling hotkey changes
-You've just gone and written and assigned your first hotkey.  However, as the detector is a separate computer it doesn't know about the assignment as the detector runs on a separate computer.  Go ahead an ssh into your raspberry pi and go to the directory that you setup 2Keys in.  Run these commands:
+You've just gone and written and assigned your first hotkey.  However, as the detector is a separate computer it doesn't know about the assignment as the detector runs on a separate computer.  Go ahead and ssh into your raspberry pi and go to the directory that you setup 2Keys in.  Run these commands:
 ```
 $ 2Keys sync
 $ sudo bash ./.2Keys/register.sh restart
