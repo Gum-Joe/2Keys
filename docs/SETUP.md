@@ -1,13 +1,7 @@
 # How to setup 2Keys
 This document will guide you through the process of setting up 2Keys
 
-THIS DOCUMENT IS INCOMPLETE.
-PI and DETECTOR are used interchangably
-
-## Assumptions
-- You know how to use command shells (such as CMD, PowerSheel or bash)
-- You know how to use a command line interface
-- You are familiar with running commands on a raspberry pi (or other linux device) in bash
+Please note raspberry pi and detetor are used interchangably
 
 
 ## Prerequisites
@@ -17,7 +11,7 @@ PI and DETECTOR are used interchangably
 - The detector, which will have the keyboards plugged into it.  It'll detect hotkeys and forward them to the server, where the hotkeys will be ran via [AutoHotkey](https://www.autohotkey.com/)
 
 As such, you'll need:
-- A Raspberry Pi Model 2 B or higher (A Model 3 B+ is probably better as it has built in wifi, so a USB doesn't have to be taken up by a dongle.  However, I haven't tested 2Keys on one of them) running Raspian.  This will be the detector.
+- A Raspberry Pi Model 2 B or higher (A Model 3 B+ is probably better as it has built in wifi, so a USB port doesn't have to be taken up by a dongle.  However, I haven't tested 2Keys on one of them) running Raspian.  This will be the detector.
 - A 64-bit Windows PC to act as the server.  Please note 2Keys has only been tested on Windows 10
 - The keyboards you want to use with 2Keys, plus USB hubs if required
 
@@ -33,6 +27,7 @@ On Windows 10: `Settings > Network and Internet > Change Connection Properties`
 On Windows 8.1 or lower: `Control Panel > Network and Internet > Network and Sharing Centre > Change Adapter Settings`
 
 Find the adapter corresponding to you internet connection.  For me this is the `Network Bridge`, for you it may be one labelled Ethernet.  Ignore any where the 3rd line is something like `Hyper-V` or `Virtual Box`.  Right click the adapter and select `Properties`.  You should see something like this:
+
 ![https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/Adapter.png](https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/Adapter.png)
 
 Highlight `Internet Protocol Version 4 (TCP/IPv4)` and select properties.  Then select `Use the following IP address`.
@@ -53,8 +48,12 @@ Once inside, run `npm install --global windows-build-tools`.  This will install 
 #### 0.1.3 Installing Git Bash
 For this tutorial you'll need `ssh` (I'll explain what this is in 0.2.1).  This can be found with Git Bash for Windows. Go to [https://git-scm.com/downloads](https://git-scm.com/downloads) and download the latest release.  During install ensure that you select the option to add the tools to `PATH`.
 ### 0.2 Setting up the detector
+Please note it's assumed you've already installed Raspian and set it up (i.e. running `sudo apt update` and `sudo apt upgrade`) (By the way `apt` is just a better version of `apt-get`).
+
+There are tutorials on this out on the web.
+
 #### 0.2.1 Setting pi-config
-If you already know how to use pi-config, just ensure SSH is enabled and that auto-login t desktop is enabled.  If you don't know how to do any of those, follow below, else, skip to 0.2.2
+If you already know how to use pi-config, just ensure SSH is enabled and that auto-login to desktop is enabled.  If you don't know how to do any of those, follow below, else, skip to 0.2.2
 
 These steps should be carried out on the raspberry pi's GUI (i.e. with it plugged into a screen), instead of via SSH (we'll get to what that is soon) etc. I'll be showing screenshots via SSH though, as that's easier to document.
 
@@ -66,6 +65,7 @@ These steps should be carried out on the raspberry pi's GUI (i.e. with it plugge
 4. Select `Yes`
 5. Hit enter once done
 6. It's also highly advised now to change the default password.  Select `Change User Password` and follow the onscreen instructions to enter a new password (`Enter new UNIX password:`).  Note that the lack of anything showing what you're typing (or if you're typing at all) is puposeful.
+8. Now set statup options.  Select `Boot Options` then `Desktop/CLI` then `Desktop Autologin`
 7. Now just select finish.
 
 **DO NOT REBOOT THE RASPBERRY PI JUST YET.** We are first going to setup a static ip address for the raspberry pi
@@ -105,7 +105,7 @@ If all commands work skip this section.
 
 If only the last command returns with a command not found, when you see `pip3` use `python3 -m pip` instead and skip this section
 
-if command 2 fails but command 3 does not, you can safely skip this section.
+If command 2 fails but command 3 does not, you can safely skip this section.
 
 Else, follow along with this section.
 
@@ -117,6 +117,7 @@ $ sudo apt install python3 python3-pip
 ```
 
 Use the commands in 0.2.3.1 to verify you have `python3` and `pip3`
+
 ## 1. Creating your first 2Keys project (server)
 ### 1.1 Installing 2Keys on the server
 Go to the folder that you want to setup your 2Keys project in, and holding SHIFT right click in an empty space.  Select "Open PowerShell window here" or "Open command window here".
@@ -151,9 +152,10 @@ $ 2Keys init --no-startup
 ```
 Note that this will still create files that allow 2Keys to be ran in the background.
 
-<!-- TODO: Add which network to use -->
 
 Answer the questions as they come up. The stuff in brackets after the questions is the default value, which can be used by entering nothing as input.
+
+When asked which IP address to select, select the IP/network that corresponds to the static IP you set in 0.1.1.
 
 Once you're done, you can run the 2Keys server by running:
 ```
@@ -163,7 +165,7 @@ $ 2Keys serve
 <!-- Add OOBE info -->
 
 <!-- TODO: Replace <PLACE> -->
-**2Keys sever:** The server that handles execution of hotkeys, by taking requests for which hotkey on which keyboard from the detector.  Later, we'll see how this works in `<PLACE; SECTION>`
+**2Keys sever:** The server that handles execution of hotkeys, by taking requests for which hotkey on which keyboard from the detector.  Later, we'll see how this works in 3.1.
 
 ### 1.3 The 2Keys daemon
 A daemon is a background process, in the case the 2Keys server when running in daemon mode.  I'll be refering to running 2Keys in the background as the 2Keys daemon.
@@ -173,13 +175,16 @@ As was just mentioned, 2Keys automatically sets itself up for startup, specifica
 You can find logs in the `.2Keys` folder in your project root. You'll also see a file called `daemon.vbs`; this is the daemon starter file that was linked to in `shell:startup`.
 
 ##### 1.3.1.1 If you ever want to stop 2Keys from starting on startup
-<!-- TODO: Add a pic -->
-Go into `shell:startup` and delete the `.vbs` file.  This won't remove the daemon itself, but stops it from running on startup.  
+Go into `shell:startup` (by typing it into Windows Explorer's address bar) and delete the `.vbs` file.  This won't remove the daemon itself, but stops it from running on startup.
+
+![https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/Startup.png](https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/Startup.png)
+**Note:** Where `KeyboardOfMacros` is will be the name of the 2Keys project.
 
 It's highly recommended to not delete the `.2Keys` folder in the project root, as otherwise you can never start 2Keys in daemon mode.
 
 ##### 1.3.1.2 Readding daemon to startup if you remove it
-TODO
+TODO.  Not necessary for first release, may be added as a feature later.
+The simple answer is to create a shortcut to `.2Keys/daemon.vbs` in `shell:startup`.
 
 #### 1.3.2 How the daemon works
 Startup is made up of 3 parts
@@ -337,8 +342,8 @@ C:
 ```
 Which would run our HelloWorld function when the C key goes up (is unpressed)
 
-<!-- TODO: Add link -->
-For the list of key codes & additional information (such as how to use `ctrl` etc. or keys such as the ones on the numpad) see `MAPPING.md`
+For the list of key codes & additional information (such as how to use `ctrl` etc. or keys such as the ones on the numpad) see `MAPPING.md`:
+[https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md](https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md)
 
 #### 3.2.3 Assigning our hotkeys
 Now, open `config.yml` and find the hotkeys line:
@@ -372,15 +377,19 @@ $ sudo bash ./.2Keys/register.sh restart
 The first downloads the updated config from the server and the second restarts the 2Keys daemon on the detector.
 
 Now, just hit `H` on `keyboard_1` and you should see the following:
-<!-- TODO: Insert picture -->
-PIC
+
+![https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/HelloWorld.png](https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/HelloWorld.png)
+
+**Note:** when AutoHotkey (from 2Keys) creates a window of anykind it will now show up as this icon in the taskbar (the one highlighted):
+
+![https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/ErrorIcon.png](https://raw.githubusercontent.com/Gum-Joe/2Keys/master/docs/ErrorIcon.png)
 
 ## 4. Additional notes
 ### 4.1 Workaround so you don't have to rewrite scripts in AutoHotkey v2
 Just run the script using AHK V1 (installed and set to the default program for `.ahk` files) directly:
 ```autohotkey
 MyFunction() {
-  Run "path/to/the/authotkey/script.ahK"
+  Run "path/to/the/authotkey/script.ahk"
 }
 ```
 
