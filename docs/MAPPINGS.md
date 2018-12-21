@@ -13,13 +13,39 @@ keyboards:
 | !         | Alt                                                                                                                              |
 | ^         | Control                                                                                                                          |
 |  +        | Shift                                                                                                                            |
+| #         | Windows key                                                                                                                      |
 | <         | Left key (i.e. left control (`<^`), left shift (`<+`))                                                                           |
 | >         | Right key (i.e. right control (`^>`), right Alt/AltGr (`!>`))                                                                    |
-| #         |                                                                                                                                  |
 | $key$     | Used to denote special keys, such as UP, DOWN, RIGHT, LEFT arrow keys; CAPS (Caps Lock), TAB. Replace key with key name in caps  |
 | character | Used for all keys that are one character, except one's in table below (i.e. numpad)                                              |
 
 ## Table of keys
+
+1. SSH into the detector.
+2. `cd` to where your 2Keys project is stored.
+3. Run `sudo bash ./.2Keys/register.sh stop` to stop the server.
+4. Run `2Keys watch <keyboard_name>`, replacing `<keyboard_name>` with the keyboard the key is on.
+5. Press the key and see what mapping comes up, if any.  See below if the mapping is blank.
+6. Restart the server with `sudo bash ./.2Keys/register.sh start` once you're done.
+
+If no mapping comes up, note down the key code and add the following to config, under the keyboard with the key on:
+```yml
+keyboard:
+  keyboard_1: # Assuming that is the name
+    map:
+      C1: key_code # Note that C1 can be whatever you want it to be.
+      # I.e.:
+      C2: 42
+```
+
+You can now use this key by wrapping the value you set (i.e. `C1`) in brackets:
+```yml
+keyboard:
+  keyboard_1: # Assuming that is the name
+    hotkeys:
+      (C1): HelloWorld
+```
+
 | Symbol       | Corresponding Key                            | Notes |
 |--------------|----------------------------------------------|-------|
 | $NUM_*$      | Numpad asterisk                              |       |
