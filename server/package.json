@@ -1,18 +1,15 @@
 {
   "name": "2Keys-server",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "description": "Server for 2Keys",
   "main": "lib/index.js",
   "repository": "https://github.com/Gum-Joe/2Keys",
   "author": "Gum-Joe",
   "license": "GPLv3",
-  "private": true,
   "bin": {
     "2Keys": "./bin/2Keys"
   },
   "dependencies": {
-    "@types/inquirer": "^0.0.43",
-    "@types/mustache": "^0.8.32",
     "bindings": "^1.3.0",
     "body-parser": "^1.18.3",
     "body-parser-json": "^1.9.2",
@@ -33,6 +30,8 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
+    "@types/inquirer": "^0.0.43",
+    "@types/mustache": "^0.8.32",
     "@types/node": "^10.9.4",
     "node-gyp": "^3.8.0"
   }
