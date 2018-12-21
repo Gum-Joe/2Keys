@@ -1,14 +1,14 @@
 # How to setup 2Keys
-This document will guide you through the process of setting up 2Keys
+This document will guide you through the process of setting up 2Keys.
 
-Please note raspberry pi and detector are used interchangeably
+Please note raspberry pi and detector are used interchangeably.
 
 
 ## Prerequisites
 2Keys is divided into 2 parts:
 
-- The server, where hotkeys will be ran
-- The detector, which will have the keyboards plugged into it.  It'll detect hotkeys and forward them to the server, where the hotkeys will be run via [AutoHotkey](https://www.autohotkey.com/)
+- The server, where hotkeys will be run
+- The detector, which will have the keyboards plugged into it.  It'll detect keypresses and forward them to the server, where the hotkeys will be run via [AutoHotkey](https://www.autohotkey.com/)
 
 As such, you'll need:
 - A Raspberry Pi Model 2 B or higher (A Model 3 B+ is probably better as it has built-in wifi, so a USB port doesn't have to be taken up by a dongle.  However, I haven't tested 2Keys on one of them) running Raspian.  This will be the detector.
@@ -55,9 +55,9 @@ There are tutorials on this out on the web.
 #### 0.2.1 Setting pi-config
 If you already know how to use pi-config, just ensure SSH is enabled and that auto-login to the desktop is enabled.  If you don't know how to do any of those, follow below, else, skip to 0.2.2
 
-These steps should be carried out on the raspberry pi's GUI (i.e. with it plugged into a screen), instead of via SSH (we'll get to what that is soon) etc. I'll be showing screenshots via SSH though, as that's easier to document.
+These steps should be carried out on the raspberry pi's GUI (i.e. with it plugged into a screen), instead of via SSH (we'll get to what that is soon).
 
-**Wait, what's SSH?** SSH (Secure Shell Host) is a secure way for us to remotely open a command shell on a different machine, in this case the raspberry pi, and access it from our PC.  It's useful as it means we can still use our main computer whilst running a task on the raspberry pi (or any other machine with SSH)
+**Wait, what's SSH?** SSH (Secure Shell) is a secure way for us to remotely open a command shell on a different machine, in this case the raspberry pi, and access it from our PC.  It's useful as it means we can still use our main computer whilst running a task on the raspberry pi (or any other machine with SSH)
 
 1. Open pi config by running `sudo raspi-config`.  Use the arrow keys to change the highlighted option and enter to select the highlighted option.
 2. Select `Interfacing Options`
@@ -102,6 +102,9 @@ $ python3 --version
 $ python3 -m pip --version
 $ pip3 --version
 ```
+
+**NOTE:** the `$` at the start is not part of the command, and represents what comes before the command input (i.e. for CMD this could be something like `C:\>`)
+
 If all commands work skip this section.
 
 If only the last command returns with a command not found, when you see `pip3` use `python3 -m pip` instead and skip this section
@@ -127,7 +130,6 @@ Then run the following command:
 ```shell
 $ npm install --global 2Keys
 ```
-**NOTE:** the `$` at the start is not part of the command, and represents what comes before the command input (i.e. for CMD this could be something like `C:\>`)
 
 This will, using node's built-in package manager `npm`, download 2Keys from the internet and install it for use via CMD or PowerShell (specified by the `--global` flag).
 
@@ -260,7 +262,8 @@ $ 2Keys --version
 0.3.0
 ```
 ### 2.2 Adding your project
-First, make sure the 2Keys server is running.  Then, create a new directory to store your project in, in a location of your choice (`mkdir path/to/dir`) and enter it (`cd path/to/dir`), replacing `path/to/dir` with a path to the directory (folder) to set 2Keys up in
+First, make sure the 2Keys server is running.  Then, create a new directory to store your project in, in a location of your choice (`mkdir path/to/dir`) and enter it (`cd path/to/dir`), replacing `path/to/dir` with a path to the directory (folder) to set 2Keys up in.
+
 **Note**: The command `mkdir` makes a new directory (folder) and `cd` sets the current dir (directory) to the path specified
 
 Then, run:
@@ -268,7 +271,7 @@ Then, run:
 $ 2Keys init
 ```
 
-Answer the questions as they come up, supplying the same values for port and IP Address as you did in 1.
+Answer the questions as they come up, supplying the same values for port and IP Address as you did in 1.2.
 
 You can see your 2Keys project is setup by running:
 ```
@@ -279,7 +282,7 @@ Output:
 config.yml
 ```
 
-You can watch a keyboard and start watching for hotkeys and sending them to the server with:
+You can watch a keyboard and start watching for keypresses and sending them to the server with:
 ```
 $ 2Keys watch keyboard
 ```
@@ -308,7 +311,7 @@ Ok, so your 2Keys project is now setup, time to write some hotkeys
 ### 3.1 How 2Keys works
 2Keys works like so:
 
-1. Detector watches and keeps track of keys pressed, and when a combi matches a hotkey it sends a request to the server telling it which keyboard the press was on and which hotkey to fire.
+1. Detector watches and keeps track of keys pressed, and when a combo matches a hotkey it sends a request to the server telling it which keyboard the press was on and which hotkey to fire.
 2. Server receives this request and directly links to AutoHotkey and runs the following:
 ```autohotkey
 #Include path/to/root.ahk ; I.e keyboard_1/index.ahk
@@ -341,7 +344,7 @@ Underneath import `hello.ahk`:
 ; i.e. #Include "run-apps.ahk"
 #Include hello.ahk
 ```
-**Note:** Since 2Keys uses AutoHotkey V2 relative imports are allowed.
+**Note:** Since 2Keys uses AutoHotkey V2, relative imports are allowed.
 
 This will add `hello.ahk` to the root, which is loaded by 2Keys, thus allowing the hotkey function to be assigned.
 
