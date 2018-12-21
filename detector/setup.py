@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 
 def readme():
-    with open("./README.rst") as f:
+    with open("./README.md") as f:
         return f.read()
 
 def get_required():
@@ -17,7 +17,7 @@ def get_required():
     return packages
 
 setup(name="2Keys",
-      version="0.3.0",
+      version="0.3.5",
       description="A easy to setup second keyboard, designed for everyone. ",
       long_description=readme(),
       url="https://github.com/Gum-Joe/2Keys",

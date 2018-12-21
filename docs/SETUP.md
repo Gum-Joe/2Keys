@@ -128,7 +128,7 @@ Go to the folder that you want to setup your 2Keys project in, and holding SHIFT
 
 Then run the following command:
 ```shell
-$ npm install --global 2Keys
+$ npm install --global twokeys-server
 ```
 
 This will, using node's built-in package manager `npm`, download 2Keys from the internet and install it for use via CMD or PowerShell (specified by the `--global` flag).
