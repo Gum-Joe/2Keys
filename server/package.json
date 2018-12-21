@@ -1,11 +1,11 @@
 {
-  "name": "2Keys-server",
-  "version": "0.2.0",
+  "name": "twokeys-server",
+  "version": "0.3.1",
   "description": "Server for 2Keys",
   "main": "lib/index.js",
   "repository": "https://github.com/Gum-Joe/2Keys",
   "author": "Gum-Joe",
-  "license": "GPLv3",
+  "license": "GPL-3.0-or-later",
   "bin": {
     "2Keys": "./bin/2Keys"
   },
