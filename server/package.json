@@ -1,6 +1,6 @@
 {
   "name": "twokeys-server",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Server for 2Keys",
   "main": "lib/index.js",
   "repository": "https://github.com/Gum-Joe/2Keys",
@@ -9,6 +9,21 @@
   "bin": {
     "2Keys": "./bin/2Keys"
   },
+  "keywords": [
+    "twokeys",
+    "2Keys",
+    "2nd",
+    "keyboard",
+    "Taran",
+    "LTT",
+    "2nd keyboard",
+    "macros",
+    "raspberry",
+    "pi",
+    "raspberry pi",
+    "python",
+    "evdev"
+  ],
   "dependencies": {
     "bindings": "^1.3.0",
     "body-parser": "^1.18.3",
