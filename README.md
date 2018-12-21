@@ -3,7 +3,7 @@ A easy to setup second keyboard, designed for everyone.
 
 For a full setup guide, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/SETUP.md)
 
-For keyboard mapping, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md)
+For keyboard mappings, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md)
 
 ### Support
 Windows is supported only as the server (where the hotkeys will run) and a raspberry pi is required to run the detector.
@@ -32,7 +32,8 @@ $ pip3 install -r required.txt
 
 ## Sofware used & inspiration
 Inspired by LTT editor Taran's second keyboard project: [https://github.com/TaranVH/2nd-keyboard](https://github.com/TaranVH/2nd-keyboard)
-Uses AutoHotkey_H (a DLL version of AutoHotkey): [https://hotkeyit.github.io/v2/](https://hotkeyit.github.io/v2/)
+
+2Keys uses AutoHotkey_H (a DLL version of AutoHotkey): [https://hotkeyit.github.io/v2/](https://hotkeyit.github.io/v2/)
 
 ## License
 Copyright 2018 Kishan Sambhi
