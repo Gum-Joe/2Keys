@@ -1,6 +1,6 @@
 {
   "name": "twokeys-server",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Server for 2Keys",
   "main": "lib/index.js",
   "repository": "https://github.com/Gum-Joe/2Keys",
