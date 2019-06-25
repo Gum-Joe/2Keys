@@ -108,17 +108,23 @@ export interface UserspaceConfig {
 /**
  * Interface for each section of the file tree
  */
-export interface FileTreeNode {
-  type: "file" | "dir" // File or dir?
-  path: string // Full path to the file
+export interface FileTreeFile {
+  type: "file"; // File or dir?
+  path: string; // Full path to the file
 }
 
 /**
  * Interface for files
  */
-export interface FileTreeDir extends FileTreeNode {
-  contents: FileTreeNode[];
+export interface FileTreeDir {
+  type: "dir";
+  path: string; // Full path to the file
+  contents: FileTreeNodes<FileTreeNode>[];
 }
+
+export type FileTreeNode = FileTreeDir | FileTreeFile;
+// The below is a conditional type, allowing the cor rect type to be used when type === "dir" or "file"
+export type FileTreeNodes<T> = T extends FileTreeDir ? FileTreeDir : FileTreeFile;
 
 /**
  * Fetch hotkey interface

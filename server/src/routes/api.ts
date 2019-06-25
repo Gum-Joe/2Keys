@@ -97,7 +97,12 @@ router.post("/post/update-keyboard-path", (req, res, next) => {
         writeFile(CONFIG_FILE, YAML.stringify(config), (err) => {
           if (err) {
             res.statusCode = 500;
-            res.send(err.stack.toString());
+            // Check for a err.stack
+            if (typeof err.stack === "undefined") {
+              res.send("Something happend, but the usual stack is not available.");
+            } else {
+              res.send(err.stack.toString());
+            }
           } else {
             res.statusCode = 200;
             res.send("OK");

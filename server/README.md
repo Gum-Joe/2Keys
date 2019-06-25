@@ -16,6 +16,7 @@ To build the server, where hotkeys are run:
 ```
 $ cd server
 $ yarn
+$ yarn run compile
 ```
 
 To build the detector:

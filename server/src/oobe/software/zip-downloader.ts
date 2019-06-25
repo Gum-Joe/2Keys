@@ -34,37 +34,40 @@ const mkdirp = promisify(mkdirpRaw);
 
 export default class ZipDownloader {
   private logger: Logger;
-  private fullPath: string | undefined; // thus.saveTo + fetch_file().saveName
+  private fullPath: string; // thus.saveTo + fetch_file().this.saveAs
 
   public argv: Arguments;
   public url: string;
   public name: string;
   public saveTo: string;
+  public saveAs: string;
 
   /**
    * Constructor
    * @param name Name of software downloading, as referenced in userspace_config.software
    * @param url URL to download the zip from (ONLY accepts HTTPS)
    * @param saveTo Dir to save file to
+   * @param saveAs Filename to save as (including the .zip prefix)
    */
-  constructor(name: string, url: string, saveTo: string, argv: Arguments) {
+  constructor(name: string, url: string, saveTo: string, saveAs: string, argv: Arguments) {
     this.name = name;
     this.logger = new Logger({
       name,
     });
     this.url = url;
     this.saveTo = saveTo;
+    this.saveAs = saveAs;
     this.argv = argv;
+
+    this.fullPath = join(this.saveTo, this.saveAs); // Save full path
   }
 
   /**
    * Download the file
-   * @param saveLoc File name to save zip to.
    */
-  fetch_file(saveName: string | undefined = this.name + ".zip"): Promise<void> {
+  fetch_file(): Promise<void> {
     return new Promise(async (resolve, reject) => {
-      this.logger.info(`Downloading package from url ${this.url} to ${this.saveTo} as ${saveName}.zip...`);
-      this.fullPath = join(this.saveTo, saveName) + ".zip"; // Save full path
+      this.logger.info(`Downloading package from url ${this.url} to ${this.saveTo} as ${this.saveAs}.zip...`);
 
       // Make dirs
       try { await mkdirp(this.saveTo) } catch (err) {
