@@ -81,6 +81,8 @@ typings/
 
 # TS source code
 src
+# Includes cpp code
+!src/cpp/*
 
 # Tests
 test
