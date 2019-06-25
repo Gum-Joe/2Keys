@@ -37,7 +37,7 @@ const logger = new Logger({
 export default async function run_oobe(argv: Arguments) {
   logger.info("Starting OOBE...");
   logger.debug("Checking if OOBE has already been ran...");
-  let config: UserspaceConfig;
+  let config = default_userspace_config; // So we don't risk config being undefined
   try {
     config = await userspace_config_loader();
   } catch (err) {
@@ -45,7 +45,6 @@ export default async function run_oobe(argv: Arguments) {
       // Doesn't exist
       logger.info("Generating config...");
       await writeFile(DEFAULT_USERSPACE_CONFIG, YAML.stringify(default_userspace_config));
-      config = default_userspace_config;
     } else {
       logger.err(`Error accesing userspace config file (${DEFAULT_USERSPACE_CONFIG})!`);
       logger.throw(err);

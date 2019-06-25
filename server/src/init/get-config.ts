@@ -31,7 +31,8 @@ const logger: Logger = new Logger({
   name: "init"
 });
 
-const questions: inquirer.Questions = [
+// Fixing build breaking issues from #15 (hence inquirer.Question[])
+const questions: inquirer.Questions & inquirer.Question[] = [
   {
     type: "input",
     name: "name",
@@ -122,7 +123,15 @@ export default function (argv: Arguments): Promise<Config> {
     }
 
     // Append keyboards
-    const questions_keyboard: inquirer.Questions = [];
+    // Fixing build breaking issues from #15 (hence inquirer.Question[])
+    // The below interface makes it so a name field is required so that
+    // we don't get complaints below for trying to access the name property
+    // that might not exist on a generic inquirer.Question
+    // Defined inline
+    interface KeyboardQ extends inquirer.Question {
+      name: string
+    }
+    const questions_keyboard: inquirer.Questions & inquirer.Question[] & KeyboardQ[] = [];
     for (let i = 1; i <= answers.numberKeyboards; i++) {
       questions_keyboard.push({
         type: "input",
@@ -160,7 +169,7 @@ export default function (argv: Arguments): Promise<Config> {
 
     let i: number = 0;
     let current_keyboard_dir: string = "";
-    let current_keyboard_name: string | undefined = "";
+    let current_keyboard_name: string = "";
     while (i < questions_keyboard.length) {
       if (i % 2 == 0) {
         // On a keyboard name

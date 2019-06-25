@@ -24,8 +24,9 @@ import { Arguments } from "yargs";
 import mkdirp from "mkdirp";
 import { WINDOWS_DAEMON_PREFIX, DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE, WINDOWS_DAEMON_PID_FILE, WINDOWS_DAEMON_FILE_JS_TEMPLATE, WINDOWS_DAEMON_FILE_VBS_TEMPLATE, WINDOWS_DAEMON_FILE_VBS } from "../util/constants";
 import Logger from "../util/logger";
-import { writeFileSync, readFile, symlinkSync, readFileSync } from "fs";
+import { writeFileSync, readFile, symlinkSync, readFileSync, statSync } from "fs";
 import { exec } from "child_process";
+import { homedir } from "os";
 
 
 const Mustache = require("mustache");
@@ -106,8 +107,9 @@ export default function add_to_startup(name: string, argv: Arguments) {
   } catch (err) {
     logger.throw(err);
   }
-
-  const VBS_SCRIPT = join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`);
+  // NOTE: Even though there may not be a "Startup" folder, windows explorer may show a "Start-Up" folder
+  // 2Keys will still see "Startup"
+  const VBS_SCRIPT = join(homedir(), "AppData", "Roaming", "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`);
   // Create service file
   try {
     logger.debug(`Creating daemon startup js file to start the server as ${WINDOWS_DAEMON_PREFIX}${name}...`);
