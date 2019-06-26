@@ -180,6 +180,10 @@ class Keyboard:
                     "func": value
                 }
             # Else it has to be a regular one as ups require type: up
+            # The below fixes #13. where if no type was specified but a func: was the program crashes
+            elif "type" not in new_hotkeys[key]:
+                # Function is present, but no type
+                new_hotkeys[key]["type"] = "down"
         return new_hotkeys
     
     # Hotkey detector algorithm
@@ -211,7 +215,7 @@ class Keyboard:
         try:
             data_hotkey = { "keyboard": self.name, "hotkey": hotkey }
             TYPE_JSON = {"Content-Type": "application/json"} # So the server can interpret it
-            requests.post("http://" + self.config["addresses"]["server"]["ipv4"] + ":" + str(self.config["addresses"]["server"]["port"]) + "/api/post/trigger", data=json.dumps(data_hotkey), headers=TYPE_JSON)
+            requests.post("http://" + self.config["addresses"]["server"]["ipv4"] + ":" + str(self.config["addresses"]["server"]["port"]) + "/api/post/trigger", data=json.dumps(data_hotkey), headers=TYPE_JSON, timeout=2)
         except requests.exceptions.ConnectionError:
             logger.err("Couldn't estanblish a connection to the server.")
             logger.err("Please check your internet connection.")
