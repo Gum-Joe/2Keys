@@ -25,7 +25,7 @@ import { join } from "path";
 import YAML from "yaml";
 import { config_loader } from "../util/config";
 import Logger from "../util/logger";
-import { Config, Hotkey } from "../util/interfaces";
+import { Config, Hotkey, EvDevValues } from "../util/interfaces";
 import { run_hotkey, fetch_hotkey } from "../util/ahk";
 import { CONFIG_FILE } from "../util/constants";
 
@@ -65,13 +65,31 @@ router.post("/post/trigger", async (req, res, next) => {
   // Get vars
   const keyboard = req.body.keyboard;
   const hotkey_code = req.body.hotkey;
-  logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}`);
+  const value: EvDevValues = req.body.hasOwnProperty("value") ?  req.body.value : EvDevValues.Down;
+  logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}, with value ${value}`);
   // Parse config
   try {
     const fetched_hotkey = await fetch_hotkey(keyboard, hotkey_code); // Gets hotkey
+    let func_to_run: string;
 
-    // Handle
-    run_hotkey(fetched_hotkey.file, fetched_hotkey.func);
+    // Use the value arg to select
+    if (typeof fetched_hotkey.func === "object") {
+      // Is an object
+      logger.debug("Got a multi event hotkey.");
+      // Select which function to run
+      if (value === EvDevValues.Down) {
+        func_to_run = fetched_hotkey.func.down
+      } else if (value === EvDevValues.Up) {
+        func_to_run = fetched_hotkey.func.up
+      } else {
+        throw new TypeError(`The request keyboard event value of ${value} is invalid.  Valid event values are: 0 (Up) & 1 (Down)`);
+      }
+    } else {
+      func_to_run = fetched_hotkey.func;
+    }
+
+    // Execute
+    run_hotkey(fetched_hotkey.file, func_to_run);
 
     res.statusCode = 200;
     res.send("OK")

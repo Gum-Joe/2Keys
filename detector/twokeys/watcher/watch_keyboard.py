@@ -102,11 +102,14 @@ class Keyboard:
                         logger.info("Registered hotkey:")
                         logger.info(checked_hotkey)
                         logger.info(hotkey)
-                        # Is is an up function?
+                        # Is is an up, down, or multi function?
                         if hotkey["type"] == "down" and value == 1:
-                            self.send_hotkey(checked_hotkey)
+                            self.send_hotkey(checked_hotkey, value)
                         elif hotkey["type"] == "up" and value == 0:
-                            self.send_hotkey(checked_hotkey)
+                            self.send_hotkey(checked_hotkey, value)
+                        elif hotkey["type"] == "multi":
+                            # The server handles picking the right hotkey
+                            self.send_hotkey(checked_hotkey, value)
                         else:
                             logger.warn("Hotkey not send as it's type " + hotkey["type"])
                 
@@ -179,11 +182,11 @@ class Keyboard:
                     "type": "down",
                     "func": value
                 }
-            # Else it has to be a regular one as ups require type: up
+            # Else it has to be a regular one OR a muti one as ups require type: up, muties just need an object
             # The below fixes #13. where if no type was specified but a func: was the program crashes
             elif "type" not in new_hotkeys[key]:
                 # Function is present, but no type
-                new_hotkeys[key]["type"] = "down"
+                new_hotkeys[key]["type"] = ("down" if isinstance(value["func"], str) else "multi") # If func is str, use down, if not, use "multi"
         return new_hotkeys
     
     # Hotkey detector algorithm
@@ -210,10 +213,11 @@ class Keyboard:
     # Hotkey sender
     # Send hotkey runner command -> server
     # hotkey = hotkey ref in config
-    def send_hotkey(self, hotkey):
+    # value = Value of event type (up, down) from evdev
+    def send_hotkey(self, hotkey, value):
         logger.info("Sending hotkey %s to server..." % hotkey)
         try:
-            data_hotkey = { "keyboard": self.name, "hotkey": hotkey }
+            data_hotkey = { "keyboard": self.name, "hotkey": hotkey, "value": value }
             TYPE_JSON = {"Content-Type": "application/json"} # So the server can interpret it
             requests.post("http://" + self.config["addresses"]["server"]["ipv4"] + ":" + str(self.config["addresses"]["server"]["port"]) + "/api/post/trigger", data=json.dumps(data_hotkey), headers=TYPE_JSON, timeout=2)
         except requests.exceptions.ConnectionError:

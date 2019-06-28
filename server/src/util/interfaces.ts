@@ -127,9 +127,25 @@ export type FileTreeNode = FileTreeDir | FileTreeFile;
 export type FileTreeNodes<T> = T extends FileTreeDir ? FileTreeDir : FileTreeFile;
 
 /**
+ * Hotkey that can be up or down, specifiying how the required functions should be stored
+ */
+export interface HotKeyUpDown {
+  up: string,
+  down: string,
+}
+/**
  * Fetch hotkey interface
  */
 export interface FetchHotkey {
   file: string,
-  func: string
+  func: string | HotKeyUpDown,
+  type: string,
+}
+
+/**
+ * EVDEV value mapping
+ */
+export enum EvDevValues {
+  Up = 0,
+  Down // 1
 }
