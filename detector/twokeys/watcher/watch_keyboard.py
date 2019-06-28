@@ -223,6 +223,10 @@ class Keyboard:
         except requests.exceptions.ConnectionError:
             logger.err("Couldn't estanblish a connection to the server.")
             logger.err("Please check your internet connection.")
+        except requests.exceptions.Timeout:
+            logger.err("The request timed out")
+            logger.warn("This means either the server isn't running, or is busy running another hotkey.")
+            logger.warn("Please note the hotkey may still execute after the server has finished running the hotkeys it is currently running")
 
     # Locks (grabs) keyboard
     def lock(self):
