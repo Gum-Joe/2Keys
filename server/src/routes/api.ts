@@ -84,6 +84,15 @@ router.post("/post/trigger", async (req, res, next) => {
       } else {
         throw new TypeError(`The request keyboard event value of ${value} is invalid.  Valid event values are: 0 (Up) & 1 (Down)`);
       }
+
+      // Validate a function actually exists
+      if (typeof func_to_run === "undefined") {
+        // Ignore
+        logger.warn(`Ignoring hotkey ${hotkey_code} of value ${value}, as no function to run exists`);
+        res.statusCode = 404;
+        res.send("Hotkey function not found");
+        return;
+      }
     } else {
       func_to_run = fetched_hotkey.func;
     }
@@ -92,7 +101,7 @@ router.post("/post/trigger", async (req, res, next) => {
     run_hotkey(fetched_hotkey.file, func_to_run);
 
     res.statusCode = 200;
-    res.send("OK")
+    res.send("OK");
   } catch (err) {
     logger.throw_noexit(err);
     res.statusCode = 500

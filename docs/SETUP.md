@@ -364,6 +364,16 @@ C:
 ```
 Which would run our HelloWorld function when the C key goes up (is unpressed)
 
+You can also have separate events fire on up and down:
+```yml
+D:
+  type: multi # You can safely omit this line
+  func:
+    down: HelloWorld
+    up: SomeOtherFunction
+```
+Which would run our HelloWorld function when the D key is pressed, and SomeOtherFunction when it is unpressed.
+
 For the list of key codes & additional information (such as how to use `ctrl` etc. or keys such as the ones on the numpad) see `MAPPING.md`:
 [https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md](https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md)
 
