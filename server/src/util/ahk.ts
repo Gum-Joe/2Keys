@@ -35,7 +35,8 @@ export async function fetch_hotkey(keyboard: string, hotkey_code: string): Promi
   const config: Config = await config_loader();
 
   // Get hotkey func
-  let func;
+  let func: string;
+  let type: string;
   if (!config.keyboards.hasOwnProperty(keyboard)) { // Validate
     throw new ReferenceError(`Keyboard ${keyboard} was not found!`);
   } else if (!config.keyboards[keyboard].hotkeys.hasOwnProperty(hotkey_code)) {
@@ -45,16 +46,19 @@ export async function fetch_hotkey(keyboard: string, hotkey_code: string): Promi
   if (typeof hotkey !== "string") {
     // Object type
     func = hotkey.func;
+    type = typeof hotkey.type === "undefined" ? "down" : hotkey.type;
   } else {
     func = hotkey;
+    type = "down";
   }
 
   // Get file
   const file = join(process.cwd(), config.keyboards[keyboard].dir, config.keyboards[keyboard].root);
 
   return {
+    type,
     file,
-    func
+    func,
   }
 }
 
