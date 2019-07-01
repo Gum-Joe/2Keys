@@ -291,6 +291,7 @@ Where `keyboard` is the keyboard name in the config.
 If you make a config change on the server, sync it to the pi using:
 ```
 $ 2Keys sync
+$ sudo bash ./.2Keys/register.sh restart
 ```
 DON'T update the config directly on the Pi, as it will be overwritten at the next sync.
 ### 2.3 Starting 2Keys on startup (detector)
