@@ -57,7 +57,7 @@ keyboard:
 | $ENTER$      | Enter                                        |       |
 | $NUMLOCK$    | Numlock                                      |       |
 | $SCROLLLOCK$ | Scrol Lock                                   |       |
-| $NUM1-9$     | Numpad numbers                               |       |
+| NUM1-9       | Numpad numbers                               |       |
 | $NUM_-$      | Numpad negative                              |       |
 | $NUM_+$      | Numpad plus                                  |       |
 | $NUM_.$      | Numpad full stop                             |       |
