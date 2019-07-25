@@ -12,6 +12,9 @@
 			"xstring": "cpp",
 			"xlocale": "cpp",
 			"xutility": "cpp"
-		}
+		},
+		"mocha.requires": ["ts-node/register"],
+		"mocha.files.glob": "test/**/*.ts",
+		"mocha.subdirectory": "server"
 	},
 }

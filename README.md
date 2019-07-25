@@ -12,18 +12,30 @@ Windows is supported only as the server (where the hotkeys will run) and a raspb
 This will download a copy of [AutoHotkey_H](https://hotkeyit.github.io/v2/), a DLL version of [AutoHotkey](http://autohotkey.com/)
 
 ## Building
-To build the server, where hotkeys are run:
+To build & install the server, where hotkeys are run (for development purposes):
 ```
 $ cd server
 $ yarn
 $ yarn run compile
+$ yarn link
 ```
 
-To build the detector:
+To build the detector (after installing [Pipenv](https://github.com/pypa/pipenv)) (for development purposes):
 ```
 $ cd detector
-$ pip3 install -r required.txt
+$ pipenv install
+$ pipenv shell
 ```
+You can then install it in the Pipenv shell's PATH with `pip link -e .`
+
+If you want to install it globally, so you can use it with the 2Keys `systemctl` services:
+```
+$ cd detector
+$ pipenv lock -r > required_tmp.txt
+$ pip3 install -r required_tmp.txt
+$ pip3 link -e .
+```
+Note that with this 2Keys and its dependencies will be installed for the entire system.
 
 ## Devices
 **Server**: The device running the hotkeys sever, i.e. where the hot keys will be run
