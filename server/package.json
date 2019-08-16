@@ -73,7 +73,7 @@
     "@types/inquirer": "^0.0.43",
     "@types/mocha": "^5.2.7",
     "@types/mustache": "^0.8.32",
-    "@types/node": "^10.9.4",
+    "@types/node": "^10.14.15",
     "chai": "^4.2.0",
     "node-gyp": "^3.8.0",
     "nyc": "^14.1.1",
