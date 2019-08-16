@@ -19,3 +19,7 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 TestFunc() {
   MsgBox "It works!"
 }
+
+RunTestForExecution1() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution1.txt")
+}

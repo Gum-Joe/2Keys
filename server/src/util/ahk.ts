@@ -31,6 +31,13 @@ const ahk = require("../../build/Release/twokeys");
 const logger: Logger = new Logger({ name: "ahk" });
 const access = promisify(fs.access);
 
+/**
+ * Fetches a hotkey from the config file,
+ * based on the keyboard and hotkey to find,
+ * providing the type of the hotkey,
+ * it's corrsponding function
+ * and the file with that function in.
+ */
 export async function fetch_hotkey(keyboard: string, hotkey_code: string): Promise<FetchHotkey> {
   const config: Config = await config_loader();
 
@@ -68,7 +75,20 @@ export async function fetch_hotkey(keyboard: string, hotkey_code: string): Promi
  * @param func {String} Function to run from that file
  */
 export async function run_hotkey(file: string, func: string): Promise<void> {
-  const old_cwd: string = process.cwd()
+  const old_cwd: string = process.cwd();
+
+  // 0: Set execution test
+  const exec_test = `
+  ; AHK EXEC 2KEYS
+  ; PRELUDE
+  Global TWOKEYS_CWD := "${process.cwd()}"
+
+  ; GRAB CLIENT CODE
+  #Include ${file}
+
+  ; EXECUTE
+  ${func}()
+  `;
   // 1: Santise file input to prevent code injection
   // Check it exists
   try {
@@ -89,7 +109,7 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
           logger.throw_noexit(new Error("DLL config option was not found!  It may be an EXE file is only available, which isn't supported."));
           return; // STOP execution
         }
-        const ahk_run = ahk.run_ahk_text(join(userspace_config.paths.software, userspace_config.software.ahk.paths.root, userspace_config.software.ahk.paths.dll), `#Include ${file}\n${func}()`);
+        const ahk_run = ahk.run_ahk_text(join(userspace_config.paths.software, userspace_config.software.ahk.paths.root, userspace_config.software.ahk.paths.dll), exec_test);
         if (typeof ahk_run !== "undefined") {
           // ERROR!
           const error: Error = new Error(`Error running AutoHotkey: ${ahk_run.message}.  Code: ${ahk_run.code}`)

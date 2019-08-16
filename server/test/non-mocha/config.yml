@@ -1,0 +1,11 @@
+keyboards:
+  keyboard_test:
+    dir: ./keyboard_test
+    path: /dev/...
+    root: index.ahk
+    hotkeys:
+      +A$HOME$:
+        type: up
+        func: IAmTheSenate
+      +B$HOME$: IAmNotTheSenate
+      ^RT: RunTestForExecution1

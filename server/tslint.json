@@ -11,7 +11,7 @@
     "member-ordering": true,
     "no-console": false,
     "no-var-requires": false,
-    "indent": false,
+    "indent": false
   },
   "rulesDirectory": []
 }
