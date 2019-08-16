@@ -53,11 +53,11 @@ keyboard:
 | $BACKSPACE$  | Backspace                                    |       |
 | $TAB$        | Tab                                          |       |
 | $CAPS$       | Caps lock                                    |       |
-| F1-F24       | Function keys, $ not required                |       |
+| F1-F24       | Function keys                                | $ not required |
 | $ENTER$      | Enter                                        |       |
 | $NUMLOCK$    | Numlock                                      |       |
 | $SCROLLLOCK$ | Scrol Lock                                   |       |
-| $NUM1-9$     | Numpad numbers                               |       |
+| NUM1-9       | Numpad numbers                               | $ not required |
 | $NUM_-$      | Numpad negative                              |       |
 | $NUM_+$      | Numpad plus                                  |       |
 | $NUM_.$      | Numpad full stop                             |       |
