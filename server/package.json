@@ -63,7 +63,7 @@
     "progress": "^2.0.1",
     "request": "^2.88.0",
     "request-progress": "^3.0.0",
-    "tslint": "^5.11.0",
+    "tslint": "^5.19.0",
     "typescript": "^3.0.3",
     "yaml": "^1.0.0-rc.8",
     "yargs": "^12.0.1",
