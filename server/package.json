@@ -58,7 +58,7 @@
     "inquirer": "^6.5.1",
     "js-yaml": "^3.12.0",
     "mkdirp": "^0.5.1",
-    "mustache": "^3.0.0",
+    "mustache": "^3.0.2",
     "node-windows": "^0.1.14",
     "progress": "^2.0.1",
     "request": "^2.88.0",
