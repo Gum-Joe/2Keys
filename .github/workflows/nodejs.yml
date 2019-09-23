@@ -17,11 +17,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Add node-gyp
+    - name: Add nodejs build tools
       run: |
         cd server
-        yarn global add node-gyp@latest
-        npm i -g node-gyp@latest
+        yarn global add windows-build-tools
     - name: Install deps
       run: |
         cd server
