@@ -11,23 +11,27 @@ jobs:
       matrix:
         node-version: [10.x, 12.x]
 
+    env:
+        CI: true
+        NODE_ENV: development
+
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, build, and test
+    - name: Add node-gyp
       run: |
-        cd ./server
+        cd server
         yarn global add node-gyp@latest
         npm i -g node-gyp@latest
-        yarn
-        yarn run build --if-present
-        yarn test
-      env:
-        CI: true
-        NODE_ENV: development
+    - name: Install deps
+      run: yarn
+    - name: Build modules
+      run: yarn run build
+    - name: Run tests
+      run: yarn test
     - uses: codecov/codecov-action@v1.0.2
       with:
         token: ${{secrets.CODECOV_TOKEN}} #required

@@ -29,7 +29,7 @@ export const CONFIG_FILE: string = "config.yml";
 //export const AHK_LIB_PATH: string = "D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\x64w\\AutoHotkey.dll";
 export const AHK_LIB_PATH: string = "D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v2-release-master\\x64w\\AutoHotkey.dll";
 export const AHK_DOWNLOAD_PATH = "https://codeload.github.com/HotKeyIt/ahkdll-v2-release/zip/master";
-export const AHK_VERSION = "2.0.0-alpha"
+export const AHK_VERSION = "2.0.0-alpha";
 
 // Default paths
 export const DEFAULT_USERSPACE_ROOT: string = join(homedir(), ".2Keys");
