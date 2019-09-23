@@ -17,10 +17,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Add nodejs build tools
-      run: |
-        cd server
-        yarn global add windows-build-tools
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
     - name: Install deps
       run: |
         cd server
