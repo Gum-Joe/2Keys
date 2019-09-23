@@ -8,7 +8,7 @@ os: windows
 # Default is fine here
 install:
   - cd server
-  - yarn install
+  - yarn
 script:
   - cd server
   - yarn run coverage
