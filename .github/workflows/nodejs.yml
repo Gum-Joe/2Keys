@@ -20,6 +20,8 @@ jobs:
     - name: npm install, build, and test
       run: |
         cd ./server
+        yarn global add node-gyp@latest
+        npm i -g node-gyp@latest
         yarn
         yarn run build --if-present
         yarn test
