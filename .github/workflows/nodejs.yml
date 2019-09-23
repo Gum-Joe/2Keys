@@ -23,17 +23,23 @@ jobs:
         yarn global add node-gyp@latest
         npm i -g node-gyp@latest
     - name: Install deps
-      run: cd server; yarn
+      run: |
+        cd server
+        yarn
       env:
         CI: true
         NODE_ENV: development
     - name: Build modules
-      run: cd server; yarn run build
+      run: |
+        cd server
+        yarn run build
       env:
         CI: true
         NODE_ENV: development
     - name: Run tests
-      run: cd server; yarn test
+      run: |
+        cd server
+        yarn test
       env:
         CI: true
         NODE_ENV: development
