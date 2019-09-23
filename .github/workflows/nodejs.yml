@@ -11,10 +11,6 @@ jobs:
       matrix:
         node-version: [10.x, 12.x]
 
-    env:
-        CI: true
-        NODE_ENV: development
-
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
@@ -28,10 +24,19 @@ jobs:
         npm i -g node-gyp@latest
     - name: Install deps
       run: yarn
+      env:
+        CI: true
+        NODE_ENV: development
     - name: Build modules
       run: yarn run build
+      env:
+        CI: true
+        NODE_ENV: development
     - name: Run tests
       run: yarn test
+      env:
+        CI: true
+        NODE_ENV: development
     - uses: codecov/codecov-action@v1.0.2
       with:
         token: ${{secrets.CODECOV_TOKEN}} #required
