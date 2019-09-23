@@ -17,8 +17,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Setup MSBuild.exe
+    - name: Setup MSBuild.exe # Needed so things work
       uses: warrenbuckley/Setup-MSBuild@v1
+    - name: Setup VS Dev Environment # Needed so things work
+      uses: seanmiddleditch/gha-setup-vsdevenv@v1
     - name: Install deps
       run: |
         cd server
