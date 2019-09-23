@@ -8,9 +8,9 @@ os: windows
 # Default is fine here
 install:
   - cd server
-  - yarn global add codecov
   - yarn install
 script:
   - cd server
   - yarn run coverage
+  - yarn add codecov
   - codecov
