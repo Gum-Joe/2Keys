@@ -6,9 +6,13 @@ node_js:
 os: windows
 
 # Default is fine here
-install:
+before_install:
+  # Convery lock file
   - cd server
-  - yarn install --verbose
+  - npm install -g synp
+  - synp --source-file ./yarn.lock
+install:
+  - npm ci
 script:
-  - yarn run coverage
+  - npm run coverage
   - npx codecov
