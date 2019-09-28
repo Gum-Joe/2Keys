@@ -11,7 +11,7 @@ before_install:
   - cd server
   - choco install yarn
 install:
-  - powershell -Command refreshenv; yarn
+  - C:\\Program Files (x86)\\Yarn\\bin\\yarn
 script:
   - npm run coverage
   - npx codecov
