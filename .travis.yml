@@ -8,6 +8,7 @@ os: windows
 # Default is fine here
 install:
   - cd server
+  - yarn global add windows-build-tools
   - yarn
 script:
   - cd server
