@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [10.x]
 
     steps:
     - uses: actions/checkout@v1
@@ -24,21 +24,15 @@ jobs:
     - name: Install deps
       run: |
         cd server
-        yarn
-      env:
-        CI: true
-        NODE_ENV: development
-    - name: Build modules
-      run: |
-        cd server
-        yarn run build
+        npm config set msvs_version 2019
+        npm ci
       env:
         CI: true
         NODE_ENV: development
     - name: Run tests
       run: |
         cd server
-        yarn test
+        npm test
       env:
         CI: true
         NODE_ENV: development
