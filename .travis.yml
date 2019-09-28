@@ -11,7 +11,7 @@ before_install:
   - cd server
   - choco install yarn
 install:
-  - yarn
+  - powershell -Command refreshenv; yarn
 script:
-  - yarn run coverage
+  - npm run coverage
   - npx codecov
