@@ -8,8 +8,7 @@ os: windows
 # Default is fine here
 install:
   - cd server
-  - npm install
+  - yarn
 script:
-  - npm run coverage
-  - npm add codecov
-  - codecov
+  - yarn run coverage
+  - npx codecov
