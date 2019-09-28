@@ -24,17 +24,7 @@ jobs:
     - name: Set values
       run: |
         cd server
-        npm config set msvs_version 2019
-        $MSBUILD_PATH = (C:\hostedtoolcache\windows\vswhere\2.7.1\x64\vswhere.exe -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe) A | Out-String
-        npm config set msbuild_path "$MSBUILD_PATH\MSBuild.exe"
-      env:
-        CI: true
-        NODE_ENV: development
-    - name: Set values 2
-      shell: powershell
-      run: |
-        $MSBUILD_PATH = (C:\hostedtoolcache\windows\vswhere\2.7.1\x64\vswhere.exe -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe) | Out-String
-        npm config set msbuild_path "$MSBUILD_PATH\MSBuild.exe"
+        .\scripts\set-msbuild.ps1
       env:
         CI: true
         NODE_ENV: development
