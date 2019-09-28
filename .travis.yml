@@ -7,10 +7,8 @@ os: windows
 
 # Default is fine here
 install:
-  - cd server
   - npm install
 script:
-  - cd server
   - npm run coverage
   - npm add codecov
   - codecov
