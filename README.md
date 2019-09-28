@@ -1,4 +1,6 @@
-# 2Keys
+# 2Keys [![Build Status](https://travis-ci.com/Gum-Joe/2Keys.svg?branch=master)](https://travis-ci.com/Gum-Joe/2Keys) [![codecov](https://codecov.io/gh/Gum-Joe/2Keys/branch/master/graph/badge.svg)](https://codecov.io/gh/Gum-Joe/2Keys)
+
+
 A easy to setup second keyboard, designed for everyone.
 
 For a full setup guide, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/SETUP.md)
