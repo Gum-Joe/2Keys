@@ -12,6 +12,8 @@ before_install:
   - choco install yarn
 install:
   - "\"/c/Program Files (x86)/Yarn/bin/yarn\""
+before_script:
+  - npx ts-node ./scripts/bootstrap.ts
 script:
   - npm run coverage
   - npx codecov
