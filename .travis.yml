@@ -7,6 +7,7 @@ os: windows
 
 # Default is fine here
 install:
+  - cd server
   - npm install
 script:
   - npm run coverage
