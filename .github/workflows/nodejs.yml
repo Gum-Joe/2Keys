@@ -24,8 +24,7 @@ jobs:
     - name: Install deps
       run: |
         cd server
-        npm config set msvs_version 2019
-        npm ci
+        npm config set msvs_version 2019; npm ci
       env:
         CI: true
         NODE_ENV: development
