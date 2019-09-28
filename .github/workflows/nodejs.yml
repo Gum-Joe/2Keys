@@ -31,7 +31,7 @@ jobs:
     - name: Install deps
       run: |
         cd server
-        npm ci
+        npm install
       env:
         CI: true
         NODE_ENV: development

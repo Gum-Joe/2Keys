@@ -8,8 +8,7 @@ os: windows
 # Default is fine here
 install:
   - cd server
-  - npm i -g windows-build-tools
-  - npm ci
+  - npm install
 script:
   - cd server
   - npm run coverage
