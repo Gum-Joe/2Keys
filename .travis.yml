@@ -10,7 +10,7 @@ before_install:
   # Convery lock file
   - cd server
   - npm install -g synp
-  - synp --source-file ./yarn.lock
+  - synp -s ./yarn.lock
 install:
   - npm ci
 script:
