@@ -8,10 +8,10 @@ os: windows
 # Default is fine here
 install:
   - cd server
-  - yarn global add windows-build-tools
-  - yarn
+  - npm i -g windows-build-tools
+  - npm ci
 script:
   - cd server
-  - yarn run coverage
-  - yarn add codecov
+  - npm run coverage
+  - npm add codecov
   - codecov
