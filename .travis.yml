@@ -9,10 +9,9 @@ os: windows
 before_install:
   # Convery lock file
   - cd server
-  - npm install -g synp
-  - synp -s yarn.lock
+  - choco install yarn
 install:
-  - npm ci
+  - yarn
 script:
-  - npm run coverage
+  - yarn run coverage
   - npx codecov
