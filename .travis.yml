@@ -8,7 +8,7 @@ os: windows
 # Default is fine here
 install:
   - cd server
-  - yarn
+  - yarn install --verbose
 script:
   - yarn run coverage
   - npx codecov
