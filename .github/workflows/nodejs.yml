@@ -21,10 +21,17 @@ jobs:
       uses: warrenbuckley/Setup-MSBuild@v1
     - name: Setup VS Dev Environment # Needed so things work
       uses: seanmiddleditch/gha-setup-vsdevenv@v1
+    - name: Set values
+      run: |
+        cd server
+        npm config set msvs_version 2019
+      env:
+        CI: true
+        NODE_ENV: development
     - name: Install deps
       run: |
         cd server
-        npm config set msvs_version 2019; npm ci
+        npm ci
       env:
         CI: true
         NODE_ENV: development
