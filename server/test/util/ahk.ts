@@ -3,9 +3,11 @@ import { MOCK_KEYBAORD_NAME, CONFIG_FILE, MOCK_ROOT } from "../global/constants"
 import { Config } from "../../src/util/interfaces";
 import { config_loader } from "../../src/util/config";
 
-import { expect } from "chai";
+import chai, { expect } from "chai";
 import { join } from "path";
 import { promises as fs } from "fs";
+
+chai.use(require("chai-as-promised"));
 
 let config: Config | any;
 
@@ -42,6 +44,14 @@ describe("AHK execution tests", () => {
 		expect(
 			(await fs.readFile(join(MOCK_ROOT, "./RunTestForExecution1.txt"))).toString(),
 		).to.equal("IT WORKED!");
+	});
+
+	it("should throw a ReferenceError when attmepting to call a non-existant keyboard", async () => {
+		await expect(fetch_hotkey(MOCK_KEYBAORD_NAME + "NOTAKEYBOARD", "+B$HOME$")).to.be.rejectedWith(ReferenceError);
+	});
+
+	it("should throw a ReferenceError when attmepting to call a non-existant host", async () => {
+		await expect(fetch_hotkey(MOCK_KEYBAORD_NAME, "INVALID")).to.be.rejectedWith(ReferenceError);
 	});
 
 	after(async () => {
