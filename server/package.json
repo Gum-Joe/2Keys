@@ -70,7 +70,7 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
-    "@types/inquirer": "^0.0.43",
+    "@types/inquirer": "^6.5.0",
     "@types/mocha": "^5.2.7",
     "@types/mustache": "^0.8.32",
     "@types/node": "^10.14.19",
