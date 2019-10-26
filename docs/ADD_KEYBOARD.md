@@ -3,7 +3,7 @@ This document goes through how to add more keyboards to your 2Keys install
 
 ## 1. How 2Keys manages keyboards
 2Keys manages your keyboards via the config file, which is stored on both the server and detector.
-A section from the example config [https://github.com/Gum-Joe/2Keys/blob/master/docs/config_example.yml](https://github.com/Gum-Joe/2Keys/blob/master/docs/config_example.yml) is below, with annotations:
+A section from the example config [docs/config_example.yml](https://github.com/Gum-Joe/2Keys/blob/master/docs/config_example.yml) is below, with annotations:
 ```yml
 # The below section contains all the info about the keyboards, including hotkeys
 keyboards:
@@ -37,12 +37,12 @@ Open your 2Keys config file and add this as part of the `keyboards` section:
 
 ```yml
 Keyboard_3: # Change this for a name you want to use
-	path: TO GET
-	dir: ./Keyboard_1 # Change this to what you want to use (reccomendation: use the name of the keybaord)
-	root: index.ahk # You should probable leave this as index.ahk
-	hotkeys:
-		# Add any hotkeys you want to add below
-		A: MsgBox # This is an example.  Feel free to remove it.
+  path: TO GET
+  dir: ./Keyboard_1 # Change this to what you want to use (reccomendation: use the name of the keybaord)
+  root: index.ahk # You should probable leave this as index.ahk
+  hotkeys:
+    # Add any hotkeys you want to add below
+    A: MsgBox # This is an example.  Feel free to remove it.
 ```
 
 Make sure to create the keyboard's root directory (in the above example, `./Keyboard_3`) and root file you specified (in the above example, `index.ahk`) in the keyboard's root directory.
