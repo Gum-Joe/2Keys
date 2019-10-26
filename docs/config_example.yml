@@ -2,7 +2,7 @@ name: KeyboardOfMacros
 
 # The below section contains all the info about the keyboards, including hotkeys
 keyboards:
-	# Each YAML entry key (NOT keybaord key) here corresponds to the name of the keyboard that 2Keys uses
+  # Each YAML entry key (NOT keybaord key) here corresponds to the name of the keyboard that 2Keys uses
   Keyboard_1: # So this keyboard is called "Keyboard_1"
     path: /dev/input/by-id/usb-04d9_1203-event-kbd # The path on the detector that is watched to detect keystrokes
     dir: ./Keyboard_1 # Root directory with all hotkeys related to this keyboard in
@@ -13,15 +13,15 @@ keyboards:
   Keyboard_2:
     path: /dev/input/by-id/xyz-etc-usw # See above for annotation on meaning
     dir: ./Keyboard_2 # See above for annotation on meaning
-		# This here allows you to manually remap certain code to internal key codes
-		# Codes can then be referred to by (internal key code) in the hotkeys section
+    # This here allows you to manually remap certain code to internal key codes
+    # Codes can then be referred to by (internal key code) in the hotkeys section
     map:
       G1: 909 # Remaps keycode 909 to "G1", which can then be used as "(G1)" to refers to as a trigger for a hotkey function
     hotkeys:
       A: DoAFunc # Function name
       $UP$: FuncTriggeredByASpecialMapping # See docs/MAPPINGS.md
       +>$ENTER$: FuncTriggeredByRightShift # See docs/MAPPINGS.md
-			# You can also configure hotkeys using an object in YAML (instead of just a string that represents the function to run)
+      # You can also configure hotkeys using an object in YAML (instead of just a string that represents the function to run)
       $PRTSC$:
         type: up # Runs keystroke on up (release of key).  Defaults to down if not specified, or a string just given like hotkeys above
         func: RunFuncOnUpStroke

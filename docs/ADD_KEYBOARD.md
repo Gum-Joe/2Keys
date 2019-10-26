@@ -14,7 +14,7 @@ keyboards:
     root: index.ahk # Root file in the directory specified above, which all hotkeys are imported to. Is loaded before execting a hotkey function
     hotkeys: # Hotkeys!
       A: MsgBox # Just specify the name of a function to use when executing hotkeys
-	
+
   Keyboard_2:
     path: /dev/input/by-id/xyz-etc-usw # See above for annotation on meaning
     dir: ./Keyboard_2 # See above for annotation on meaning
