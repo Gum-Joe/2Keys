@@ -2,11 +2,11 @@ name: KeyboardOfMacros
 
 # The below section contains all the info about the keyboards, including hotkeys
 keyboards:
-  # Each YAML entry key (NOT keybaord key) here corresponds to the name of the keyboard that 2Keys uses
+  # Each YAML entry key (NOT keyboard key) here corresponds to the name of the keyboard that 2Keys uses
   Keyboard_1: # So this keyboard is called "Keyboard_1"
     path: /dev/input/by-id/usb-04d9_1203-event-kbd # The path on the detector that is watched to detect keystrokes
     dir: ./Keyboard_1 # Root directory with all hotkeys related to this keyboard in
-    root: index.ahk # Root file in the directory specified above, which all hotkeys are imported to. Is loaded before execting a hotkey function
+    root: index.ahk # Root file in the directory specified above, which all hotkeys are imported to. Is loaded before executing a hotkey function
     hotkeys: # Hotkeys!
       A: MsgBox # Just specify the name of a function to use when executing hotkeys
   
