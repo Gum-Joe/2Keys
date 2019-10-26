@@ -3,11 +3,11 @@ This document goes through how to add more keyboards to your 2Keys install
 
 ## 1. How 2Keys manages keyboards
 2Keys manages your keyboards via the config file, which is stored on both the server and detector.
-A section from the example config (docs/config_example.yml) is below, with annotations:
+A section from the example config [https://github.com/Gum-Joe/2Keys/blob/master/docs/config_example.yml](https://github.com/Gum-Joe/2Keys/blob/master/docs/config_example.yml) is below, with annotations:
 ```yml
 # The below section contains all the info about the keyboards, including hotkeys
 keyboards:
-	# Each YAML entry key (NOT keybaord key) here corresponds to the name of the keyboard that 2Keys uses
+  # Each YAML entry key (NOT keybaord key) here corresponds to the name of the keyboard that 2Keys uses
   Keyboard_1: # So this keyboard is called "Keyboard_1"
     path: /dev/input/by-id/usb-04d9_1203-event-kbd # The path on the detector that is watched to detect keystrokes
     dir: ./Keyboard_1 # Root directory with all hotkeys related to this keyboard in
