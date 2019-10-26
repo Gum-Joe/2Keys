@@ -41,3 +41,4 @@ const server: (port: number) => void = (port: number = DEFAULT_PORT) => {
 };
 
 export default server;
+export app;

@@ -225,7 +225,7 @@ To restart it:
 $ 2Keys restart
 ```
 
-#### 1.4 If you can't restart the process
+#### 1.3.4 If you can't restart the process
 The 2Keys daemon sometimes doesn't stop correctly (see [#12](https://github.com/Gum-Joe/2Keys/issues/12)).
 
 If you end up with a log file like this when attempting to restart the 2Keys daemon:

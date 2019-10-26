@@ -15,6 +15,13 @@
 		},
 		"mocha.requires": ["ts-node/register"],
 		"mocha.files.glob": "test/**/*.ts",
-		"mocha.subdirectory": "server"
+		"mocha.subdirectory": "server",
+		"mochaExplorer.cwd": "./server",
+		"mochaExplorer.files": "test/**/*.ts",
+		"mochaExplorer.require": "ts-node/register",
+		"mochaExplorer.nodePath": null,
+		"mocha.coverage": {
+			"enable": false,
+		},
 	},
 }
