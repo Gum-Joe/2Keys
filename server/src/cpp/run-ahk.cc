@@ -45,7 +45,9 @@ namespace twokeys {
     if (err->code == 126) {
       err->message = "AHK DLL not found!";
     } else {
-      err->message = "See code for error.  Lookup error codes for LoadLibrary().";
+      err->message =
+        "See code for error.  Lookup error codes for LoadLibrary(). CODE:" +
+        err->code;
     };
   }
 

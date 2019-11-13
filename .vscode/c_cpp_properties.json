@@ -54,7 +54,8 @@
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/ucrt",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/shared",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/winrt",
-                "${workspaceRoot}"
+                "${workspaceRoot}",
+                "D:/Users/Kishan/.node-gyp/13.0.1/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -75,6 +76,23 @@
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
             }
+        },
+        {
+            "name": "Nodejs",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "D:\\Users\\Kishan\\.node-gyp\\13.0.1\\**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.23.28105/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
         }
     ],
     "version": 4
