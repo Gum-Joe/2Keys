@@ -1,23 +1,24 @@
 // Router tests
 import { expect } from "chai";
 import request from "supertest";
-import api from "../../src/routes/api";
-import { promises as fs } from "fs";
-import { join } from "path";
+import { app } from "../../src/index";
+import fs from "fs";
+import YAML from "yaml";
 import { CONFIG_FILE } from "../global/constants";
 
-const agent = request.agent(api);
+const agent = request.agent(app);
 
 describe("/api test", () => {
 
-	it("should send back a copy of the config", async () => {
-		const config = await fs.readFile(CONFIG_FILE);
+	it("should send back a copy of the config", (done) => {
+		const config = fs.readFileSync(CONFIG_FILE);
 		agent
-			.get("/get/config")
+			.get("/api/get/config")
 			.expect(200)
 			.end((err, res) => {
-				if (err) { throw err; }
-				expect(res.body).to.equal(config);
+				if (err) { done(err); }
+				expect(res.body).to.deep.equal(YAML.parse(config.toString()));
+				done();
 			});
 	});
 

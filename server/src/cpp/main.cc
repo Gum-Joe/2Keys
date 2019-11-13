@@ -21,80 +21,83 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  * Uses N-API
  */
 #include "define.h" // Definitons
+#include <assert.h>
+#include <napi.h>
 
 // External stuff
 #include <iostream>
-#include <node.h>
 #include <tchar.h>
 
 // Own files
-#include "convert.h"
 #include "run-ahk.h"
 
 namespace twokeys {
-  using v8::Exception;
-  using v8::FunctionCallbackInfo;
-  using v8::Isolate;
-  using v8::Local;
-  using v8::Number;
-  using v8::Object;
-  using v8::String;
-  using v8::Value;
-  using namespace std;
+  Napi::Value AHK_NAPI(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
 
-  void RunAHKText(const FunctionCallbackInfo<Value> &args) {
-    Isolate *isolate = args.GetIsolate();
-
-    // Check we have enough args
-    if (args.Length() < 2) {
-      // Throw an Error that is passed back to JavaScript
-      isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(
-        isolate,
-        "Wrong number of arguments.  Need both text to execute and library path")));
-      return;
+    if (info.Length() < 2) {
+      Napi::TypeError::New(env, "Wrong number of arguments")
+        .ThrowAsJavaScriptException();
+      return env.Null();
     }
 
-    // Check arg types
-    if (!args[0]->IsString() || !args[1]->IsString()) {
-      isolate->ThrowException(
-        Exception::TypeError(String::NewFromUtf8(isolate, "Wrong arguments")));
-      return;
+    if (!info[0].IsString() || !info[1].IsString()) {
+      Napi::TypeError::New(env, "Wrong argument types!").ThrowAsJavaScriptException();
+      return env.Null();
     }
 
-    // Variables
-    // Ideally, we'd use one convert function but that creates issues
-    // And pointers/references
+    std::string const run_text_str = info[1].As<Napi::String>().Utf8Value();
+    std::string const ahk_path_str = info[0].As<Napi::String>().Utf8Value();
 
-    v8::String::Utf8Value ahk_v8String(args[0]);
-    std::string ahk_str(*ahk_v8String, ahk_v8String.length());
-    std::wstring ahk_wstr = std::wstring(ahk_str.begin(), ahk_str.end());
-    LPCWSTR ahk_path = ahk_wstr.c_str();
-
-    v8::String::Utf8Value run_text_v8String(args[1]);
-    std::string run_text_str(*run_text_v8String, run_text_v8String.length());
+    std::wstring ahk_path_wstr =
+      std::wstring(ahk_path_str.begin(), ahk_path_str.end());
+    LPCWSTR ahk_path = ahk_path_wstr.c_str();
     std::wstring run_text_wstr =
       std::wstring(run_text_str.begin(), run_text_str.end());
     LPCWSTR run_text = run_text_wstr.c_str();
 
-    // LPCWSTR ahk_path =
-    // L"D:\\Users\\Kishan\\Documents\\Projects\\2Keys\\cli\\lib\\ahkdll-v1-release-master\\x64w\\AutoHotkey.dll";
-    // LPTSTR run_text = L"Msgbox IT WORKS ";
-    // Run
     AHKRunError error_handler = new_ahk_run_err();
     run_ahk_text(ahk_path, run_text, &error_handler);
     // Error check
     if (error_handler.is_error) {
-      Local<Object> err_obj = Object::New(isolate);
-      err_obj->Set(String::NewFromUtf8(isolate, "code"), v8::Number::New(isolate, error_handler.code));
-      err_obj->Set(String::NewFromUtf8(isolate, "message"), v8::String::NewFromUtf8(isolate, error_handler.message.c_str()));
-      err_obj->Set(String::NewFromUtf8(isolate, "type"), v8::String::NewFromUtf8(isolate, "AHKRunError"));
-      args.GetReturnValue().Set(err_obj);
+      Napi::Error::New(env, error_handler.message).ThrowAsJavaScriptException();
     }
+
+    //size_t result1;
+    //status = napi_get_value_string_utf8(env, argv[0], ahk_str, 100, &result1);
+
+    //if (status != napi_ok) {
+    //  napi_throw_error(env, NULL, "Invalid string was passed as argument 1");
+    //}
+
+    /**status = napi_get_value_string_utf8(env, argv[1], &run_text_str);
+
+    if (status != napi_ok) {
+      napi_throw_error(env, NULL, "Invalid string was passed as argument 2");
+    }
+
+    std::wstring ahk_wstr = std::wstring(ahk_str.begin(), ahk_str.end());
+    LPCWSTR ahk_path = ahk_wstr.c_str();
+    std::wstring run_text_wstr =
+      std::wstring(run_text_str.begin(), run_text_str.end());
+    LPCWSTR run_text = run_text_wstr.c_str();
+
+    // RUn
+    AHKRunError error_handler = new_ahk_run_err();
+    run_ahk_text(ahk_path, run_text, &error_handler);
+    // Error check
+    if (error_handler.is_error) {
+      napi_throw_error(env, NULL, "Execution error!");
+    }**/
+    return Napi::Number::New(env, 0);
+
   }
 
-  void Init(Local<Object> exports) {
-    NODE_SET_METHOD(exports, "run_ahk_text", RunAHKText);
-  }
+  Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    exports.Set(Napi::String::New(env, "run_ahk_text"),
+                Napi::Function::New(env, AHK_NAPI));
+    return exports;
+}
 
-  NODE_MODULE(NODE_GYP_MODULE_NAME, Init)
-} // namespace 2Keys
+NODE_API_MODULE(addon, Init)
+}

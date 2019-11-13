@@ -32,7 +32,7 @@ const logger: Logger = new Logger({
 });
 
 app.use(bodyParser.json());
-app.use("/api", api)
+app.use("/api", api);
 
 const server: (port: number) => void = (port: number = DEFAULT_PORT) => {
   app.listen(port, () => {
@@ -41,4 +41,4 @@ const server: (port: number) => void = (port: number = DEFAULT_PORT) => {
 };
 
 export default server;
-export app;
+export { app };

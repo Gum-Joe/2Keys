@@ -109,12 +109,8 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
           logger.throw_noexit(new Error("DLL config option was not found!  It may be an EXE file is only available, which isn't supported."));
           return; // STOP execution
         }
+        // Errors handled by the code
         const ahk_run = ahk.run_ahk_text(join(userspace_config.paths.software, userspace_config.software.ahk.paths.root, userspace_config.software.ahk.paths.dll), exec_test);
-        if (typeof ahk_run !== "undefined") {
-          // ERROR!
-          const error: Error = new Error(`Error running AutoHotkey: ${ahk_run.message}.  Code: ${ahk_run.code}`)
-          logger.throw_noexit(error);
-        }
         // Change back to old CWD (DLL changes CWD)
         process.chdir(old_cwd);
       } catch (err) {
