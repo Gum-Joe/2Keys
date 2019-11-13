@@ -18,7 +18,7 @@
       'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")"],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
       "sources": [
-        "./src/cpp/main-napi.cc",
+        "./src/cpp/main.cc",
         "./src/cpp/run-ahk.cc",
         "./src/cpp/current-dir.cc"
       ],
