@@ -47,7 +47,6 @@ router.get("/get/config", (req, res, next) => {
     const data_to_send = JSON.stringify(YAML.parse(data.toString()));
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    console.log(res.send)
     res.send(data_to_send);
   });
 });
