@@ -55,7 +55,7 @@ router.get("/get/config", (req, res, next) => {
  * Trigger a hotkey
  * Info to send:
  * - keyboard: The keyboard name that has been pressed
- * - key: set of keys that have been pressed
+ * - hotkey: set of keys that have been pressed
  */
 router.post("/post/trigger", async (req, res, next) => {
   /**
@@ -103,8 +103,9 @@ router.post("/post/trigger", async (req, res, next) => {
     res.statusCode = 200;
     res.send("OK");
   } catch (err) {
+    // TODO: Hand off to an error handler instead.  RISKS EXPOSING DIR STRUCTURE
     logger.throw_noexit(err);
-    res.statusCode = 500
+    res.statusCode = 500;
     res.send(err.stack.toString());
   }
 });

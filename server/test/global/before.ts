@@ -8,4 +8,4 @@ import { MOCK_ROOT } from "./constants";
 // Set root dir so file are located correctly
 before(() => {
 	process.chdir(MOCK_ROOT);
-})
+});

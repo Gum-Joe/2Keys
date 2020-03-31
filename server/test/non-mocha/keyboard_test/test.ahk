@@ -23,3 +23,7 @@ TestFunc() {
 RunTestForExecution1() {
   FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution1.txt")
 }
+
+RunTestForExecution2() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution2.txt")
+}

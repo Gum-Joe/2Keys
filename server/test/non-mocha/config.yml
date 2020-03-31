@@ -9,3 +9,4 @@ keyboards:
         func: IAmTheSenate
       +B$HOME$: IAmNotTheSenate
       ^RT: RunTestForExecution1
+      +^B: RunTestForExecution2
