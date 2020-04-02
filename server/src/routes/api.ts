@@ -82,7 +82,8 @@ router.post("/post/trigger", async (req, res, next) => {
       } else if (value === EvDevValues.Up) {
         func_to_run = fetched_hotkey.func.up
       } else {
-        throw new TypeError(`The request keyboard event value of ${value} is invalid.  Valid event values are: 0 (Up) & 1 (Down)`);
+        // Stop exec as and error was encountered
+        return next(new TypeError(`The request keyboard event value of ${value} is invalid.  Valid event values are: 0 (Up) & 1 (Down)`));
       }
 
       // Validate a function actually exists
@@ -103,10 +104,7 @@ router.post("/post/trigger", async (req, res, next) => {
     res.statusCode = 200;
     res.send("OK");
   } catch (err) {
-    // TODO: Hand off to an error handler instead.  RISKS EXPOSING DIR STRUCTURE
-    logger.throw_noexit(err);
-    res.statusCode = 500;
-    res.send(err.stack.toString());
+    next(err); // Hand off to error handler
   }
 });
 

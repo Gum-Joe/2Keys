@@ -47,7 +47,9 @@ yargs
   }, async argv => {
     const config = await config_loader();
     process.chdir(argv.dir);
-    const port = typeof argv.port === "number" ? parseInt(argv.port) : (config.addresses.server.hasOwnProperty("port") ? config.addresses.server.port : DEFAULT_PORT)
+      const port = typeof argv.port === "number" ? parseInt(argv.port)
+      :
+      ((config.hasOwnProperty("addresses") && config.addresses.hasOwnProperty("server") && config.addressesconfig.addresses.server.hasOwnProperty("port")) ? config.addresses.server.port : DEFAULT_PORT)
     serve(port);
   })
   .command("oobe", "Runs OOBE; i.e. donwloads required components", yarg => {

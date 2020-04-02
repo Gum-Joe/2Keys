@@ -66,7 +66,7 @@ export async function fetch_hotkey(keyboard: string, hotkey_code: string): Promi
     type,
     file,
     func,
-  }
+  };
 }
 
 /**

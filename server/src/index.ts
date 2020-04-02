@@ -40,5 +40,12 @@ const server: (port: number) => void = (port: number = DEFAULT_PORT) => {
   });
 };
 
+// Error handler
+app.use((err, req, res, next) => {
+  logger.err(`An error was encountered on router ${req.originalUrl}`);
+  logger.throw_noexit(err);
+  next(err);
+});
+
 export default server;
 export { app };

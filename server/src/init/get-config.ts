@@ -32,7 +32,7 @@ const logger: Logger = new Logger({
 });
 
 // Fixing build breaking issues from #15 (hence inquirer.Question[])
-const questions: inquirer.Questions & inquirer.Question[] = [
+const questions: inquirer.Question[] = [
   {
     type: "input",
     name: "name",
@@ -90,12 +90,14 @@ export default function (argv: Arguments): Promise<Config> {
         aliases++;
       }
     }
-    questions.push({
+    const ipQ = {
       type: "list",
       name: "local_ip",
       message: "What is the ipv4 addres the detector should use to contact this PC?  NOTE: You'll need this for setup on the pi later.  If in doubt, ignore anything that says vEthernet",
       choices: ip_choices,
-    }); // Push to array
+    }; // Push to array
+
+    questions.push(ipQ);
 
     // Add port Q
     questions.push({
@@ -131,7 +133,7 @@ export default function (argv: Arguments): Promise<Config> {
     interface KeyboardQ extends inquirer.Question {
       name: string
     }
-    const questions_keyboard: inquirer.Questions & inquirer.Question[] & KeyboardQ[] = [];
+    const questions_keyboard: inquirer.Question[] & KeyboardQ[] = [];
     for (let i = 1; i <= answers.numberKeyboards; i++) {
       questions_keyboard.push({
         type: "input",

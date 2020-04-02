@@ -130,16 +130,16 @@ export type FileTreeNodes<T> = T extends FileTreeDir ? FileTreeDir : FileTreeFil
  * Hotkey that can be up or down, specifiying how the required functions should be stored
  */
 export interface HotKeyUpDown {
-  up: string,
-  down: string,
+  up: string;
+  down: string;
 }
 /**
  * Fetch hotkey interface
  */
 export interface FetchHotkey {
-  file: string,
-  func: string | HotKeyUpDown,
-  type: string,
+  file: string;
+  func: string | HotKeyUpDown;
+  type: string;
 }
 
 /**
@@ -147,5 +147,5 @@ export interface FetchHotkey {
  */
 export enum EvDevValues {
   Up = 0,
-  Down // 1
+  Down, // 1
 }

@@ -27,3 +27,11 @@ RunTestForExecution1() {
 RunTestForExecution2() {
   FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution2.txt")
 }
+
+RunTestForExecution3() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution3.txt")
+}
+
+RunTestForExecution4() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution4.txt")
+}
