@@ -7,7 +7,7 @@ import YAML from "yaml";
 import { CONFIG_FILE, MOCK_KEYBAORD_NAME, MOCK_ROOT } from "../global/constants";
 import { join } from "path";
 import { promises as fsp } from "fs";
-import { EvDevValues } from "../../src/util/interfaces";
+import { EvDevValues, Config } from "../../src/util/interfaces";
 
 const agent = request.agent(app);
 
@@ -26,6 +26,32 @@ describe("/api test", () => {
 				});
 		});
 	});
+
+	describe("/api/post/update-keyboard-path", () => {
+		it("should successfully change keyboard path", (done) => {
+			const testPath = "/dev/input/by-id/" + Math.random();
+			agent
+				.post("/api/post/update-keyboard-path")
+				.expect(200)
+				.send({
+					keyboard: MOCK_KEYBAORD_NAME,
+					path: testPath,
+				})
+				.end((err, res) => {
+					if (err) { done(err); }
+					// Delay, to account for time to execute
+					setTimeout(() => {
+						fsp.readFile(join(MOCK_ROOT, "./config.yml"))
+							.then((contents) => {
+								const config: Config = YAML.parse(contents.toString());
+								expect(config.keyboards[MOCK_KEYBAORD_NAME].path).to.equal(testPath);
+								done();
+							})
+							.catch(done);
+					}, 100);
+				});
+		});
+	})
 
 	describe("/api/post/trigger", () => {
 		it("should successfully execute a hotkey", (done) => {

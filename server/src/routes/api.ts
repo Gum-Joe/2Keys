@@ -41,8 +41,7 @@ router.get("/get/config", (req, res, next) => {
   logger.debug("Sending a config copy as JSON...");
   readFile(join(process.cwd(), "config.yml"), (err, data) => {
     if (err) {
-      res.statusCode = 500;
-      res.send(err.stack);
+      return next(err);
     }
     const data_to_send = JSON.stringify(YAML.parse(data.toString()));
     res.setHeader("Content-Type", "application/json");
@@ -122,13 +121,7 @@ router.post("/post/update-keyboard-path", (req, res, next) => {
         logger.debug("Writing config...");
         writeFile(CONFIG_FILE, YAML.stringify(config), (err) => {
           if (err) {
-            res.statusCode = 500;
-            // Check for a err.stack
-            if (typeof err.stack === "undefined") {
-              res.send("Something happend, but the usual stack is not available.");
-            } else {
-              res.send(err.stack.toString());
-            }
+            return next(err);
           } else {
             res.statusCode = 200;
             res.send("OK");
