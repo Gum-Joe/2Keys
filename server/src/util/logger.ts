@@ -29,7 +29,7 @@ export default class Logger {
   private argv: string[];
   private isDebug: boolean;
   private chalk: Chalk;
-  private isSilent: boolean;
+  public isSilent: boolean;
   constructor(args: LoggerArgs) {
     this.args = args || { name: "logger" };
     this.argv = process.argv;

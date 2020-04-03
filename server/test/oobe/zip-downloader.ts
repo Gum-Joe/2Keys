@@ -18,7 +18,7 @@ process.on('uncaughtException', function (err) {
 	console.log(err.stack)
 })
 
-describe("Zip downloader test", () => {
+describe("Zip downloader test (can take a while to run)", () => {
 
 	before(async () => {
 		await mkdirp(ROOT);
@@ -27,17 +27,19 @@ describe("Zip downloader test", () => {
 	it("should successfully download a zip file and extract it", async () => {
 		const zipDownloader = new ZipDownloader("AHK v2", "https://codeload.github.com/HotKeyIt/ahkdll-v2-release/zip/master", ROOT, ZIP_FILENAME);
 		// Validate it doesn't extract a non-existant zip
-		// await expect(zipDownloader.extract()).to.be.rejectedWith(Error);
-		// const res = await zipDownloader.fetch_file(); // Fetch
-		// expect(FILE_PATH).to.be.a.file();
+		await expect(zipDownloader.extract()).to.be.rejectedWith(Error);
+		await zipDownloader.fetch_file(); // Fetch
+		// Validate it doesn't attept to redownload
+		await expect(zipDownloader.fetch_file()).to.be.rejectedWith(Error);
+		// Validate download
+		expect(FILE_PATH).to.be.a.file();
+		// Extract & test
 		await zipDownloader.extract();
-		console.log("hello");
-		expect(ROOT).to.be.a.directory().and.include.files(["README.md", "LICENSE", "HASH"]);
-		expect(join(ROOT, "x64w")).to.be.a.directory().and.include.files(["AutoHotkey.exe", "AutoHotkey.dll"]);
+		expect(join(ROOT, "ahkdll-v2-release-master")).to.be.a.directory().and.include.files(["README.md", "LICENSE", "HASH"]);
+		expect(join(ROOT, "ahkdll-v2-release-master", "x64w")).to.be.a.directory().and.include.files(["AutoHotkey.exe", "AutoHotkey.dll"]);
 	}).timeout(50000);
 
 	after((done) => {
-		// rimraf(ROOT, done);
-		done();
+		rimraf(ROOT, done);
 	});
 });

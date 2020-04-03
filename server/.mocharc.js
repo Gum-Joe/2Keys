@@ -3,5 +3,5 @@
 module.exports = {
 	"r": "ts-node/register",
 	"recursive": true,
-	"spec": "test/oobe/zip-downloader.ts"
+	"spec": "test/**/*.ts"
 }

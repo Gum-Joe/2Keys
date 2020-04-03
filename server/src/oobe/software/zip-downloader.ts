@@ -24,10 +24,9 @@ import https from "https";
 import mkdirp from "mkdirp";
 import ProgressBar from "progress";
 import { Arguments } from "yargs";
-import yauzl from "yauzl";
 import Logger from "../../util/logger";
-import { promisify } from "util";
 import { join } from "path";
+import AdmZip from "adm-zip";
 
 const { open, access } = promises;
 
@@ -65,14 +64,14 @@ export default class ZipDownloader {
   /**
    * Download the file
    */
-  fetch_file(): Promise<void> {
+  public fetch_file(): Promise<void> {
     return new Promise(async (resolve, reject) => {
       this.logger.info(`Downloading package from url ${this.url} to ${this.saveTo} as ${this.saveAs}.zip...`);
 
       // Make dirs
       try { await mkdirp(this.saveTo); } catch (err) {
         this.logger.err("Error making download dirs!");
-        this.logger.throw_noexit(err);
+        reject(err);
         return;
       }
       this.logger.debug("Created dirs.");
@@ -85,9 +84,10 @@ export default class ZipDownloader {
         } catch (err) {
           if (err.code === "EEXIST") {
             this.logger.err(`${this.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
+            reject(new Error(`${this.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`))
           } else {
             this.logger.err(`Error opening file to save to!`);
-            this.logger.throw(err);
+            reject(err);
           }
           return;
         }
@@ -103,19 +103,20 @@ export default class ZipDownloader {
       req.on("response", res => {
         const len = parseInt(res.headers["content-length"], 10);
         let downloaded = "";
-
-        const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
-          complete: '▓',
-          incomplete: '░',
-          width: 50,
-          total: isNaN(len) ? 6403580 : len
-        });
+        if (!this.logger.isSilent) {
+          const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
+            complete: '▓',
+            incomplete: '░',
+            width: 50,
+            total: isNaN(len) ? 6403580 : len
+          });
+          res.on("data", (chunk) => {
+            progress_bar.tick(chunk.length);
+          });
+        }
         const fileStream = createWriteStream(this.fullPath);
-        res.on('data', chunk => {
-          progress_bar.tick(chunk.length);
-        });
         res.pipe(fileStream); // Pipe to writer
-        res.on('end', () => {
+        res.on("end", () => {
           // console.log("");
           this.logger.info("Download complete.");
           fileStream.close();
@@ -130,7 +131,7 @@ export default class ZipDownloader {
   /**
    * Extract the zip folder
    */
-  extract() {
+  public extract() {
     return new Promise((resolve, reject) => {
       this.logger.info("Extracting...");
       // Validate existence
@@ -138,53 +139,10 @@ export default class ZipDownloader {
         .then(() => {
           this.logger.debug("Zip file found. Extracting...")
           // DO IT
-          // From https://github.com/thejoshwolfe/yauzl
-          yauzl.open(this.fullPath, { lazyEntries: true }, (err, zipfile) => {
-            if (err) { return reject(err); }
-            this.logger.debug("Zip File now open.")
-            const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
-              complete: '▓',
-              incomplete: '░',
-              width: 50,
-              total: zipfile?.fileSize
-            });
-            zipfile?.readEntry();
-            zipfile?.on("error", reject);
-            zipfile?.on("entry", (entry) => {
-              this.logger.debug("Found entry " + entry.fileName);
-              if (/\/$/.test(entry.fileName)) {
-                this.logger.debug("DIR!");
-                // Directory file names end with '/'.
-                // Note that entires for directories themselves are optional.
-                // An entry's fileName implicitly requires its parent directories to exist.
-                mkdirp(join(this.saveTo, entry.fileName)).catch(reject);
-                zipfile.readEntry();
-              } else {
-                this.logger.debug("FILE");
-                // file entry
-                zipfile.openReadStream(entry, (err, readStream) => {
-                  if (err) { return reject(err); }
-                  this.logger.debug("File read.");
-                  this.logger.debug("Writing file...");
-                  const writer = createWriteStream(join(this.saveTo, entry.fileName));
-                  readStream?.on("error", reject);
-                  writer.on("error", reject);
-                  writer.on("close", () => {
-                    this.logger.debug("WROTE.")
-                    progress_bar.tick(entry.compressedSize);
-                    zipfile.readEntry();
-                  });
-                  readStream?.pipe(writer);
-                  zipfile.readEntry();
-                });
-              }
-            });
-            zipfile?.on("end", () => {
-              console.log("DORT");
-              zipfile?.close();
-              resolve();
-            });
-          });
+          // From https://github.com/cthackers/adm-zip
+          const zipFile = new AdmZip(this.fullPath);
+          zipFile.extractAllTo(this.saveTo, true);
+          resolve();
         })
         .catch(reject);
     });
