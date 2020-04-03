@@ -76,6 +76,7 @@
     "@types/mustache": "^0.8.32",
     "@types/node": "^10.14.19",
     "@types/supertest": "^2.0.8",
+    "@types/yauzl": "^2.9.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-fs": "^2.0.0",
