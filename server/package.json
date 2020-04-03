@@ -78,10 +78,12 @@
     "@types/supertest": "^2.0.8",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "chai-fs": "^2.0.0",
     "codecov": "^3.6.5",
     "mocha": "^6.2.2",
     "node-gyp": "^5.0.5",
     "nyc": "^14.1.1",
+    "rimraf": "^3.0.2",
     "supertest": "^4.0.2",
     "ts-node": "^8.5.2"
   }

@@ -29,11 +29,13 @@ export default class Logger {
   private argv: string[];
   private isDebug: boolean;
   private chalk: Chalk;
+  private isSilent: boolean;
   constructor(args: LoggerArgs) {
     this.args = args || { name: "logger" };
     this.argv = process.argv;
     this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.DEBUG === "true";
     this.chalk = new chalk.constructor();
+    this.isSilent = this.argv.includes("--silent") || process.env.NODE_ENV === "test";
   }
 
   // Logger methods
@@ -46,7 +48,7 @@ export default class Logger {
    * @private
    */
   private _log(level: string, colour: string, text: string, args: LoggerArgs = this.args) {
-    if (!this.argv.includes("--silent")) {
+    if (!this.isSilent) {
       // Add prefix
       let prefix = "";
       if (args.hasOwnProperty("name")) {
@@ -70,7 +72,7 @@ export default class Logger {
    * @color green
    */
   public warn(text: string) {
-    if (!this.argv.includes("--silent")) {
+    if (!this.isSilent) {
       // Add prefix
       let prefix = "";
       if (this.args.hasOwnProperty("name")) {
@@ -85,7 +87,7 @@ export default class Logger {
    * @public
    */
   public err(text: string) {
-    if (!this.argv.includes("--silent")) {
+    if (!this.isSilent) {
       // Add prefix
       let prefix = "";
       if (this.args.hasOwnProperty("name")) {
@@ -123,7 +125,7 @@ export default class Logger {
    * @public
    */
   public throw_noexit(err: Error) {
-    if (!this.argv.includes("--silent")) {
+    if (!this.isSilent) {
       this.err("");
       this.err(`${err.message}`);
       this.err("");

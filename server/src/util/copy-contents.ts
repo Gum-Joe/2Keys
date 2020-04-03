@@ -124,22 +124,28 @@ function mkdirs(root: string, destination: string, progress_bar: ProgressBar, di
       // Make relative to root, then attach dest to start i.e.
       // C:\AHK\ahk-v2 => .\ahk-v2 -> D:\software\.\ahk-v2
       const relativeDir = path.join(destination, path.relative(root, dir));
-      mkdirp(relativeDir, (err) => {
-        if (err) reject(err);
-        progress_bar.tick({
-          action: "mkdir",
-          symbol: ">>",
-          dest: relativeDir,
-        });
-        // At end?
-        if (dir === dirs[dirs.length - 1]) {
-          resolve();
-        }
-      });
+      mkdirp(relativeDir)
+        .then(() => {
+          progress_bar.tick({
+            action: "mkdir",
+            symbol: ">>",
+            dest: relativeDir,
+          });
+          // At end?
+          if (dir === dirs[dirs.length - 1]) {
+            resolve();
+          }
+        })
+        .catch(reject);
     }
   });
 }
 
+/**
+ * Copies the contents of root to the directory destination (i.e. no sub-dir created at dest with the name of root)
+ * @param root Root directory with files to copy
+ * @param destination Destinatian directory (will be created if it does not exist)
+ */
 export default async function copy_contents(root: string, destination: string): Promise<{}> {
   return new Promise(async (resolve, reject) => {
     logger.info(`Copying files from ${root} to ${destination}...`);
