@@ -36,13 +36,22 @@ def cli():
 @cli.command()
 @click.option("--address", "-a", help="Specify the IPv4 address of the server")
 @click.option("--port", "-p", help="Specify the port the server is running on")
-def init(address, port):
-    init_cli(address=address, port=port)
+@click.option("--no-path-request", is_flag=True, help="Don't run the interactive keyboard detector (assumes all /dev/input/ paths have already been put into the config on the server)")
+def init(address, port, no_path_request):
+  init_cli(address=address, port=port, no_path_request=no_path_request)
 
 @cli.command()
-def sync():
+@click.option("-y", "--yes", is_flag=True, help="Don't ask for prompts")
+def sync(yes):
     logger.warn("This will overwrite the copy of the config on the detector. Proceed? [Y/n]")
-    proceed = input("").lower()
+    proceed = ""
+    if yes:
+      logger.warn("-y flag was given.  Proceeding...")
+      proceed = "y"
+    else:
+      # ASK
+      proceed = input("").lower()
+    # DO IT
     if proceed == "y":
       sync_config()
 
