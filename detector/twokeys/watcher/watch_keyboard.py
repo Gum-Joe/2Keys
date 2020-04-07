@@ -28,6 +28,7 @@ import aiofiles
 import requests
 import json
 from evdev import InputDevice
+from os import path
 from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
 from ..util.keyboard_map import keys as KEY_MAP
 from ..util.config import load_config
@@ -240,9 +241,10 @@ class Keyboard:
 
 # str keyboard: Keyboard file in /dev/input/by-id
 class AsyncKeyboard:
-    def __init__(self, keyboard):
+    # Root defaults to /dev/input/by-id
+    def __init__(self, keyboard, root):
         # File for input that corresponds to the keyboard.
-        self.keyboard = KEYBOARDS_PATH_BASE + "/" + keyboard
+        self.keyboard = path.join(root, keyboard)
         # Open keyboard events file in binary mode
         self.in_file = open(self.keyboard, "rb")
         # Run checker

@@ -48,7 +48,8 @@ def gen_async_handler(keyboards, keyboard_name):
       logger.debug("ASYNC FILE OPS") # DEBUG: signal start of async file ops, so as to help detect where program breaks
       config_contents = await config_file.read() # Read config
       logger.debug("Contents:\n" + config_contents)
-      config = yaml.load(config_contents) # Parse it into python obj
+      # Parse it into python obj
+      config = yaml.load(config_contents, Loader=yaml.FullLoader)
       logger.debug("Parsed contents: " + str(config))
       config["keyboards"][keyboard_name]["path"] = keyboard # Update keyboard with path in /dev/input
       logger.debug("Writing config...")
@@ -58,7 +59,7 @@ def gen_async_handler(keyboards, keyboard_name):
                     yaml.dump(config, default_flow_style=False)) # Write it
         await config_write.close() # Close so other programs can use
         logger.info("Config writen.")
-        logger.info("Updating path on keyboard....")
+        logger.info("Updating path on server....")
         await update_server_keyboard_path(keyboard_name, keyboard)
         os.kill(PID, signal.SIGTERM) # Exit() does't work, so we have to self kill the script
       exit() # So only one ^C is needed to end the program

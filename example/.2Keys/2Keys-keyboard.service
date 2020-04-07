@@ -1,0 +1,13 @@
+# Service template for 2Keys
+[Unit]
+Description=2Keys service for MUNCH
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/local/bin/2Keys watch keyboard 
+Environment=PYTHONPATH=/home/pi/Documents/Projects/2Keys/detector/twokeys/util/..:/usr/local/lib/python3.5/dist-packages:/home/pi/.local/lib/python3.5/site-packages
+WorkingDirectory=/home/pi/Documents/Projects/2Keys/example
+
+[Install]
+WantedBy=multi-user.target
