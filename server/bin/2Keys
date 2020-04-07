@@ -139,10 +139,10 @@ yargs
   .command("fire <keyboard> <hotkey>", "Fires a hotkey, as in it runs the function that corresponds to it", yarg => {
     yarg.positional("keyboard", {
       describe: "Keyboard to \"fire\" from",
-    })
+    });
     yarg.positional("hotkey", {
       describe: "Hotkey string to fire (i.e. ^C or $UP$)",
-    })  
+    });  
   }, argv => {
     fetch_hotkey(argv.keyboard, argv.hotkey)
       .then(data => run_hotkey(data.file, data.func))
