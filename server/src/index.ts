@@ -22,9 +22,11 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 import express from "express";
 import bodyParser from "body-parser";
+import { writeFile } from "fs";
 import api from "./routes/api";
 import Logger from "./util/logger";
 import { DEFAULT_PORT } from "./util/constants";
+import { Arguments } from "yargs";
 
 const app = express();
 const logger: Logger = new Logger({
@@ -34,10 +36,20 @@ const logger: Logger = new Logger({
 app.use(bodyParser.json());
 app.use("/api", api);
 
-const server: (port: number) => void = (port: number = DEFAULT_PORT) => {
+const server = (port: number = DEFAULT_PORT, argv: Arguments) => {
   app.listen(port, () => {
     logger.info("Server now listenning on port " + port);
+    logger.debug("PID: " + process.pid);
   });
+
+  if (argv.hasOwnProperty("pid-file") && argv["pid-file"]) {
+    logger.debug(`Writing pid file to ${argv["pid-file"]}...`);
+    writeFile(argv["pid-file"], process.pid, (err) => {
+      if (err) { logger.throw(err); }
+      logger.info("PID file Written.");
+    });
+  }
+
 };
 
 // Error handler

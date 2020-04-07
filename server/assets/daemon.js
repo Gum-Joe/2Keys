@@ -40,10 +40,14 @@ const logger = createWriteStream(join(root, "{{ default_local_twokeys }}", `${ d
 
 // PID file
 console.log("Creating a PID file for this process...");
-const pid = writeFileSync(join(root, "{{ default_local_twokeys }}", "{{ daemon_pid_file }}"), process.pid);
+writeFileSync(join(root, "{{ default_local_twokeys }}", "{{ daemon_pid_file }}"), process.pid);
 
 console.log("Starting 2Keys server for four...");
-const server = spawn("2Keys", ["serve"], {
+const server = spawn("2Keys", [
+  "serve",
+  "--pid-file",
+  join(root, "{{ default_local_twokeys }}", "{{ server_pid_file }}")
+], {
   shell: true,
   env: {
     "DEBUG": "*",
