@@ -26,6 +26,7 @@ from ..util import Logger, load_config, constants
 from ..add_keyboard import gen_async_handler, add_keyboard
 from ..init import init as init_cli
 from ..sync import sync_config
+from ..daemon import generate_daemon
 
 logger = Logger("cli")
 
@@ -67,7 +68,7 @@ def add(keyboard, inputs_path):
   add_keyboard(keyboard, gen_async_handler, inputs_path)
 
 @cli.command()
-@click.argument("keyboard", )
+@click.argument("keyboard")
 @click.option("-n", "--no-lock", is_flag=True, help="Don't lock the keyboard")
 def watch(keyboard, no_lock):
   if keyboard == "":
@@ -89,6 +90,12 @@ def watch(keyboard, no_lock):
 
 # Command to generate daemons
 @cli.command()
-@click.option("--path", "-p", help="Specify a root directory to place daemon files in (default: ./.2Keys)", default=constants.LOCAL_ROOT) # TODO
-def daemon_gen(path):
-  logger.info("NOT YET IMPLEMENTED")
+@click.argument("keyboards", nargs=-1, required=False)
+def daemon_gen(keyboards):
+  logger.info("Generating daemon files...")
+  config = load_config()
+  keyboard_list = config["keyboards"].keys()
+  if keyboards != ():
+    # Use args instead
+    keyboard_list = keyboards
+  generate_daemon(config["name"], config["keyboards"].keys())

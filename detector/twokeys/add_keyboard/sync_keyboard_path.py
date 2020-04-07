@@ -19,8 +19,10 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 # Sync keyboard path to server
 import aiohttp
 import aiofiles
+import asyncio
 import os
 import yaml
+import logging
 from ..util import load_config, Logger
 from ..util.constants import UPDATE_KEYBOARD_PATH
 
@@ -32,14 +34,21 @@ async def update_server_keyboard_path(name, keyboard_path):
       logger.debug("ASYNC FILE OPS") # DEBUG: signal start of async file ops, so as to help detect where program breaks
       config_contents = await config_file.read() # Read config
       logger.debug("Contents:\n" + config_contents)
-      config = yaml.load(config_contents) # Parse it into python obj
+      # Parse it into python obj
+      config = yaml.load(config_contents, Loader=yaml.FullLoader)
       logger.debug("Parsed contents: " + str(config))
       try:
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=5)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+          logger.debug("Making request....")
           async with session.post("http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + UPDATE_KEYBOARD_PATH,
-                    json={ "keyboard": name, "path": keyboard_path }) as resp:
+                    json={ "keyboard": name, "path": keyboard_path }, timeout=timeout) as resp:
+            logger.debug("Request made.")
             if int(resp.status) != 200:
               logger.err("ERROR Updating paths!")
               logger.err(await resp.text())
-      except aiohttp.Error as err:
-        logger.err(err)
+      except (aiohttp.ClientError, asyncio.TimeoutError, KeyError) as err:
+        logger.err("ERROR!")
+        logging.exception("")
+      except KeyboardInterrupt:
+        raise

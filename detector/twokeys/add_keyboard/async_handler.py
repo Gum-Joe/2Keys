@@ -48,7 +48,8 @@ def gen_async_handler(keyboards, keyboard_name):
       logger.debug("ASYNC FILE OPS") # DEBUG: signal start of async file ops, so as to help detect where program breaks
       config_contents = await config_file.read() # Read config
       logger.debug("Contents:\n" + config_contents)
-      config = yaml.load(config_contents) # Parse it into python obj
+      # Parse it into python obj
+      config = yaml.load(config_contents, Loader=yaml.FullLoader)
       logger.debug("Parsed contents: " + str(config))
       config["keyboards"][keyboard_name]["path"] = keyboard # Update keyboard with path in /dev/input
       logger.debug("Writing config...")

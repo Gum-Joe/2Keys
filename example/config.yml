@@ -10,3 +10,4 @@ keyboards:
     path: /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-if01
     root: index.ahk
 packs: {}
+name: MUNCH
