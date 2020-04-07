@@ -27,6 +27,7 @@ from ..util.constants import SCRIPTS_ROOT, DEFAULT_PORT, MODULE_NAME
 from ..util.logger import Logger
 from ..util.config import load_config
 from ..daemon import generate_daemon
+from ..add_keyboard import add_keyboards
 
 logger = Logger("init")
 
@@ -85,13 +86,9 @@ def init(**args):
   if args["no_path_request"]:
     logger.warn("--no-path-request flag was given")
     logger.warn("It is assumed all keyboard /dev/input paths are already given in the config.")
+    logger.warn("Skipping to daemon generation.")
   else:
-    for key, value in config["keyboards"].items():
-      logger.info("Running script to add keyboard for keyboard " + colorful.cyan(key) + "...")
-      ADD_KEYBOARD_CLI = SCRIPTS_ROOT + "/__main__.py"
-      print("") # Padding
-      os.system("cd " + os.getcwd() + " && python3 -m " + MODULE_NAME + " add " + key)
-      print("") # Padding
+    add_keyboards(config)
 
   # Add daemons
   generate_daemon(config["name"], config["keyboards"].keys())

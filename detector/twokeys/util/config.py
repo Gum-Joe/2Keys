@@ -19,7 +19,10 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 # Config loader#
 import yaml
 from .constants import CONFIG_FILE
+from ..util.logger import Logger
+logger = Logger("config")
 
 def load_config():
+	logger.debug("Loading config...")
 	config_file = open(CONFIG_FILE, "r")
 	return yaml.load(config_file.read(), Loader=yaml.FullLoader)

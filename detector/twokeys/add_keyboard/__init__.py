@@ -16,5 +16,5 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 """
-from .add_keyboard import add_keyboard
+from .add_keyboard import add_keyboard, add_keyboards
 from .async_handler import gen_async_handler

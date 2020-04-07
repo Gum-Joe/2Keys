@@ -58,7 +58,7 @@ def gen_async_handler(keyboards, keyboard_name):
                     yaml.dump(config, default_flow_style=False)) # Write it
         await config_write.close() # Close so other programs can use
         logger.info("Config writen.")
-        logger.info("Updating path on keyboard....")
+        logger.info("Updating path on server....")
         await update_server_keyboard_path(keyboard_name, keyboard)
         os.kill(PID, signal.SIGTERM) # Exit() does't work, so we have to self kill the script
       exit() # So only one ^C is needed to end the program

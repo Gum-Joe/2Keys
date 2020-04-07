@@ -18,29 +18,50 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Function to detect a keyboard
 import asyncio
-from os import path, listdir
-from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE
+from os import path, listdir, getcwd, system
+import colorful
+from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, SCRIPTS_ROOT, MODULE_NAME
 from ..util.logger import Logger
+from ..util.config import load_config
 from ..watcher import AsyncKeyboard as AsyncKeyboardWatcher
 logger = Logger("detect")
 
-def add_keyboard(name, gen_handler):
+# Function to add keyboards (s is emphasised) from config
+def add_keyboards(config):
+  for key, value in config["keyboards"].items():
+      logger.info("Running script to add keyboard for keyboard " + colorful.cyan(key) + "...")
+      print("")  # Padding
+      system("cd " + getcwd() + " && python3 -m " + MODULE_NAME + " add " + key)
+      print("")  # Padding
+
+
+def add_keyboard(name, gen_handler, inputs_path):
+  # Check if paths not given
+  config = load_config()
+  if name == "" or name not in config["keyboards"]:
+    logger.warn("No keyboard supplied.")
+    logger.warn("Detection will be ran on all keyboards.")
+    logger.warn("To just generate daemons, use the 'daemon-gen' command")
+    logger.info("Running detection on all keyboards...")
+    return add_keyboards(config)
+
   logger.info("Mapping keyboard " + name)
   logger.info("Scanning for keyboards...")
-  if not path.isdir(KEYBOARDS_PATH_BASE): # Make sure there's something to detect
+  if not path.isdir(inputs_path): # Make sure there's something to detect
     logger.err("Couldn't scan for keyboards")
     logger.err("Verify you have at least one keyboard plugged in")
-    logger.err("and the dir /dev/input/by-id exists")
+    logger.err("and the dir " + inputs_path + " exists")
+    logger.err("You can specify a custom path with the --inputs-path option")
     exit()
   # Scan
   # From https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
-  keyboards = listdir(KEYBOARDS_PATH_BASE)
+  keyboards = listdir(inputs_path)
   logger.debug("Keyboards:")
   logger.debug(keyboards)
 
   logger.info("Press a button on the keyboard you want to map to register it.")
   # Then watch all keyboards and ask for one to be pressed
-  keyboards_events = [AsyncKeyboardWatcher(keyboard_path) for keyboard_path in keyboards] # Keyboard watch classes for each input
+  keyboards_events = [AsyncKeyboardWatcher(keyboard_path, inputs_path) for keyboard_path in keyboards] # Keyboard watch classes for each input
 
   handler = gen_handler(keyboards_events, name) # The handler needs access to keyboards_events, which it won't on exe in the watcher, as well as keyboard name
   

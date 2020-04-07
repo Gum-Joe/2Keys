@@ -22,7 +22,7 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 import click
 import sys
 from ..watcher import Keyboard
-from ..util import Logger, load_config
+from ..util import Logger, load_config, constants
 from ..add_keyboard import gen_async_handler, add_keyboard
 from ..init import init as init_cli
 from ..sync import sync_config
@@ -56,15 +56,18 @@ def sync(yes):
       sync_config()
 
 @cli.command()
-@click.argument("keyboard")
-def add(keyboard):
-  if keyboard == "":
-    logger.err("Please provide a keyboard to add.")
-    exit()
-  add_keyboard(keyboard, gen_async_handler)
+@click.argument("keyboard", default="")
+@click.option(
+  "--inputs-path",
+  "-i",
+  help="Provide an alternative path to use as the source of keyboard input 'files' (default: /dev/input/by-id)",
+  default=constants.KEYBOARDS_PATH_BASE
+)
+def add(keyboard, inputs_path):
+  add_keyboard(keyboard, gen_async_handler, inputs_path)
 
 @cli.command()
-@click.argument("keyboard")
+@click.argument("keyboard", )
 @click.option("-n", "--no-lock", is_flag=True, help="Don't lock the keyboard")
 def watch(keyboard, no_lock):
   if keyboard == "":
@@ -83,3 +86,9 @@ def watch(keyboard, no_lock):
       exit(0)
   else:
     keyboard.watch_keyboard()
+
+# Command to generate daemons
+@cli.command()
+@click.option("--path", "-p", help="Specify a root directory to place daemon files in (default: ./.2Keys)", default=constants.LOCAL_ROOT) # TODO
+def daemon_gen(path):
+  logger.info("NOT YET IMPLEMENTED")
