@@ -32,4 +32,8 @@ jobs:
     - name: Test with unittest
       working-directory: ./detector
       run: |
-        pipenv run cd python -m unittest discover -s ./tests -p "test*.py"
+        pipenv run coverage run -m unittest discover -s ./tests -p "test*.py"
+    - uses: codecov/codecov-action@v1
+      with:
+        file: ./detector/.coverage # optional
+        name: detector # optional
