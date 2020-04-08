@@ -31,7 +31,9 @@ from ..daemon import generate_daemon
 logger = Logger("cli")
 
 @click.group()
-def cli():
+@click.option("--debug", is_flag=True, help="Enable debugging")
+@click.option("--silent", is_flag=True, help="Don't log")
+def cli(debug, silent):
   return
 
 @cli.command()

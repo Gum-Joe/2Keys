@@ -1,0 +1,9 @@
+name: MOCK
+keyboards:
+  keyboard:
+    dir: ./
+    hotkeys:
+      +A: TestFunc
+      ^!7: MsgBox
+    path: /dev/input/by-id/akbd
+    root: index.ahk

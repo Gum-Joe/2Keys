@@ -25,4 +25,6 @@ logger = Logger("config")
 def load_config():
 	logger.debug("Loading config...")
 	config_file = open(CONFIG_FILE, "r")
-	return yaml.load(config_file.read(), Loader=yaml.FullLoader)
+	contents = yaml.load(config_file.read(), Loader=yaml.FullLoader)
+	config_file.close()
+	return contents

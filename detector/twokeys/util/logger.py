@@ -18,16 +18,28 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Logger for 2Keys Python scripts
 import colorful
+import sys
+import os
 # string name: Name of module logging
 class Logger:
   def __init__(self, name):
+    self.silent = False
+    self.isDebug = False
     self.name = name
+    if "--debug" in sys.argv or os.getenv("DEBUG", "false").lower() == "true":
+      self.isDebug = True
+    if "--silent" in sys.argv or os.getenv("2KEYS_TEST", "False").lower() == "true":
+      self.silent = True
   def info(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.green("info") + " " + str(text))
+    if not self.silent:
+      print(colorful.magenta(self.name) + " " + colorful.green("info") + " " + str(text))
   def debug(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.cyan("debug") + " " + str(text))
+    if not self.silent and self.isDebug:
+      print(colorful.magenta(self.name) + " " + colorful.cyan("debug") + " " + str(text))
   def err(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.red("err") + " " + str(text))
+    if not self.silent:
+      print(colorful.magenta(self.name) + " " + colorful.red("err") + " " + str(text))
   def warn(self, text):
-    print(colorful.magenta(self.name) + " " + colorful.yellow("warn") + " " + str(text))
+    if not self.silent:
+      print(colorful.magenta(self.name) + " " + colorful.yellow("warn") + " " + str(text))
     

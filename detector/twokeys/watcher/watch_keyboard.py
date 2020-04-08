@@ -84,7 +84,7 @@ class Keyboard:
             # We only want event type 1, as that is a key press
             # If key is already pressed, ignore event provided value not 0 (key unpressed)
             if (type == 1 or type == 0x1):
-                logger.debug("Key pressed. Code %u, value %u. Mapping: %s" %
+                logger.info("Key pressed. Code %u, value %u. Mapping: %s" %
                         (code, value, self.map[code]))
     
                 # Set key in array
