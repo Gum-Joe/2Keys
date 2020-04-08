@@ -30,6 +30,5 @@ jobs:
       run: |
         pipenv install
     - name: Test with unittest
-      working-directory: ./detector
       run: |
-        pipenv run python -m unittest discover -s ./tests -p "test*.py"
+        pipenv run python -m unittest discover -s ./detector/tests -p "test*.py"
