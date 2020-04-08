@@ -10,7 +10,7 @@ from twokeys.util import load_config, logger
 class TestUtil(unittest.TestCase):
 
     def setUp(self):
-        os.chdir("./detector/tests/mock")
+        os.chdir("./tests/mock") # Needs more logic
     
     def test_load_config(self):
         config = load_config()
