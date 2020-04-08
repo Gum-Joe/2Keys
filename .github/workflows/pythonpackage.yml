@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies
       working-directory: ./detector
       run: |
-        pipenv install
+        pipenv install --dev
     - name: Test with unittest
       working-directory: ./detector
       run: |
