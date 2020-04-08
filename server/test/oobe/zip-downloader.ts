@@ -13,11 +13,6 @@ const ZIP_FILENAME = "ahk_v2.zip";
 const ROOT = join(MOCK_ROOT, "oobe_test");
 const FILE_PATH = join(ROOT, ZIP_FILENAME);
 
-process.on('uncaughtException', function (err) {
-	// handle the error safely
-	console.log(err.stack)
-})
-
 describe("Zip downloader test (can take a while to run)", () => {
 
 	before(async () => {

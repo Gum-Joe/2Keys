@@ -33,8 +33,8 @@ const logger: Logger = new Logger({ name: "config" });
 export async function config_loader(): Promise<Config> {
 	try {
 		const config: Buffer = await readFile(join(process.cwd(), CONFIG_FILE));
-		const parsed_config: Config = YAML.parse(config.toString());
-		return parsed_config;
+		const parsedConfig: Config = YAML.parse(config.toString());
+		return parsedConfig;
 	} catch (err) {
 		throw err; // Handled by callback
 	}

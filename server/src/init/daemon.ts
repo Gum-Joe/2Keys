@@ -22,11 +22,12 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 import { join } from "path";
 import { Arguments } from "yargs";
 import mkdirp from "mkdirp";
-import { WINDOWS_DAEMON_PREFIX, DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE, WINDOWS_DAEMON_PID_FILE, WINDOWS_DAEMON_FILE_JS_TEMPLATE, WINDOWS_DAEMON_FILE_VBS_TEMPLATE, WINDOWS_DAEMON_FILE_VBS } from "../util/constants";
+import { WINDOWS_DAEMON_PREFIX, DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE, WINDOWS_DAEMON_PID_FILE, WINDOWS_DAEMON_FILE_JS_TEMPLATE, WINDOWS_DAEMON_FILE_VBS_TEMPLATE, WINDOWS_DAEMON_FILE_VBS, WINDOWS_SERVER_PID_FILE } from "../util/constants";
 import Logger from "../util/logger";
-import { writeFileSync, readFile, symlinkSync, readFileSync, statSync } from "fs";
+import { writeFileSync, readFile, symlinkSync, readFileSync, statSync, promises as fsPromises } from "fs";
 import { exec } from "child_process";
 import { homedir } from "os";
+import { config_loader } from "../util/config";
 
 
 const Mustache = require("mustache");
@@ -45,6 +46,7 @@ function gen_startup_js(name: string): string {
     name,
     default_local_twokeys: DEFAULT_LOCAL_2KEYS,
     daemon_pid_file: WINDOWS_DAEMON_PID_FILE,
+    server_pid_file: WINDOWS_SERVER_PID_FILE
   });
   return output;
 }
@@ -66,13 +68,20 @@ function gen_startup_vbs(name: string) {
 export function stop_daemon() {
   return new Promise((resolve, reject) => {
     logger.info("Stopping 2Keys startup daemon...");
-    logger.debug("Reading .pid file...")
-    readFile(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_PID_FILE), (err, pid) => {
+    logger.info("NB: You may need to run 2Keys daemon-gen to make sure you have the latest daemon files.");
+    logger.debug("Reading .pid files...");
+    readFile(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE), (err, pid) => {
       if (err) logger.throw(err);
-      logger.debug(`PID: ${pid.toString()}`);
+      logger.debug(`Server PID: ${pid.toString()}`);
       logger.debug("Killing...");
-      process.kill(parseInt(pid.toString()));
-      resolve();
+      process.kill(parseInt(pid.toString()), "SIGINT");
+      readFile(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_PID_FILE), (err2, pid2) => {
+        if (err2) logger.throw(err2);
+        logger.debug(`Daemon PID: ${pid2.toString()}`);
+        logger.debug("Killing...");
+        process.kill(parseInt(pid2.toString()));
+        resolve();
+      });
     });
   });
 }
@@ -82,13 +91,34 @@ export function stop_daemon() {
  */
 export function start_daemon() {
   logger.info("Starting 2Keys daemon...");
-  logger.info(`See logs in ${join(process.cwd(), DEFAULT_LOCAL_2KEYS)} for logs.`)
+  logger.info(`See logs in ${join(process.cwd(), DEFAULT_LOCAL_2KEYS)} for logs.`);
   exec(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), {}, (error, stdout, stderr) => {
     if (error) {
       logger.throw(error);
     }
     logger.info("2Keys daemon now running.");
   });
+}
+
+/**
+ * Function to regenerate daemons
+ * @param argv CLI args
+ */
+export async function regenerateDaemons(argv: Arguments) {
+  logger.info("Regenerating daemon files...");
+  logger.warn("Deleting old files...");
+  try {
+    await fsPromises.unlink(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE)); // JS
+    await fsPromises.unlink(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS)); // VBS Script; Startup script not deleted
+
+    logger.debug("Grabbing config...");
+    const config = await config_loader();
+
+    logger.debug("Running generator...");
+    add_to_startup(config.name, argv);
+  } catch (err) {
+    logger.throw(err);
+  }
 }
 
 /**
@@ -118,7 +148,7 @@ export default function add_to_startup(name: string, argv: Arguments) {
     logger.debug("Adding a .vbs script to .2Keys to start daemon in the background...")
     // writeFileSync(join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${name}.vbs`), gen_startup_vbs());
     writeFileSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), gen_startup_vbs(name));
-    
+
     if (!argv.hasOwnProperty("startup")) { // If --no-startup given, startup set to false.  Is undefined if not
       logger.debug("Symlinking this .vbs script into user startup folder...");
       symlinkSync(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT);
