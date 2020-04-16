@@ -1,11 +1,11 @@
-# 2Keys [![Build Status](https://travis-ci.com/Gum-Joe/2Keys.svg?branch=master)](https://travis-ci.com/Gum-Joe/2Keys) [![codecov](https://codecov.io/gh/Gum-Joe/2Keys/branch/master/graph/badge.svg)](https://codecov.io/gh/Gum-Joe/2Keys)
+# 2Keys [![Build Status](https://travis-ci.com/Gum-Joe/2Keys.svg?branch=v1)](https://travis-ci.com/Gum-Joe/2Keys) [![codecov](https://codecov.io/gh/Gum-Joe/2Keys/branch/v1/graph/badge.svg)](https://codecov.io/gh/Gum-Joe/2Keys)
 
 
 A easy to setup second keyboard, designed for everyone.
 
-For a full setup guide, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/SETUP.md)
+For a full setup guide, see [here](https://github.com/Gum-Joe/2Keys/blob/v1/docs/SETUP.md)
 
-For keyboard mappings, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md)
+For keyboard mappings, see [here](https://github.com/Gum-Joe/2Keys/blob/v1/docs/MAPPINGS.md)
 
 ### DEVELOPMENT NOTICE
 I'm now working on a new version of 2Keys that is more modular.
