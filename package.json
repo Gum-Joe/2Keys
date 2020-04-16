@@ -1,0 +1,13 @@
+{
+  "name": "twokeys",
+  "version": "0.5.0",
+  "description": "A easy to setup second keyboard, designed for everyone. ",
+  "repository": "https://github.com/Gum-Joe/2Keys",
+  "author": "Kishan <kishansambhi@hotmail.co.uk>",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "detectors/*/controller"
+  ]
+}
