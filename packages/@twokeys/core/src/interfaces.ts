@@ -17,13 +17,14 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Level } from "chalk";
+
 /**
  * Defines options for the Logger class
  */
 export interface Logger {
   name: string;
   windowLogger?: boolean;
-  isColour?: boolean;
 }
 
 export interface LoggerTypes {
