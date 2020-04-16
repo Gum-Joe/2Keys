@@ -27,13 +27,18 @@ export default class Logger {
   private args: LoggerArgs;
   private argv: string[];
   private isDebug: boolean;
+  private isColour: boolean;
   private chalk: Chalk;
   public isSilent: boolean;
   constructor(args: LoggerArgs) {
     this.args = args || { name: "logger" };
     this.argv = process.argv;
     this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.DEBUG === "true";
-    this.chalk = new chalk.constructor();
+    this.isColour = (this.argv.includes("--color") || this.argv.includes("--colour") || this.args.isColour || process.env.TWOKEYS_COLOUR === "true") && !this.argv.includes("--no-colour") ? true : false
+    this.chalk = new chalk.constructor({
+      enabled: this.isColour,
+    });
+    console.log(this.isColour);
     this.isSilent = this.argv.includes("--silent") || process.env.NODE_ENV === "test";
   }
 

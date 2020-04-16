@@ -23,6 +23,7 @@
 export interface Logger {
   name: string;
   windowLogger?: boolean;
+  isColour?: boolean;
 }
 
 export interface LoggerTypes {
