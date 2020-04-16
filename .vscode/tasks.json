@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "packages/twokeys-core/",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "npm: build - packages/twokeys-core",
+			"detail": "tsc -p tsconfig.build.json"
+		}
+	]
+}

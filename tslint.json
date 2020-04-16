@@ -12,7 +12,8 @@
     "no-console": false,
     "no-var-requires": false,
     "indent": false,
-    "arrow-parens": false
+    "arrow-parens": false,
+    "no-trailing-whitespace": false
   },
   "rulesDirectory": []
 }

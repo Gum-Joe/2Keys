@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.build.json",
+
+  "compilerOptions": {
+    "baseUrl": "./packages",
+    "paths": {
+      "@twokey/core": [
+        "twokeys-core/src"
+      ],
+      "@twokey/server": [
+        "twokeys-server/src"
+      ]
+    }
+  }
+}
