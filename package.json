@@ -7,7 +7,7 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "workspaces": [
-    "packages/*",
+    "packages/@twokeys/*",
     "detectors/*/controller",
     "executors/*"
   ],

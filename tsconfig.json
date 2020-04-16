@@ -5,10 +5,10 @@
     "baseUrl": "./packages",
     "paths": {
       "@twokey/core": [
-        "twokeys-core/src"
+        "@twokeys/core/src"
       ],
       "@twokey/server": [
-        "twokeys-server/src"
+        "@twokeys/server/src"
       ]
     }
   }
