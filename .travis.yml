@@ -8,7 +8,7 @@ os: windows
 # Default is fine here
 before_install:
   # Convery lock file
-  - cd server
+  - cd packages/twokeys-server
   - choco install yarn
 install:
   - "\"/c/Program Files (x86)/Yarn/bin/yarn\""

@@ -4,14 +4,12 @@ permissions:
 
 keyboards:
   Keyboard_1:
-    !com.gumjoe.twokeys.generators.config.Keyboard
     path: /dev/input/by-id/xyz
     dir: ./Keyboard_1
     root: index.ahk
     hotkeys:
       A: MsgBox # Uses same shortcodes, specifies a function to run when hotkey is triggered
   Keyboard_2:
-    !com.gumjoe.twokeys.generators.config.Keyboard
     path: /dev/input/by-id/xyz
     dir: ./Keyboard_2
     map:
@@ -33,7 +31,6 @@ keyboards:
         type: down
         func: npm/premiere/preview-window:FiveFramesForward
     Keyboard_2:
-      !com.gumjoe.twokeys.generators.config.Keyboard
       path: /dev/input/by-id/xyz
       dir: ./Keyboard_2
       include:
