@@ -20,8 +20,11 @@
  * @overview Logging module for 2Keys, from https://github.com/Gum-Joe/tara
  * @module logger
  */
-import chalk, { Chalk, Level } from "chalk";
+import { Chalk } from "chalk";
 import { Logger as LoggerArgs } from "./interfaces";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { Instance } = require("chalk");
 
 export default class Logger {
 	private args: LoggerArgs;
@@ -33,7 +36,8 @@ export default class Logger {
 		this.args = args || { name: "logger" };
 		this.argv = process.argv;
 		this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.DEBUG === "true";
-		this.chalk = chalk;
+		const chalkOpts = process.env.TWOKEYS_USE_COLOUR === "true" ? { level: 3 } : {}; // Development hack to enable colour in electron-forge
+		this.chalk = new Instance(chalkOpts);
 		this.isSilent = this.argv.includes("--silent") || process.env.NODE_ENV === "test";
 	}
 
@@ -50,7 +54,7 @@ export default class Logger {
 		if (!this.isSilent) {
 			// Add prefix
 			let prefix = "";
-			if (args.hasOwnProperty("name")) {
+			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
 				prefix = this.chalk.magenta(args.name) + " "; // eslint-disable-line prefer-template
 			}
 			console.log(`${prefix}${this.chalk[colour](level)} ${text}`);
@@ -74,7 +78,7 @@ export default class Logger {
 		if (!this.isSilent) {
 			// Add prefix
 			let prefix = "";
-			if (this.args.hasOwnProperty("name")) {
+			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
 				prefix = this.chalk.magenta(this.args.name) + " "; // eslint-disable-line prefer-template
 			}
 			console.warn(`${prefix}${this.chalk.yellow("warn")} ${text}`);
@@ -89,7 +93,7 @@ export default class Logger {
 		if (!this.isSilent) {
 			// Add prefix
 			let prefix = "";
-			if (this.args.hasOwnProperty("name")) {
+			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
 				prefix = this.chalk.magenta(this.args.name) + " "; // eslint-disable-line prefer-template
 			}
 			console.error(`${prefix}${this.chalk.red("err")} ${text}`);
