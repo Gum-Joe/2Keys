@@ -8,7 +8,7 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "compile": "tsc -p tsconfig.build.json"
   },
   "devDependencies": {
     "typescript": "^3.8.3"

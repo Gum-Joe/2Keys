@@ -16,17 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 */
-export interface Logger {
-  name: string;
-  windowLogger?: boolean;
-}
-
-export interface LoggerTypes {
-  level: "info" | "warn" | "error" | "debug";
-  colour: string;
-  text: string;
-  args: Logger;
-}
+export { Logger, LoggerTypes } from "@twokeys/core/src/interfaces";
 
 export interface Hotkey {
   type: "down" | "up";
