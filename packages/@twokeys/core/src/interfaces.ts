@@ -29,6 +29,7 @@ export interface Logger {
 
 export interface LoggerTypes {
   level: "info" | "warn" | "err" | "debug";
+  name: string;
   colour: string;
   text: string;
   args?: Logger;

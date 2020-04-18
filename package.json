@@ -14,5 +14,8 @@
   "devDependencies": {
     "lerna": "^2.8.0",
     "node-gyp": "^6.1.0"
+  },
+  "dependencies": {
+    "chalk": "4.0.0"
   }
 }
