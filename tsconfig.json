@@ -4,10 +4,10 @@
   "compilerOptions": {
     "baseUrl": "./packages",
     "paths": {
-      "@twokey/core": [
+      "@twokeys/core": [
         "@twokeys/core/src"
       ],
-      "@twokey/server": [
+      "@twokeys/server": [
         "@twokeys/server/src"
       ]
     }

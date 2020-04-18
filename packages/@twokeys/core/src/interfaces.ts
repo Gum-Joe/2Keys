@@ -28,8 +28,8 @@ export interface Logger {
 }
 
 export interface LoggerTypes {
-  level: "info" | "warn" | "error" | "debug";
+  level: "info" | "warn" | "err" | "debug";
   colour: string;
   text: string;
-  args: Logger;
+  args?: Logger;
 }

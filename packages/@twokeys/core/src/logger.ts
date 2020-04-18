@@ -27,16 +27,16 @@ import { Logger as LoggerArgs } from "./interfaces";
 const { Instance } = require("chalk");
 
 export default class Logger {
-	private args: LoggerArgs;
 	private argv: string[];
-	private isDebug: boolean;
 	private chalk: Chalk;
+	public isDebug: boolean;
+	public args: LoggerArgs;
 	public isSilent: boolean;
 	constructor(args: LoggerArgs) {
 		this.args = args || { name: "logger" };
 		this.argv = process.argv;
 		this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.DEBUG === "true";
-		const chalkOpts = process.env.TWOKEYS_USE_COLOUR === "true" ? { level: 3 } : {}; // Development hack to enable colour in electron-forge
+		const chalkOpts = (process.env.TWOKEYS_USE_COLOUR === "true" || this.argv.includes("--color")) && !this.argv.includes("--no-color") ? { level: 3 } : {}; // Development hack to enable colour in electron-forge
 		this.chalk = new Instance(chalkOpts);
 		this.isSilent = this.argv.includes("--silent") || process.env.NODE_ENV === "test";
 	}
@@ -48,16 +48,18 @@ export default class Logger {
 	 * @param colour {String} colour of string
 	 * @param text {String} Text to log
 	 * @param args {LoggerArgs} Logger args
+	 * @param logger Custom logger to print with
 	 * @private
 	 */
-	private _log(level: string, colour: string, text: string, args: LoggerArgs = this.args) {
+	public _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args, ) {
 		if (!this.isSilent) {
 			// Add prefix
 			let prefix = "";
 			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
 				prefix = this.chalk.magenta(args.name) + " "; // eslint-disable-line prefer-template
 			}
-			console.log(`${prefix}${this.chalk[colour](level)} ${text}`);
+			const today  = new Date();
+			logger(`${this.chalk.grey(`${today.getDate()}/${today.getDate()}/${today.getFullYear()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`)} ${prefix}${this.chalk[colour](level)} ${text}`);
 		}
 	}
 	/*
@@ -81,7 +83,7 @@ export default class Logger {
 			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
 				prefix = this.chalk.magenta(this.args.name) + " "; // eslint-disable-line prefer-template
 			}
-			console.warn(`${prefix}${this.chalk.yellow("warn")} ${text}`);
+			this._log("warn", "yellow", text, console.warn);
 		}
 	}
 	/*
@@ -96,7 +98,7 @@ export default class Logger {
 			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
 				prefix = this.chalk.magenta(this.args.name) + " "; // eslint-disable-line prefer-template
 			}
-			console.error(`${prefix}${this.chalk.red("err")} ${text}`);
+			this._log("err", "red", text, console.error);
 		}
 	}
 
@@ -127,7 +129,7 @@ export default class Logger {
 	 * From Bedel
 	 * @public
 	 */
-	public throw_noexit(err: Error) {
+	public throw_noexit(err: Error) { // eslint-disable-line @typescript-eslint/camelcase
 		if (!this.isSilent) {
 			this.err("");
 			this.err(`${err.message}`);
@@ -136,7 +138,7 @@ export default class Logger {
 				if (typeof err.stack !== "undefined") {
 					this.err("Full error:");
 					this.err("");
-					let e: any = 0;
+					let e = "";
 					for (e of err.stack.split("\n")) {
 						this.err(e);
 					}
