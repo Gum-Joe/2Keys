@@ -59,7 +59,7 @@ export default class Logger {
 				prefix = this.chalk.magenta(args.name) + " "; // eslint-disable-line prefer-template
 			}
 			const today  = new Date();
-			logger(`${this.chalk.grey(`${today.getDate()}/${today.getDate()}/${today.getFullYear()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`)} ${prefix}${this.chalk[colour](level)} ${text}`);
+			logger(`${this.chalk.grey(`${today.toLocaleDateString()} ${today.toTimeString()}`)} ${prefix}${this.chalk[colour](level)} ${text}`);
 		}
 	}
 	/*
