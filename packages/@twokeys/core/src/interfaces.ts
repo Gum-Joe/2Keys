@@ -35,6 +35,7 @@ export interface LoggerTypes {
 
 /**
  * Config types
+ * See `example` for examples of each
  */
 /**
  * Defines the config for a project file.

@@ -5,6 +5,11 @@
 import { promises as fs } from "fs";
 import YAML from "yaml";
 import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig } from "../lib/interfaces";
+import Logger from "./logger";
+
+const logger = new Logger({
+	name: "config",
+});
 
 /**
  * Loads and parses a YAML config from a file
@@ -17,10 +22,12 @@ import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig } from "../li
  */
 export async function loadConfig(configFile: string): Promise<ServerConfig | DetectorConfig | ClientConfig | ProjectConfig> {
 	try {
+		logger.debug("Reading config from file " + configFile);
 		const config: Buffer = await fs.readFile(configFile);
 		const parsedConfig: ServerConfig | DetectorConfig | ClientConfig | ProjectConfig = YAML.parse(config.toString());
 		return parsedConfig;
 	} catch (err) {
+		logger.err("ERROR READING CONFIG FILE " + configFile);
 		throw err; // Handled by callback
 	} 
 }
