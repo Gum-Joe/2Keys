@@ -1,13 +1,17 @@
-# Config for 2Keys
-# ONLY FOR USE BY THE PROGRAM
-# To change the config, update it on the client and run "2Keys config-update" here
-keyboards:
-  keyboard:
-    dir: ./
-    hotkeys:
-      +A: TestFunc
-      ^!7: MsgBox
-    path: /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-if01
-    root: index.ahk
-packs: {}
-name: MUNCH
+# Root 2Keys config
+# Contains data about project
+name: Name of project
+id: 666666 # UUID
+version: 1.0.0 # 2Keys version
+sync: false
+
+server:
+  port: 8080
+  perms:
+    start-startup: false
+
+detectors:
+  - ./detector-pi.yml
+  - ./detector-custom.yml
+  - ./detector-interception.yml
+  - ./detector-hasu.yml

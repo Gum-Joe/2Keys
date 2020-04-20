@@ -1,0 +1,13 @@
+# Controls config for a given detector
+name: Name of detector
+device:
+  id: device-00001
+  name: Detector-Interception
+detector-config: # Schema specified by controller
+  perms:
+    start-startup: false
+    lock-kds: true
+    storage-path: /home/2Keys/project666666
+    cli-args: --debug
+
+keyboards:

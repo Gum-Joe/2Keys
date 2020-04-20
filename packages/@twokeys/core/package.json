@@ -15,6 +15,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "chalk": "^4.0.0"
+    "chalk": "^4.0.0",
+    "yaml": "^1.9.2"
   }
 }

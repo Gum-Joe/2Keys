@@ -1,0 +1,12 @@
+# COnfig for a device
+# Stored with AppData/2Keys.yml
+# For the pi
+id: 00000 # Id of device, used in project config to say "use this"
+name: Detector-PI # Name
+controller: detector-pi # Controller add-on to use
+controller-config: # Schema specified by controller, i.e. config for controller and device
+  ipv4: 1.1.1.1 # Detector IP
+  server-ipv4: 2.2.2.2 # Server IP
+  perms: # Permissions 
+    no-user: false # Don't create a user account for 2Keys
+    allow-ssh: false # Allow SSH into cleint
