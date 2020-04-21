@@ -250,3 +250,6 @@ typings/
 
 # Serverless directories
 .serverless
+
+# Dpcs
+docs

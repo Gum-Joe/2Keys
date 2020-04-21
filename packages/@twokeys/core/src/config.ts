@@ -6,6 +6,7 @@ import { promises as fs } from "fs";
 import YAML from "yaml";
 import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig } from "./interfaces";
 import Logger from "./logger";
+import { CONFIG_DEFAULT_FILE_SERVER } from "./constants";
 
 const logger = new Logger({
 	name: "config",
@@ -13,11 +14,11 @@ const logger = new Logger({
 
 /**
  * Loads and parses a YAML config from a file
- * Configs can be of three types, defines in `interfaces.ts`:
- * - Config for the server (see interface `ServerConfig`)
- * - Config for a project (see interface `ProjectConfig`)
- * - Config for a client (see interface `ClientConfig`)
- * - Config for a detector that is used in a project (see interface `DetectorConfig`)
+ * Configs can be of three types, defined in {@link interfaces.ts}:
+ * - Config for the server (see interface {@link ServerConfig})
+ * - Config for a project (see interface {@link ProjectConfig})
+ * - Config for a client (see interface {@link ClientConfig})
+ * - Config for a detector that is used in a project (see interface {@link DetectorConfig})
  * @param configFile File to load config from
  */
 export async function loadConfig(configFile: string): Promise<ServerConfig | DetectorConfig | ClientConfig | ProjectConfig> {
@@ -30,4 +31,12 @@ export async function loadConfig(configFile: string): Promise<ServerConfig | Det
 		logger.err("ERROR READING CONFIG FILE " + configFile);
 		throw err; // Handled by callback
 	} 
+}
+
+/**
+ * Loads the main server config from the default dir ({@link CONFIG_DEFAULT_FILE_SERVER})
+ */
+export async function loadServerConfig(file = CONFIG_DEFAULT_FILE_SERVER): Promise<ServerConfig> {
+	logger.debug(`Loading server config from file ${file}...`);
+	return loadConfig(file) as Promise<ServerConfig>;
 }

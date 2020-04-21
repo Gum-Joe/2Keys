@@ -49,7 +49,6 @@ export default class Logger {
 	 * @param text {String} Text to log
 	 * @param args {LoggerArgs} Logger args
 	 * @param logger Custom logger to print with
-	 * @private
 	 */
 	public _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args, ) {
 		if (!this.isSilent) {

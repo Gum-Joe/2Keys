@@ -67,7 +67,7 @@ export interface ProjectConfig {
 
 /**
  * Configures a client that is used as a detector.
- * This config is project-agnostic and is stored with the 2Keys Root Config (see interface `2KeysConfig`).
+ * This config is project-agnostic and is stored with the 2Keys Root Config (see interface {@link ServerConfig}).
  */
 export interface ClientConfig {
   /** UUID of client, used to reference it in project config so it can be used in projects */
@@ -83,9 +83,9 @@ export interface ClientConfig {
 /**
  * Configures an individual hotkey.
  * `TypeSingle` because it only configures for the key balue of down, i.e. when the hotkey keys are pressed down.
- * Other values are up and hold (see interface `HotkeyTypeKeypressValue`)
+ * Other values are up and hold (see interface {@link HotkeyTypeKeypressValue})
  * The actual config here is up to each executor to decide.
- * It recommened that what's here can override the config in `Keybaord.executors[executor]`
+ * It recommened that what's here can override the config in `Keyboard.executors[executor]`
  */
 export interface HotkeyTypeSingle {
   /** Executor to use for this hotkey (defaults to `keyboard[keybaord].executors.default) */
@@ -109,7 +109,7 @@ export interface HotkeyTypeKeypressValue {
   hold?: HotkeyTypeSingle;
 }
 
-/** Hotkey type. Is either `HotkeyTypeSingle` or `HotkeyTypeKeypressValue` */
+/** Hotkey type. Is either {@link HotkeyTypeSingle} or {@link HotkeyTypeKeypressValue} */
 export type Hotkey = HotkeyTypeSingle | HotkeyTypeKeypressValue;
 
 /**
@@ -124,7 +124,7 @@ export interface Hotkeys {
 
 /**
  * Configures a specific keyboard.
- * Used in the detector config (interface `DetectorConfig`)
+ * Used in the detector config (interface {@link DetectorConfig})
  */
 export interface Keyboard {
   /** Root folder where all macros are stored */
@@ -160,8 +160,8 @@ export interface Keyboard {
 
 /**
  * Configures a detector as part of a project.
- * This is different to the client config file, which is stored the 2Keys Root Config (see interface `2KeysConfig`).
- * This config is stored with the project config (see interface `ProjectConfig`).
+ * This is different to the client config file, which is stored the 2Keys Root Config (see interface {@link ServerConfig}).
+ * This config is stored with the project config (see interface {@link ProjectConfig}).
  */
 export interface DetectorConfig {
   /** Name of Detector */
@@ -189,6 +189,7 @@ export interface DetectorConfig {
  * Interface to define the 'root' config.
  * This is the config the configures a 2Keys server.
  * It is default stored in AppData.
+ * @interface ServerConfig
  */
 export interface ServerConfig {
   /** Name of server */

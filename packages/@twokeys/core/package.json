@@ -1,6 +1,6 @@
 {
   "name": "@twokeys/core",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "The Core Modules that are used throughout 2Keys",
   "main": "lib/index.js",
   "repository": "https://github.com/Gum-Joe/2Keys",
@@ -9,9 +9,11 @@
   "private": true,
   "scripts": {
     "compile": "tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json --watch"
+    "watch": "tsc -p tsconfig.build.json --watch",
+    "docs": "typedoc --includes src"
   },
   "devDependencies": {
+    "typedoc": "^0.17.4",
     "typescript": "^3.8.3"
   },
   "dependencies": {
