@@ -6,6 +6,9 @@
   "author": "Kishan <kishansambhi@hotmail.co.uk>",
   "license": "GPL-3.0-or-later",
   "private": true,
+  "scripts": {
+    "lint": "tslint --project ./"
+  },
   "workspaces": [
     "packages/@twokeys/*",
     "detectors/*/controller",
