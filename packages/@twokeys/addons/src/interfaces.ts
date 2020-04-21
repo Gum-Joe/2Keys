@@ -3,8 +3,8 @@
  */
 
 /** Add-on type, i.e. tells us what type it is */
-export type TWOKEYS_ADDON_TYPES = "executor" | "detector"; // | "pack" | "library" | "extension";
-
+export type TWOKEYS_ADDON_TYPES = "executor" | "detector" | "pack" | "library" | "extension";
+export const TWOKEYS_ADDON_TYPES_ARRAY = ["executor", "detector", "pack", "library", "extension"]
 /**
  * Represents information stored under key `twokeys` in an add-ons `package.json`
  */
@@ -21,7 +21,7 @@ export interface TwokeysPackageInfo {
  * (single DB document)
  */
 export interface PackageInDB {
-	id: number;
+	_id?: string;
 	name: string;
 	types: TWOKEYS_ADDON_TYPES[];
 	/** Information about the package, which is found in package.json */
@@ -29,9 +29,9 @@ export interface PackageInDB {
 		version: string;
 		description: string;
 		/** Size of package */
-		size: number;
+		size: number | null;
 		/** Location (URL, so file:// for local files) of icon */
-		iconURL: string;
+		iconURL?: string;
 		/** Display name of package in GUI/CLI */
 		displayName?: string;
 	};
