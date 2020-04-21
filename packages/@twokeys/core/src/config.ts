@@ -4,7 +4,7 @@
  */
 import { promises as fs } from "fs";
 import YAML from "yaml";
-import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig } from "../lib/interfaces";
+import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig } from "./interfaces";
 import Logger from "./logger";
 
 const logger = new Logger({
