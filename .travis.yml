@@ -5,6 +5,10 @@ node_js:
 
 os: windows
 
+# Fix build timeout. See https://travis-ci.community/t/build-timeout-but-actually-succeeded/2763
+env:
+  - YARN_GPG=no
+
 # Default is fine here
 before_install:
   # Convery lock file
