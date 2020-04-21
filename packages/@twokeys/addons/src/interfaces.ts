@@ -23,8 +23,6 @@ export interface TwokeysPackageInfo {
 export interface PackageInDB {
 	id: number;
 	name: string;
-	/** Display name of package in GUI/CLI */
-	displayName?: string;
 	types: TWOKEYS_ADDON_TYPES[];
 	/** Information about the package, which is found in package.json */
 	info: {
@@ -34,6 +32,8 @@ export interface PackageInDB {
 		size: number;
 		/** Location (URL, so file:// for local files) of icon */
 		iconURL: string;
+		/** Display name of package in GUI/CLI */
+		displayName?: string;
 	};
 	/** Entry point file of package with requireed exports for a given add-on type (for types see {@link TWOKEYS_ADDON_TYPE}) */
 	entry: Map<TWOKEYS_ADDON_TYPES, string>;
