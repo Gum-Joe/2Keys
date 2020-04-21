@@ -100,7 +100,7 @@ export default class AddOnsRegistry {
 			// Validate
 			const validation = this.validatePackageJSON(packageJSON);
 			if (!validation.status) {
-				logger.err("Error validating package.json")
+				logger.err("Error validating package.json");
 				logger.warn("Package not added.");
 				return {
 					status: false,
