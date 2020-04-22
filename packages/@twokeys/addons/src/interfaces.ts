@@ -4,7 +4,7 @@
 
 /** Add-on type, i.e. tells us what type it is */
 export type TWOKEYS_ADDON_TYPES = "executor" | "detector" | "pack" | "library" | "extension";
-export const TWOKEYS_ADDON_TYPES_ARRAY = ["executor", "detector", "pack", "library", "extension"]
+export const TWOKEYS_ADDON_TYPES_ARRAY = ["executor", "detector", "pack", "library", "extension"];
 /**
  * Represents information stored under key `twokeys` in an add-ons `package.json`
  */

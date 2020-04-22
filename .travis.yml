@@ -16,6 +16,7 @@ before_install:
 install:
   - "\"/c/Program Files (x86)/Yarn/bin/yarn\""
 before_script:
+  - yarn workspace @twokeys/core run compile
   - yarn workspaces run compile
   - cd packages/@twokeys/server
   - npx ts-node ./scripts/bootstrap.ts
