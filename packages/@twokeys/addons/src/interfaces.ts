@@ -21,7 +21,7 @@ export interface TwokeysPackageInfo {
  * (single DB document)
  */
 export interface PackageInDB {
-	_id?: string;
+	_id?: string; // Given by nedb
 	name: string;
 	types: TWOKEYS_ADDON_TYPES[];
 	/** Information about the package, which is found in package.json */

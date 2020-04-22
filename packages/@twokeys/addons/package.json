@@ -35,13 +35,17 @@
   },
   "dependencies": {
     "@twokeys/core": "^1.0.0",
-    "@yarnpkg/core": "^2.0.0-rc.26",
     "mkdirp": "^1.0.4",
     "nedb": "^1.8.0",
+    "npm": "^6.14.4",
     "rimraf": "^3.0.2"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/chai-fs": "^2.0.2",
     "@types/nedb": "^1.8.9",
+    "@types/npm": "^2.0.31",
+    "@types/pacote": "^11.1.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-fs": "^2.0.0",

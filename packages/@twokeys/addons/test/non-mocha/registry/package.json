@@ -1,0 +1,10 @@
+{
+  "DO_NOT_MODIFY": true,
+  "name": "twokeys-local-registry",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "executor1-test": "file:../executor1",
+    "mkdirp": "^1.0.4"
+  }
+}
