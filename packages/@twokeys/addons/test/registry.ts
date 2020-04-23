@@ -3,6 +3,7 @@
  */
 import { join } from "path";
 import chai from "chai";
+import fs from "fs";
 import rimraf from "rimraf";
 import Datastore from "nedb-promises";
 import AddOnsRegistry from "../src/registry";
@@ -18,10 +19,17 @@ const REGISTRY_DIR = join(__dirname, "non-mocha", "registry");
 const EXECUTOR_TEST = join(__dirname, "non-mocha", "executor1");
 
 describe("Registry tests", () => {
+
+	before((done) => {
+		rimraf(REGISTRY_DIR, (err) => {
+			done(); // Do not handle error, since we just want to delete it if not there
+		});
+	});
+	
 	it("should create a registry", async () => {
-		//await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
-		//expect(REGISTRY_DIR).to.be.a.directory();
-		//expect(REGISTRY_DIR).to.include.files(["package.json", REGISTRY_FILE_NAME]);
+		await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
+		expect(REGISTRY_DIR).to.be.a.directory();
+		expect(REGISTRY_DIR).to.include.files(["package.json", REGISTRY_FILE_NAME]);
 	});
 
 	it("should sucessfully install a package and NOT add it to the registry", async () => {
