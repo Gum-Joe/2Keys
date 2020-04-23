@@ -3,12 +3,12 @@
  */
 import { join } from "path";
 import chai from "chai";
-import fs from "fs";
 import rimraf from "rimraf";
-import Datastore from "nedb-promises";
+import { open } from "sqlite";
+import sqlite3 from "sqlite3";
 import AddOnsRegistry from "../src/registry";
 import { REGISTRY_FILE_NAME } from "../src/constants";
-import { PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY } from "../src/interfaces";
+import { PackageInDB, REGISTRY_TABLE_NAME } from "../src/interfaces";
 import { TWOKEYS_ADDON_TYPE_EXECUTOR } from "../src/interfaces";
 
 chai.use(require("chai-fs"));
@@ -38,11 +38,13 @@ describe("Registry tests", () => {
 		expect(join(REGISTRY_DIR, "node_modules")).to.be.a.directory();
 		expect(join(REGISTRY_DIR, "node_modules", "mkdirp")).to.be.a.directory();
 		// Check DB
-		const db = new Datastore({ filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME), autoload: true });
-		db.find({ name: "mkdirp" }, (err, docs) => {
-			if (err) { throw err; }
-			expect(docs).to.be.of.length(0);
+		const db = await open({
+			filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+			driver: sqlite3.Database,
 		});
+		const docs = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = \"mkdirp\"`);
+		await db.close();
+		expect(docs).to.be.of.length(0);
 	}).timeout(50000);
 
 	it("should sucessfully install an executor and add it to the registry", async () => {
@@ -54,16 +56,17 @@ describe("Registry tests", () => {
 		expect(join(REGISTRY_DIR, "node_modules")).to.be.a.directory();
 		expect(join(REGISTRY_DIR, "node_modules", pkgJSON.name)).to.be.a.directory();
 		// Check DB
-		const db = Datastore.create({ filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME), autoload: true });
-		db.find({ name: pkgJSON.name }, (err, docs: PackageInDB[]) => {
-			if (err) { throw err; }
-			expect(docs).to.be.of.length(1);
-			expect(docs[0].name).to.be(pkgJSON.name);
-			expect(docs[0].name).to.be(pkgJSON.name);
-			expect(docs[0].types).to.be.equal([TWOKEYS_ADDON_TYPE_EXECUTOR]);
-			expect(docs[0].info.version).to.be(pkgJSON.version);
-			expect(docs[0].entry.executor).to.be(pkgJSON.twokeys.entry.executor);
+		const db = await open({
+			filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+			driver: sqlite3.Database,
 		});
+		const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+		await db.close();
+		expect(docs).to.be.of.length(1);
+		expect(docs[0].name).to.equal(pkgJSON.name);
+		expect(JSON.parse(docs[0].types)).to.deep.equal([TWOKEYS_ADDON_TYPE_EXECUTOR]);
+		expect(JSON.parse(docs[0].info).version).to.be.equal(pkgJSON.version);
+		expect(JSON.parse(docs[0].entry).executor).to.be.equal(pkgJSON.twokeys.entry.executor);
 	}).timeout(50000);
 	
 	it("should not duplicate a package in the registry", async () => {
@@ -73,14 +76,16 @@ describe("Registry tests", () => {
 		// tslint:disable-next-line: no-unused-expression
 		expect(status.status).to.be.false;
 		// Check DB
-		const db = Datastore.create({ filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME), autoload: true });
-		db.find({ name: pkgJSON.name }, (err, docs: PackageInDB[]) => {
-			if (err) { throw err; }
-			expect(docs).to.be.of.length(1);
+		const db = await open({
+			filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+			driver: sqlite3.Database,
 		});
+		const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+		await db.close();
+		expect(docs).to.be.of.length(1);
 	}).timeout(50000);
 
-	it("should duplicate a package in the registry when force: true is passed", async () => {
+	it("should duplicate a package in the registry when force: true is passed and delete the old one", async () => {
 		const registry = new AddOnsRegistry(REGISTRY_DIR);
 		const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
 		const status = await registry.addPackage(pkgJSON.name, {
@@ -89,11 +94,12 @@ describe("Registry tests", () => {
 		// tslint:disable-next-line: no-unused-expression
 		expect(status.status).to.be.true;
 		// Check DB
-		const db = Datastore.create({ filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME), autoload: true });
-		db.find({ name: pkgJSON.name }, (err, docs: PackageInDB[]) => {
-			if (err) { throw err; }
-			expect(docs).to.be.of.length(2);
-			expect(docs[0]).to.deep.equal(docs[1]);
+		const db = await open({
+			filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+			driver: sqlite3.Database,
 		});
+		const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+		await db.close();
+		expect(docs).to.be.of.length(1);
 	}).timeout(50000);
 });

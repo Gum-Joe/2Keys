@@ -10,7 +10,8 @@
   "scripts": {
     "compile": "tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json --watch",
-    "docs": "typedoc --includes src"
+    "docs": "typedoc --includes src",
+    "test": "echo NONE"
   },
   "devDependencies": {
     "typedoc": "^0.17.4",

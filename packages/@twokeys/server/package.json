@@ -74,6 +74,8 @@
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.32",
+    "@types/chai": "^4.2.11",
+    "@types/chai-as-promised": "^7.1.2",
     "@types/inquirer": "^6.5.0",
     "@types/mocha": "^5.2.7",
     "@types/mustache": "^0.8.32",

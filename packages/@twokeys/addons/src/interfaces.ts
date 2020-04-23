@@ -25,8 +25,8 @@ export interface TwokeysPackageInfo {
  * Represents a package (add-on) in the database (add-on registry).
  * (single DB document)
  */
-export interface PackageInDB {
-	_id?: string; // Given by nedb
+export interface Package {
+	id?: string; // Given by it
 	name: string;
 	types: TWOKEYS_ADDON_TYPES[];
 	/** Information about the package, which is found in package.json */
@@ -43,3 +43,22 @@ export interface PackageInDB {
 	/** Entry point file of package with requireed exports for a given add-on type (for types see {@link TWOKEYS_ADDON_TYPE}) */
 	entry: { [key in TWOKEYS_ADDON_TYPES]: string };
 }
+
+export interface PackageInDB {
+	id: string;
+	name: string;
+	types: string; // JSON
+	info: string; // JSON
+	entry: string; // JSON
+}
+
+/** SQL Query to create packages table */
+export const REGISTRY_TABLE_NAME = "packages";
+export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE ${REGISTRY_TABLE_NAME} (
+	id TEXT,
+	name TEXT,
+	types TEXT,
+	info TEXT,
+	entry TEXT,
+	PRIMARY KEY (id)
+)`;

@@ -2,14 +2,16 @@
  * Controls the management of 2Keys packages
  */
 import mkdirp from "mkdirp";
-import Datastore from "nedb-promises";
+import { v4 as uuidv4 } from "uuid";
+import sqlite3 from "sqlite3";
+import { open as openDB, Database } from "sqlite";
 import { promisify } from "util";
 import { promises as fs } from "fs";
 import { join } from "path";
 import npm from "npm";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME } from "./constants";
-import { PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY } from "./interfaces";
+import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME } from "./interfaces";
 
 const logger = new Logger({
 	name: "add-ons:registry",
@@ -24,7 +26,7 @@ interface AddOnsRegistryOptions {
 }
 
 /**
- * Options when installing a package
+ * Options when installing a Package
  */
 interface InstallOptions {
 	/** Local package or not? */
@@ -41,9 +43,10 @@ interface AddPackageOptions {
 }
 
 /**
- * Return type of {@link AddOnsRegistry#addPackage}
+ * Return type for validators
  */
-interface AddPackageReturn { status: boolean; message?: string; }
+interface ValidatorReturn { status: boolean; message?: string; }
+type ParseDBReturn = ValidatorReturn & { entry?: Package; };
 
 /**
  * Registry class.
@@ -51,13 +54,14 @@ interface AddPackageReturn { status: boolean; message?: string; }
  * How a registry works:
  * - In the root there are two files `package.json` and `twokeys-registry.db` and a `node_modules` directory
  * 	- `package.json` is a normal npm `package.json` and stores a list of dependencies, which is the list of installed add-ons (packages)]
- * 	- `twokeys-registry.db` is an easy access DB with information about the add-ons so we don't have to load all the package.json of the add-ons.  See {@link PackageInDB} for contents
+ * 	- `twokeys-registry.db` is an easy access DB with information about the add-ons so we don't have to load all the package.json of the add-ons.  See {@link Package} for contents
  * 	- `node_modules` contains the add-ons themselves
  */
 export default class AddOnsRegistry {
 
 	private directory: string;
-	private registry: Datastore;
+	// @ts-ignore: Is initalised in constructor as a promise.
+	private registry: Database<sqlite3.Database, sqlite3.Statement>;
 	private registryDBFilePath: string;
 
 	/**
@@ -68,8 +72,79 @@ export default class AddOnsRegistry {
 		logger.debug(`New registry class created for ${dir}`);
 		this.directory = dir;
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
-		logger.debug("Loading registry DB file...");
-		this.registry = Datastore.create({ filename: this.registryDBFilePath });
+		logger.debug("Loading registry DB...");
+		// this.registry = Datastore.create({ filename: this.registryDBFilePath });
+	}
+
+	/**
+	 * Initalises the DB so we can use it
+	 * @param entry 
+	 */
+	public async initDB(): Promise<void> {
+		this.registry = await openDB({
+			filename: this.registryDBFilePath,
+			driver: sqlite3.cached.Database,
+		});
+	}
+
+	// Registry SQLite parser
+	/**
+	 * Parses an SQLite entry of a package into an actual package object.
+	 * Use because be can't have objects in tables.
+	 * @param entry Entry from the database to parse
+	 */
+	private parsePackageFromDB(entry: PackageInDB): ParseDBReturn {
+		logger.debug("Parsing an entry from the DB...");
+		const returned: any = {
+			id: entry.id,
+			name: entry.name,
+		};
+		logger.debug("Validating info...");
+		returned.info = JSON.parse(entry.info);
+		if (returned.info?.version || returned.info?.description) {
+			logger.err("Either the version of description field was mising from info.");
+			return {
+				status: false,
+				message: "Either the version of description field was mising from info.",
+			};
+		}
+		logger.debug("Validating types & entries...");
+		returned.types = JSON.parse(entry.types);
+		returned.entry = JSON.parse(entry.entry);
+		for (const typeClaim of returned.types) {
+			if (!TWOKEYS_ADDON_TYPES_ARRAY.includes(typeClaim)) {
+				logger.err(`Type ${typeClaim} is not a valid type!`);
+				return {
+					status: false,
+					message: `Type ${typeClaim} is not a valid type!`,
+				};
+			} else {
+				logger.debug(`Checking type ${typeClaim} for an entry...`);
+				if (!returned.entry[typeClaim]) {
+					logger.err(`Type ${typeClaim} did not have an entry point!`);
+					return {
+						status: false,
+						message: `Type ${typeClaim} did not have an entry point!`,
+					};
+				}
+			}
+		}
+		// Now we can be sure it is right
+		return { entry: returned as Package, status: true };
+	}
+
+	/**
+	 * Converts a package object for storage in the sqlite DB
+	 * @param packageToAdd Package object to convert for storage
+	 */
+	private convertPackageForDB(packageToAdd: Package): PackageInDB {
+		return {
+			id: uuidv4(),
+			name: packageToAdd.name,
+			types: JSON.stringify(packageToAdd.types),
+			info: JSON.stringify(packageToAdd.info),
+			entry: JSON.stringify(packageToAdd.entry),
+		};
 	}
 
 	/**
@@ -77,7 +152,7 @@ export default class AddOnsRegistry {
 	 * @param packageJSON Parsed package.json to validate
 	 * @returns flag of if package was added (true) or not (false) and err message if not added
 	 */
-	private validatePackageJSON(packageJSON: any): { status: boolean, message?: string } {
+	private validatePackageJSON(packageJSON: any): ValidatorReturn {
 		logger.debug("Validating a package.json...");
 		logger.debug(JSON.stringify(packageJSON));
 		// Check if has twokeys metadata
@@ -118,13 +193,17 @@ export default class AddOnsRegistry {
 	 * @param name Name of package to add
 	 * @returns flag of if package was added (true) or not (false) and message why if not added
 	 */
-	public async addPackage(name: string, options?: AddPackageOptions): Promise<AddPackageReturn> {
+	public async addPackage(name: string, options?: AddPackageOptions): Promise<ValidatorReturn> {
 		logger.info(`Adding package (add-on) ${name} to DB...`);
+		logger.debug("Loading DB if not loaded...");
+		if (!this.registry) {
+			await this.initDB();
+		}
 		const packageLocation = join(this.directory, "node_modules", name);
 		logger.debug(`Package location: ${packageLocation}`);
 		logger.debug("Checking if package already in registry...");
-		const docs = await this.registry.find({ name });
-		if (docs.length > 0) {
+		const docs = await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, name);
+		if (typeof docs !== "undefined" && docs.length > 0) {
 			if (!options?.force) {
 				logger.warn(`Package ${name} was already in the registry.`);
 				logger.warn(`If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackage().`);
@@ -135,7 +214,7 @@ export default class AddOnsRegistry {
 				};
 			} else {
 				logger.warn(`Removing any packages by name ${name} in registry already.`);
-				await this.registry.remove({ name }, { multi: true });
+				await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, name);
 				logger.debug("Documents removed.");
 			}
 		}
@@ -157,7 +236,7 @@ export default class AddOnsRegistry {
 			// Check if has entry point
 			logger.debug("Inserting...");
 			// Type cast & promisify
-			const docToInsert: PackageInDB = {
+			const docToInsert: Package = {
 				name: packageJSON.name,
 				types: packageJSON.twokeys.types,
 				entry: packageJSON.twokeys.entry,
@@ -175,7 +254,17 @@ export default class AddOnsRegistry {
 				docToInsert.info.iconURL = packageJSON.twokeys.iconURL;
 			}
 			logger.debug("About to run insert");
-			await this.registry.insert([docToInsert]);
+			const documentConverted = this.convertPackageForDB(docToInsert);
+			const stmt = await this.registry.prepare(
+				`INSERT INTO ${REGISTRY_TABLE_NAME} (id, name, types, info, entry) VALUES (@id, @name, @types, @info, @entry)`,
+			);
+			await stmt.all({
+				"@name": documentConverted.name,
+				"@id": documentConverted.id,
+				"@types": documentConverted.types,
+				"@info": documentConverted.info,
+				"@entry": documentConverted.entry,
+			});
 			logger.info(`Package ${name} added to registry.`);
 			return { status: true };
 		} catch (err) {
@@ -195,7 +284,7 @@ export default class AddOnsRegistry {
 	 * @param packageName Packe to install
 	 * @param options Options
 	 */
-	public async install(packageName: string, options?: InstallOptions): Promise<AddPackageReturn> {
+	public async install(packageName: string, options?: InstallOptions): Promise<ValidatorReturn> {
 		logger.debug("Installing new package...");
 		try {
 			await this.runNpmInstall(packageName, options);
@@ -263,15 +352,28 @@ export default class AddOnsRegistry {
 	public static async createNewRegistry(dir: string) {
 		logger.info(`Creating new registry in ${dir}...`);
 		try { await mkdirp(dir); } catch (err) { throw err; }
-		logger.debug("Directory made.");
+		logger.info("Directory made.");
 		logger.debug("Writing default package.json...");
 		fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
-		logger.debug("Creating registry DB...");
+		logger.info("Creating registry DB...");
 		try {
-			const fd = await fs.open(join(dir, REGISTRY_FILE_NAME), "w");
-			await fd.close(); // CLose immediately
+			const db = await openDB({
+				filename: join(dir, REGISTRY_FILE_NAME),
+				driver: sqlite3.Database,
+			});
+			logger.debug("Adding table...");
+			await db.exec(CREATE_REGISTRY_DB_QUERY);
+			logger.debug("Closing...");
+			await db.close();
+			logger.info("SQLite registry DB created.");
+			// await fd.close(); // CLose immediately
 		} catch (err) {
-			throw err;
+			logger.err("An error was encountered!");
+			if (err.stack.includes(`table ${REGISTRY_TABLE_NAME} already exists`)) {
+				logger.warn("Table (registry) already exists.");
+			} else {
+				throw err;
+			}
 		}
 		logger.info("Registry created.");
 	}
