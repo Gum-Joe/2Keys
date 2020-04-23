@@ -8,7 +8,7 @@ import rimraf from "rimraf";
 import Datastore from "nedb-promises";
 import AddOnsRegistry from "../src/registry";
 import { REGISTRY_FILE_NAME } from "../src/constants";
-import { PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY } from "../lib/interfaces";
+import { PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY } from "../src/interfaces";
 import { TWOKEYS_ADDON_TYPE_EXECUTOR } from "../src/interfaces";
 
 chai.use(require("chai-fs"));
@@ -25,7 +25,7 @@ describe("Registry tests", () => {
 			done(); // Do not handle error, since we just want to delete it if not there
 		});
 	});
-
+	
 	it("should create a registry", async () => {
 		await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
 		expect(REGISTRY_DIR).to.be.a.directory();
@@ -65,6 +65,7 @@ describe("Registry tests", () => {
 			expect(docs[0].entry.executor).to.be(pkgJSON.twokeys.entry.executor);
 		});
 	}).timeout(50000);
+	
 	it("should not duplicate a package in the registry", async () => {
 		const registry = new AddOnsRegistry(REGISTRY_DIR);
 		const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
