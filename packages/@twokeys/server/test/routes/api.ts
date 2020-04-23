@@ -51,7 +51,7 @@ describe("/api test", () => {
 					}, 100);
 				});
 		});
-	})
+	});
 
 	describe("/api/post/trigger", () => {
 		it("should successfully execute a hotkey", (done) => {

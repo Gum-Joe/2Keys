@@ -18,8 +18,7 @@ install:
 before_script:
   - yarn workspace @twokeys/core run compile
   - yarn workspaces run compile
-  - cd packages/@twokeys/server
-  - npx ts-node ./scripts/bootstrap.ts
+  - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts
 script:
-  - npm run coverage
-  - npx codecov
+  - yarn workspaces run coverage
+  - yarn workspaces run coverage:upload

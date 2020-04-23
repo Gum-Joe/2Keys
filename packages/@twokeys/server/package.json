@@ -10,6 +10,7 @@
     "compile": "tsc -p tsconfig.build.json",
     "test": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
     "coverage": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
+    "coverage:upload": "codecov",
     "docs": "typedoc --ignoreCompilerErrors"
   },
   "nyc": {
