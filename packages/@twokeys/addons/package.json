@@ -49,6 +49,7 @@
     "@types/chai-fs": "^2.0.2",
     "@types/npm": "^2.0.31",
     "@types/rimraf": "^3.0.0",
+    "@types/uuid": "^7.0.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-fs": "^2.0.0",
