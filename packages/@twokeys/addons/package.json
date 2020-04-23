@@ -35,10 +35,13 @@
   },
   "dependencies": {
     "@twokeys/core": "^1.0.0",
+    "@types/sqlite3": "^3.1.6",
     "mkdirp": "^1.0.4",
     "nedb-promises": "^4.0.1",
     "npm": "^6.14.4",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "sqlite": "^4.0.7",
+    "sqlite3": "^4.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
