@@ -26,7 +26,7 @@ export interface TwokeysPackageInfo {
  * (single DB document)
  */
 export interface Package {
-	id: string; // Given by it
+	id?: string; // Given by it
 	name: string;
 	types: TWOKEYS_ADDON_TYPES[];
 	/** Information about the package, which is found in package.json */
@@ -53,7 +53,8 @@ export interface PackageInDB {
 }
 
 /** SQL Query to create packages table */
-export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE packages (
+export const REGISTRY_TABLE_NAME = "packages";
+export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE ${REGISTRY_TABLE_NAME} (
 	id TEXT,
 	name TEXT,
 	types TEXT,

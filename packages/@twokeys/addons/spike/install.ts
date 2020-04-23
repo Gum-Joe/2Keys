@@ -14,5 +14,6 @@ AddOnsRegistry.createNewRegistry(directory)
 			.catch((err) => { console.log(err.stack); });
 	})
 	.catch((err) => {
-		throw err;
+		console.log(err.stack);
+		// throw err;
 	});
