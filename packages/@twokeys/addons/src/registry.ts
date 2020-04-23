@@ -78,7 +78,7 @@ export default class AddOnsRegistry {
 	}
 
 	/**
-	 * Initalises the DB
+	 * Initalises the DB so we can use it
 	 * @param entry 
 	 */
 	public async initDB(): Promise<void> {
@@ -257,7 +257,7 @@ export default class AddOnsRegistry {
 			logger.debug("About to run insert");
 			const documentConverted = this.convertPackageForDB(docToInsert);
 			const stmt = await this.registry.prepare(
-				`INSERT INTO ${REGISTRY_TABLE_NAME} (id, name, types, info, entry) VALUES (@id, @name, @types, @info, @entry)`
+				`INSERT INTO ${REGISTRY_TABLE_NAME} (id, name, types, info, entry) VALUES (@id, @name, @types, @info, @entry)`,
 			);
 			await stmt.all({
 				"@name": documentConverted.name,
