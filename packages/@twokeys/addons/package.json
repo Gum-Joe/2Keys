@@ -43,9 +43,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/chai-fs": "^2.0.2",
-    "@types/nedb": "^1.8.9",
     "@types/npm": "^2.0.31",
-    "@types/pacote": "^11.1.0",
     "@types/rimraf": "^3.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
