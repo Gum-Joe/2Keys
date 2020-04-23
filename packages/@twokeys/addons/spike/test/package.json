@@ -4,6 +4,6 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "mkdirp": "^1.0.4"
+    "executor1-test": "file:../../test/non-mocha/executor1"
   }
 }

@@ -2,7 +2,7 @@
  * Controls the management of 2Keys packages
  */
 import mkdirp from "mkdirp";
-import Datastore from "nedb";
+import Datastore from "nedb-promises";
 import { promisify } from "util";
 import { promises as fs } from "fs";
 import { join } from "path";
@@ -28,7 +28,16 @@ interface AddOnsRegistryOptions {
  */
 interface InstallOptions {
 	/** Local package or not? */
-	local?: true;
+	local?: boolean;
+	/** Force npm install & adding to registry */
+	force?: boolean;
+}
+
+/**
+ * Options when adding a package to registry
+ */
+interface AddPackageOptions {
+	force?: boolean;
 }
 
 /**
@@ -55,7 +64,7 @@ export default class AddOnsRegistry {
 		this.directory = dir;
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
 		logger.debug("Loading registry DB file...");
-		this.registry = new Datastore(this.registryDBFilePath);
+		this.registry = Datastore.create({ filename: this.registryDBFilePath });
 	}
 
 	/**
@@ -104,11 +113,28 @@ export default class AddOnsRegistry {
 	 * @param name Name of package to add
 	 * @returns flag of if package was added (true) or not (false) and message why if not added
 	 */
-	public async addPackage(name: string): Promise<{ status: boolean, message?: string }> {
+	public async addPackage(name: string, options?: AddPackageOptions): Promise<{ status: boolean, message?: string }> {
 		logger.info(`Adding package (add-on) ${name} to DB...`);
 		const packageLocation = join(this.directory, "node_modules", name);
 		logger.debug(`Package location: ${packageLocation}`);
-		logger.debug("Checking if package is installed...");
+		logger.debug("Checking if package already in registry...");
+		const docs = await this.registry.find({ name });
+		if (docs.length > 0) {
+			if (!options?.force) {
+				logger.warn(`Package ${name} was already in the registry.`);
+				logger.warn(`If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackage().`);
+				logger.warn("This probably means --force on the CLI.");
+				return {
+					status: false,
+					message: "Package already in registry.",
+				};
+			} else {
+				logger.warn(`Removing any packages by name ${name} in registry already.`);
+				await this.registry.remove({ name }, { multi: true });
+				logger.debug("Documents removed.");
+			}
+		}
+		logger.debug("Checking if package is already installed...");
 		try {
 			await fs.access(packageLocation);
 			logger.debug("Reading package.json");
@@ -126,7 +152,6 @@ export default class AddOnsRegistry {
 			// Check if has entry point
 			logger.debug("Inserting...");
 			// Type cast & promisify
-			const inserter: (newDoc: PackageInDB[]) => Promise<any[]> = promisify(this.registry.insert).bind(this.registry);
 			const docToInsert: PackageInDB = {
 				name: packageJSON.name,
 				types: packageJSON.twokeys.types,
@@ -144,8 +169,9 @@ export default class AddOnsRegistry {
 			if (packageJSON.twokeys.iconURL) {
 				docToInsert.info.iconURL = packageJSON.twokeys.iconURL;
 			}
-			await inserter([docToInsert]);
-			logger.info("Package ${name} added to registry.");
+			logger.debug("About to run insert");
+			await this.registry.insert([docToInsert]);
+			logger.info(`Package ${name} added to registry.`);
 			return { status: true };
 		} catch (err) {
 			logger.err("ERROR!");
@@ -173,9 +199,9 @@ export default class AddOnsRegistry {
 			if (options?.local) {
 				logger.debug("Local package.  Getting name...");
 				const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
-				await this.addPackage(packageJSON.name);
+				await this.addPackage(packageJSON.name, options);
 			} else {
-				await this.addPackage(packageName);
+				await this.addPackage(packageName, options);
 			}
 		} catch (err) {
 			throw err;
@@ -204,6 +230,7 @@ export default class AddOnsRegistry {
 			npm.load({
 				"bin-links": false,
 				"save": true,
+				"force": options?.force ? true : false,
 			}, (err) => {
 				// catch errors
 				if (err) { reject(err); }

@@ -3,8 +3,13 @@
  */
 
 /** Add-on type, i.e. tells us what type it is */
+export const TWOKEYS_ADDON_TYPE_EXECUTOR = "executor";
+export const TWOKEYS_ADDON_TYPE_DETECTOR = "detector";
+export const TWOKEYS_ADDON_TYPE_PACK = "pack";
+export const TWOKEYS_ADDON_TYPE_LIBRARY = "library";
+export const TWOKEYS_ADDON_TYPE_EXTENSION = "extension";
 export type TWOKEYS_ADDON_TYPES = "executor" | "detector" | "pack" | "library" | "extension";
-export const TWOKEYS_ADDON_TYPES_ARRAY = ["executor", "detector", "pack", "library", "extension"];
+export const TWOKEYS_ADDON_TYPES_ARRAY = [TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_PACK, TWOKEYS_ADDON_TYPE_LIBRARY, TWOKEYS_ADDON_TYPE_EXTENSION];
 /**
  * Represents information stored under key `twokeys` in an add-ons `package.json`
  */
