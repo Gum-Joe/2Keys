@@ -41,6 +41,11 @@ interface AddPackageOptions {
 }
 
 /**
+ * Return type of {@link AddOnsRegistry#addPackage}
+ */
+interface AddPackageReturn { status: boolean; message?: string; }
+
+/**
  * Registry class.
  * Handles management of add-ons
  * How a registry works:
@@ -113,7 +118,7 @@ export default class AddOnsRegistry {
 	 * @param name Name of package to add
 	 * @returns flag of if package was added (true) or not (false) and message why if not added
 	 */
-	public async addPackage(name: string, options?: AddPackageOptions): Promise<{ status: boolean, message?: string }> {
+	public async addPackage(name: string, options?: AddPackageOptions): Promise<AddPackageReturn> {
 		logger.info(`Adding package (add-on) ${name} to DB...`);
 		const packageLocation = join(this.directory, "node_modules", name);
 		logger.debug(`Package location: ${packageLocation}`);
@@ -190,7 +195,7 @@ export default class AddOnsRegistry {
 	 * @param packageName Packe to install
 	 * @param options Options
 	 */
-	public async install(packageName: string, options?: InstallOptions) {
+	public async install(packageName: string, options?: InstallOptions): Promise<AddPackageReturn> {
 		logger.debug("Installing new package...");
 		try {
 			await this.runNpmInstall(packageName, options);
@@ -199,9 +204,9 @@ export default class AddOnsRegistry {
 			if (options?.local) {
 				logger.debug("Local package.  Getting name...");
 				const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
-				await this.addPackage(packageJSON.name, options);
+				return await this.addPackage(packageJSON.name, options);
 			} else {
-				await this.addPackage(packageName, options);
+				return await this.addPackage(packageName, options);
 			}
 		} catch (err) {
 			throw err;

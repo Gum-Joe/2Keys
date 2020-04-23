@@ -41,5 +41,5 @@ export interface PackageInDB {
 		displayName?: string;
 	};
 	/** Entry point file of package with requireed exports for a given add-on type (for types see {@link TWOKEYS_ADDON_TYPE}) */
-	entry: Map<TWOKEYS_ADDON_TYPES, string>;
+	entry: { [key in TWOKEYS_ADDON_TYPES]: string };
 }
