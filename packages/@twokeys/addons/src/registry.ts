@@ -2,7 +2,6 @@
  * Controls the management of 2Keys packages
  */
 import mkdirp from "mkdirp";
-import Datastore from "nedb-promises";
 import { v4 as uuidv4 } from "uuid";
 import sqlite3 from "sqlite3";
 import { open as openDB, Database } from "sqlite";

@@ -68,7 +68,7 @@ describe("/api test", () => {
 					setTimeout(() => {
 						fsp.readFile(join(MOCK_ROOT, "./RunTestForExecution2.txt"))
 							.then((contents) => {
-								expect(contents.toString(), done).to.equal("IT WORKED!");
+								expect(contents.toString()).to.equal("IT WORKED!");
 								done();
 							})
 							.catch(done);
@@ -92,7 +92,7 @@ describe("/api test", () => {
 					setTimeout(() => {
 						fsp.readFile(join(MOCK_ROOT, "./RunTestForExecution4.txt"))
 							.then((contents) => {
-								expect(contents.toString(), done).to.equal("IT WORKED!");
+								expect(contents.toString()).to.equal("IT WORKED!");
 								done();
 							})
 							.catch(done);
@@ -115,7 +115,7 @@ describe("/api test", () => {
 					setTimeout(() => {
 						fsp.readFile(join(MOCK_ROOT, "./RunTestForExecution3.txt"))
 							.then((contents) => {
-								expect(contents.toString(), done).to.equal("IT WORKED!");
+								expect(contents.toString()).to.equal("IT WORKED!");
 								done();
 							})
 							.catch(done);
