@@ -1,14 +1,15 @@
 {
-	"name": "executor1-test",
+	"name": "no-type",
 	"private": true,
 	"version": "1.0.0",
 	"description": "MEAP",
 	"author": "Kishan",
 	"entry": "app.js",
 	"twokeys": {
-		"types": ["executor"],
 		"entry": {
+			"types": ["NOT_A_TYPE"],
 			"executor": "./main.js"
-		}
+		},
+		"displayName": "NOT_E"
 	}
 }

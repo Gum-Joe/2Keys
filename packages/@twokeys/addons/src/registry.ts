@@ -1,5 +1,24 @@
 /**
- * Controls the management of 2Keys packages
+ * @license
+ * Copyright 2020 Kishan Sambhi
+ *
+ * This file is part of 2Keys.
+ *
+ * 2Keys is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * 2Keys is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+ */
+/**
+ * @file Controls the management of 2Keys packages
  */
 import mkdirp from "mkdirp";
 import { v4 as uuidv4 } from "uuid";
@@ -21,7 +40,7 @@ const logger = new Logger({
  * Options for add-on registry
  */
 interface AddOnsRegistryOptions {
-	/** Location of registry database (a .db file) */
+	/** Absolute path of registry database (a sqlite3 .db file) */
 	dbFilePath?: string;
 }
 
@@ -72,8 +91,6 @@ export default class AddOnsRegistry {
 		logger.debug(`New registry class created for ${dir}`);
 		this.directory = dir;
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
-		logger.debug("Loading registry DB...");
-		// this.registry = Datastore.create({ filename: this.registryDBFilePath });
 	}
 
 	/**
@@ -172,7 +189,7 @@ export default class AddOnsRegistry {
 			};
 		}
 		// Check if entry points present
-		for (const addOnType in packageJSON.twokeys?.entry) {
+		for (const addOnType of packageJSON.twokeys?.types) {
 			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
 				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
 					logger.err(`Entry point was not found for add-on type ${addOnType}`);
@@ -349,7 +366,7 @@ export default class AddOnsRegistry {
 	 * Creates a new registry in dir
 	 * @param dir Directory to create registry in
 	 */
-	public static async createNewRegistry(dir: string) {
+	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions) {
 		logger.info(`Creating new registry in ${dir}...`);
 		try { await mkdirp(dir); } catch (err) { throw err; }
 		logger.info("Directory made.");
@@ -358,7 +375,7 @@ export default class AddOnsRegistry {
 		logger.info("Creating registry DB...");
 		try {
 			const db = await openDB({
-				filename: join(dir, REGISTRY_FILE_NAME),
+				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
 				driver: sqlite3.Database,
 			});
 			logger.debug("Adding table...");

@@ -1,5 +1,5 @@
 {
-	"name": "executor1-test",
+	"name": "optional-props",
 	"private": true,
 	"version": "1.0.0",
 	"description": "MEAP",
@@ -8,7 +8,10 @@
 	"twokeys": {
 		"types": ["executor"],
 		"entry": {
-			"executor": "./main.js"
-		}
+			"executor": "./main.js",
+			"notAType": "./n.js"
+		},
+		"iconURL": "./not-an-icon.svg",
+		"displayName": "THE TEST"
 	}
 }
