@@ -3,7 +3,7 @@
  */
 import mkdirp from "mkdirp";
 import Datastore from "nedb-promises";
-import uuid from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import sqlite3 from "sqlite3";
 import { open as openDB, Database } from "sqlite";
 import { promisify } from "util";
@@ -74,11 +74,18 @@ export default class AddOnsRegistry {
 		this.directory = dir;
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
 		logger.debug("Loading registry DB...");
-		openDB({
+		// this.registry = Datastore.create({ filename: this.registryDBFilePath });
+	}
+
+	/**
+	 * Initalises the DB
+	 * @param entry 
+	 */
+	public async initDB(): Promise<void> {
+		this.registry = await openDB({
 			filename: this.registryDBFilePath,
 			driver: sqlite3.cached.Database,
-		}).then((db) => this.registry = db).catch((err) => { throw err; });
-		// this.registry = Datastore.create({ filename: this.registryDBFilePath });
+		});
 	}
 
 	// Registry SQLite parser
@@ -133,7 +140,7 @@ export default class AddOnsRegistry {
 	 */
 	private convertPackageForDB(packageToAdd: Package): PackageInDB {
 		return {
-			id: uuid.v4(),
+			id: uuidv4(),
 			name: packageToAdd.name,
 			types: JSON.stringify(packageToAdd.types),
 			info: JSON.stringify(packageToAdd.info),
@@ -189,14 +196,15 @@ export default class AddOnsRegistry {
 	 */
 	public async addPackage(name: string, options?: AddPackageOptions): Promise<ValidatorReturn> {
 		logger.info(`Adding package (add-on) ${name} to DB...`);
+		logger.debug("Loading DB if not loaded...");
+		if (!this.registry) {
+			await this.initDB();
+		}
 		const packageLocation = join(this.directory, "node_modules", name);
 		logger.debug(`Package location: ${packageLocation}`);
 		logger.debug("Checking if package already in registry...");
-		const statement = await this.registry.prepare(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, name);
-		await statement.bind(name);
-		const docs = await statement.get();
-		console.log(docs);
-		if (docs.length > 0) {
+		const docs = await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, name);
+		if (typeof docs !== "undefined" && docs.length > 0) {
 			if (!options?.force) {
 				logger.warn(`Package ${name} was already in the registry.`);
 				logger.warn(`If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackage().`);
@@ -207,7 +215,7 @@ export default class AddOnsRegistry {
 				};
 			} else {
 				logger.warn(`Removing any packages by name ${name} in registry already.`);
-				await this.registry.run(`DELTE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, name);
+				await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, name);
 				logger.debug("Documents removed.");
 			}
 		}
@@ -247,7 +255,17 @@ export default class AddOnsRegistry {
 				docToInsert.info.iconURL = packageJSON.twokeys.iconURL;
 			}
 			logger.debug("About to run insert");
-			await this.registry.run(`INSERT INTO ${REGISTRY_TABLE_NAME} VALUES (?)`, this.convertPackageForDB(docToInsert));
+			const documentConverted = this.convertPackageForDB(docToInsert);
+			const stmt = await this.registry.prepare(
+				`INSERT INTO ${REGISTRY_TABLE_NAME} (id, name, types, info, entry) VALUES (@id, @name, @types, @info, @entry)`
+			);
+			await stmt.all({
+				"@name": documentConverted.name,
+				"@id": documentConverted.id,
+				"@types": documentConverted.types,
+				"@info": documentConverted.info,
+				"@entry": documentConverted.entry,
+			});
 			logger.info(`Package ${name} added to registry.`);
 			return { status: true };
 		} catch (err) {
