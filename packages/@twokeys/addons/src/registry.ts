@@ -18,7 +18,7 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * @file Controls the management of 2Keys packages
+ * @file Controls the management of 2Keys packages & add-ons (add-ons come in package, specifically npm packages)
  */
 import mkdirp from "mkdirp";
 import npm from "npm";
@@ -30,6 +30,7 @@ import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME } from "./constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn } from "./interfaces";
+import { TWOKEYS_ADDON_TYPES } from "../lib/interfaces";
 
 const logger = new Logger({
 	name: "add-ons:registry",
@@ -44,9 +45,9 @@ interface AddOnsRegistryOptions {
 }
 
 /**
- * Options when installing a Package
+ * Options for package management functions
  */
-interface InstallOptions {
+interface ManagerOptions {
 	/** Local package or not? */
 	local?: boolean;
 	/** Force npm install & adding to registry */
@@ -63,9 +64,46 @@ interface AddPackageOptions {
 /** Return type for function {@link AddOnsRegistry#parsePackageFromDB} that parses DB entries to a {@link Package} */
 type ParseDBReturn = ValidatorReturn & { entry?: Package; };
 
-/** Return type for function {@link AddOnsRegistry#getPackage} that parses DB entries to a {@link Package} */
+/** Return type for function {@link AddOnsRegistry#getPackageFromDB} that parses DB entries to a {@link Package} */
 type GetPackageReturn = ValidatorReturn & { results?: Package[]; };
 
+/**
+ * Defines the methods {@link AddOnsRegistry} should implement.
+ * Many returns types left out as we don't know what they will be.
+ */
+interface AddOnsRegistryInterface {
+	// Package operations
+	/** Removes a package from node_modules via npm & the DB */
+	uninstall: (packageName: string) => any;
+	/** Removes a package via npm */
+	runNpmUninstall: (packageName: string) => any;
+	/** Removes a package from the DB */
+	removePackageFromDB: (packageName: string) => any;
+	/** Installs a package & adds to DB */
+	install: (packageName: string, options?: InstallOptions) => any;
+	/** Adds a package via npm */
+	runNpmInstall: (packageName: string, options?: InstallOptions) => any;
+	/** Removes a package from the DB */
+	addPackageToDB: (packageName: string, options?: AddPackageOptions) => any;
+	/** Update package to version */
+	update: (packageName: string, version: string) => any;
+	runNpmUpdate: (packageName: string, version: string) => any;
+	/** Update package in DB */
+	updatePackageInDB: (packageName: string, propsToUpdate: any) => any;
+	/** Force reindex the registry, by running {@link AddOnsRegistry#addPackageToDB()} on all packages in `package.json` */
+	reindex: () => any;
+
+	// Loaders
+	/** Loads one package in full, */
+	load: (packageName: string, types?: TWOKEYS_ADDON_TYPES | TWOKEYS_ADDON_TYPES[]) => any;
+	/** Loads all add-ons of a given type */
+	loadAll: (types?: TWOKEYS_ADDON_TYPES | TWOKEYS_ADDON_TYPES[]) => any;
+
+	// Misc
+	createNewRegistry: (dir: string, options?: AddOnsRegistryOptions) => any;
+}
+
+// TODO: Before and after hooks
 /**
  * Registry class.
  * Handles management of add-ons
@@ -92,6 +130,123 @@ export default class AddOnsRegistry {
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
 	}
 
+	// Load functions
+	load: (packageName: string, types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	loadAll: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+
+	// Package management operations
+	/**
+	 * Installs a new package (through {@link AddOnsRegistry#runNpmInstall}) AND adds it to the registry
+	 * @param packageName Packe to install
+	 * @param options Options
+	 */
+	public async install(packageName: string, options?: ManagerOptions): Promise<ValidatorReturn> {
+		logger.debug("Installing new package...");
+		try {
+			await this.runNpm(packageName, "install", options);
+			logger.debug("Adding package to registry...");
+			// If local, get Name and use that
+			if (options?.local) {
+				logger.debug("Local package.  Getting name...");
+				const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
+				return await this.addPackageToDB(packageJSON.name, options);
+			} else {
+				return await this.addPackageToDB(packageName, options);
+			}
+		} catch (err) {
+			throw err;
+		}
+	}
+
+	/**
+	 * Runs an npm command
+	 * It is recommended this is ran in a worker thread.
+	 * WARNING! This will change the current dir.
+	 * WARNING! This does not add the package to the registry either.
+	 * @param packageName Name of package to run on
+	 * @param command Command to run
+	 * @param options Options
+	 */
+	private runNpm(packageName: string, command: string, options?: ManagerOptions): Promise<void> {
+		return new Promise((resolve, reject) => {
+			const npmLogger = new Logger({ // For npm to log with
+				name: "add-ons:registry:npm",
+			});
+			logger.debug(`Running command npm ${command} ${packageName}...`);
+			logger.debug("Running command...");
+			const oldCWD = this.directory;
+			process.chdir(this.directory); // So lock files are made etc
+			logger.debug(`Changed dir to ${this.directory}.`);
+			// Functions
+			npm.load({
+				"bin-links": false,
+				"save": true,
+				"force": options?.force ? true : false,
+			}, (err) => {
+				// catch errors
+				if (err) {
+					logger.err("Error loading npm!");
+					return reject(err);
+				}
+				logger.debug("Npm loaded.");
+				npm.commands[command]([packageName], (er, data) => {
+					if (er) {
+						logger.err("Error running npm!");
+						return reject(er);
+					}
+					npmLogger.info(data);
+					process.chdir(oldCWD);
+					logger.debug("Gone back to old CWD.");
+					logger.info("Command should have been ran successfully.");
+					resolve();
+				});
+				npm.on("log", (message) => {
+					// log the progress of the installation
+					npmLogger.info(message);
+				});
+			});
+		});
+	}
+	
+	/**
+	 * Uninstalls a package, removing it from the DB as well
+	 * @param packageName Name of package to uninstall
+	 * @param options Options
+	 */
+	public async uninstall(packageName: string, options?: ManagerOptions): Promise<void> {
+		logger.info(`Uninstalling package ${packageName}...`);
+		try {
+			await this.runNpm(packageName, "remove", options);
+			logger.debug("Remove package from registry...");
+			// If local, get Name and use that
+			return await this.removePackageFromDB(packageName);
+		} catch (err) {
+			logger.err("ERROR when uninstalling!");
+			throw err;
+		}
+	}
+
+	/**
+	 * Update package to version
+	 * @param packageName Name of package to update
+	 * @param version SemVer compliant version to update to.
+	 */
+	public async update(packageName: string, version: string, options?: ManagerOptions): Promise<ValidatorReturn> {
+		logger.info(`Updating package ${packageName} to version ${version}...`);
+		try {
+			await this.runNpm(packageName, "install", options);
+			logger.debug("Reindexing package in registry...");
+			return await this.addPackageToDB(packageName, {
+				...options,
+				force: true,
+			});
+		} catch (err) {
+			logger.err("ERROR when updating!");
+			throw err;
+		}
+	}
+
+	// Registry SQLite functions
 	/**
 	 * Initalises the DB so we can use it
 	 * @param entry 
@@ -103,12 +258,15 @@ export default class AddOnsRegistry {
 		});
 	}
 
+	/** Force reindex the registry, by running {@link AddOnsRegistry#addPackageToDB()} on all packages in `package.json` */
+	public reindex: () => Promise<ValidatorReturn> ;
+
 	/**
 	 * Adds a package to the registry DB
 	 * @param name Name of package to add
 	 * @returns flag of if package was added (true) or not (false) and message why if not added
 	 */
-	public async addPackage(name: string, options?: AddPackageOptions): Promise<ValidatorReturn> {
+	public async addPackageToDB(name: string, options?: AddPackageOptions): Promise<ValidatorReturn> {
 		logger.info(`Adding package (add-on) ${name} to DB...`);
 		logger.debug("Loading DB if not loaded...");
 		if (!this.registry) {
@@ -117,7 +275,7 @@ export default class AddOnsRegistry {
 		const packageLocation = join(this.directory, "node_modules", name);
 		logger.debug(`Package location: ${packageLocation}`);
 		logger.debug("Checking if package already in registry...");
-		const state = await this.getPackage(name);
+		const state = await this.getPackageFromDB(name);
 		if (!state.status) {
 			logger.err("There was an error retrieving package of name ${name}.");
 			logger.err(state?.message || "NO MESSAGE FOUND");
@@ -126,7 +284,7 @@ export default class AddOnsRegistry {
 		if (typeof state.results !== "undefined" && state.results.length > 0) {
 			if (!options?.force) {
 				logger.warn(`Package ${name} was already in the registry.`);
-				logger.warn(`If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackage().`);
+				logger.warn(`If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackageToDB().`);
 				logger.warn("This probably means --force on the CLI.");
 				return {
 					status: false,
@@ -202,83 +360,26 @@ export default class AddOnsRegistry {
 	}
 
 	/**
-	 * Installs a new package (through {@link AddOnsRegistry#runNpmInstall}) AND adds it to the registry
-	 * @param packageName Packe to install
-	 * @param options Options
+	 * Removes all instances of a package from the DB
+	 * @param packageName Name of package to delete
 	 */
-	public async install(packageName: string, options?: InstallOptions): Promise<ValidatorReturn> {
-		logger.debug("Installing new package...");
+	private async removePackageFromDB(packageName: string): Promise<void> {
+		logger.info(`Removing any packages by name ${packageName} in registry DB.`);
 		try {
-			await this.runNpmInstall(packageName, options);
-			logger.debug("Adding package to registry...");
-			// If local, get Name and use that
-			if (options?.local) {
-				logger.debug("Local package.  Getting name...");
-				const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
-				return await this.addPackage(packageJSON.name, options);
-			} else {
-				return await this.addPackage(packageName, options);
-			}
+			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
 		} catch (err) {
+			logger.err("Error removing package!");
+			logger.err(err.message);
 			throw err;
 		}
+		logger.debug("Documents removed.");
 	}
 
-	/**
-	 * Installs a new package using npm
-	 * It is recommended this is ran in a worker thread.
-	 * WARNING! This will change the current dir.
-	 * WARNING! This does not add the package to the registry either.
-	 * @param packageName Name of package to install
-	 * @param options Options
-	 */
-	private runNpmInstall(packageName: string, options?: InstallOptions): Promise<void> {
-		return new Promise((resolve, reject) => {
-			const npmLogger = new Logger({ // For npm to log with
-				name: "add-ons:registry:npm",
-			});
-			logger.info(`Installing new package ${packageName}...`);
-			logger.debug("Running install...");
-			const oldCWD = this.directory;
-			process.chdir(this.directory); // So lock files are made etc
-			logger.debug(`Changed dir to ${this.directory}.`);
-			// Functions
-			npm.load({
-				"bin-links": false,
-				"save": true,
-				"force": options?.force ? true : false,
-			}, (err) => {
-				// catch errors
-				if (err) {
-					logger.err("Error loading npm!");
-					return reject(err);
-				}
-				logger.debug("Npm loaded.");
-				npm.commands.install([packageName], (er, data) => {
-					if (er) {
-						logger.err("Error running npm!");
-						return reject(er);
-					}
-					npmLogger.info(data);
-					process.chdir(oldCWD);
-					logger.debug("Gone back to old CWD.");
-					logger.info("Package (add-on) should have been installed.");
-					resolve();
-				});
-				npm.on("log", (message) => {
-					// log the progress of the installation
-					npmLogger.info(message);
-				});
-			});
-		});
-	}
-
-	// Registry SQLite parser functions
 	/**
 	 * Retrieves a package from the DB and parses it to a {@link Package}
 	 * @param packageName Name of package to get
 	 */
-	public async getPackage(packageName: string): Promise<GetPackageReturn> {
+	public async getPackageFromDB(packageName: string): Promise<GetPackageReturn> {
 		logger.info(`Getting info for package ${packageName}...`);
 		try {
 			const docs = await this.queryDBForPackage(packageName);
@@ -304,22 +405,6 @@ export default class AddOnsRegistry {
 			logger.err(err.message);
 			throw err;
 		}
-	}
-
-	/**
-	 * Removes all instances of a package from the DB
-	 * @param packageName Name of package to delete
-	 */
-	private async removePackageFromDB(packageName: string): Promise<void> {
-		logger.info(`Removing any packages by name ${packageName} in registry DB.`);
-		try {
-			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
-		} catch (err) {
-			logger.err("Error removing package!");
-			logger.err(err.message);
-			throw err;
-		}
-		logger.debug("Documents removed.");
 	}
 
 	/**

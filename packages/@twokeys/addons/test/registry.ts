@@ -48,14 +48,12 @@ describe("Registry tests", () => {
 				done(); // Do not handle error, since we just want to delete it if not there
 			});
 		});
+
 		it("should create a registry", async () => {
 			await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
 			expect(REGISTRY_DIR).to.be.a.directory();
 			expect(REGISTRY_DIR).to.include.files(["package.json", REGISTRY_FILE_NAME]);
 		});
-
-		// TODO:
-		// // Add error handling tests:
 		it("should gracefully fail to create a new registry in the same location", async () => {
 			// tslint:disable-next-line: no-unused-expression
 			const res = await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
@@ -68,14 +66,6 @@ describe("Registry tests", () => {
 			// tslint:disable:no-unused-expression
 			expect(AddOnsRegistry.createNewRegistry({ notAPath: true })).to.be.rejected; 
 		});
-	});
-
-	describe("Class methods", () => {
-		before((done) => {
-			registry = new AddOnsRegistry(REGISTRY_DIR);
-			done();
-		});
-
 		it("should create a registry, with a db at a different folder when the option is given", async () => {
 			const TEST_REG_DIR = join(REGISTRY_DIR, "test2");
 			await AddOnsRegistry.createNewRegistry(TEST_REG_DIR, {
@@ -87,136 +77,185 @@ describe("Registry tests", () => {
 			expect(() => reg.initDB()).to.not.throw();
 		});
 
-		it("should sucessfully install a package and NOT add it to the registry when twokeys properties are not present", async () => {
-			await registry.install("mkdirp");
-			expect(join(REGISTRY_DIR, "node_modules")).to.be.a.directory();
-			expect(join(REGISTRY_DIR, "node_modules", "mkdirp")).to.be.a.directory();
-			// Check DB
-			const db = await open({
-				filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
-			});
-			const docs = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = \"mkdirp\"`);
-			await db.close();
-			expect(docs).to.be.of.length(0);
-		}).timeout(50000);
+	});
 
-		it("should sucessfully install an executor and add it to the registry", async () => {
-			const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
-			const status = await registry.install(EXECUTOR_TEST, { local: true });
-			// tslint:disable-next-line: no-unused-expression
-			expect(status.status).to.be.true;
-			expect(join(REGISTRY_DIR, "node_modules")).to.be.a.directory();
-			expect(join(REGISTRY_DIR, "node_modules", pkgJSON.name)).to.be.a.directory();
-			// Check DB
-			const db = await open({
-				filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
-			});
-			const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
-			await db.close();
-			expect(docs).to.be.of.length(1);
-			expect(docs[0].name).to.equal(pkgJSON.name);
-			expect(JSON.parse(docs[0].types)).to.deep.equal([TWOKEYS_ADDON_TYPE_EXECUTOR]);
-			expect(JSON.parse(docs[0].info).version).to.be.equal(pkgJSON.version);
-			expect(JSON.parse(docs[0].entry).executor).to.be.equal(pkgJSON.twokeys.entry.executor);
-		}).timeout(50000);
-
-		it("should fail on a package that is not installed", async () => {
-			// tslint:disable-next-line: no-unused-expression
-			expect(registry.addPackage("express")).to.be.rejected;
+	describe("Class methods", () => {
+		before((done) => {
+			registry = new AddOnsRegistry(REGISTRY_DIR);
+			done();
 		});
 
-		it("should not duplicate a package in the registry", async () => {
-			const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
-			const status = await registry.addPackage(pkgJSON.name);
-			// tslint:disable-next-line: no-unused-expression
-			expect(status.status).to.be.false;
-			// Check DB
-			const db = await open({
-				filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
+		describe("Package install", () => {
+			it("should sucessfully install a package and NOT add it to the registry when twokeys properties are not present", async () => {
+				await registry.install("mkdirp");
+				expect(join(REGISTRY_DIR, "node_modules")).to.be.a.directory();
+				expect(join(REGISTRY_DIR, "node_modules", "mkdirp")).to.be.a.directory();
+				// Check DB
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = \"mkdirp\"`);
+				await db.close();
+				expect(docs).to.be.of.length(0);
+			}).timeout(50000);
+
+			it("should sucessfully install an executor and add it to the registry", async () => {
+				const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
+				const status = await registry.install(EXECUTOR_TEST, { local: true });
+				// tslint:disable-next-line: no-unused-expression
+				expect(status.status).to.be.true;
+				expect(join(REGISTRY_DIR, "node_modules")).to.be.a.directory();
+				expect(join(REGISTRY_DIR, "node_modules", pkgJSON.name)).to.be.a.directory();
+				// Check DB
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+				await db.close();
+				expect(docs).to.be.of.length(1);
+				expect(docs[0].name).to.equal(pkgJSON.name);
+				expect(JSON.parse(docs[0].types)).to.deep.equal([TWOKEYS_ADDON_TYPE_EXECUTOR]);
+				expect(JSON.parse(docs[0].info).version).to.be.equal(pkgJSON.version);
+				expect(JSON.parse(docs[0].entry).executor).to.be.equal(pkgJSON.twokeys.entry.executor);
+			}).timeout(50000);
+
+			it("should fail on a package that is not installed", async () => {
+				// tslint:disable-next-line: no-unused-expression
+				expect(registry.addPackageToDB("express")).to.be.rejected;
 			});
-			const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
-			await db.close();
-			expect(docs).to.be.of.length(1);
-		}).timeout(50000);
 
-		it("should duplicate a package in the registry when force: true is passed and delete the old one", async () => {
-			const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
-			const status = await registry.addPackage(pkgJSON.name, {
-				force: true,
+			it("should not duplicate a package in the registry", async () => {
+				const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
+				const status = await registry.addPackageToDB(pkgJSON.name);
+				// tslint:disable-next-line: no-unused-expression
+				expect(status.status).to.be.false;
+				// Check DB
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+				await db.close();
+				expect(docs).to.be.of.length(1);
+			}).timeout(50000);
+
+			it("should duplicate a package in the registry when force: true is passed and delete the old one", async () => {
+				const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
+				const status = await registry.addPackageToDB(pkgJSON.name, {
+					force: true,
+				});
+				// tslint:disable-next-line: no-unused-expression
+				expect(status.status).to.be.true;
+				// Check DB
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+				await db.close();
+				expect(docs).to.be.of.length(1);
+			}).timeout(50000);
+
+			it("should reject a package with no valid type", async () => {
+				const status = await registry.install(join(__dirname, "non-mocha/noType"), { local: true });
+				// tslint:disable-next-line: no-unused-expression
+				expect(status.status).to.be.false;
+				expect(status.message).to.include("No valid type");
+			}).timeout(50000);
+
+			it("should reject a package with no types at all", async () => {
+				const status = await registry.install(join(__dirname, "non-mocha/noType2"), { local: true });
+				// tslint:disable-next-line: no-unused-expression
+				expect(status.status).to.be.false;
+				expect(status.message).to.include("No valid type");
+			}).timeout(50000);
+
+			it("should reject a package with missing entry points", async () => {
+				const status = await registry.install(join(__dirname, "non-mocha/noEntry"), { local: true });
+				// tslint:disable-next-line: no-unused-expression
+				expect(status.status).to.be.false;
+				expect(status.message).to.include("Entry point was not found");
+			}).timeout(50000);
+
+			it("should include optional properties in the registry and ignore invalid types in the entries list", async () => {
+				// NOTE: Invalid entry points are still included in the registry as they can just be ignored
+				// However, the `types` property should be filtered
+				const status = await registry.install(join(__dirname, "non-mocha/optionalProps"), { local: true });
+				const pkgJSON = require(join(__dirname, "non-mocha/optionalProps", "package.json"));
+				// tslint:disable-next-line: no-unused-expression
+				expect(status.status).to.be.true;
+				// Check DB
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+				expect(docs).to.be.of.length(1);
+				const info: Package["info"] = JSON.parse(docs[0].info);
+				const types: Package["types"] = JSON.parse(docs[0].types);
+				expect(types).to.not.include("notAType");
+				expect(types).to.be.of.length(1);
+				expect(types).to.include("detector");
+				expect(info).to.have.property("iconURL");
+				expect(info).to.have.property("displayName");
+				expect(info.iconURL).to.be.equal(pkgJSON.twokeys.iconURL);
+				expect(info.displayName).to.be.equal(pkgJSON.twokeys.displayName);
+			}).timeout(50000);
+
+			// TODO:
+			// Fix above test
+			// Add error handlers:
+			it("should throw an error if npm has an error installing.", () => {
+				// tslint:disable-next-line: no-unused-expression
+				expect(registry.install("DEFINTILY_NOT_A_PACKAGE" + Math.random())).to.be.rejected;
+			}).timeout(50000);
+			it("should throw an error if encountered when adding a package.", () => {
+				// Pass an invalid path
+				// @ts-ignore
+				// tslint:disable-next-line: no-unused-expression
+				expect(registry.addPackageToDB({ notAFilePath: true })).to.be.rejected;
+			}).timeout(50000);
+		});
+
+		describe("Package uninstall", () => {
+			it("should succesfuly uninstall a package", async () => {
+				const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
+				await registry.uninstall(pkgJSON.name);
+				expect(join(REGISTRY_DIR, "node_modules", pkgJSON.name)).to.not.be.a.directory();
+				// Check DB
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
+				await db.close();
+				expect(docs).to.be.of.length(0);
 			});
-			// tslint:disable-next-line: no-unused-expression
-			expect(status.status).to.be.true;
-			// Check DB
-			const db = await open({
-				filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
+			it("should throw an error uninstalling a package that does not exist", async () => {
+				expect(registry.uninstall("NOT_INSTALL")).to.be.rejected;
 			});
-			const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
-			await db.close();
-			expect(docs).to.be.of.length(1);
-		}).timeout(50000);
+		});
 
-		it("should reject a package with no valid type", async () => {
-			const status = await registry.install(join(__dirname, "non-mocha/noType"), { local: true });
-			// tslint:disable-next-line: no-unused-expression
-			expect(status.status).to.be.false;
-			expect(status.message).to.include("No valid type");
-		}).timeout(50000);
-
-		it("should reject a package with no types at all", async () => {
-			const status = await registry.install(join(__dirname, "non-mocha/noType2"), { local: true });
-			// tslint:disable-next-line: no-unused-expression
-			expect(status.status).to.be.false;
-			expect(status.message).to.include("No valid type");
-		}).timeout(50000);
-
-		it("should reject a package with missing entry points", async () => {
-			const status = await registry.install(join(__dirname, "non-mocha/noEntry"), { local: true });
-			// tslint:disable-next-line: no-unused-expression
-			expect(status.status).to.be.false;
-			expect(status.message).to.include("Entry point was not found");
-		}).timeout(50000);
-
-		it("should include optional properties in the registry and ignore invalid types in the entries list", async () => {
-			// NOTE: Invalid entry points are still included in the registry as they can just be ignored
-			// However, the `types` property should be filtered
-			const status = await registry.install(join(__dirname, "non-mocha/optionalProps"), { local: true });
-			const pkgJSON = require(join(__dirname, "non-mocha/optionalProps", "package.json"));
-			// tslint:disable-next-line: no-unused-expression
-			expect(status.status).to.be.true;
-			// Check DB
-			const db = await open({
-				filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
+		describe("Package update", () => {
+			it("should succesfuly update a package", async () => {
+				await registry.install("debug@3.0.0");
+				await registry.update("debug", "4.0.1");
+				expect(join(REGISTRY_DIR, "node_modules", "debug")).to.be.a.directory();
+				// Check DB
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, "debug");
+				await db.close();
+				expect(docs).to.be.of.length(1);
+				expect(docs[1]).to.be.true;
 			});
-			const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
-			expect(docs).to.be.of.length(1);
-			const info: Package["info"] = JSON.parse(docs[0].info);
-			const types: Package["types"] = JSON.parse(docs[0].types);
-			expect(types).to.not.include("notAType");
-			expect(types).to.be.of.length(1);
-			expect(types).to.include("detector");
-			expect(info).to.have.property("iconURL");
-			expect(info).to.have.property("displayName");
-			expect(info.iconURL).to.be.equal(pkgJSON.twokeys.iconURL);
-			expect(info.displayName).to.be.equal(pkgJSON.twokeys.displayName);
-		}).timeout(50000);
-
-		// TODO:
-		// Fix above test
-		// Add error handlers:
-		it("should throw an error if npm has an error installing.", () => {
-			// tslint:disable-next-line: no-unused-expression
-			expect(registry.install("DEFINTILY_NOT_A_PACKAGE" + Math.random())).to.be.rejected;
-		}).timeout(50000);
-		it("should throw an error if encountered when adding a package.", () => {
-			// Pass an invalid path
-			// @ts-ignore
-			// tslint:disable-next-line: no-unused-expression
-			expect(registry.addPackage({ notAFilePath: true })).to.be.rejected;
-		}).timeout(50000);
+			it("should throw an error uninstalling a package that does not exist", async () => {
+				expect(registry.uninstall("NOT_INSTALL")).to.be.rejected;
+			});
+		});
 	});
 });
