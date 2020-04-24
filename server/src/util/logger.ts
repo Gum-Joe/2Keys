@@ -34,7 +34,7 @@ export default class Logger {
     this.args = args || { name: "logger" };
     this.argv = process.argv;
     this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.DEBUG === "true";
-    this.chalk = new chalk.constructor();
+    this.chalk = new chalk.Instance();
     this.isSilent = this.argv.includes("--silent") || process.env.NODE_ENV === "test";
   }
 

@@ -26,6 +26,7 @@ import Logger from "../util/logger";
 import { networkInterfaces, NetworkInterfaceInfo } from "os";
 import { Config, Keyboard } from "../util/interfaces";
 import { DEFAULT_HOTKEY_FILE_ROOT, DEFAULT_PORT } from "../util/constants";
+import { rejects } from "assert";
 
 const logger: Logger = new Logger({
   name: "init"
@@ -68,26 +69,32 @@ const questions: inquirer.Question[] = [
 ]
 
 export default function (argv: Arguments): Promise<Config> {
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
     // Add Q about ip address of local PC here
     // From https://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
     const ifaces = networkInterfaces();
     const ip_choices: string[] = [];
-    for (let ifname in ifaces) {
-      const iface_root = ifaces[ifname];
-      let aliases: number = 0; // To check if mutliple IPs
-      for (let iface of iface_root) {
-        if ('IPv4' !== iface.family || iface.internal !== false) {
-          // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-          continue;
-        } else if (aliases >= 1) {
-          // this single interface has multiple ipv4 addresses
-          ip_choices.push(`${ifname}, alias ${aliases}, ${iface.address}`);
-        } else {
-          // this interface has only one ipv4 adress
-          ip_choices.push(`${ifname}, ${iface.address}`);
+    for (const ifname in ifaces) {
+      if (Object.prototype.hasOwnProperty.call(ifaces, ifname)) {
+        const iface_root = ifaces[ifname];
+        if (typeof iface_root === "undefined") {
+          logger.err("No ifaces found!");
+          return reject(new Error("No ifaces found!"));
         }
-        aliases++;
+        let aliases: number = 0; // To check if mutliple IPs
+        for (const iface of iface_root) {
+          if ('IPv4' !== iface.family || iface.internal !== false) {
+            // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+            continue;
+          } else if (aliases >= 1) {
+            // this single interface has multiple ipv4 addresses
+            ip_choices.push(`${ifname}, alias ${aliases}, ${iface.address}`);
+          } else {
+            // this interface has only one ipv4 adress
+            ip_choices.push(`${ifname}, ${iface.address}`);
+          }
+          aliases++;
+        }
       }
     }
     const ipQ = {

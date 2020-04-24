@@ -52,7 +52,8 @@ export default async function run_init(argv: Arguments): Promise<void> {
   });
 
   // Only catch error if -f not specified
-  writeStream.on("error", (err) => {
+  type FSError = Error & { code?: string };
+  writeStream.on("error", (err: FSError) => {
     if (argv.force && err.code === "EEXIST") {
       return;
     }

@@ -101,18 +101,20 @@ export default class ZipDownloader {
       });
 
       req.on("response", res => {
-        const len = parseInt(res.headers["content-length"], 10);
-        let downloaded = "";
-        if (!this.logger.isSilent) {
-          const progress_bar = new ProgressBar(':bar :percent ETA: :etas', {
-            complete: '▓',
-            incomplete: '░',
-            width: 50,
-            total: isNaN(len) ? 6403580 : len
-          });
-          res.on("data", (chunk) => {
-            progress_bar.tick(chunk.length);
-          });
+        if (typeof res.headers !== "undefined" && typeof res.headers["content-length"] !== "undefined") {
+          const len = parseInt(res.headers["content-length"], 10);
+          let downloaded = "";
+          if (!this.logger.isSilent) {
+            const progressBar = new ProgressBar(':bar :percent ETA: :etas', {
+              complete: '▓',
+              incomplete: '░',
+              width: 50,
+              total: isNaN(len) ? 6403580 : len
+            });
+            res.on("data", (chunk) => {
+              progressBar.tick(chunk.length);
+            });
+          }
         }
         const fileStream = createWriteStream(this.fullPath);
         res.pipe(fileStream); // Pipe to writer
