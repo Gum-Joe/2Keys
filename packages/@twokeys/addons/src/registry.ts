@@ -63,6 +63,9 @@ interface AddPackageOptions {
 /** Return type for function {@link AddOnsRegistry#parsePackageFromDB} that parses DB entries to a {@link Package} */
 type ParseDBReturn = ValidatorReturn & { entry?: Package; };
 
+/** Return type for function {@link AddOnsRegistry#getPackage} that parses DB entries to a {@link Package} */
+type GetPackageReturn = ValidatorReturn & { results?: Package[]; };
+
 /**
  * Registry class.
  * Handles management of add-ons
@@ -100,66 +103,6 @@ export default class AddOnsRegistry {
 		});
 	}
 
-	// Registry SQLite parser
-	/**
-	 * Parses an SQLite entry of a package into an actual package object.
-	 * Use because be can't have objects in tables.
-	 * @param entry Entry from the database to parse
-	 */
-	private parsePackageFromDB(entry: PackageInDB): ParseDBReturn {
-		logger.debug("Parsing an entry from the DB...");
-		const returned: any = {
-			id: entry.id,
-			name: entry.name,
-		};
-		logger.debug("Validating info...");
-		returned.info = JSON.parse(entry.info);
-		if (returned.info?.version || returned.info?.description) {
-			logger.err("Either the version of description field was mising from info.");
-			return {
-				status: false,
-				message: "Either the version of description field was mising from info.",
-			};
-		}
-		logger.debug("Validating types & entries...");
-		returned.types = JSON.parse(entry.types);
-		returned.entry = JSON.parse(entry.entry);
-		for (const typeClaim of returned.types) {
-			if (!TWOKEYS_ADDON_TYPES_ARRAY.includes(typeClaim)) {
-				logger.err(`Type ${typeClaim} is not a valid type!`);
-				return {
-					status: false,
-					message: `Type ${typeClaim} is not a valid type!`,
-				};
-			} else {
-				logger.debug(`Checking type ${typeClaim} for an entry...`);
-				if (!returned.entry[typeClaim]) {
-					logger.err(`Type ${typeClaim} did not have an entry point!`);
-					return {
-						status: false,
-						message: `Type ${typeClaim} did not have an entry point!`,
-					};
-				}
-			}
-		}
-		// Now we can be sure it is right
-		return { entry: returned as Package, status: true };
-	}
-
-	/**
-	 * Converts a package object for storage in the sqlite DB
-	 * @param packageToAdd Package object to convert for storage
-	 */
-	private convertPackageForDB(packageToAdd: Package): PackageInDB {
-		return {
-			id: uuidv4(),
-			name: packageToAdd.name,
-			types: JSON.stringify(packageToAdd.types),
-			info: JSON.stringify(packageToAdd.info),
-			entry: JSON.stringify(packageToAdd.entry),
-		};
-	}
-
 	/**
 	 * Adds a package to the registry DB
 	 * @param name Name of package to add
@@ -174,8 +117,13 @@ export default class AddOnsRegistry {
 		const packageLocation = join(this.directory, "node_modules", name);
 		logger.debug(`Package location: ${packageLocation}`);
 		logger.debug("Checking if package already in registry...");
-		const docs = await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, name);
-		if (typeof docs !== "undefined" && docs.length > 0) {
+		const state = await this.getPackage(name);
+		if (!state.status) {
+			logger.err("There was an error retrieving package of name ${name}.");
+			logger.err(state?.message || "NO MESSAGE FOUND");
+			return state;
+		}
+		if (typeof state.results !== "undefined" && state.results.length > 0) {
 			if (!options?.force) {
 				logger.warn(`Package ${name} was already in the registry.`);
 				logger.warn(`If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackage().`);
@@ -186,7 +134,7 @@ export default class AddOnsRegistry {
 				};
 			} else {
 				logger.warn(`Removing any packages by name ${name} in registry already.`);
-				await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, name);
+				await this.removePackageFromDB(name);
 				logger.debug("Documents removed.");
 			}
 		}
@@ -279,8 +227,8 @@ export default class AddOnsRegistry {
 	/**
 	 * Installs a new package using npm
 	 * It is recommended this is ran in a worker thread.
-	 * WARNING! This will change the current dir
-	 * WARNING! This does not add the package to the registry either
+	 * WARNING! This will change the current dir.
+	 * WARNING! This does not add the package to the registry either.
 	 * @param packageName Name of package to install
 	 * @param options Options
 	 */
@@ -325,13 +273,14 @@ export default class AddOnsRegistry {
 		});
 	}
 
+	// Static methods
 	/**
 	 * Creates a new registry in dir & the SQLite3 DB to go with it
 	 * @param dir Directory to create registry in
 	 */
 	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions): Promise<ValidatorReturn> {
 		logger.info(`Creating new registry in ${dir}...`);
-		try { 
+		try {
 			await mkdirp(dir);
 			logger.info("Directory made.");
 			logger.debug("Writing default package.json...");
@@ -400,6 +349,123 @@ export default class AddOnsRegistry {
 			}
 		}
 		return { status: true };
+	}
+
+	// Registry SQLite parser functions
+	/**
+	 * Retrieves a package from the DB and parses it to a {@link Package}
+	 * @param packageName Name of package to get
+	 */
+	public async getPackage(packageName: string): Promise<GetPackageReturn> {
+		logger.info(`Getting info for package ${packageName}...`);
+		try {
+			const docs = await this.queryDBForPackage(packageName);
+			logger.debug("Raw DB output retrieved.");
+			logger.debug("Converting...");
+			const newDocs: Package[] = [];
+			for (const doc of docs) {
+				const newDoc = this.parsePackageFromDB(doc);
+				if (!newDoc.status || !newDoc.entry || typeof newDoc.entry === "undefined") {
+					logger.err(`An error was encountered converting document of name ${doc.name} to a Package!`);
+					return {
+						status: false,
+						message: newDoc.message || "No parsed package was received back",
+					};
+				} else {
+					newDocs.push(newDoc.entry);
+					logger.debug(`Document of name ${newDoc.entry.name} parsed.`);
+				}
+			}
+			return { status: true, results: newDocs };
+		} catch (err) {
+			logger.err("An error was encountered retrieving data from DB!");
+			logger.err(err.message);
+			throw err;
+		}
+	}
+
+	/**
+	 * Removes all instances of a package from the DB
+	 * @param packageName Name of package to delete
+	 */
+	private async removePackageFromDB(packageName: string): Promise<void> {
+		logger.info(`Removing any packages by name ${packageName} in registry DB.`);
+		try {
+			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
+		} catch (err) {
+			logger.err("Error removing package!");
+			logger.err(err.message);
+			throw err;
+		}
+		logger.debug("Documents removed.");
+	}
+
+	/**
+	 * Querys the DB for a package, returning the raw {@link PackageInDB}
+	 * @param packageName Package name to find
+	 */
+	private async queryDBForPackage(packageName: string): Promise<PackageInDB[]> {
+		logger.debug(`Query DB for package ${packageName}...`);
+		return await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
+	}
+
+	/**
+	 * Converts a package object for storage in the sqlite DB
+	 * @param packageToAdd Package object to convert for storage
+	 */
+	private convertPackageForDB(packageToAdd: Package): PackageInDB {
+		return {
+			id: uuidv4(),
+			name: packageToAdd.name,
+			types: JSON.stringify(packageToAdd.types),
+			info: JSON.stringify(packageToAdd.info),
+			entry: JSON.stringify(packageToAdd.entry),
+		};
+	}
+
+	/**
+	 * Parses an SQLite entry of a package into an actual package object.
+	 * Use because be can't have objects in tables.
+	 * @param entry Entry from the database to parse
+	 */
+	private parsePackageFromDB(entry: PackageInDB): ParseDBReturn {
+		logger.debug("Parsing an entry from the DB...");
+		const returned: any = {
+			id: entry.id,
+			name: entry.name,
+		};
+		logger.debug("Validating info...");
+		returned.info = JSON.parse(entry.info);
+		if (!returned.info?.version || !returned.info?.description) {
+			logger.err("Either the version of description field was mising from info.");
+			return {
+				status: false,
+				message: "Either the version of description field was mising from info.",
+			};
+		}
+		logger.debug("Validating types & entries...");
+		returned.types = JSON.parse(entry.types);
+		returned.entry = JSON.parse(entry.entry);
+		for (const typeClaim of returned.types) {
+			if (!TWOKEYS_ADDON_TYPES_ARRAY.includes(typeClaim)) {
+				logger.err(`Type ${typeClaim} is not a valid type!`);
+				return {
+					status: false,
+					message: `Type ${typeClaim} is not a valid type!`,
+				};
+			} else {
+				logger.debug(`Checking type ${typeClaim} for an entry...`);
+				if (!returned.entry[typeClaim]) {
+					logger.err(`Type ${typeClaim} did not have an entry point!`);
+					return {
+						status: false,
+						message: `Type ${typeClaim} did not have an entry point!`,
+					};
+				}
+			}
+		}
+		// Now we can be sure it is right
+		return { entry: returned as Package, status: true };
 	}
 
 }
