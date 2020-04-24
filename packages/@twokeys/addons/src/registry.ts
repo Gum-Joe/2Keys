@@ -30,7 +30,7 @@ import { join } from "path";
 import npm from "npm";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME } from "./constants";
-import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME } from "./interfaces";
+import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, TwokeysPackageInfo } from "./interfaces";
 
 const logger = new Logger({
 	name: "add-ons:registry",
@@ -188,7 +188,7 @@ export default class AddOnsRegistry {
 				message: "No valid type was listed in the package.json!",
 			};
 		}
-		// Check if entry points present
+		// Check if entry points present for each of twokeys.types
 		for (const addOnType of packageJSON.twokeys?.types) {
 			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
 				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
@@ -239,7 +239,7 @@ export default class AddOnsRegistry {
 		try {
 			await fs.access(packageLocation);
 			logger.debug("Reading package.json");
-			const packageJSON = JSON.parse((await fs.readFile(join(packageLocation, "package.json"))).toString("utf8"));
+			const packageJSON: { twokeys: TwokeysPackageInfo, [key: string]: any } = JSON.parse((await fs.readFile(join(packageLocation, "package.json"))).toString("utf8"));
 			// Validate
 			const validation = this.validatePackageJSON(packageJSON);
 			if (!validation.status) {
@@ -253,9 +253,11 @@ export default class AddOnsRegistry {
 			// Check if has entry point
 			logger.debug("Inserting...");
 			// Type cast & promisify
+			// Filters out types that are invalid in twokeys.types
+			// Entries are not filtered, just ignored, as it's not worth the compute cycles, as it can just be ignored
 			const docToInsert: Package = {
 				name: packageJSON.name,
-				types: packageJSON.twokeys.types,
+				types: packageJSON.twokeys.types.filter(theType => TWOKEYS_ADDON_TYPES_ARRAY.includes(theType)),
 				entry: packageJSON.twokeys.entry,
 				info: {
 					version: packageJSON.version,
@@ -344,14 +346,20 @@ export default class AddOnsRegistry {
 				"force": options?.force ? true : false,
 			}, (err) => {
 				// catch errors
-				if (err) { reject(err); }
+				if (err) {
+					logger.err("Error loading npm!");
+					return reject(err);
+				}
 				logger.debug("Npm loaded.");
 				npm.commands.install([packageName], (er, data) => {
-					if (er) { reject(er); }
+					if (er) {
+						logger.err("Error running npm!");
+						return reject(er);
+					}
 					npmLogger.info(data);
 					process.chdir(oldCWD);
 					logger.debug("Gone back to old CWD.");
-					logger.info("Package (add-on) installed.");
+					logger.info("Package (add-on) should have been installed.");
 					resolve();
 				});
 				npm.on("log", (message) => {
@@ -363,17 +371,17 @@ export default class AddOnsRegistry {
 	}
 
 	/**
-	 * Creates a new registry in dir
+	 * Creates a new registry in dir & the SQLite3 DB to go with it
 	 * @param dir Directory to create registry in
 	 */
-	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions) {
+	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions): Promise<ValidatorReturn> {
 		logger.info(`Creating new registry in ${dir}...`);
-		try { await mkdirp(dir); } catch (err) { throw err; }
-		logger.info("Directory made.");
-		logger.debug("Writing default package.json...");
-		fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
-		logger.info("Creating registry DB...");
-		try {
+		try { 
+			await mkdirp(dir);
+			logger.info("Directory made.");
+			logger.debug("Writing default package.json...");
+			await fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
+			logger.info("Creating registry DB...");
 			const db = await openDB({
 				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
 				driver: sqlite3.Database,
@@ -388,11 +396,13 @@ export default class AddOnsRegistry {
 			logger.err("An error was encountered!");
 			if (err.stack.includes(`table ${REGISTRY_TABLE_NAME} already exists`)) {
 				logger.warn("Table (registry) already exists.");
+				return { status: false, message: "Table (registry) already exists." };
 			} else {
 				throw err;
 			}
 		}
 		logger.info("Registry created.");
+		return { status: true };
 	}
 
 }

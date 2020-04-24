@@ -8,9 +8,7 @@ const directory = join(__dirname, "test");
 AddOnsRegistry.createNewRegistry(directory)
 	.then(() => {
 		const reg = new AddOnsRegistry(directory);
-		reg.install(join(__dirname, "../test/non-mocha/executor1"), {
-			local: true,
-		})
+		reg.addPackage("")
 			.catch((err) => { console.log(err.stack); });
 	})
 	.catch((err) => {

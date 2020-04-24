@@ -6,8 +6,11 @@
 	"author": "Kishan",
 	"entry": "app.js",
 	"twokeys": {
+		"types": [
+			"executor",
+			"NOT_A_TYPE"
+		],
 		"entry": {
-			"types": ["NOT_A_TYPE"],
 			"executor": "./main.js"
 		},
 		"displayName": "NOT_E"

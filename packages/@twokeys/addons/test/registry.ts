@@ -56,8 +56,18 @@ describe("Registry tests", () => {
 
 		// TODO:
 		// // Add error handling tests:
-		it("should gracefully fail to create a new registry in the same location");
-		it("should error if we try to make a registry in an invalid location");
+		it("should gracefully fail to create a new registry in the same location", async () => {
+			// tslint:disable-next-line: no-unused-expression
+			const res = await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
+			// tslint:disable-next-line: no-unused-expression
+			expect(res.status).to.be.false;
+			expect(res.message).to.include("already exists");
+		});
+		it("should error if we try to make a registry in an invalid location", () => {
+			// @ts-ignore
+			// tslint:disable:no-unused-expression
+			expect(AddOnsRegistry.createNewRegistry({ notAPath: true })).to.be.rejected; 
+		});
 	});
 
 	describe("Class methods", () => {
@@ -154,25 +164,29 @@ describe("Registry tests", () => {
 			// tslint:disable-next-line: no-unused-expression
 			expect(status.status).to.be.false;
 			expect(status.message).to.include("No valid type");
-		});
+		}).timeout(50000);
 
 		it("should reject a package with no types at all", async () => {
 			const status = await registry.install(join(__dirname, "non-mocha/noType"), { local: true });
 			// tslint:disable-next-line: no-unused-expression
 			expect(status.status).to.be.false;
 			expect(status.message).to.include("No valid type");
-		});
+		}).timeout(50000);
 
 		it("should reject a package with missing entry points", async () => {
 			const status = await registry.install(join(__dirname, "non-mocha/noEntry"), { local: true });
 			// tslint:disable-next-line: no-unused-expression
 			expect(status.status).to.be.false;
 			expect(status.message).to.include("Entry point was not found");
-		});
+		}).timeout(50000);
 
 		it("should include optional properties in the registry and ignore invalid types in the entries list", async () => {
+			// NOTE: Invalid entry points are still included in the registry as they can just be ignored
+			// However, the `types` property should be filtered
 			const status = await registry.install(join(__dirname, "non-mocha/optionalProps"), { local: true });
 			const pkgJSON = require(join(__dirname, "non-mocha/optionalProps", "package.json"));
+			// tslint:disable-next-line: no-unused-expression
+			expect(status.status).to.be.true;
 			// Check DB
 			const db = await open({
 				filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
@@ -181,19 +195,26 @@ describe("Registry tests", () => {
 			const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
 			expect(docs).to.be.of.length(1);
 			const info: Package["info"] = JSON.parse(docs[0].info);
-			const entry: Package["entry"] = JSON.parse(docs[0].entry);
-			// TODO: Reenable
-			// expect(entry).to.not.have.property("notAType");
+			const types: Package["types"] = JSON.parse(docs[0].types);
+			expect(types).to.not.include("notAType");
 			expect(info).to.have.property("iconURL");
 			expect(info).to.have.property("displayName");
 			expect(info.iconURL).to.be.equal(pkgJSON.twokeys.iconURL);
 			expect(info.displayName).to.be.equal(pkgJSON.twokeys.displayName);
-		});
+		}).timeout(50000);
 
 		// TODO:
 		// Fix above test
 		// Add error handlers:
-		it("should throw an error if npm has an error installing.");
-		it("should throw an error if encountered when adding a package.");
+		it("should throw an error if npm has an error installing.", () => {
+			// tslint:disable-next-line: no-unused-expression
+			expect(registry.install("DEFINTILY_NOT_A_PACKAGE" + Math.random())).to.be.rejected;
+		}).timeout(50000);
+		it("should throw an error if encountered when adding a package.", () => {
+			// Pass an invalid path
+			// @ts-ignore
+			// tslint:disable-next-line: no-unused-expression
+			expect(registry.addPackage({ notAFilePath: true })).to.be.rejected;
+		}).timeout(50000);
 	});
 });
