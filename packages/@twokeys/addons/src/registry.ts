@@ -273,84 +273,6 @@ export default class AddOnsRegistry {
 		});
 	}
 
-	// Static methods
-	/**
-	 * Creates a new registry in dir & the SQLite3 DB to go with it
-	 * @param dir Directory to create registry in
-	 */
-	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions): Promise<ValidatorReturn> {
-		logger.info(`Creating new registry in ${dir}...`);
-		try {
-			await mkdirp(dir);
-			logger.info("Directory made.");
-			logger.debug("Writing default package.json...");
-			await fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
-			logger.info("Creating registry DB...");
-			const db = await openDB({
-				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
-			});
-			logger.debug("Adding table...");
-			await db.exec(CREATE_REGISTRY_DB_QUERY);
-			logger.debug("Closing...");
-			await db.close();
-			logger.info("SQLite registry DB created.");
-			// await fd.close(); // CLose immediately
-		} catch (err) {
-			logger.err("An error was encountered!");
-			if (err.stack.includes(`table ${REGISTRY_TABLE_NAME} already exists`)) {
-				logger.warn("Table (registry) already exists.");
-				return { status: false, message: "Table (registry) already exists." };
-			} else {
-				throw err;
-			}
-		}
-		logger.info("Registry created.");
-		return { status: true };
-	}
-
-	/**
-	 * Validates a package.json.
-	 * Tested by the functions that test the insyall function
-	 * @param packageJSON Parsed package.json to validate
-	 * @returns flag of if package was added (true) or not (false) and err message if not added
-	 */
-	public static validatePackageJSON(packageJSON: any): ValidatorReturn {
-		logger.debug("Validating a package.json...");
-		logger.debug(JSON.stringify(packageJSON));
-		// Check if has twokeys metadata
-		if (!Object.prototype.hasOwnProperty.call(packageJSON, "twokeys")) {
-			logger.err("Package does not contain 2Keys metadata!");
-			return {
-				status: false,
-				message: "Package does not contain 2Keys metadata!",
-			};
-		}
-		// Check type is valid
-		if (!packageJSON.twokeys?.types?.some(element => TWOKEYS_ADDON_TYPES_ARRAY.includes(element))) {
-			logger.err("No valid type was listed in the package.json!");
-			return {
-				status: false,
-				message: "No valid type was listed in the package.json!",
-			};
-		}
-		// Check if entry points present for each of twokeys.types
-		for (const addOnType of packageJSON.twokeys?.types) {
-			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
-				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
-					logger.err(`Entry point was not found for add-on type ${addOnType}`);
-					return {
-						status: false,
-						message: `Entry point was not found for add-on type ${addOnType}`,
-					};
-				}
-			} else {
-				logger.warn(`Type ${addOnType} is not a valid type.  ignoring...`);
-			}
-		}
-		return { status: true };
-	}
-
 	// Registry SQLite parser functions
 	/**
 	 * Retrieves a package from the DB and parses it to a {@link Package}
@@ -466,6 +388,84 @@ export default class AddOnsRegistry {
 		}
 		// Now we can be sure it is right
 		return { entry: returned as Package, status: true };
+	}
+
+	// Static methods
+	/**
+	 * Creates a new registry in dir & the SQLite3 DB to go with it
+	 * @param dir Directory to create registry in
+	 */
+	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions): Promise<ValidatorReturn> {
+		logger.info(`Creating new registry in ${dir}...`);
+		try {
+			await mkdirp(dir);
+			logger.info("Directory made.");
+			logger.debug("Writing default package.json...");
+			await fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
+			logger.info("Creating registry DB...");
+			const db = await openDB({
+				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
+				driver: sqlite3.Database,
+			});
+			logger.debug("Adding table...");
+			await db.exec(CREATE_REGISTRY_DB_QUERY);
+			logger.debug("Closing...");
+			await db.close();
+			logger.info("SQLite registry DB created.");
+			// await fd.close(); // CLose immediately
+		} catch (err) {
+			logger.err("An error was encountered!");
+			if (err.stack.includes(`table ${REGISTRY_TABLE_NAME} already exists`)) {
+				logger.warn("Table (registry) already exists.");
+				return { status: false, message: "Table (registry) already exists." };
+			} else {
+				throw err;
+			}
+		}
+		logger.info("Registry created.");
+		return { status: true };
+	}
+
+	/**
+	 * Validates a package.json.
+	 * Tested by the functions that test the insyall function
+	 * @param packageJSON Parsed package.json to validate
+	 * @returns flag of if package was added (true) or not (false) and err message if not added
+	 */
+	public static validatePackageJSON(packageJSON: any): ValidatorReturn {
+		logger.debug("Validating a package.json...");
+		logger.debug(JSON.stringify(packageJSON));
+		// Check if has twokeys metadata
+		if (!Object.prototype.hasOwnProperty.call(packageJSON, "twokeys")) {
+			logger.err("Package does not contain 2Keys metadata!");
+			return {
+				status: false,
+				message: "Package does not contain 2Keys metadata!",
+			};
+		}
+		// Check type is valid
+		if (!packageJSON.twokeys?.types?.some(element => TWOKEYS_ADDON_TYPES_ARRAY.includes(element))) {
+			logger.err("No valid type was listed in the package.json!");
+			return {
+				status: false,
+				message: "No valid type was listed in the package.json!",
+			};
+		}
+		// Check if entry points present for each of twokeys.types
+		for (const addOnType of packageJSON.twokeys?.types) {
+			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
+				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
+					logger.err(`Entry point was not found for add-on type ${addOnType}`);
+					return {
+						status: false,
+						message: `Entry point was not found for add-on type ${addOnType}`,
+					};
+				}
+			} else {
+				logger.warn(`Type ${addOnType} is not a valid type.  ignoring...`);
+			}
+		}
+		return { status: true };
 	}
 
 }
