@@ -21,23 +21,22 @@
  * @file Controls the management of 2Keys packages
  */
 import mkdirp from "mkdirp";
-import { v4 as uuidv4 } from "uuid";
+import npm from "npm";
 import sqlite3 from "sqlite3";
+import { v4 as uuidv4 } from "uuid";
 import { open as openDB, Database } from "sqlite";
-import { promisify } from "util";
 import { promises as fs } from "fs";
 import { join } from "path";
-import npm from "npm";
 import { Logger } from "@twokeys/core";
-import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME } from "./constants";
-import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, TwokeysPackageInfo } from "./interfaces";
+import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME } from "./constants";
+import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn } from "./interfaces";
 
 const logger = new Logger({
 	name: "add-ons:registry",
 });
 
 /**
- * Options for add-on registry
+ * Options for add-on registry constructor
  */
 interface AddOnsRegistryOptions {
 	/** Absolute path of registry database (a sqlite3 .db file) */
@@ -61,10 +60,7 @@ interface AddPackageOptions {
 	force?: boolean;
 }
 
-/**
- * Return type for validators
- */
-interface ValidatorReturn { status: boolean; message?: string; }
+/** Return type for function {@link AddOnsRegistry#parsePackageFromDB} that parses DB entries to a {@link Package} */
 type ParseDBReturn = ValidatorReturn & { entry?: Package; };
 
 /**
@@ -165,47 +161,6 @@ export default class AddOnsRegistry {
 	}
 
 	/**
-	 * Validates a package.json
-	 * @param packageJSON Parsed package.json to validate
-	 * @returns flag of if package was added (true) or not (false) and err message if not added
-	 */
-	private validatePackageJSON(packageJSON: any): ValidatorReturn {
-		logger.debug("Validating a package.json...");
-		logger.debug(JSON.stringify(packageJSON));
-		// Check if has twokeys metadata
-		if (!Object.prototype.hasOwnProperty.call(packageJSON, "twokeys")) {
-			logger.err("Package does not contain 2Keys metadata!");
-			return {
-				status: false,
-				message: "Package does not contain 2Keys metadata!",
-			};
-		}
-		// Check type is valid
-		if (!packageJSON.twokeys?.types?.some(element => TWOKEYS_ADDON_TYPES_ARRAY.includes(element))) {
-			logger.err("No valid type was listed in the package.json!");
-			return {
-				status: false,
-				message: "No valid type was listed in the package.json!",
-			};
-		}
-		// Check if entry points present for each of twokeys.types
-		for (const addOnType of packageJSON.twokeys?.types) {
-			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
-				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
-					logger.err(`Entry point was not found for add-on type ${addOnType}`);
-					return {
-						status: false,
-						message: `Entry point was not found for add-on type ${addOnType}`,
-					};
-				}
-			} else {
-				logger.warn(`Type ${addOnType} is not a valid type.  ignoring...`);
-			}
-		}
-		return { status: true };
-	}
-
-	/**
 	 * Adds a package to the registry DB
 	 * @param name Name of package to add
 	 * @returns flag of if package was added (true) or not (false) and message why if not added
@@ -241,7 +196,7 @@ export default class AddOnsRegistry {
 			logger.debug("Reading package.json");
 			const packageJSON: { twokeys: TwokeysPackageInfo, [key: string]: any } = JSON.parse((await fs.readFile(join(packageLocation, "package.json"))).toString("utf8"));
 			// Validate
-			const validation = this.validatePackageJSON(packageJSON);
+			const validation = AddOnsRegistry.validatePackageJSON(packageJSON);
 			if (!validation.status) {
 				logger.err("Error validating package.json.");
 				logger.warn("Package not added.");
@@ -402,6 +357,48 @@ export default class AddOnsRegistry {
 			}
 		}
 		logger.info("Registry created.");
+		return { status: true };
+	}
+
+	/**
+	 * Validates a package.json.
+	 * Tested by the functions that test the insyall function
+	 * @param packageJSON Parsed package.json to validate
+	 * @returns flag of if package was added (true) or not (false) and err message if not added
+	 */
+	public static validatePackageJSON(packageJSON: any): ValidatorReturn {
+		logger.debug("Validating a package.json...");
+		logger.debug(JSON.stringify(packageJSON));
+		// Check if has twokeys metadata
+		if (!Object.prototype.hasOwnProperty.call(packageJSON, "twokeys")) {
+			logger.err("Package does not contain 2Keys metadata!");
+			return {
+				status: false,
+				message: "Package does not contain 2Keys metadata!",
+			};
+		}
+		// Check type is valid
+		if (!packageJSON.twokeys?.types?.some(element => TWOKEYS_ADDON_TYPES_ARRAY.includes(element))) {
+			logger.err("No valid type was listed in the package.json!");
+			return {
+				status: false,
+				message: "No valid type was listed in the package.json!",
+			};
+		}
+		// Check if entry points present for each of twokeys.types
+		for (const addOnType of packageJSON.twokeys?.types) {
+			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
+				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
+					logger.err(`Entry point was not found for add-on type ${addOnType}`);
+					return {
+						status: false,
+						message: `Entry point was not found for add-on type ${addOnType}`,
+					};
+				}
+			} else {
+				logger.warn(`Type ${addOnType} is not a valid type.  ignoring...`);
+			}
+		}
 		return { status: true };
 	}
 

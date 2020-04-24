@@ -73,13 +73,7 @@ export interface PackageInDB {
 	entry: string; // JSON
 }
 
-/** SQL Query to create packages table */
-export const REGISTRY_TABLE_NAME = "packages";
-export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE ${REGISTRY_TABLE_NAME} (
-	id TEXT,
-	name TEXT,
-	types TEXT,
-	info TEXT,
-	entry TEXT,
-	PRIMARY KEY (id)
-)`;
+/**
+ * Return type for validators
+ */
+export interface ValidatorReturn { status: boolean; message?: string; }

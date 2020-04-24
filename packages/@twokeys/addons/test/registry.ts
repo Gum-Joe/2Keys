@@ -26,8 +26,8 @@ import rimraf from "rimraf";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
 import AddOnsRegistry from "../src/registry";
-import { REGISTRY_FILE_NAME } from "../src/constants";
-import { PackageInDB, REGISTRY_TABLE_NAME, Package } from "../src/interfaces";
+import { REGISTRY_FILE_NAME, REGISTRY_TABLE_NAME } from "../src/constants";
+import { PackageInDB, Package } from "../src/interfaces";
 import { TWOKEYS_ADDON_TYPE_EXECUTOR } from "../src/interfaces";
 
 chai.use(require("chai-fs"));

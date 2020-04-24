@@ -33,3 +33,15 @@ export const DEFAULT_REGISTRY_ROOT_PACKAGE_JSON = {
 	private: true,
 	dependencies: {},
 };
+
+/** Name of table in the sqlite3 regstry DB to insert add-ons to */
+export const REGISTRY_TABLE_NAME = "packages";
+/** SQL Query to create packages table */
+export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE ${REGISTRY_TABLE_NAME} (
+	id TEXT,
+	name TEXT,
+	types TEXT,
+	info TEXT,
+	entry TEXT,
+	PRIMARY KEY (id)
+)`;
