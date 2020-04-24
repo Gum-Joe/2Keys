@@ -6,9 +6,9 @@
 	"author": "Kishan",
 	"entry": "app.js",
 	"twokeys": {
-		"types": ["executor"],
+		"types": ["detector", "notAType"],
 		"entry": {
-			"executor": "./main.js",
+			"detector": "./main.js",
 			"notAType": "./n.js"
 		},
 		"iconURL": "./not-an-icon.svg",

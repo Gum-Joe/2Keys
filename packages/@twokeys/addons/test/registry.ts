@@ -167,7 +167,7 @@ describe("Registry tests", () => {
 		}).timeout(50000);
 
 		it("should reject a package with no types at all", async () => {
-			const status = await registry.install(join(__dirname, "non-mocha/noType"), { local: true });
+			const status = await registry.install(join(__dirname, "non-mocha/noType2"), { local: true });
 			// tslint:disable-next-line: no-unused-expression
 			expect(status.status).to.be.false;
 			expect(status.message).to.include("No valid type");
@@ -197,6 +197,8 @@ describe("Registry tests", () => {
 			const info: Package["info"] = JSON.parse(docs[0].info);
 			const types: Package["types"] = JSON.parse(docs[0].types);
 			expect(types).to.not.include("notAType");
+			expect(types).to.be.of.length(1);
+			expect(types).to.include("detector");
 			expect(info).to.have.property("iconURL");
 			expect(info).to.have.property("displayName");
 			expect(info.iconURL).to.be.equal(pkgJSON.twokeys.iconURL);
