@@ -35,7 +35,7 @@ export default class Logger {
 	constructor(args: LoggerArgs) {
 		this.args = args || { name: "logger" };
 		this.argv = process.argv;
-		this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.DEBUG === "true";
+		this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.TWOKEYS_DEBUG === "true" || (process.env.NODE_ENV === "development" && process.env.TWOKEYS_DEBUG !== "false");
 		const chalkOpts = (process.env.TWOKEYS_USE_COLOUR === "true" || this.argv.includes("--color")) && !this.argv.includes("--no-color") ? { level: 3 } : {}; // Development hack to enable colour in electron-forge
 		this.chalk = new Instance(chalkOpts);
 		this.isSilent = this.argv.includes("--silent") || process.env.NODE_ENV === "test";
@@ -50,7 +50,7 @@ export default class Logger {
 	 * @param args {LoggerArgs} Logger args
 	 * @param logger Custom logger to print with
 	 */
-	public _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args, ) {
+	public _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args) {
 		if (!this.isSilent) {
 			// Add prefix
 			let prefix = "";
@@ -107,7 +107,7 @@ export default class Logger {
 	 * @public
 	 */
 	public debug(text: string) {
-		this._log("debug", "cyan", text);
+		if (this.isDebug) { this._log("debug", "cyan", text); }
 	}
 
 	/*

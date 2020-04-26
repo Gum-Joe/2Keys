@@ -222,12 +222,19 @@ export default class AddOnsRegistry {
 	public async uninstall(packageName: string, options?: ManagerOptions): Promise<void> {
 		logger.info(`Uninstalling package ${packageName}...`);
 		try {
+			logger.debug("Checking if package exists...");
+			await fs.access(join(this.directory, "node_modules", packageName)); // will throw err
 			await this.runNpm(packageName, "remove", options);
 			logger.debug("Remove package from registry...");
 			// If local, get Name and use that
-			return await this.removePackageFromDB(packageName);
+			await this.removePackageFromDB(packageName);
+			return;
 		} catch (err) {
-			logger.err("ERROR when uninstalling!");
+			logger.err("Error when uninstalling!");
+			if (err.code === "ENOENT") {
+				logger.err("Package that was requested to be uninstalled not installed in the first place.");
+				logger.err(`If you think this is in error, try running \"npm remove ${packageName}\" in ${this.directory}`);
+			}
 			throw err;
 		}
 	}
@@ -389,12 +396,12 @@ export default class AddOnsRegistry {
 		logger.info(`Removing any packages by name ${packageName} in registry DB.`);
 		try {
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
+			logger.debug("Documents removed.");
 		} catch (err) {
 			logger.err("Error removing package!");
 			logger.err(err.message);
 			throw err;
 		}
-		logger.debug("Documents removed.");
 	}
 
 	/**
@@ -419,7 +426,7 @@ export default class AddOnsRegistry {
 	 * @param packageName Name of package to get
 	 */
 	public async getPackageFromDB(packageName: string): Promise<GetPackageReturn> {
-		logger.info(`Getting info for package ${packageName}...`);
+		logger.info(`Getting info for package ${packageName} from DB...`);
 		try {
 			const docs = await this.queryDBForPackage(packageName);
 			logger.debug("Raw DB output retrieved.");

@@ -83,7 +83,7 @@ describe("Registry tests", () => {
 	describe("Class methods", () => {
 		before((done) => {
 			registry = new AddOnsRegistry(REGISTRY_DIR);
-			done();
+			registry.initDB().then(done).catch(done);
 		});
 
 		describe("Package install", () => {
@@ -233,10 +233,10 @@ describe("Registry tests", () => {
 				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, pkgJSON.name);
 				await db.close();
 				expect(docs).to.be.of.length(0);
-			});
-			it("should throw an error uninstalling a package that does not exist", async () => {
-				expect(registry.uninstall("NOT_INSTALL")).to.be.rejected;
-			});
+			}).timeout(50000);
+			it("should throw an error uninstalling a package that does not exist", () => {
+				expect(registry.uninstall("NOT_INSTALL")).to.be.eventually.rejected;
+			}).timeout(50000);
 		});
 
 		describe("Package update", () => {
@@ -249,9 +249,6 @@ describe("Registry tests", () => {
 				expect(join(REGISTRY_DIR, "node_modules", "debug")).to.be.a.directory();
 				const pkgJSON = require(join(REGISTRY_DIR, "node_modules", "debug", "package.json"));
 				expect(pkgJSON.version).to.be.equal("4.0.1");
-			}).timeout(50000);
-			it("should throw an error uninstalling a package that does not exist", async () => {
-				expect(registry.uninstall("NOT_INSTALL")).to.be.rejected;
 			}).timeout(50000);
 		});
 	});

@@ -3,5 +3,6 @@
 module.exports = {
 	"r": "ts-node/register",
 	"recursive": true,
-	"spec": "test/*.ts"
+	"spec": "test/*.ts",
+	"unhandled-rejections": "strict",
 }
