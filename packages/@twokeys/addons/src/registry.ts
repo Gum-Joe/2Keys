@@ -135,8 +135,8 @@ export default class AddOnsRegistry {
 	}
 
 	// Load functions
-	// load: (packageName: string, types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
-	// loadAll: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	load: (packageName: string, types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	loadAll: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
 
 	// Package management operations
 	/**
@@ -145,9 +145,9 @@ export default class AddOnsRegistry {
 	 * @param options Options
 	 */
 	public async install(packageName: string, options?: ManagerOptions): Promise<ValidatorReturn> {
-		logger.debug("Installing new package...");
+		logger.info("Installing new package...");
 		const packageString = options?.version ? packageName + "@" + options.version : packageName;
-		logger.debug(`Package: ${packageString}`);
+		logger.info(`Package: ${packageString}`);
 		try {
 			await this.runNpm(packageString, "install", options);
 			logger.debug("Adding package to registry...");
@@ -178,7 +178,7 @@ export default class AddOnsRegistry {
 			const npmLogger = new Logger({ // For npm to log with
 				name: "add-ons:registry:npm",
 			});
-			logger.debug(`Running command npm ${command} ${packageName}...`);
+			logger.info(`Running command npm ${command} ${packageName}...`);
 			logger.debug("Running command...");
 			const oldCWD = this.directory;
 			process.chdir(this.directory); // So lock files are made etc
@@ -248,7 +248,7 @@ export default class AddOnsRegistry {
 		logger.info(`Updating package ${packageName} to version ${options?.version}...`);
 		try {
 			await this.runNpm(packageName + "@" + options?.version, "install", options);
-			logger.debug("Reindexing package in registry...");
+			logger.info("Reindexing package in registry...");
 			return await this.addPackageToDB(packageName, {
 				...options,
 				force: true,
@@ -272,8 +272,12 @@ export default class AddOnsRegistry {
 		});
 	}
 
-	/** Force reindex the registry, by running {@link AddOnsRegistry#addPackageToDB()} on all packages in `package.json` */
-	// public reindex: () => Promise<ValidatorReturn> ;
+	/**
+	 * Force reindex the registry, by running {@link AddOnsRegistry#addPackageToDB()} on all packages in `package.json`
+	 */
+	public reindex(): Promise<ValidatorReturn> {
+		logger.info("Reindexing package registry...");
+	};
 
 	/**
 	 * Adds a package to the registry DB
@@ -395,6 +399,10 @@ export default class AddOnsRegistry {
 	private async removePackageFromDB(packageName: string): Promise<void> {
 		logger.info(`Removing any packages by name ${packageName} in registry DB.`);
 		try {
+			logger.debug("Loading DB if not loaded...");
+			if (!this.registry) {
+				await this.initDB();
+			}
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
 			logger.debug("Documents removed.");
 		} catch (err) {
@@ -409,7 +417,7 @@ export default class AddOnsRegistry {
 	 * @param packageName Name of package to update
 	 * @param updateContent Contents to update
 	 */
-	private async updatePackageInDB(packageName: string, updateContent: PackageInDB): Promise<void> {
+	/*private async updatePackageInDB(packageName: string, updateContent: PackageInDB): Promise<void> {
 		logger.info(`Updating any packages by name ${packageName} in registry DB.`);
 		try {
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
@@ -419,7 +427,7 @@ export default class AddOnsRegistry {
 			throw err;
 		}
 		logger.debug("Documents removed.");
-	}
+	}*/
 
 	/**
 	 * Retrieves a package from the DB and parses it to a {@link Package}
@@ -428,6 +436,10 @@ export default class AddOnsRegistry {
 	public async getPackageFromDB(packageName: string): Promise<GetPackageReturn> {
 		logger.info(`Getting info for package ${packageName} from DB...`);
 		try {
+			logger.debug("Loading DB if not loaded...");
+			if (!this.registry) {
+				await this.initDB();
+			}
 			const docs = await this.queryDBForPackage(packageName);
 			logger.debug("Raw DB output retrieved.");
 			logger.debug("Converting...");
@@ -459,6 +471,10 @@ export default class AddOnsRegistry {
 	 */
 	private async queryDBForPackage(packageName: string): Promise<PackageInDB[]> {
 		logger.debug(`Query DB for package ${packageName}...`);
+		logger.debug("Loading DB if not loaded...");
+		if (!this.registry) {
+			await this.initDB();
+		}
 		return await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
 	}
 
@@ -531,18 +547,18 @@ export default class AddOnsRegistry {
 		try {
 			await mkdirp(dir);
 			logger.info("Directory made.");
-			logger.debug("Writing default package.json...");
+			logger.info("Writing default package.json...");
 			await fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
 			logger.info("Creating registry DB...");
 			const db = await openDB({
 				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
 				driver: sqlite3.Database,
 			});
-			logger.debug("Adding table...");
+			logger.debug(`Adding ${CREATE_REGISTRY_DB_QUERY} table...`);
 			await db.exec(CREATE_REGISTRY_DB_QUERY);
 			logger.debug("Closing...");
 			await db.close();
-			logger.info("SQLite registry DB created.");
+			logger.info("SQLite registry DB & tables created.");
 			// await fd.close(); // CLose immediately
 		} catch (err) {
 			logger.err("An error was encountered!");
@@ -564,7 +580,7 @@ export default class AddOnsRegistry {
 	 * @returns flag of if package was added (true) or not (false) and err message if not added
 	 */
 	public static validatePackageJSON(packageJSON: any): ValidatorReturn {
-		logger.debug("Validating a package.json...");
+		logger.info("Validating a package.json...");
 		logger.debug(JSON.stringify(packageJSON));
 		// Check if has twokeys metadata
 		if (!Object.prototype.hasOwnProperty.call(packageJSON, "twokeys")) {
@@ -596,6 +612,7 @@ export default class AddOnsRegistry {
 				logger.warn(`Type ${addOnType} is not a valid type.  ignoring...`);
 			}
 		}
+		logger.info("package.json is valid");
 		return { status: true };
 	}
 
