@@ -29,8 +29,7 @@ import { promises as fs } from "fs";
 import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME } from "./constants";
-import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn } from "./interfaces";
-import { TWOKEYS_ADDON_TYPES } from "../lib/interfaces";
+import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES } from "./interfaces";
 
 const logger = new Logger({
 	name: "add-ons:registry",
