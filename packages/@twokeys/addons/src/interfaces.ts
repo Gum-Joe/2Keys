@@ -18,7 +18,8 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * @file Interfaces
+ * Interfaces
+ * @packageDocumentation
  */
 
 /** Add-on type, i.e. tells us what type it is */

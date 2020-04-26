@@ -18,7 +18,8 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * @file Constants
+ * Constants
+ * @packageDocumentation
  */
 
 export const PACKAGE_VERSION = require("../package.json").version;
@@ -45,3 +46,6 @@ export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE ${REGISTRY_TABLE_NAME} (
 	entry TEXT,
 	PRIMARY KEY (id)
 )`;
+
+/** Folder in registry where modules are */
+export const REGISTRY_MODULE_FOLDER = "node_modules";
