@@ -1,0 +1,14 @@
+{
+	"name": "update-test",
+	"private": true,
+	"version": "1.0.0",
+	"description": "MEAP",
+	"author": "Kishan",
+	"entry": "app.js",
+	"twokeys": {
+		"types": ["pack"],
+		"entry": {
+			"pack": "./main.js"
+		}
+	}
+}

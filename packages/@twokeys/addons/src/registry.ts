@@ -24,7 +24,7 @@ import mkdirp from "mkdirp";
 import npm from "npm";
 import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
-import { open as openDB, Database } from "sqlite";
+import { open as openDB, Database, Statement } from "sqlite";
 import { promises as fs } from "fs";
 import { join } from "path";
 import { Logger } from "@twokeys/core";
@@ -52,6 +52,8 @@ interface ManagerOptions {
 	local?: boolean;
 	/** Force npm install & adding to registry */
 	force?: boolean;
+	/** Semver version to install */
+	version?: string;
 }
 
 /**
@@ -59,6 +61,8 @@ interface ManagerOptions {
  */
 interface AddPackageOptions {
 	force?: boolean;
+	/** Update package in place if overlap found & entries of it = 1 */
+	update?: boolean;
 }
 
 /** Return type for function {@link AddOnsRegistry#parsePackageFromDB} that parses DB entries to a {@link Package} */
@@ -80,9 +84,9 @@ interface AddOnsRegistryInterface {
 	/** Removes a package from the DB */
 	removePackageFromDB: (packageName: string) => any;
 	/** Installs a package & adds to DB */
-	install: (packageName: string, options?: InstallOptions) => any;
+	install: (packageName: string, options?: ManagerOptions) => any;
 	/** Adds a package via npm */
-	runNpmInstall: (packageName: string, options?: InstallOptions) => any;
+	runNpmInstall: (packageName: string, options?: ManagerOptions) => any;
 	/** Removes a package from the DB */
 	addPackageToDB: (packageName: string, options?: AddPackageOptions) => any;
 	/** Update package to version */
@@ -131,8 +135,8 @@ export default class AddOnsRegistry {
 	}
 
 	// Load functions
-	load: (packageName: string, types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
-	loadAll: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	// load: (packageName: string, types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	// loadAll: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
 
 	// Package management operations
 	/**
@@ -142,8 +146,10 @@ export default class AddOnsRegistry {
 	 */
 	public async install(packageName: string, options?: ManagerOptions): Promise<ValidatorReturn> {
 		logger.debug("Installing new package...");
+		const packageString = options?.version ? packageName + "@" + options.version : packageName;
+		logger.debug(`Package: ${packageString}`);
 		try {
-			await this.runNpm(packageName, "install", options);
+			await this.runNpm(packageString, "install", options);
 			logger.debug("Adding package to registry...");
 			// If local, get Name and use that
 			if (options?.local) {
@@ -185,13 +191,13 @@ export default class AddOnsRegistry {
 			}, (err) => {
 				// catch errors
 				if (err) {
-					logger.err("Error loading npm!");
+					npmLogger.err("Error loading npm!");
 					return reject(err);
 				}
 				logger.debug("Npm loaded.");
 				npm.commands[command]([packageName], (er, data) => {
 					if (er) {
-						logger.err("Error running npm!");
+						npmLogger.err("Error running npm!");
 						return reject(er);
 					}
 					npmLogger.info(data);
@@ -231,14 +237,15 @@ export default class AddOnsRegistry {
 	 * @param packageName Name of package to update
 	 * @param version SemVer compliant version to update to.
 	 */
-	public async update(packageName: string, version: string, options?: ManagerOptions): Promise<ValidatorReturn> {
-		logger.info(`Updating package ${packageName} to version ${version}...`);
+	public async update(packageName: string, options?: ManagerOptions): Promise<ValidatorReturn> {
+		logger.info(`Updating package ${packageName} to version ${options?.version}...`);
 		try {
-			await this.runNpm(packageName, "install", options);
+			await this.runNpm(packageName + "@" + options?.version, "install", options);
 			logger.debug("Reindexing package in registry...");
 			return await this.addPackageToDB(packageName, {
 				...options,
 				force: true,
+				update: true,
 			});
 		} catch (err) {
 			logger.err("ERROR when updating!");
@@ -259,7 +266,7 @@ export default class AddOnsRegistry {
 	}
 
 	/** Force reindex the registry, by running {@link AddOnsRegistry#addPackageToDB()} on all packages in `package.json` */
-	public reindex: () => Promise<ValidatorReturn> ;
+	// public reindex: () => Promise<ValidatorReturn> ;
 
 	/**
 	 * Adds a package to the registry DB
@@ -291,12 +298,18 @@ export default class AddOnsRegistry {
 					message: "Package already in registry.",
 				};
 			} else {
-				logger.warn(`Removing any packages by name ${name} in registry already.`);
-				await this.removePackageFromDB(name);
-				logger.debug("Documents removed.");
+				if (!options.update) {
+					// Don't update, remove
+					logger.warn(`Removing any packages by name ${name} in registry already.`);
+					await this.removePackageFromDB(name);
+					logger.debug("Documents removed.");
+				} else {
+					// Update
+					logger.warn(`Please note all packages of name ${name} will be updated to the new package.`);
+				}
 			}
 		}
-		logger.debug("Checking if package is already installed...");
+		logger.debug("Validating package is installed...");
 		try {
 			await fs.access(packageLocation);
 			logger.debug("Reading package.json");
@@ -335,15 +348,24 @@ export default class AddOnsRegistry {
 			}
 			logger.debug("About to run insert");
 			const documentConverted = this.convertPackageForDB(docToInsert);
-			const stmt = await this.registry.prepare(
-				`INSERT INTO ${REGISTRY_TABLE_NAME} (id, name, types, info, entry) VALUES (@id, @name, @types, @info, @entry)`,
-			);
+			let stmt: Statement<sqlite3.Statement>;
+			if (options?.update) {
+				logger.debug("Using an SQLite UPDATE command.");
+				stmt = await this.registry.prepare(
+					`UPDATE ${REGISTRY_TABLE_NAME} SET id = @id, name = @name, types = @types, info = @info, entry = @entry WHERE name = @packname`,
+				);
+			} else {
+				stmt = await this.registry.prepare(
+					`INSERT INTO ${REGISTRY_TABLE_NAME} (id, name, types, info, entry) VALUES (@id, @name, @types, @info, @entry)`,
+				);
+			}
 			await stmt.all({
 				"@name": documentConverted.name,
 				"@id": documentConverted.id,
 				"@types": documentConverted.types,
 				"@info": documentConverted.info,
 				"@entry": documentConverted.entry,
+				"@packname": options?.update ? documentConverted.name : undefined,
 			});
 			logger.info(`Package ${name} added to registry.`);
 			return { status: true };
@@ -365,6 +387,23 @@ export default class AddOnsRegistry {
 	 */
 	private async removePackageFromDB(packageName: string): Promise<void> {
 		logger.info(`Removing any packages by name ${packageName} in registry DB.`);
+		try {
+			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
+		} catch (err) {
+			logger.err("Error removing package!");
+			logger.err(err.message);
+			throw err;
+		}
+		logger.debug("Documents removed.");
+	}
+
+	/**
+	 * Updates all instances of a package from the DB
+	 * @param packageName Name of package to update
+	 * @param updateContent Contents to update
+	 */
+	private async updatePackageInDB(packageName: string, updateContent: PackageInDB): Promise<void> {
+		logger.info(`Updating any packages by name ${packageName} in registry DB.`);
 		try {
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
 		} catch (err) {

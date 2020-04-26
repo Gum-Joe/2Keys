@@ -21,6 +21,7 @@
  * Tests the registry code
  */
 import { join } from "path";
+import { promises as fs, constants as fsConstants } from "fs";
 import chai from "chai";
 import rimraf from "rimraf";
 import { open } from "sqlite";
@@ -223,7 +224,7 @@ describe("Registry tests", () => {
 			it("should succesfuly uninstall a package", async () => {
 				const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
 				await registry.uninstall(pkgJSON.name);
-				expect(join(REGISTRY_DIR, "node_modules", pkgJSON.name)).to.not.be.a.directory();
+				expect(fs.access(join(REGISTRY_DIR, "node_modules", pkgJSON.name), fsConstants.F_OK)).to.be.rejected;
 				// Check DB
 				const db = await open({
 					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
@@ -240,22 +241,18 @@ describe("Registry tests", () => {
 
 		describe("Package update", () => {
 			it("should succesfuly update a package", async () => {
-				await registry.install("debug@3.0.0");
-				await registry.update("debug", "4.0.1");
-				expect(join(REGISTRY_DIR, "node_modules", "debug")).to.be.a.directory();
-				// Check DB
-				const db = await open({
-					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
-					driver: sqlite3.Database,
+				// TODO: Update paclage from npm that is with 2Keys, we can't test this as no such package exists
+				await registry.install("debug", {
+					version: "3.0.0",
 				});
-				const docs: PackageInDB[] = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, "debug");
-				await db.close();
-				expect(docs).to.be.of.length(1);
-				expect(docs[1]).to.be.true;
-			});
+				await registry.update("debug", { version: "4.0.1" });
+				expect(join(REGISTRY_DIR, "node_modules", "debug")).to.be.a.directory();
+				const pkgJSON = require(join(REGISTRY_DIR, "node_modules", "debug", "package.json"));
+				expect(pkgJSON.version).to.be.equal("4.0.1");
+			}).timeout(50000);
 			it("should throw an error uninstalling a package that does not exist", async () => {
 				expect(registry.uninstall("NOT_INSTALL")).to.be.rejected;
-			});
+			}).timeout(50000);
 		});
 	});
 });
