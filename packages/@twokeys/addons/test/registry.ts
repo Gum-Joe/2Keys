@@ -251,5 +251,30 @@ describe("Registry tests", () => {
 				expect(pkgJSON.version).to.be.equal("4.0.1");
 			}).timeout(50000);
 		});
+
+		describe("Package reindexing", () => {
+			it("should reindex the package", async () => {
+				// Contaminate DB
+				const db1 = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				await db1.run(
+					`INSERT INTO ${REGISTRY_TABLE_NAME} (id, name, types, info, entry) VALUES ("UUID_0191914029374", "NOT_A_NAMED", "NOT_VALID", "WHAT??", "42")`,
+				);
+				await db1.close();
+				// Reindex
+				await registry.reindex();
+				// Check
+				const db2 = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				const docs = await db2.all(
+					`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE id = "UUID_0191914029374"`,
+				);
+				expect(docs).to.be.of.length(0);
+			});
+		});
 	});
 });

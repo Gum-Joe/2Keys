@@ -135,8 +135,9 @@ export default class AddOnsRegistry {
 	}
 
 	// Load functions
-	load: (packageName: string, types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
-	loadAll: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	// TODO
+	//load: (packageName: string, types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	//loadAll: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
 
 	// Package management operations
 	/**
@@ -275,9 +276,34 @@ export default class AddOnsRegistry {
 	/**
 	 * Force reindex the registry, by running {@link AddOnsRegistry#addPackageToDB()} on all packages in `package.json`
 	 */
-	public reindex(): Promise<ValidatorReturn> {
-		logger.info("Reindexing package registry...");
-	};
+	public async reindex(): Promise<void> {
+		logger.info("Reindexing package registry from package.json...");
+		logger.warn("Wiping registry..."); // Wipe DB
+		try {
+			logger.debug("Loading DB if not loaded...");
+			if (!this.registry) {
+				await this.initDB();
+			}
+			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME};`);
+			logger.info("DB wiped. Will now readd packages from package.json");
+			const pkgJSON = JSON.parse((await fs.readFile(join(this.directory, "package.json"))).toString("utf8"));
+			const deps = Object.keys(pkgJSON.dependencies);
+			for (const dep of deps) {
+				logger.debug(`Reindexing package ${dep}...`);
+				const status = await this.addPackageToDB(dep);
+				if (!status.status) {
+					logger.err(`Could not add package ${dep}!`);
+					logger.err(`Reason: ${status.message}`);
+					logger.warn("The package has been ignored.");
+				}
+			}
+			logger.info("Packages reindexed.");
+		} catch (err) {
+			logger.err("Error reindexing!");
+			logger.err(err.message);
+			throw err;
+		}
+	}
 
 	/**
 	 * Adds a package to the registry DB
