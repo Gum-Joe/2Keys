@@ -145,9 +145,9 @@ export interface Keyboard {
   };
   /**
    * Contains detector-specific config that is required per keyboard.
-   * For example, this is the identifier for the keyboard to watch
+   * For example, the identifier for the keyboard to watch
    */
-  detector: object;
+  detector: any;
   /**
    * Holds the mapping of hotkeys to macros.
    * For example, the macro to run when a hotkey combo is pressed.
