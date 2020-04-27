@@ -90,6 +90,8 @@ export interface ClientConfig {
 export interface HotkeyTypeSingle {
   /** Executor to use for this hotkey (defaults to `keyboard[keybaord].executors.default) */
   executor?: string;
+  /** Macro funcion to execute */
+  func: any;
   /**
    * Config for the executor
    */
@@ -135,13 +137,13 @@ export interface Keyboard {
    * The key here is the name of the executor.
    * Also contains a `default` key to sepcify the default executor.
    */
-  executors: {
+  executors: {  
     /** Default executor */
     default: string;
     /**
      * @param executorName Name of executor being configured
      */
-    [executorName: string]: string | object;
+    [executorName: string]: any;
   };
   /**
    * Contains detector-specific config that is required per keyboard.
