@@ -218,7 +218,7 @@ export interface Executor {
 	 * Scan for function to execute for {@link HotkeyTypeSingle.func}
 	 * @returns A list of functions
 	 */
-	scan: TaskFunction<any, ExecutorScan>; // Scan for functions
+	scan: TaskFunction<Keyboard, ExecutorScan>; // Scan for functions
 	/** Adds an executor to a kdb, creating e.g. boilerplate files */
 	addToKeyboard: TaskFunction<AddExecutorToKeyboardConfig>; // Add executor to a KDB (e.g. create boilerplate files)
 }
