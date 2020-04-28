@@ -7,7 +7,7 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts --ext .js ."
   },
   "workspaces": [
     "packages/@twokeys/*",

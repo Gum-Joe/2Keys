@@ -1,4 +1,4 @@
-# 2Keys [![Build Status](https://travis-ci.com/Gum-Joe/2Keys.svg?branch=v1)](https://travis-ci.com/Gum-Joe/2Keys) [![codecov](https://codecov.io/gh/Gum-Joe/2Keys/branch/v1/graph/badge.svg)](https://codecov.io/gh/Gum-Joe/2Keys)
+# 2Keys [![Build Status](https://travis-ci.com/Gum-Joe/2Keys.svg?branch=v1)](https://travis-ci.com/Gum-Joe/2Keys) [![codecov](https://codecov.io/gh/Gum-Joe/2Keys/branch/v1/graph/badge.svg)](https://codecov.io/gh/Gum-Joe/2Keys) [![Maintainability](https://api.codeclimate.com/v1/badges/5ac4148c6d32ed9fbbab/maintainability)](https://codeclimate.com/github/Gum-Joe/2Keys/maintainability)
 
 
 A easy to setup second keyboard, designed for everyone.

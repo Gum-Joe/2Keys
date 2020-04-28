@@ -2,6 +2,9 @@ plugins:
   eslint:
     enabled: true
     channel: "eslint-6"
+    extensions:
+      - .ts
+      - .js
   bandit:
     enabled: true
   fixme:
