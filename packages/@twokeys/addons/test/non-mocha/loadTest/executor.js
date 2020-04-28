@@ -1,3 +1,3 @@
-export function execute(twokeys, config) {
+export const execute = async function (twokeys, config) {
 	config.testValue = true;
 }

@@ -316,6 +316,30 @@ describe("Registry tests", () => {
 				}
 				throw new Error("No error thrown when one was expected!");
 			});
+
+			it("should successfully load all add-ons of a given type", async () => {
+				// Install stuff
+				await registry.install(join(__dirname, "non-mocha", "loadTest"), { local: true });
+				await registry.install(join(__dirname, "non-mocha", "loadTest2"), { local: true });
+				const pkgJson2 = require(join(__dirname, "non-mocha", "loadTest2", "package.json"));
+				// now check
+				const res = await registry.loadAllOfType("executor");
+				expect(res).to.have.property(pkgJson.name);
+				expect(res).to.have.property(pkgJson2.name);
+				expect(Object.keys(res)).to.be.of.length(2);
+				const testOBJ = {
+					testValue: false,
+					testValue2: false,
+				};
+				// Exec
+				// @ts-ignore: We don't have a proper config to test with yet
+				await res[pkgJson.name].execute({}, testOBJ);
+				// @ts-ignore: We don't have a proper config to test with yet
+				await res[pkgJson2.name].execute({}, testOBJ);
+				expect(testOBJ.testValue).to.be.true;
+				expect(testOBJ.testValue2).to.be.true;
+
+			}).timeout(50000);
 		});
 	});
 });

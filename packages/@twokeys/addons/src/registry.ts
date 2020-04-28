@@ -139,10 +139,43 @@ export default class AddOnsRegistry {
 
 	// Load functions
 	/**
-	 * Loads an add-on, getting add-on code for a given type.
-	 * @param packageName Package to load
+	 * Loads an {@link Package} (so a package that has already been retrieved from DB)
+	 * @param packageToLoad Package object to load from, converted from {@link PackageInDB}
 	 * @param typeOfAddOn SINGLE type to load
-	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only
+	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
+	 */
+	private async loadPackage<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(packageToLoad: Package, typeOfAddOn: AddOnsType): Promise<AddOnModulesCollection[AddOnsType]> {
+		try {
+			logger.info(`Loading package ${packageToLoad.name}, type ${typeOfAddOn}...`);
+			logger.debug(JSON.stringify(packageToLoad));
+			console.log(packageToLoad.entry);
+			console.log(typeof packageToLoad.entry);
+			console.log("a" + typeOfAddOn + "a");
+			console.log(Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn));
+			console.log(packageToLoad.entry[typeOfAddOn]);
+			if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
+				const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
+				logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
+				// load
+				const loaded: AddOnModulesCollection[AddOnsType] = require(file);
+				logger.debug("Type of add-on loaded.");
+				logger.info("Add-on loaded.");
+				return loaded;
+			} else {
+				// Not found!
+				logger.err(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name} entries!`);
+				throw new Error(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name} entries!`);
+			}
+		} catch (err) {
+			logger.err("Error loading package!");
+			throw err;
+		}
+	}
+	/**
+	 * Loads an add-on, getting add-on code for a given type, by querying DB
+	 * @param packageName Name of package (add-on) to load
+	 * @param typeOfAddOn SINGLE type to load
+	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
 	 */
 	public async load<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(packageName: string, typeOfAddOn: AddOnsType): Promise<AddOnModulesCollection[AddOnsType]> {
 		logger.info(`Loading add-on ${packageName}...`);
@@ -164,23 +197,7 @@ export default class AddOnsRegistry {
 				throw new Error("Got back multiple packages! Registry DB may be corrupt!");
 			} else {
 				// Everything OK, so we can load
-				const packageToLoad: Package = packagesResults.results[0];
-				logger.debug(JSON.stringify(packageToLoad));
-				let loaded: AddOnModulesCollection[AddOnsType];
-				if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
-					const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
-					logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
-					// load
-					loaded = require(file);
-					logger.debug("Type of add-on loaded.");
-				} else {
-					// Not found!
-					logger.err(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name}!`);
-					throw new Error(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name}!`);
-				}
-				// Now we have a list
-				logger.info("Add-on loaded.");
-				return loaded;
+				return await this.loadPackage<AddOnsType>(packagesResults.results[0], typeOfAddOn);
 			}
 		} catch (err) {
 			logger.err("Error loading package!");
@@ -195,7 +212,27 @@ export default class AddOnsRegistry {
 	public async loadDetector(packageName: string): Promise<DetectorController> {
 		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, TWOKEYS_ADDON_TYPE_DETECTOR));
 	}
-	//loadAllOfType: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
+	/**
+	 * Loads all add-ons of a given type
+	 * @param typeOfAddOn Add-on type to load
+	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only
+	 */
+	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType): Promise<{ [name: string]: AddOnModulesCollection[AddOnsType] }> {
+		logger.info(`Loading all modules of type ${typeOfAddOn}...`);
+		logger.debug("Querying...");
+		const addOnsList: Package[] = (await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE types LIKE ?`, `%${typeOfAddOn}%`)).map(value => {
+			const res = this.parsePackageFromDB(value);
+			if (!res.status || !res.entry) { throw new Error(res.message); }
+			return res.entry;
+		});
+		logger.debug(JSON.stringify(addOnsList));
+		const loadedAddOns: { [name: string]: AddOnModulesCollection[AddOnsType] } = {};
+		for (const addOn of addOnsList) {
+			loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(addOn, typeOfAddOn);
+		}
+		return loadedAddOns;
+
+	}
 
 	// Package management operations
 	/**

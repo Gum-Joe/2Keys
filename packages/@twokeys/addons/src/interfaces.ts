@@ -58,7 +58,7 @@ export interface TwokeysPackageInfo {
 }
 
 /**
- * Represents a package (add-on) in the database (add-on registry).
+ * Represents a package (add-on) in the database (add-on registry) that has been parsed and converted
  * (single DB document)
  */
 export interface Package {
@@ -80,6 +80,9 @@ export interface Package {
 	entry: { [key in TWOKEYS_ADDON_TYPES]: string };
 }
 
+/**
+ * Represents an unparsed package in the DB
+ */
 export interface PackageInDB {
 	id: string;
 	name: string;
