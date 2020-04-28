@@ -23,7 +23,7 @@
  */
 
 import { HotkeyTypeSingle, Keyboard } from "@twokeys/core/src/interfaces";
-import { ConfigDescriptors, TaskFunction, ConfigDescriptor } from "@twokeys/addons/lib/module-interfaces";
+import { ConfigDescriptors, TaskFunction, ConfigDescriptor } from "@twokeys/addons/src/module-interfaces";
 
 /**
  * Config for {@link Executor.exec}

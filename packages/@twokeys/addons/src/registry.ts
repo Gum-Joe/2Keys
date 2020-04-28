@@ -121,7 +121,8 @@ interface AddOnsRegistryInterface {
 export default class AddOnsRegistry {
 
 	private directory: string;
-	// @ts-ignore: Is initalised in constructor as a promise.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+	// @ts-ignore: Is initalised by this.initDB()
 	private registry: Database<sqlite3.Database, sqlite3.Statement>;
 	private registryDBFilePath: string;
 	private registryModulesPath: string;
@@ -244,19 +245,15 @@ export default class AddOnsRegistry {
 		logger.info("Installing new package...");
 		const packageString = options?.version ? packageName + "@" + options.version : packageName;
 		logger.info(`Package: ${packageString}`);
-		try {
-			await this.runNpm(packageString, "install", options);
-			logger.debug("Adding package to registry...");
-			// If local, get Name and use that
-			if (options?.local) {
-				logger.debug("Local package.  Getting name...");
-				const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
-				return await this.addPackageToDB(packageJSON.name, options);
-			} else {
-				return await this.addPackageToDB(packageName, options);
-			}
-		} catch (err) {
-			throw err;
+		await this.runNpm(packageString, "install", options);
+		logger.debug("Adding package to registry...");
+		// If local, get Name and use that
+		if (options?.local) {
+			logger.debug("Local package.  Getting name...");
+			const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
+			return await this.addPackageToDB(packageJSON.name, options);
+		} else {
+			return await this.addPackageToDB(packageName, options);
 		}
 	}
 
@@ -329,7 +326,7 @@ export default class AddOnsRegistry {
 			logger.err("Error when uninstalling!");
 			if (err.code === "ENOENT") {
 				logger.err("Package that was requested to be uninstalled not installed in the first place.");
-				logger.err(`If you think this is in error, try running \"npm remove ${packageName}\" in ${this.directory}`);
+				logger.err(`If you think this is in error, try running "npm remove ${packageName}" in ${this.directory}`);
 			}
 			throw err;
 		}
