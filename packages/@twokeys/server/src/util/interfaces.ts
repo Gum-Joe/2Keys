@@ -1,21 +1,22 @@
 /**
-Copyright 2018 Kishan Sambhi
-
-This file is part of 2Keys.
-
-2Keys is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-2Keys is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * @license
+ * Copyright 2020 Kishan Sambhi
+ *
+ * This file is part of 2Keys.
+ *
+ * 2Keys is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * 2Keys is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+ */
 export { Logger, LoggerTypes } from "@twokeys/core/src/interfaces";
 
 export interface Hotkey {
@@ -32,7 +33,7 @@ export interface Keyboard {
   dir: string; // Dir of hotkeys
   root: string; // Root AHK file with all hotkeys
   map?: Map<string, number>;
-  hotkeys: Hotkeys
+  hotkeys: Hotkeys;
 }
 
 export interface Config {
@@ -46,10 +47,10 @@ export interface Config {
       port: number;  // Port number
     };
     detector: string;
-  }
+  };
   perms?: { // Permissions
     ssh: boolean; // Allow us to auto run setup and startup and 2Keys command on the pi via SSH
-  }
+  };
 }
 
 /**
@@ -60,16 +61,16 @@ export interface Config {
  * @param exe (Optional) Relative path to a EXE to run
  */
 export interface AppPath {
-  root: string,
-  dll?: string,
-  exe?: string
+  root: string;
+  dll?: string;
+  exe?: string;
 }
 
 /**
  * Index type of constants.DEFAULT_APP_PATH
  */
 export interface AppPaths {
-  [index: string]: AppPath
+  [index: string]: AppPath;
 }
 
 export interface UserspaceConfigSoftwareConfig {

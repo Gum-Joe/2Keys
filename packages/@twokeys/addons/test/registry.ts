@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 /**
  * @license
  * Copyright 2020 Kishan Sambhi
@@ -20,13 +21,13 @@
 /**
  * Tests the registry code
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { join } from "path";
 import { promises as fs, constants as fsConstants } from "fs";
 import chai from "chai";
 import rimraf from "rimraf";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
-import uuid from "uuid";
 import AddOnsRegistry from "../src/registry";
 import { REGISTRY_FILE_NAME, REGISTRY_TABLE_NAME } from "../src/constants";
 import { PackageInDB, Package } from "../src/interfaces";
@@ -46,7 +47,7 @@ describe("Registry tests", () => {
 
 	before((done) => {
 		// Delete it
-		rimraf(REGISTRY_DIR, (err) => {
+		rimraf(REGISTRY_DIR, () => {
 			done(); // Do not handle error, since we just want to delete it if not there
 		});
 	});
@@ -66,7 +67,7 @@ describe("Registry tests", () => {
 			expect(res.message).to.include("already exists");
 		});
 		it("should error if we try to make a registry in an invalid location", () => {
-			// @ts-ignore
+			// @ts-ignore: So we can make an invalid location
 			// tslint:disable:no-unused-expression
 			expect(AddOnsRegistry.createNewRegistry({ notAPath: true })).to.be.rejected; 
 		});
@@ -100,7 +101,7 @@ describe("Registry tests", () => {
 					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
 					driver: sqlite3.Database,
 				});
-				const docs = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = \"mkdirp\"`);
+				const docs = await db.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = "mkdirp"`);
 				await db.close();
 				expect(docs).to.be.of.length(0);
 			}).timeout(50000);

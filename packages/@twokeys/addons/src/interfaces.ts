@@ -94,4 +94,4 @@ export interface PackageInDB {
 /**
  * Return type for validators
  */
-export interface ValidatorReturn { status: boolean; message?: string; }
+export interface ValidatorReturn { status: boolean; message?: string }

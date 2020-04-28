@@ -67,10 +67,10 @@ interface AddPackageOptions {
 }
 
 /** Return type for function {@link AddOnsRegistry.parsePackageFromDB} that parses DB entries to a {@link Package} */
-type ParseDBReturn = ValidatorReturn & { entry?: Package; };
+type ParseDBReturn = ValidatorReturn & { entry?: Package };
 
 /** Return type for function {@link AddOnsRegistry.getPackageFromDB} that parses DB entries to a {@link Package} */
-type GetPackageReturn = ValidatorReturn & { results?: Package[]; };
+type GetPackageReturn = ValidatorReturn & { results?: Package[] };
 
 /**
  * Defines the methods {@link AddOnsRegistry} should implement.
@@ -423,7 +423,7 @@ export default class AddOnsRegistry {
 		if (typeof state.results !== "undefined" && state.results.length > 0) {
 			if (!options?.force) {
 				logger.warn(`Package ${name} was already in the registry.`);
-				logger.warn(`If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackageToDB().`);
+				logger.warn("If you want to force overwrite what is in the registry, please pass { force: true } to AddOnsRegistry.addPackageToDB().");
 				logger.warn("This probably means --force on the CLI.");
 				return {
 					status: false,
@@ -445,7 +445,7 @@ export default class AddOnsRegistry {
 		try {
 			await fs.access(packageLocation);
 			logger.debug("Reading package.json");
-			const packageJSON: { twokeys: TwokeysPackageInfo, [key: string]: any } = JSON.parse((await fs.readFile(join(packageLocation, "package.json"))).toString("utf8"));
+			const packageJSON: { twokeys: TwokeysPackageInfo; [key: string]: any } = JSON.parse((await fs.readFile(join(packageLocation, "package.json"))).toString("utf8"));
 			// Validate
 			const validation = AddOnsRegistry.validatePackageJSON(packageJSON);
 			if (!validation.status) {

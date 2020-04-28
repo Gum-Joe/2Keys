@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2020 Kishan Sambhi
  *
  * This file is part of 2Keys.
@@ -17,8 +18,8 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * @overview Logging module for 2Keys, from https://github.com/Gum-Joe/tara
- * @module logger
+ * Logging module for 2Keys, from https://github.com/Gum-Joe/tara
+ * @packageDocumentation
  */
 import { Chalk } from "chalk";
 import { Logger as LoggerArgs } from "./interfaces";
@@ -50,7 +51,7 @@ export default class Logger {
 	 * @param args {LoggerArgs} Logger args
 	 * @param logger Custom logger to print with
 	 */
-	public _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args) {
+	public _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args): void {
 		if (!this.isSilent) {
 			// Add prefix
 			let prefix = "";
@@ -66,7 +67,7 @@ export default class Logger {
 	 * @public
 	 * @color green
 	 */
-	public info(text: string) {
+	public info(text: string): void {
 		this._log("info", "green", text);
 	}
 
@@ -75,13 +76,8 @@ export default class Logger {
 	 * @public
 	 * @color green
 	 */
-	public warn(text: string) {
+	public warn(text: string): void {
 		if (!this.isSilent) {
-			// Add prefix
-			let prefix = "";
-			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
-				prefix = this.chalk.magenta(this.args.name) + " "; // eslint-disable-line prefer-template
-			}
 			this._log("warn", "yellow", text, console.warn);
 		}
 	}
@@ -90,13 +86,8 @@ export default class Logger {
 	 * @color green
 	 * @public
 	 */
-	public err(text: string) {
+	public err(text: string): void {
 		if (!this.isSilent) {
-			// Add prefix
-			let prefix = "";
-			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
-				prefix = this.chalk.magenta(this.args.name) + " "; // eslint-disable-line prefer-template
-			}
 			this._log("err", "red", text, console.error);
 		}
 	}
@@ -106,7 +97,7 @@ export default class Logger {
 	 * @color green
 	 * @public
 	 */
-	public debug(text: string) {
+	public debug(text: string): void {
 		if (this.isDebug) { this._log("debug", "cyan", text); }
 	}
 
@@ -116,7 +107,7 @@ export default class Logger {
 	 * @throw Error
 	 * @public
 	 */
-	public throw(err: Error) {
+	public throw(err: Error): void {
 		this.throw_noexit(err);
 		process.exit(1);
 	}
@@ -128,7 +119,7 @@ export default class Logger {
 	 * From Bedel
 	 * @public
 	 */
-	public throw_noexit(err: Error) { // eslint-disable-line @typescript-eslint/camelcase
+	public throw_noexit(err: Error): void { // eslint-disable-line @typescript-eslint/camelcase
 		if (!this.isSilent) {
 			this.err("");
 			this.err(`${err.message}`);

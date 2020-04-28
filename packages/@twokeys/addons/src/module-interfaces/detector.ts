@@ -84,7 +84,7 @@ export interface DetectorController {
 	 * Context menu functions, that is used to display actions that can be undergone on a detector.
 	 * Is diplayed in the project window in the GUI
 	 */
-	contextMenu: Array<{ name: string, func: TaskFunction<any> }>;
+	contextMenu: Array<{ name: string; func: TaskFunction<any> }>;
 	/**
 	 * Used to retrieve logs from the detector.
 	 * This is different to {@link DetectorController.logKeys}, as instead of being live

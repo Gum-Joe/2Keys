@@ -10,7 +10,7 @@
     "compile": "tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json --watch",
     "docs": "typedoc --ignoreCompilerErrors",
-    "test": "cross-env mocha",
+    "test": "cross-env NODE_ENV=test mocha",
     "coverage": "cross-env NODE_ENV=test nyc mocha",
     "coverage:upload": "codecov"
   },

@@ -1,4 +1,5 @@
 {
+  // NO LONGER USED
   "defaultSeverity": "error",
   "extends": [
     "tslint:recommended"
