@@ -5,6 +5,8 @@ plugins:
     extensions:
       - .ts
       - .js
+    config:
+      config: ./.eslintrc.yml
   bandit:
     enabled: true
   fixme:

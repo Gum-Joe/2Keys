@@ -17,6 +17,6 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 const run_hotkey = require("../../lib/util/ahk").run_hotkey;
-async function test() { await run_hotkey("test.ahk", "TestFunc") };
+async function test() { await run_hotkey("test.ahk", "TestFunc"); }
 
-test()
+test();

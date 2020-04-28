@@ -1,1 +1,1 @@
-console.log("BLANK")
+console.log("BLANK");
