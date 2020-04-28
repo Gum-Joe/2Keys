@@ -14,9 +14,6 @@ parserOptions:
   sourceType: module
 plugins:
   - '@typescript-eslint'
-ignorePatterns:
-  - node_modules/
-  - lib
 root: true
 rules:
   indent:
