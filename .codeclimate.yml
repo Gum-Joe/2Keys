@@ -1,0 +1,8 @@
+plugins: 
+  eslint:
+    enabled: true
+    channel: "eslint-6"
+  bandit:
+    enabled: true
+  fixme:
+    enabled: true
