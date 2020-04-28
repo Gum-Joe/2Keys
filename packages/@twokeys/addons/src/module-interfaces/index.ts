@@ -22,6 +22,11 @@
  * Add-on types are defined in {@link TWOKEYS_ADDON_TYPES}.
  * @packageDocumentation
  */
+
+import { Executor } from "./executor";
+import { DetectorController } from "./detector";
+import { TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPES } from "../interfaces";
+
 // TODO: Add types for TaskFunction<T, G>
 export * from "./common";
 export * from "./detector";

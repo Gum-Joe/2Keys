@@ -26,6 +26,11 @@ export const TWOKEYS_ADDON_TYPE_DETECTOR = "detector";
 export const TWOKEYS_ADDON_TYPE_PACK = "pack";
 export const TWOKEYS_ADDON_TYPE_LIBRARY = "library";
 export const TWOKEYS_ADDON_TYPE_EXTENSION = "extension";
+export type TWOKEYS_ADDON_TYPE_EXECUTOR = "executor";
+export type TWOKEYS_ADDON_TYPE_DETECTOR = "detector";
+export type TWOKEYS_ADDON_TYPE_PACK = "pack";
+export type TWOKEYS_ADDON_TYPE_LIBRARY = "library";
+export type TWOKEYS_ADDON_TYPE_EXTENSION = "extension";
 /**
  * Defines possible add-on types, i.e. teels us what the add-ons does:
  * - Executor: These add-ons handle execution of macros, and are called by the server when a hotkey is detected
@@ -36,7 +41,7 @@ export const TWOKEYS_ADDON_TYPE_EXTENSION = "extension";
  * - Library: A library of functions that can be used by users to write macros for a given executor. **There are no plans to implement this just yet.**
  * - Extension: Extends the functionality of 2Keys, adding e.g. RGB. **There are no plans to implement this just yet.**
  */
-export type TWOKEYS_ADDON_TYPES = "executor" | "detector" | "pack" | "library" | "extension";
+export type TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPE_EXECUTOR | TWOKEYS_ADDON_TYPE_DETECTOR | TWOKEYS_ADDON_TYPE_PACK | TWOKEYS_ADDON_TYPE_LIBRARY | TWOKEYS_ADDON_TYPE_EXTENSION;
 /** See {@link TWOKEYS_ADDON_TYPES} */
 export const TWOKEYS_ADDON_TYPES_ARRAY = [TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_PACK, TWOKEYS_ADDON_TYPE_LIBRARY, TWOKEYS_ADDON_TYPE_EXTENSION];
 /**

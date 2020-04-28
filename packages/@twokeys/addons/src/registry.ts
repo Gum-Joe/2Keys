@@ -30,7 +30,8 @@ import { promises as fs } from "fs";
 import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./constants";
-import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES } from "./interfaces";
+import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR } from "./interfaces";
+import { Executor, DetectorController } from "./module-interfaces";
 
 const logger = new Logger({
 	name: "add-ons:registry",
@@ -70,6 +71,18 @@ type ParseDBReturn = ValidatorReturn & { entry?: Package; };
 
 /** Return type for function {@link AddOnsRegistry.getPackageFromDB} that parses DB entries to a {@link Package} */
 type GetPackageReturn = ValidatorReturn & { results?: Package[]; };
+
+/**
+ * Return type for {@link AddOnsRegistry.load}
+ * @template AddOnsTypes Union type representing the modules types to load
+ * TODO: Remove optional bit
+ */
+type LoadReturnMulti<AddOnsTypes extends TWOKEYS_ADDON_TYPES> = {
+	[key in AddOnsTypes]?:
+		key extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorController :
+		key extends TWOKEYS_ADDON_TYPE_EXECUTOR ? Executor :
+		never;
+};
 
 /**
  * Defines the methods {@link AddOnsRegistry} should implement.
@@ -139,16 +152,13 @@ export default class AddOnsRegistry {
 	// Load functions
 	/**
 	 * Loads an add-on, getting add-on code for a given type.
-	 * @param packageName 
-	 * @param types 
+	 * @param packageName Package to load
+	 * @param types Array of types to load (can be just 1)
+	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES} as a union type
 	 */
-	public async load(packageName: string, types?: TWOKEYS_ADDON_TYPES | TWOKEYS_ADDON_TYPES[]): Promise<any> {
+	public async load<AddOnsTypes extends TWOKEYS_ADDON_TYPES>(packageName: string, types?: AddOnsTypes[]): Promise<LoadReturnMulti<AddOnsTypes>> {
 		logger.info(`Loading add-on ${packageName}...`);
 		try {
-			if (typeof types === "string") {
-				// Is string
-				types = [types];
-			}
 			// Query DB for package
 			const packagesResults = await this.getPackagesFromDB(packageName);
 			if (!packagesResults.status) {
@@ -167,7 +177,7 @@ export default class AddOnsRegistry {
 			} else {
 				// Everything OK, so we can load
 				const packageToLoad: Package = packagesResults.results[0];
-				const loaded: any = {};
+				const loaded: LoadReturnMulti<AddOnsTypes> = {};
 				if (typeof types === "undefined") {
 					// Load all types
 					logger.debug("Loading all types...");
@@ -208,6 +218,14 @@ export default class AddOnsRegistry {
 			logger.err("Error loading package!");
 			throw err;
 		}
+	}
+	/** Loads an executor */
+	public async loadExecutor(packageName: string): Promise<Executor | undefined> {
+		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, [TWOKEYS_ADDON_TYPE_EXECUTOR])).executor;
+	}
+	/** Loads a detector */
+	public async loadDetector(packageName: string): Promise<DetectorController | undefined> {
+		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, [TWOKEYS_ADDON_TYPE_DETECTOR])).detector;
 	}
 	//loadAllOfType: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
 
