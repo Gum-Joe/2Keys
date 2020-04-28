@@ -161,7 +161,7 @@ export default class AddOnsRegistry {
 				logger.err("Error! Got back multiple packages!");
 				logger.err("This means the registry DB may be corrupt.");
 				logger.err("Please reindex the packages DB in full.");
-				throw new Error("Got Got back multiple packages! Registry DB may be corrupt!");
+				throw new Error("Got back multiple packages! Registry DB may be corrupt!");
 			} else {
 				// Everything OK, so we can load
 				const packageToLoad: Package = packagesResults.results[0];

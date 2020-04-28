@@ -26,6 +26,7 @@ import chai from "chai";
 import rimraf from "rimraf";
 import { open } from "sqlite";
 import sqlite3 from "sqlite3";
+import uuid from "uuid";
 import AddOnsRegistry from "../src/registry";
 import { REGISTRY_FILE_NAME, REGISTRY_TABLE_NAME } from "../src/constants";
 import { PackageInDB, Package } from "../src/interfaces";
@@ -43,12 +44,14 @@ let registry: AddOnsRegistry;
 
 describe("Registry tests", () => {
 
-	describe("Static methods", () => {
-		before((done) => {
-			rimraf(REGISTRY_DIR, (err) => {
-				done(); // Do not handle error, since we just want to delete it if not there
-			});
+	before((done) => {
+		// Delete it
+		rimraf(REGISTRY_DIR, (err) => {
+			done(); // Do not handle error, since we just want to delete it if not there
 		});
+	});
+
+	describe("Static methods", () => {
 
 		it("should create a registry", async () => {
 			await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
@@ -81,9 +84,10 @@ describe("Registry tests", () => {
 	});
 
 	describe("Class methods", () => {
-		before((done) => {
+		before(async () => {
+			await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
 			registry = new AddOnsRegistry(REGISTRY_DIR);
-			registry.initDB().then(done).catch(done);
+			await registry.initDB();
 		});
 
 		describe("Package install", () => {
@@ -280,7 +284,9 @@ describe("Registry tests", () => {
 		describe("Add On Loading", () => {
 			const LOAD_TEST = join(__dirname, "non-mocha", "loadTest");
 			const pkgJson = require(join(__dirname, "non-mocha", "loadTest", "package.json"));
-			before(async () => {
+			before(async function () {
+				this.timeout(50000);
+				await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
 				registry = new AddOnsRegistry(REGISTRY_DIR);
 				await registry.initDB();
 				// Install packages
@@ -295,6 +301,20 @@ describe("Registry tests", () => {
 				// @ts-ignore: We don't have a proper config to test with yet
 				executor.execute({}, config);
 				expect(config.testValue).to.be.true;
+			});
+
+			it("should throw an error if we ask for an add-on that is not installed", () => {
+				expect(registry.load("DEFO_NOT_IN_REG_" + Math.random(), "detector")).to.be.rejectedWith(/No packages were found (.*)/);
+			});
+
+			it("should throw an error if we load a type not in the package", async () => {
+				try {
+					await registry.load(pkgJson.name, "pack");
+				} catch (err) {
+					expect(err.message).to.include("Add-on of type");
+					return;
+				}
+				throw new Error("No error thrown when one was expected!");
 			});
 		});
 	});
