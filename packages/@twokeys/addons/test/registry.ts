@@ -276,5 +276,14 @@ describe("Registry tests", () => {
 				expect(docs).to.be.of.length(0);
 			});
 		});
+
+		describe("Add On Loading", () => {
+			before(async () => {
+				registry = new AddOnsRegistry(REGISTRY_DIR);
+				await registry.initDB();
+				// Install packages
+				
+			});
+		});
 	});
 });

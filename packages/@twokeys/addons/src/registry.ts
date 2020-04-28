@@ -31,7 +31,7 @@ import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR } from "./interfaces";
-import { Executor, DetectorController } from "./module-interfaces";
+import { Executor, DetectorController, AddOnModulesCollection } from "./module-interfaces";
 
 const logger = new Logger({
 	name: "add-ons:registry",
@@ -71,18 +71,6 @@ type ParseDBReturn = ValidatorReturn & { entry?: Package; };
 
 /** Return type for function {@link AddOnsRegistry.getPackageFromDB} that parses DB entries to a {@link Package} */
 type GetPackageReturn = ValidatorReturn & { results?: Package[]; };
-
-/**
- * Return type for {@link AddOnsRegistry.load}
- * @template AddOnsTypes Union type representing the modules types to load
- * TODO: Remove optional bit
- */
-type LoadReturnMulti<AddOnsTypes extends TWOKEYS_ADDON_TYPES> = {
-	[key in AddOnsTypes]?:
-		key extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorController :
-		key extends TWOKEYS_ADDON_TYPE_EXECUTOR ? Executor :
-		never;
-};
 
 /**
  * Defines the methods {@link AddOnsRegistry} should implement.
@@ -153,10 +141,10 @@ export default class AddOnsRegistry {
 	/**
 	 * Loads an add-on, getting add-on code for a given type.
 	 * @param packageName Package to load
-	 * @param types Array of types to load (can be just 1)
-	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES} as a union type
+	 * @param typeOfAddOn SINGLE type to load
+	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only
 	 */
-	public async load<AddOnsTypes extends TWOKEYS_ADDON_TYPES>(packageName: string, types?: AddOnsTypes[]): Promise<LoadReturnMulti<AddOnsTypes>> {
+	public async load<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(packageName: string, typeOfAddOn: AddOnsType): Promise<AddOnModulesCollection[AddOnsType]> {
 		logger.info(`Loading add-on ${packageName}...`);
 		try {
 			// Query DB for package
@@ -177,38 +165,17 @@ export default class AddOnsRegistry {
 			} else {
 				// Everything OK, so we can load
 				const packageToLoad: Package = packagesResults.results[0];
-				const loaded: LoadReturnMulti<AddOnsTypes> = {};
-				if (typeof types === "undefined") {
-					// Load all types
-					logger.debug("Loading all types...");
-					logger.debug("[WARN] It's recomended a type is explicity provided to prevent unessecary I/O ops");
-					let typeOfAddOn: TWOKEYS_ADDON_TYPES;
-					for (typeOfAddOn in packageToLoad.entry) {
-						if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
-							const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
-							logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
-							// load
-							const addOn = require(file);
-							loaded[typeOfAddOn] = addOn;
-							logger.debug("Type of add-on loaded.");
-						}
-					}
+				let loaded: AddOnModulesCollection[AddOnsType];
+				if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
+					const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
+					logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
+					// load
+					loaded = require(file);
+					logger.debug("Type of add-on loaded.");
 				} else {
-					let typeOfAddOn: TWOKEYS_ADDON_TYPES;
-					for (typeOfAddOn of types) {
-						if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
-							const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
-							logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
-							// load
-							const addOn = require(file);
-							loaded[typeOfAddOn] = addOn;
-							logger.debug("Type of add-on loaded.");
-						} else {
-							// Not found!
-							logger.err(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name}!`);
-							throw new Error(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name}!`);
-						}
-					}
+					// Not found!
+					logger.err(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name}!`);
+					throw new Error(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name}!`);
 				}
 				// Now we have a list
 				logger.info("Add-on loaded.");
@@ -220,12 +187,12 @@ export default class AddOnsRegistry {
 		}
 	}
 	/** Loads an executor */
-	public async loadExecutor(packageName: string): Promise<Executor | undefined> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, [TWOKEYS_ADDON_TYPE_EXECUTOR])).executor;
+	public async loadExecutor(packageName: string): Promise<Executor> {
+		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, TWOKEYS_ADDON_TYPE_EXECUTOR));
 	}
 	/** Loads a detector */
-	public async loadDetector(packageName: string): Promise<DetectorController | undefined> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, [TWOKEYS_ADDON_TYPE_DETECTOR])).detector;
+	public async loadDetector(packageName: string): Promise<DetectorController> {
+		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, TWOKEYS_ADDON_TYPE_DETECTOR));
 	}
 	//loadAllOfType: (types?: "executor" | "detector" | "pack" | "library" | "extension" | TWOKEYS_ADDON_TYPES[] | undefined) => any;
 

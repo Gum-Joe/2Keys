@@ -31,3 +31,10 @@ import { TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON
 export * from "./common";
 export * from "./detector";
 export * from "./executor";
+
+export type AddOnModulesCollection = {
+	[key in TWOKEYS_ADDON_TYPES]:
+		key extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorController :
+		key extends TWOKEYS_ADDON_TYPE_EXECUTOR ? Executor :
+		any;
+};
