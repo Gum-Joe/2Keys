@@ -278,11 +278,23 @@ describe("Registry tests", () => {
 		});
 
 		describe("Add On Loading", () => {
+			const LOAD_TEST = join(__dirname, "non-mocha", "loadTest");
+			const pkgJson = require(join(__dirname, "non-mocha", "loadTest", "package.json"));
 			before(async () => {
 				registry = new AddOnsRegistry(REGISTRY_DIR);
 				await registry.initDB();
 				// Install packages
-				
+				await registry.install(LOAD_TEST, { local: true });
+			});
+
+			it("should load a add-on", async () => {
+				const executor = await registry.loadExecutor(pkgJson.name);
+				const config = {
+					testValue: false,
+				};
+				// @ts-ignore: We don't have a proper config to test with yet
+				executor.execute({}, config);
+				expect(config.testValue).to.be.true;
 			});
 		});
 	});

@@ -152,12 +152,12 @@ export default class AddOnsRegistry {
 			if (!packagesResults.status) {
 				logger.err("Error loading package!");
 				throw new Error(`Error loading package: ${packagesResults.message || "See logs above"}`);
-			} else if (typeof packagesResults.results === "undefined" || packagesResults.results?.length < 1) {
+			} else if (typeof packagesResults.results === "undefined" || packagesResults.results.length < 1) {
 				logger.err(`No packages were found by name ${packageName}!`);
 				const err: any = new Error(`No packages were found by name ${packageName}!`);
 				err.code = "ENOENT";
 				throw err;
-			} else if (packagesResults.results?.length > 1) {
+			} else if (packagesResults.results.length > 1) {
 				logger.err("Error! Got back multiple packages!");
 				logger.err("This means the registry DB may be corrupt.");
 				logger.err("Please reindex the packages DB in full.");
@@ -165,6 +165,7 @@ export default class AddOnsRegistry {
 			} else {
 				// Everything OK, so we can load
 				const packageToLoad: Package = packagesResults.results[0];
+				logger.debug(JSON.stringify(packageToLoad));
 				let loaded: AddOnModulesCollection[AddOnsType];
 				if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
 					const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
