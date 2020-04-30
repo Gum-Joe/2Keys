@@ -61,6 +61,8 @@ export interface StepsExplainer {
  * Defines a generic task function used to execute addon tasks, such as:
  * - Setup of a detector
  * - Execution of a hotkey
+ * @param twokeys An object provided to the task function that allow it to interact with 2Keys and access function for, for example, logging
+ * @param config Config object to pass to function
  * @template GenericConfigT Generic where the config the add-on wants is defined
  * @template ReturnG An optional return type for the Promise
  */

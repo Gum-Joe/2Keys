@@ -30,7 +30,7 @@ import { promises as fs } from "fs";
 import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./constants";
-import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR } from "./interfaces";
+import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./interfaces";
 import { Executor, DetectorController, AddOnModulesCollection } from "./module-interfaces";
 
 const logger = new Logger({
@@ -71,6 +71,13 @@ type ParseDBReturn = ValidatorReturn & { entry?: Package };
 
 /** Return type for function {@link AddOnsRegistry.getPackageFromDB} that parses DB entries to a {@link Package} */
 type GetPackageReturn = ValidatorReturn & { results?: Package[] };
+
+/**
+ * Represents a loaded add-on,
+ * basically retrieving the correct add-on exports defintion from {@link AddOnModulesCollection}
+ * & adding a {@link Package} object so we can get info about the package the add-on is loaded from
+ */
+type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] &  { package: Package };
 
 /**
  * Defines the methods {@link AddOnsRegistry} should implement.
@@ -145,7 +152,7 @@ export default class AddOnsRegistry {
 	 * @param typeOfAddOn SINGLE type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
 	 */
-	private async loadPackage<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(packageToLoad: Package, typeOfAddOn: AddOnsType): Promise<AddOnModulesCollection[AddOnsType]> {
+	private async loadPackage<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageToLoad: Package, typeOfAddOn: AddOnsType): Promise<LoadedAddOn<AddOnsType>> {
 		try {
 			logger.info(`Loading package ${packageToLoad.name}, type ${typeOfAddOn}...`);
 			logger.debug(JSON.stringify(packageToLoad));
@@ -158,8 +165,10 @@ export default class AddOnsRegistry {
 				const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
 				logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
 				// load
-				const loaded: AddOnModulesCollection[AddOnsType] = require(file);
+				const loaded: LoadedAddOn<AddOnsType> = require(file);
 				logger.debug("Type of add-on loaded.");
+				// Add package object
+				loaded.package = packageToLoad;
 				logger.info("Add-on loaded.");
 				return loaded;
 			} else {
@@ -178,7 +187,7 @@ export default class AddOnsRegistry {
 	 * @param typeOfAddOn SINGLE type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
 	 */
-	public async load<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(packageName: string, typeOfAddOn: AddOnsType): Promise<AddOnModulesCollection[AddOnsType]> {
+	public async load<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageName: string, typeOfAddOn: AddOnsType): Promise<LoadedAddOn<AddOnsType>> {
 		logger.info(`Loading add-on ${packageName}...`);
 		try {
 			// Query DB for package
@@ -218,7 +227,7 @@ export default class AddOnsRegistry {
 	 * @param typeOfAddOn Add-on type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only
 	 */
-	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType): Promise<{ [name: string]: AddOnModulesCollection[AddOnsType] }> {
+	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType): Promise<{ [name: string]: LoadedAddOn<AddOnsType> }> {
 		logger.info(`Loading all modules of type ${typeOfAddOn}...`);
 		logger.debug("Querying...");
 		const addOnsList: Package[] = (await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE types LIKE ?`, `%${typeOfAddOn}%`)).map(value => {
@@ -227,7 +236,7 @@ export default class AddOnsRegistry {
 			return res.entry;
 		});
 		logger.debug(JSON.stringify(addOnsList));
-		const loadedAddOns: { [name: string]: AddOnModulesCollection[AddOnsType] } = {};
+		const loadedAddOns: { [name: string]: LoadedAddOn<AddOnsType> } = {};
 		for (const addOn of addOnsList) {
 			loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(addOn, typeOfAddOn);
 		}

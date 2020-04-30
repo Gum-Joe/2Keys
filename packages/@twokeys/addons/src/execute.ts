@@ -18,25 +18,16 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Contains the 2Keys class that is provided to {@link TaskFunction}s
+ * Holds the function that executes {@link TaskFunction}s
+ * @packageDocumentation
  */
 
-import { Logger } from "@twokeys/core";
-import { TaskFunction } from "./common";
-import { Package } from "../interfaces";
+import { Package } from "./interfaces";
+import { TaskFunction } from "../lib/module-interfaces";
+import TwoKeys from "./module-interfaces/twokeys";
 
-/**
- * Class provided to add-on function that allows them to access 
- */
-export default class TwoKeys {
-	public logger: Logger;
-	public package: Package;
-
-	constructor(packageObject: Package) {
-		this.logger = new Logger({
-			name: `add-on:${packageObject.name}`
-		});
-		this.package = packageObject;
-	}
-	
+export default async function executeAddOnTask<GenericConfigT = any, ReturnG = any>
+(packageObject: Package, func: TaskFunction<GenericConfigT, ReturnG>, config: GenericConfigT, TwoKeysClass: typeof TwoKeys = TwoKeys): Promise<ReturnG> {
+	const twoKeysObject = new TwoKeysClass(packageObject);
+	return await func(twoKeysObject, config);
 }

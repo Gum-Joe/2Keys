@@ -32,10 +32,17 @@ export * from "./common";
 export * from "./detector";
 export * from "./executor";
 
-/** Collection of AddOnModules, used to easily reference an addon module defintion based on a string of its type */
+/**
+ * Collection of AddOnModules, used to easily reference an add-on exports defintion
+ * (i.e. what should be exported by a given add-on type)
+ * based on a string of its type.
+ * This is referenced by keys to get the correct add-on types. E.g:
+ * ```ts
+ * AddOnModulesCollection["executor"] // Type become {@link Executor}
+ */
 export type AddOnModulesCollection = {
 	[key in TWOKEYS_ADDON_TYPES]:
 		key extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorController :
 		key extends TWOKEYS_ADDON_TYPE_EXECUTOR ? Executor :
-		any;
+		{};
 };

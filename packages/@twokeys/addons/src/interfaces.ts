@@ -42,6 +42,8 @@ export type TWOKEYS_ADDON_TYPE_EXTENSION = "extension";
  * - Extension: Extends the functionality of 2Keys, adding e.g. RGB. **There are no plans to implement this just yet.**
  */
 export type TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPE_EXECUTOR | TWOKEYS_ADDON_TYPE_DETECTOR | TWOKEYS_ADDON_TYPE_PACK | TWOKEYS_ADDON_TYPE_LIBRARY | TWOKEYS_ADDON_TYPE_EXTENSION;
+/** A single string that represents on of the above add-on types */
+export type TWOKEYS_ADDON_TYPE_SINGLE = TWOKEYS_ADDON_TYPES & string;
 /** See {@link TWOKEYS_ADDON_TYPES} */
 export const TWOKEYS_ADDON_TYPES_ARRAY = [TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_PACK, TWOKEYS_ADDON_TYPE_LIBRARY, TWOKEYS_ADDON_TYPE_EXTENSION];
 /**
