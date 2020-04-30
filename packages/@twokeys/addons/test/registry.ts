@@ -294,13 +294,14 @@ describe("Registry tests", () => {
 				await registry.install(LOAD_TEST, { local: true });
 			});
 
-			it("should load a add-on", async () => {
+			it("should load a add-on and allow us to execute it", async () => {
 				const executor = await registry.loadExecutor(pkgJson.name);
 				const config = {
 					testValue: false,
+					expect,
 				};
 				// @ts-ignore: We don't have a proper config to test with yet
-				executor.execute({}, config);
+				await executor.call(executor.execute, config);
 				expect(config.testValue).to.be.true;
 			});
 
@@ -331,12 +332,13 @@ describe("Registry tests", () => {
 				const testOBJ = {
 					testValue: false,
 					testValue2: false,
+					expect,
 				};
 				// Exec
 				// @ts-ignore: We don't have a proper config to test with yet
-				await res[pkgJson.name].execute({}, testOBJ);
+				await res[pkgJson.name].call(res[pkgJson.name].execute, testOBJ);
 				// @ts-ignore: We don't have a proper config to test with yet
-				await res[pkgJson2.name].execute({}, testOBJ);
+				await res[pkgJson2.name].call(res[pkgJson2.name].execute, testOBJ);
 				expect(testOBJ.testValue).to.be.true;
 				expect(testOBJ.testValue2).to.be.true;
 

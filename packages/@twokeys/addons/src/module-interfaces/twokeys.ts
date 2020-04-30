@@ -22,7 +22,6 @@
  */
 
 import { Logger } from "@twokeys/core";
-import { TaskFunction } from "./common";
 import { Package } from "../interfaces";
 
 /**

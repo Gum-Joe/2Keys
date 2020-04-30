@@ -31,7 +31,8 @@ import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./interfaces";
-import { Executor, DetectorController, AddOnModulesCollection } from "./module-interfaces";
+import { AddOnModulesCollection, TaskFunction } from "./module-interfaces";
+import TwoKeys from "./module-interfaces/twokeys";
 
 const logger = new Logger({
 	name: "add-ons:registry",
@@ -43,6 +44,8 @@ const logger = new Logger({
 interface AddOnsRegistryOptions {
 	/** Absolute path of registry database (a sqlite3 .db file) */
 	dbFilePath?: string;
+	/** Custom twokeys class to use when loading modules */
+	twokeys?: typeof TwoKeys;
 }
 
 /**
@@ -76,44 +79,22 @@ type GetPackageReturn = ValidatorReturn & { results?: Package[] };
  * Represents a loaded add-on,
  * basically retrieving the correct add-on exports defintion from {@link AddOnModulesCollection}
  * & adding a {@link Package} object so we can get info about the package the add-on is loaded from
+ * @param package Package object of add-on that is loaded
+ * @param call Function to run an add-ons task function
  */
-type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] &  { package: Package };
-
-/**
- * Defines the methods {@link AddOnsRegistry} should implement.
- * Many returns types left out as we don't know what they will be.
- */
-interface AddOnsRegistryInterface {
-	// Package operations
-	/** Removes a package from node_modules via npm & the DB */
-	uninstall: (packageName: string) => any;
-	/** Removes a package via npm */
-	runNpmUninstall: (packageName: string) => any;
-	/** Removes a package from the DB */
-	removePackageFromDB: (packageName: string) => any;
-	/** Installs a package & adds to DB */
-	install: (packageName: string, options?: ManagerOptions) => any;
-	/** Adds a package via npm */
-	runNpmInstall: (packageName: string, options?: ManagerOptions) => any;
-	/** Removes a package from the DB */
-	addPackageToDB: (packageName: string, options?: AddPackageOptions) => any;
-	/** Update package to version */
-	update: (packageName: string, version: string) => any;
-	runNpmUpdate: (packageName: string, version: string) => any;
-	/** Update package in DB */
-	updatePackageInDB: (packageName: string, propsToUpdate: any) => any;
-	/** Force reindex the registry, by running {@link AddOnsRegistry.addPackageToDB()} on all packages in `package.json` */
-	reindex: () => any;
-
-	// Loaders
-	/** Loads one package in full, */
-	load: (packageName: string, types?: TWOKEYS_ADDON_TYPES | TWOKEYS_ADDON_TYPES[]) => any;
-	/** Loads all add-ons of a given type */
-	loadAll: (types?: TWOKEYS_ADDON_TYPES | TWOKEYS_ADDON_TYPES[]) => any;
-
-	// Misc
-	createNewRegistry: (dir: string, options?: AddOnsRegistryOptions) => any;
-}
+type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] &  {
+	/** Package object of add-on that is loaded */
+	package: Package;
+	/**
+	 * Function to run an add-on {@link TaskFunction}
+	 * @template T Config type
+	 * @template U Return type (excluding promise wrapper) of the function
+	 * @returns The Promise from the function
+	 */
+	call: <T, U>(fn: TaskFunction<T, U>, config: T) => Promise<U>;
+	/** twokeys class */
+	twokeys: TwoKeys;
+};
 
 // TODO: Before and after hooks
 /**
@@ -133,6 +114,8 @@ export default class AddOnsRegistry {
 	private registry: Database<sqlite3.Database, sqlite3.Statement>;
 	private registryDBFilePath: string;
 	private registryModulesPath: string;
+	/** TwoKeys class to use in {@link TaskFunction}s, when loading add-ons */
+	private TwoKeys: typeof TwoKeys = TwoKeys;
 
 	/**
 	 * Initalises a new registry class for the registry at `dir`
@@ -143,14 +126,21 @@ export default class AddOnsRegistry {
 		this.directory = dir;
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
 		this.registryModulesPath = join(this.directory, REGISTRY_MODULE_FOLDER);
+		if (typeof options?.twokeys !== "undefined" && options.twokeys) {
+			this.TwoKeys = options.twokeys;
+		}
 	}
 
 	// Load functions
 	/**
-	 * Loads an {@link Package} (so a package that has already been retrieved from DB)
+	 * Loads the entry points for an add-on type from a {@link Package} (so a package that has already been retrieved from DB).
+	 * Also adds information about the add-on to the loaded module, in the `package` key (see {@link LoadedAddOn}).
+	 * 
+	 * **Important:** To call {@link TaskFunction}s in an add-on, use the .call() method in the returned boject (a {@link LoadedAddOn})
 	 * @param packageToLoad Package object to load from, converted from {@link PackageInDB}
 	 * @param typeOfAddOn SINGLE type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
+	 * @returns A loaded add-on.  Use .call(config) to call a {@link TaskFunction}
 	 */
 	private async loadPackage<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageToLoad: Package, typeOfAddOn: AddOnsType): Promise<LoadedAddOn<AddOnsType>> {
 		try {
@@ -169,6 +159,12 @@ export default class AddOnsRegistry {
 				logger.debug("Type of add-on loaded.");
 				// Add package object
 				loaded.package = packageToLoad;
+				// Add call function
+				logger.debug("Adding twokeys class & call function");
+				loaded.twokeys = new this.TwoKeys(Object.assign(packageToLoad));
+				loaded.call = <T, U>(fn: TaskFunction<T, U>, config: T): Promise<U> => {
+					return fn(loaded.twokeys, config);
+				};
 				logger.info("Add-on loaded.");
 				return loaded;
 			} else {
@@ -215,11 +211,11 @@ export default class AddOnsRegistry {
 		}
 	}
 	/** Loads an executor */
-	public async loadExecutor(packageName: string): Promise<Executor> {
+	public async loadExecutor(packageName: string): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_EXECUTOR>> {
 		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, TWOKEYS_ADDON_TYPE_EXECUTOR));
 	}
 	/** Loads a detector */
-	public async loadDetector(packageName: string): Promise<DetectorController> {
+	public async loadDetector(packageName: string): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_DETECTOR>> {
 		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, TWOKEYS_ADDON_TYPE_DETECTOR));
 	}
 	/**
