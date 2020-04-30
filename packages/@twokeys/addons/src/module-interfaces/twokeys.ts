@@ -18,11 +18,18 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Constants
- * @packageDocumentation
+ * Contains the 2Keys class that is provided to {@link TaskFunction}s
  */
-import { join } from "path";
-import { homedir } from "os";
 
-/** Default location of 2Keys project config (see interface {@link ServerConfig}) */
-export const CONFIG_DEFAULT_FILE_SERVER = join(process.env.APPDATA || join(homedir(), "AppData", "Roaming"), "2Keys", "2Keys.yml");
+import { Logger } from "@twokeys/core";
+import { TaskFunction } from "./common";
+
+/**
+ * Class provided to add-on function that allows them to access 
+ */
+export default class TwoKeys {
+	public logger: Logger = "h";
+
+
+	
+}

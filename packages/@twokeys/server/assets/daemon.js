@@ -36,7 +36,7 @@ process.chdir(root);
 // Create log file
 console.log("Creating log file...");
 const date = new Date();
-const logger = createWriteStream(join(root, "{{ default_local_twokeys }}", `${ date.getFullYear() }.${ date.getMonth() }.${ date.getDate() } ${ date.getHours() }.${ date.getMinutes() }.${ date.getSeconds() }.log`));
+const logger = createWriteStream(join(root, "{{ default_local_twokeys }}", `${ date.getFullYear() }.${ date.getMonth() + 1 }.${ date.getDate() } ${ date.getHours() }.${ date.getMinutes() }.${ date.getSeconds() }.log`));
 
 // PID file
 console.log("Creating a PID file for this process...");

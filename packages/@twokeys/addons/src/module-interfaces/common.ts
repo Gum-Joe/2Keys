@@ -21,11 +21,7 @@
  * Common types required by all types of add-on
  * @packageDocumentation
  */
-
-/**
- * Placeholder for twokeys modules object.
- */
-export type TwoKeysModule = any;
+import TwoKeys from "./twokeys";
 
 /**
  * Interface for setup descriptors.
@@ -68,4 +64,4 @@ export interface StepsExplainer {
  * @template GenericConfigT Generic where the config the add-on wants is defined
  * @template ReturnG An optional return type for the Promise
  */
-export type TaskFunction<GenericConfigT, ReturnG = void> = (twokeys: TwoKeysModule, config: GenericConfigT) => Promise<ReturnG>;
+export type TaskFunction<GenericConfigT, ReturnG = void> = (twokeys: TwoKeys, config: GenericConfigT) => Promise<ReturnG>;
