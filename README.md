@@ -1,4 +1,5 @@
-# 2Keys [![Build Status](https://travis-ci.com/Gum-Joe/2Keys.svg?branch=master)](https://travis-ci.com/Gum-Joe/2Keys) [![codecov](https://codecov.io/gh/Gum-Joe/2Keys/branch/master/graph/badge.svg)](https://codecov.io/gh/Gum-Joe/2Keys)
+# 2Keys [![Build Status](https://travis-ci.com/Gum-Joe/2Keys.svg?branch=master)](https://travis-ci.com/Gum-Joe/2Keys) [![codecov](https://codecov.io/gh/Gum-Joe/2Keys/branch/master/graph/badge.svg)](https://codecov.io/gh/Gum-Joe/2Keys)[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FGum-Joe%2F2Keys.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FGum-Joe%2F2Keys?ref=badge_shield)
+
 
 
 A easy to setup second keyboard, designed for everyone.
@@ -69,3 +70,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FGum-Joe%2F2Keys.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FGum-Joe%2F2Keys?ref=badge_large)
