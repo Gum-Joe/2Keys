@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2020 Kishan Sambhi
  *
  * This file is part of 2Keys.
@@ -18,10 +17,18 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Exports stuff for registry
- * @packageDocumentation
+ * Header file for ahk runner
  */
-export * from "./registry";
-export * from "./interfaces";
-export * from "./constants";
-export * from "./module-interfaces";
+
+#include <windows.h>
+
+namespace twokeys {
+  struct AHKRunError {
+    DWORD code; // Code from windows, function GetLastError()
+    std::string message; // Message from 2Keys
+    bool is_error; // Is there or is there not an error?
+  };
+  void run_ahk_text(LPCWSTR library, LPCWSTR text, AHKRunError *error_handler);
+  void handle_getting_err_message(AHKRunError *err);
+  AHKRunError new_ahk_run_err();
+}

@@ -1,7 +1,7 @@
 {
-  "name": "@twokeys/addons",
+  "name": "@twokeys/executor-ahk",
   "version": "1.0.0",
-  "description": "Add-on loader for 2Keys",
+  "description": "2Keys executor that runs scripts using AutoHotkey V2 (AutoHotkey_H)",
   "main": "lib/index.js",
   "repository": "https://github.com/Gum-Joe/2Keys",
   "author": "Kishan <kishansambhi@hotmail.co.uk>",
@@ -13,6 +13,12 @@
     "test": "cross-env NODE_ENV=test mocha",
     "coverage": "cross-env NODE_ENV=test nyc mocha",
     "coverage:upload": "codecov"
+  },
+  "twokeys": {
+    "types": ["executor"],
+    "entry": {
+      "executor": "lib/index.js"
+    }
   },
   "nyc": {
     "include": [
@@ -36,23 +42,13 @@
   },
   "dependencies": {
     "@twokeys/core": "^1.0.0",
-    "mkdirp": "^1.0.4",
-    "npm": "^6.14.4",
-    "rimraf": "^3.0.2",
-    "sqlite": "^4.0.7",
-    "sqlite3": "^4.1.1",
-    "uuid": "^7.0.3"
+    "@twokeys/addons": "^1.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/chai-fs": "^2.0.2",
-    "@types/npm": "^2.0.31",
-    "@types/rimraf": "^3.0.0",
-    "@types/sqlite3": "^3.1.6",
-    "@types/uuid": "^7.0.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "chai-fs": "^2.0.0",
     "cross-env": "^7.0.2",
     "mocha": "^7.1.1",
     "nyc": "^15.0.1",

@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2020 Kishan Sambhi
  *
  * This file is part of 2Keys.
@@ -18,10 +17,23 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Exports stuff for registry
- * @packageDocumentation
+ * Gets current dir
  */
-export * from "./registry";
-export * from "./interfaces";
-export * from "./constants";
-export * from "./module-interfaces";
+#include <iostream>
+#include <stdio.h>
+#include <direct.h>
+// From
+// http://www.codebind.com/cpp-tutorial/c-get-current-directory-linuxwindows/
+#define GetCurrentDir _getcwd
+
+#include "current-dir.h"
+
+namespace twokeys {
+std::string GetCurrentWorkingDir()
+{
+  char buff[FILENAME_MAX];
+  GetCurrentDir(buff, FILENAME_MAX);
+  std::string current_working_dir(buff);
+  return current_working_dir;
+}
+}

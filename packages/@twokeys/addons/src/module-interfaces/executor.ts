@@ -27,15 +27,28 @@ import { ConfigDescriptors, TaskFunction, ConfigDescriptor } from "@twokeys/addo
 
 /**
  * Config for {@link Executor.exec}
- * @template ExecutorHotKeyConfig Defintion of the config an executor expects in a hotkey
+ * @template ExecutorConfig Defintion of the config an executor expects in a hotkey & for `config.keyboard.executors[executor]`. WIll be provided as generic to {@link HotkeyTypeSingle} so don't provide this as part of the generic
  */
-export interface ExecutorExecConfig<ExecutorHotKeyConfig extends HotkeyTypeSingle> {
-	/** Hotkey from the config to execute */
-	hotkey: HotkeyTypeSingle & ExecutorHotKeyConfig;
+export interface ExecutorExecConfig<ExecutorConfig> {
+	/**
+	 * Hotkey from the config to execute.
+	 * This is **combined** with `config.keyboard.executors[executor]`.
+	 * Like so:
+	 * ```ts
+	 * executorConfig.hotkey = { ...keyboard.executors[executor], ...keyboard.hotkeys[hotkeyCode] }
+	 * ```
+	 */
+	hotkey: HotkeyTypeSingle<ExecutorConfig>;
 	/** Hotkey code (used as the key in {@link Hotkeys}) */
 	hotkeyCode: string;
-	/** Executor config from config ({@link Keyboard.executors}) */
-	executorConfig: Keyboard["executors"]["executorName"];
+	/**
+	 * Executor config from ({@link Keyboard.executors}).
+	 * Included for reference purposes
+	 * Please note this included in the `hotkey` key above (hotkey config and this are combined together into one object; see above)
+	 **/
+	executorDefaultConfig: ExecutorConfig;
+	/** Keyboard hotkeys are from (config)*/
+	keyboard: Keyboard;
 }
 
 /** Config for {@link Executor.addToKeyboard} */
@@ -77,14 +90,17 @@ export interface ExecutorScanMultiFileOne {
  */
 export type ExecutorScan = ExecutorScanMultiFileOne[] | ExecutorScanIndividual[];
 
-/** Defines the exports for an executor */
-export interface Executor {
+/**
+ * Defines the exports for an executor
+ * @template THotkeyConfig Definition of the configuration of a hotkey in config files
+ */
+export interface Executor<THotkeyConfig = { [key: string]: string }> {
 	/** Options to present to user when installing executor software */
 	installOptions: ConfigDescriptors;
 	/** Function that runs when installing the executor, doing, for example, downloading the executor software */
 	install: TaskFunction<any>;
 	/** Executes a hotkey */
-	execute: TaskFunction<ExecutorExecConfig<HotkeyTypeSingle>>;
+	execute: TaskFunction<ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>>;
 	/** Options to present to user when defining a new hotkey (e.g. the function to execute) */
 	hotkeyOptions: ConfigDescriptor;
 	/**
@@ -92,7 +108,7 @@ export interface Executor {
 	 * Is optional
 	 * @returns Hotkey config
 	 */
-	assignToKey?: TaskFunction<ExecutorExecConfig<HotkeyTypeSingle>, ExecutorExecConfig<HotkeyTypeSingle>["hotkey"]>;
+	assignToKey?: TaskFunction<ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>, ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>["hotkey"]>;
 	/**
 	 * Scan for function to execute for {@link HotkeyTypeSingle.func}
 	 * @returns A list of functions

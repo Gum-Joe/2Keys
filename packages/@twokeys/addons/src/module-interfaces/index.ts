@@ -26,11 +26,13 @@
 import { Executor } from "./executor";
 import { DetectorController } from "./detector";
 import { TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPES } from "../interfaces";
+import TwoKeys from "./twokeys";
 
 // TODO: Add types for TaskFunction<T, G>
 export * from "./common";
 export * from "./detector";
 export * from "./executor";
+export { TwoKeys };
 
 /**
  * Collection of AddOnModules, used to easily reference an add-on exports defintion
@@ -39,6 +41,7 @@ export * from "./executor";
  * This is referenced by keys to get the correct add-on types. E.g:
  * ```ts
  * AddOnModulesCollection["executor"] // Type become {@link Executor}
+ * ```
  */
 export type AddOnModulesCollection = {
 	[key in TWOKEYS_ADDON_TYPES]:

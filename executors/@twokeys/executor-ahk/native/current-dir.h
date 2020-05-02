@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2020 Kishan Sambhi
  *
  * This file is part of 2Keys.
@@ -17,11 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
-/**
- * Exports stuff for registry
- * @packageDocumentation
- */
-export * from "./registry";
-export * from "./interfaces";
-export * from "./constants";
-export * from "./module-interfaces";
+#include <iostream>
+
+namespace twokeys {
+std::string GetCurrentWorkingDir();
+}

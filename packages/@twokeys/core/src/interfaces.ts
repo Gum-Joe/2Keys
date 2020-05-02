@@ -87,18 +87,26 @@ export interface ClientConfig {
  * `TypeSingle` because it only configures for the key balue of down, i.e. when the hotkey keys are pressed down.
  * Other values are up and hold (see interface {@link HotkeyTypeKeypressValue})
  * The actual config here is up to each executor to decide.
- * It recommened that what's here can override the config in `Keyboard.executors[executor]`
+ * What's here can override what is in `Keyboard.executors[executor]`.
  */
-export interface HotkeyTypeSingle {
+export interface BaseHotkeyTypeSingle {
   /** Executor to use for this hotkey (defaults to `keyboard[keybaord].executors.default) */
   executor?: string;
-  /** Macro funcion to execute */
-  func: any;
   /**
-   * Config for the executor
+   * Macro funcion to execute.
+   * Ideally this would be a string,
+   * however, as different executor may want it to be e.g. an object, `unknown` is used
+   * so that executors can override this.
    */
-  [key: string]: any;
+  func: unknown;
 }
+
+/**
+ * Actually hotkey key single type.
+ * Takes {@link BaseHotkeyTypeSingle} and adds the config for the executor
+ * @template ExecutorConfig config for the executor; overrides keyboard[keybaord].executors[executor] and can also specify type for {@link BaseHotkeyTypeSingle.func}
+ */
+export type HotkeyTypeSingle<ExecutorConfig = { [key: string]: any }> = BaseHotkeyTypeSingle & ExecutorConfig;
 
 /**
  * Configures an individual hotkey,
@@ -131,7 +139,10 @@ export interface Hotkeys {
  * Used in the detector config (interface {@link DetectorConfig})
  */
 export interface Keyboard {
-  /** Root folder where all macros are stored */
+  /**
+   * Root folder where all macros are stored
+   * TODO: **Map this to an absolute path when using it**
+   */
   root: string;
   /**
    * Contains the executor specific config for executors.
