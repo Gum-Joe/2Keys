@@ -97,3 +97,50 @@ export interface PackageInDB {
  * Return type for validators
  */
 export interface ValidatorReturn { status: boolean; message?: string }
+
+// Interfaces for the software registry
+// Processor architectures we support.
+export const SOFTWARE_ARCH_X32 = "x32";
+export const SOFTWARE_ARCH_X64 = "x64";
+export const SOFTWARE_ARCH_ARM = "arm";
+export const SOFTWARE_ARCH_ARM64 = "arm64";
+export type SOFTWARE_ARCH_X32 = "x32";
+export type SOFTWARE_ARCH_X64 = "x64";
+export type SOFTWARE_ARCH_ARM = "arm";
+export type SOFTWARE_ARCH_ARM64 = "arm64";
+/**
+ * Defines a single executable that's included in software
+ */
+export interface Executable {
+	name: string;
+	/**
+	 * Path to this executable. This is:
+	 * - Relative path inside the downloaded file to the executable when downloading it.  Use `./` for the downloaded file itself.
+	 * - Absolute path to the executable when an object conforming to this interface is stored in the registry.
+	 * - Name of an executable in path for preinstalled software
+	 */
+	path: string;
+	/** Architecture of executable, 32 bit or 64 bit or arm or arm64 */
+	arch: SOFTWARE_ARCH_X32 | SOFTWARE_ARCH_X64 | SOFTWARE_ARCH_ARM | SOFTWARE_ARCH_ARM64;
+	/** OS.  Optional as it is assumed otherwise it is the current OS (`os.platform()`) */
+	os?: NodeJS.Platform;
+}
+/** Represents a single piece of installed software */
+export interface Software {
+	name: string;
+	/**
+	 * Download URL of software.
+	 */
+	url: string;
+	/** Homepage */
+	homepage: string;
+	/** List of executables (such as .exe and .dll files) included with the software */
+	executables: Executable[];
+	/**
+	 * Installed flag. Can be set to false to signify software should not be installed, or is not installed.
+	 * The flag could be set for several reasons:
+	 * - Provide the user with the opportunity to manually specify the software should be installed
+	 * - The software points to a piece of preinstalled software
+	 */
+	runInstall?: boolean;
+}

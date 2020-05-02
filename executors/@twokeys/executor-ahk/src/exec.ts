@@ -7,6 +7,8 @@ import { join } from "path";
 import type { ExecutorExecConfig } from "@twokeys/addons/src/module-interfaces";
 import type TwoKeys from "@twokeys/addons/src/module-interfaces/twokeys";
 
+const ahk = require("../build/Release/executor-ahk.node");
+
 /** Defines the config expected by this executor */
 export interface AHKExecutorConfig {
 	/** Root file */
@@ -81,4 +83,5 @@ export default async (twokeys: TwoKeys, config: ThisExecutorConfig): Promise<voi
 	`;
 	twokeys.logger.info("Exec string created & config validated. Executing...");
 	twokeys.logger.debug(execString);
+	// ahk.run_ahk_text("PATH", execString);
 };
