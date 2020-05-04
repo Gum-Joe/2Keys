@@ -124,6 +124,8 @@ export interface Executable {
 	arch: SOFTWARE_ARCH_X32 | SOFTWARE_ARCH_X64 | SOFTWARE_ARCH_ARM | SOFTWARE_ARCH_ARM64;
 	/** OS.  Optional as it is assumed otherwise it is the current OS (`os.platform()`) */
 	os?: NodeJS.Platform;
+	/** Flag if user installed (i.e. 2Keys should treat it as if as it is on PATH). */
+	userInstalled?: boolean;
 }
 /** Represents a single piece of installed software */
 export interface Software {
@@ -134,13 +136,10 @@ export interface Software {
 	url: string;
 	/** Homepage */
 	homepage: string;
-	/** List of executables (such as .exe and .dll files) included with the software */
+	/** Map of executables (such as .exe and .dll files) included with the software to string */
 	executables: Executable[];
 	/**
-	 * Installed flag. Can be set to false to signify software should not be installed, or is not installed.
-	 * The flag could be set for several reasons:
-	 * - Provide the user with the opportunity to manually specify the software should be installed
-	 * - The software points to a piece of preinstalled software
+	 * Installed flag. Can be set to false to signify software should not be installed, or is not installed at all (in the case of software on the PATH).
 	 */
-	runInstall?: boolean;
+	autoInstall?: boolean;
 }

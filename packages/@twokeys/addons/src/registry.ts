@@ -113,6 +113,7 @@ export default class AddOnsRegistry {
 	// @ts-ignore: Is initalised by this.initDB()
 	private registry: Database<sqlite3.Database, sqlite3.Statement>;
 	private registryDBFilePath: string;
+	/** Path to root of registry */
 	private registryModulesPath: string;
 	/** TwoKeys class to use in {@link TaskFunction}s, when loading add-ons */
 	private TwoKeys: typeof TwoKeys = TwoKeys;
@@ -161,7 +162,7 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys(Object.assign(packageToLoad));
+				loaded.twokeys = new this.TwoKeys(Object.assign(packageToLoad), this.registryDBFilePath);
 				loaded.call = <T, U>(fn: TaskFunction<T, U>, config: T): Promise<U> => {
 					return fn(loaded.twokeys, config);
 				};
@@ -361,7 +362,6 @@ export default class AddOnsRegistry {
 	// Registry SQLite functions
 	/**
 	 * Initalises the DB so we can use it
-	 * @param entry 
 	 */
 	public async initDB(): Promise<void> {
 		this.registry = await openDB({
@@ -677,7 +677,7 @@ export default class AddOnsRegistry {
 				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
 				driver: sqlite3.Database,
 			});
-			logger.debug(`Adding ${CREATE_REGISTRY_DB_QUERY} table...`);
+			logger.debug(`Adding ${REGISTRY_TABLE_NAME} table...`);
 			await db.exec(CREATE_REGISTRY_DB_QUERY);
 			logger.debug("Closing...");
 			await db.close();

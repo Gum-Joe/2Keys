@@ -20,22 +20,41 @@
 /**
  * Contains the 2Keys class that is provided to {@link TaskFunction}s
  */
-
+import path from "path";
 import { Logger } from "@twokeys/core";
 import { Package } from "../interfaces";
+import SoftwareRegistry from "../software";
+
+/** Interface twokeys must implement */
+interface TwoKeysI {
+	logger: Logger;
+	package: Package;
+	software: SoftwareRegistry;
+}
 
 /**
  * Class provided to add-on function that allows them to access 
  */
-export default class TwoKeys {
+export default class TwoKeys implements TwoKeysI {
 	public logger: Logger;
 	public package: Package;
+	public software: SoftwareRegistry;
 
-	constructor(packageObject: Package) {
+	/**
+	 * 
+	 * @param packageObject Object containing info on add-on
+	 * @param registryDB Path to add-ons registry DB, where software table is stored (see {@link SoftwareRegistry})
+	 */
+	constructor(packageObject: Package, registryDB: string) {
 		this.logger = new Logger({
 			name: `add-on:${packageObject.name}`
 		});
 		this.package = packageObject;
+		this.software = new SoftwareRegistry({
+			package: packageObject,
+			directory: path.dirname(registryDB),
+			dbFileName: path.basename(registryDB)
+		});
 	}
 	
 }

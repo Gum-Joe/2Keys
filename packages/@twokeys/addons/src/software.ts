@@ -22,14 +22,19 @@
  * @packageDocumentation
  */
 
-import { Software, Executable } from "./interfaces";
+import { join } from "path";
+import { constants as fsconstants, promises as fs } from "fs";
+import { Database, open as openDB } from "sqlite";
+import uuid from "uuid";
+import sqlite3 from "sqlite3";
 import { Logger } from "@twokeys/core";
-import { Database } from "sqlite";
+import { Software, Executable, Package } from "./interfaces";
+import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./constants";
 
 // Interface to implement
 interface SoftwareRegI {
 	// Properties
-	db: Database;
+	db?: Database;
 	directory: string;
 
 	// Methods
@@ -52,25 +57,131 @@ interface SoftwareRegI {
 	/** Converts software in DB to a {@link Software} */
 	parseSoftwareFromDB(softwareFromDB: any): Software;
 }
+/** Options for a new Software registry */
+interface SoftwareRegistryOptions {
+	/**
+	 * Location of software registry root.
+	 * This folder contains folders for each installed add-on, which themselves have the registry in
+	 */
+	directory: string;
+	/** Package object for software registry */
+	package: Package;
+	/** Optional File name of DB */
+	dbFileName?: string;
+	/** Logger to use */
+	logger?: Logger;
+}
 /**
  * Software registry class
  * This is a registry of software that is installed for a **specific** add-on.
- * It is stored in 2Keys-root/add-ons/software/<add-on-name> (i.e. as a sub-dir in a add-ons registry).
+ * It is stored as a table in the registry DB ({@link SOFTWARE_TABLE_NAME}).
+ * It is noted all software is stored in one table and the ownerName field used to limit software to only that used by an add-on
  */
 export default class SoftwareRegistry implements SoftwareRegI {
 
 	public directory: string;
-	public db: Database<import("sqlite3").Database, import("sqlite3").Statement>;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+	// @ts-ignore: DB initalised automatically.
+	public db: Database;
+	/** Package Object representing the add-on the software reg is for */
+	public package: Package;
+	private dbFilePath: string;
 	private logger: Logger;
 
-	constructor(directory: string) {
-		this.directory = directory;
+	constructor(options: SoftwareRegistryOptions) {
+		this.package = options.package;
+		this.directory = options.directory;
+		this.dbFilePath = join(this.directory, options.dbFileName || REGISTRY_FILE_NAME);
+		this.logger = options.logger || new Logger({ name: "software:" + options.package.name });
 	}
-	initDB(): Promise<void> {
-		throw new Error("Method not implemented.");
+
+	/** Creates a registry */
+	public static async createSoftwareRegistry(directory: string, fileName: string = REGISTRY_FILE_NAME): Promise<void> {
+		// Create DB
+		const logger = new Logger({ name: "add-ons:software" });
+		try {
+			const fullFilePath = join(directory, fileName);
+			logger.info("Creating a software DB...");
+			await fs.access(fullFilePath, fsconstants.F_OK); // If error throws, something went wrong
+			const db = await openDB({
+				filename: fullFilePath,
+				driver: sqlite3.Database,
+			});
+			logger.debug(`Adding ${SOFTWARE_TABLE_NAME} table...`);
+			await db.exec(CREATE_SOFTWARE_DB_QUERY);
+			logger.debug(`Adding ${EXECUTABLES_TABLE_NAME} table...`);
+			await db.exec(CREATE_EXECUTABLES_DB_QUERY);
+			logger.debug("Closing...");
+			await db.close();
+			logger.info("SQLite registry DB & tables created.");
+		} catch (err) {
+			logger.err("An error was encountered!");
+			if (err.code === "ENOENT") {
+				logger.err("Error! Registry DB likely does not exist!");
+				logger.err("This probably means your 2Keys install is corrupt!");
+				logger.err("Please (re)create the registry DB first!");
+				err.message = `Registry DB likely does not exist! Please (re)create the registry DB first! Original message: ${err.message}`;
+				throw err;
+			} else if (err.stack.includes(`table ${SOFTWARE_TABLE_NAME} already exists`)) {
+				logger.err("Software table already existed!  Executables table may not have been made!");
+				logger.throw_noexit(err);
+				throw new Error("Software table already existed!  Executables table may not have been made!");
+			} else if (err.stack.includes(`table ${EXECUTABLES_TABLE_NAME} already exists`)) {
+				logger.err("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
+				logger.throw_noexit(err);
+				throw new Error("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
+			} else {
+				throw err;
+			}
+		}
 	}
-	installSoftware(software: Software): Promise<void> {
-		throw new Error("Method not implemented.");
+
+	/**
+	 * Initalises the DB so we can use it
+	 * @param entry 
+	 */
+	public async initDB(): Promise<void> {
+		this.logger.debug("Opening DB...");
+		this.logger.debug("Checking for dir...");
+		this.db = await openDB({
+			filename: this.dbFilePath,
+			driver: sqlite3.cached.Database,
+		});
+		this.logger.debug("DB Open.");
+	}
+
+	public async installSoftware(software: Software): Promise<void> {
+		this.logger.info(`Installing software ${software.name}...`);
+		if (!this.db || typeof this.db === "undefined") {
+			await this.initDB();
+		}
+		this.logger.info("Adding software...");
+		const softwareUUID = uuid.v4();
+		const stmt = await this.db.prepare(
+			`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed) VALUES (@id, @name, @url, @homepage, @ownerName, @installed)`,
+		);
+		await stmt.all({
+			"@name": software.name,
+			"@id": softwareUUID,
+			"@url": software.url,
+			"@homepage": software.homepage,
+			"@ownerName": this.package.name,
+			"@installed": 0, // NOTE: Use 0 for false and 1 for true
+		});
+		this.logger.info("Adding executables...");
+		for (const executable of software.executables) {
+			const executablesStmt = await this.db.prepare(
+				`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, path, arch, os, softwareId) VALUES (@id, @name, @path, @arch, @os, @softwareId)`,
+			);
+			await executablesStmt.all({
+				"@name": executable.name,
+				"@id": uuid.v4(),
+				"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? executable.path : join(this.getSoftwareFolder(), software.name, executable.path),
+				"@arch": executable.arch,
+				"@os": executable.os || process.platform,
+				"@softwareId": softwareUUID,
+			});
+		}
 	}
 	runInstall(name: string): Promise<void> {
 		throw new Error("Method not implemented.");
@@ -92,6 +203,11 @@ export default class SoftwareRegistry implements SoftwareRegI {
 	}
 	parseSoftwareFromDB(softwareFromDB: any): Software {
 		throw new Error("Method not implemented.");
+	}
+
+	/** Gets software folder */
+	private getSoftwareFolder(): string {
+		return join(this.directory, SOFTWARE_ROOT_FOLDER, this.package.name);
 	}
 
 
