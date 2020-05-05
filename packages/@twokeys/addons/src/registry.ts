@@ -93,7 +93,7 @@ type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModul
 	 */
 	call: <T, U>(fn: TaskFunction<T, U>, config: T) => Promise<U>;
 	/** twokeys class */
-	twokeys: TwoKeys;
+	twokeys: TwoKeys<AddOnsType>;
 };
 
 // TODO: Before and after hooks

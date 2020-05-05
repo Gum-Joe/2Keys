@@ -75,7 +75,7 @@ export const CREATE_EXECUTABLES_DB_QUERY = `CREATE TABLE ${EXECUTABLES_TABLE_NAM
 	name TEXT,
 	path TEXT,
 	arch TEXT,
-	os TEXT
+	os TEXT,
 	softwareId TEXT,
 	PRIMARY KEY (id),
 	FOREIGN KEY (softwareId)

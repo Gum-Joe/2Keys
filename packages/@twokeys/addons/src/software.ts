@@ -28,7 +28,7 @@ import { Database, open as openDB } from "sqlite";
 import uuid from "uuid";
 import sqlite3 from "sqlite3";
 import { Logger } from "@twokeys/core";
-import { Software, Executable, Package } from "./interfaces";
+import { Software, Executable, Package, TWOKEYS_ADDON_TYPES } from "./interfaces";
 import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./constants";
 
 // Interface to implement
@@ -58,14 +58,14 @@ interface SoftwareRegI {
 	parseSoftwareFromDB(softwareFromDB: any): Software;
 }
 /** Options for a new Software registry */
-interface SoftwareRegistryOptions {
+interface SoftwareRegistryOptions<PackageType extends TWOKEYS_ADDON_TYPES> {
 	/**
 	 * Location of software registry root.
 	 * This folder contains folders for each installed add-on, which themselves have the registry in
 	 */
 	directory: string;
 	/** Package object for software registry */
-	package: Package;
+	package: Package<PackageType>;
 	/** Optional File name of DB */
 	dbFileName?: string;
 	/** Logger to use */
@@ -77,18 +77,18 @@ interface SoftwareRegistryOptions {
  * It is stored as a table in the registry DB ({@link SOFTWARE_TABLE_NAME}).
  * It is noted all software is stored in one table and the ownerName field used to limit software to only that used by an add-on
  */
-export default class SoftwareRegistry implements SoftwareRegI {
+export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> implements SoftwareRegI {
 
 	public directory: string;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 	// @ts-ignore: DB initalised automatically.
 	public db: Database;
 	/** Package Object representing the add-on the software reg is for */
-	public package: Package;
+	public package: Package<PackageType>;
 	private dbFilePath: string;
 	private logger: Logger;
 
-	constructor(options: SoftwareRegistryOptions) {
+	constructor(options: SoftwareRegistryOptions<PackageType>) {
 		this.package = options.package;
 		this.directory = options.directory;
 		this.dbFilePath = join(this.directory, options.dbFileName || REGISTRY_FILE_NAME);
@@ -171,7 +171,7 @@ export default class SoftwareRegistry implements SoftwareRegI {
 		this.logger.info("Adding executables...");
 		for (const executable of software.executables) {
 			const executablesStmt = await this.db.prepare(
-				`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, path, arch, os, softwareId) VALUES (@id, @name, @path, @arch, @os, @softwareId)`,
+				`INSERT INTO ${EXECUTABLES_TABLE_NAME} (id, name, path, arch, os, softwareId) VALUES (@id, @name, @path, @arch, @os, @softwareId)`,
 			);
 			await executablesStmt.all({
 				"@name": executable.name,

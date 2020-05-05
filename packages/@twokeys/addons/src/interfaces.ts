@@ -63,10 +63,10 @@ export interface TwokeysPackageInfo {
  * Represents a package (add-on) in the database (add-on registry) that has been parsed and converted
  * (single DB document)
  */
-export interface Package {
+export interface Package<Types extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> {
 	id?: string; // Given by it
 	name: string;
-	types: TWOKEYS_ADDON_TYPES[];
+	types: Types[];
 	/** Information about the package, which is found in package.json */
 	info: {
 		version: string;
@@ -79,7 +79,7 @@ export interface Package {
 		displayName?: string;
 	};
 	/** Entry point file of package with requireed exports for a given add-on type (for types see {@link TWOKEYS_ADDON_TYPE}) */
-	entry: { [key in TWOKEYS_ADDON_TYPES]: string };
+	entry: { [key in Types]: string };
 }
 
 /**

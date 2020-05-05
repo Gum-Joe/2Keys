@@ -22,35 +22,35 @@
  */
 import path from "path";
 import { Logger } from "@twokeys/core";
-import { Package } from "../interfaces";
+import { Package, TWOKEYS_ADDON_TYPES } from "../interfaces";
 import SoftwareRegistry from "../software";
 
 /** Interface twokeys must implement */
-interface TwoKeysI {
+interface TwoKeysI<AddOnsType extends TWOKEYS_ADDON_TYPES> {
 	logger: Logger;
-	package: Package;
-	software: SoftwareRegistry;
+	package: Package<AddOnsType>;
+	software: SoftwareRegistry<AddOnsType>;
 }
 
 /**
  * Class provided to add-on function that allows them to access 
  */
-export default class TwoKeys implements TwoKeysI {
+export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES> implements TwoKeysI<AddOnsType> {
 	public logger: Logger;
-	public package: Package;
-	public software: SoftwareRegistry;
+	public package: Package<AddOnsType>;
+	public software: SoftwareRegistry<AddOnsType>;
 
 	/**
 	 * 
 	 * @param packageObject Object containing info on add-on
 	 * @param registryDB Path to add-ons registry DB, where software table is stored (see {@link SoftwareRegistry})
 	 */
-	constructor(packageObject: Package, registryDB: string) {
+	constructor(packageObject: Package<AddOnsType>, registryDB: string) {
 		this.logger = new Logger({
 			name: `add-on:${packageObject.name}`
 		});
 		this.package = packageObject;
-		this.software = new SoftwareRegistry({
+		this.software = new SoftwareRegistry<AddOnsType>({
 			package: packageObject,
 			directory: path.dirname(registryDB),
 			dbFileName: path.basename(registryDB)
