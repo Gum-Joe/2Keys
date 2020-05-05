@@ -22,6 +22,7 @@
  * @packageDocumentation
  */
 import TwoKeys from "./twokeys";
+import { TWOKEYS_ADDON_TYPES } from "../interfaces";
 
 /**
  * Interface for setup descriptors.
@@ -66,4 +67,4 @@ export interface StepsExplainer {
  * @template GenericConfigT Generic where the config the add-on wants is defined
  * @template ReturnG An optional return type for the Promise
  */
-export type TaskFunction<GenericConfigT, ReturnG = void> = (twokeys: TwoKeys, config: GenericConfigT) => Promise<ReturnG>;
+export type TaskFunction<GenericConfigT, ReturnG = void, AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = (twokeys: TwoKeys<AddOnsType>, config: GenericConfigT) => Promise<ReturnG>;

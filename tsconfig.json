@@ -9,6 +9,9 @@
       ],
       "@twokeys/server": [
         "@twokeys/server/src"
+      ],
+      "@twokeys/addons": [
+        "@twokeys/addons/src"
       ]
     }
   }

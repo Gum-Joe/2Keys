@@ -91,7 +91,7 @@ type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModul
 	 * @template U Return type (excluding promise wrapper) of the function
 	 * @returns The Promise from the function
 	 */
-	call: <T, U>(fn: TaskFunction<T, U>, config: T) => Promise<U>;
+	call: <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T) => Promise<U>;
 	/** twokeys class */
 	twokeys: TwoKeys<AddOnsType>;
 };
@@ -162,8 +162,8 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys(Object.assign(packageToLoad), this.registryDBFilePath);
-				loaded.call = <T, U>(fn: TaskFunction<T, U>, config: T): Promise<U> => {
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath);
+				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
 					return fn(loaded.twokeys, config);
 				};
 				logger.info("Add-on loaded.");

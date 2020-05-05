@@ -90,6 +90,8 @@ export interface ExecutorScanMultiFileOne {
  */
 export type ExecutorScan = ExecutorScanMultiFileOne[] | ExecutorScanIndividual[];
 
+type ExecutorTaskFunction<ConfigT, ReturnG = void> = TaskFunction<ConfigT, ReturnG, "executor">
+
 /**
  * Defines the exports for an executor
  * @template THotkeyConfig Definition of the configuration of a hotkey in config files
@@ -98,9 +100,9 @@ export interface Executor<THotkeyConfig = { [key: string]: string }> {
 	/** Options to present to user when installing executor software */
 	installOptions: ConfigDescriptors;
 	/** Function that runs when installing the executor, doing, for example, downloading the executor software */
-	install: TaskFunction<any>;
+	install: ExecutorTaskFunction<any>;
 	/** Executes a hotkey */
-	execute: TaskFunction<ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>>;
+	execute: ExecutorTaskFunction<ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>>;
 	/** Options to present to user when defining a new hotkey (e.g. the function to execute) */
 	hotkeyOptions: ConfigDescriptor;
 	/**
@@ -108,12 +110,12 @@ export interface Executor<THotkeyConfig = { [key: string]: string }> {
 	 * Is optional
 	 * @returns Hotkey config
 	 */
-	assignToKey?: TaskFunction<ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>, ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>["hotkey"]>;
+	assignToKey?: ExecutorTaskFunction<ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>, ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>["hotkey"]>;
 	/**
 	 * Scan for function to execute for {@link HotkeyTypeSingle.func}
 	 * @returns A list of functions
 	 */
-	scan: TaskFunction<Keyboard, ExecutorScan>; // Scan for functions
+	scan: ExecutorTaskFunction<Keyboard, ExecutorScan>; // Scan for functions
 	/** Adds an executor to a kdb, creating e.g. boilerplate files */
-	addToKeyboard: TaskFunction<AddExecutorToKeyboardConfig>; // Add executor to a KDB (e.g. create boilerplate files)
+	addToKeyboard: ExecutorTaskFunction<AddExecutorToKeyboardConfig>; // Add executor to a KDB (e.g. create boilerplate files)
 }

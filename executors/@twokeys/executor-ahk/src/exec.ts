@@ -42,7 +42,7 @@ function getPrelude(config: ThisExecutorConfig): string {
  * AHK root files must exist, and be in the root dir.
  * If it throws an error, you've had a problem.
  */
-async function validateConfig(twokeys: TwoKeys, config: ThisExecutorConfig): Promise<void> {
+async function validateConfig(twokeys: TwoKeys<"executor">, config: ThisExecutorConfig): Promise<void> {
 	// Check it exists
 	try {
 		await fs.access(join(config.keyboard.root, config.hotkey.root), fsconstants.F_OK | fsconstants.S_IFREG);
@@ -61,7 +61,7 @@ async function validateConfig(twokeys: TwoKeys, config: ThisExecutorConfig): Pro
 	}
 }
 
-export default async (twokeys: TwoKeys, config: ThisExecutorConfig): Promise<void> => {
+export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig): Promise<void> => {
 	twokeys.logger.info("Starting execution...");
 	twokeys.logger.debug(`Hotkey: ${config.hotkeyCode}`);
 	twokeys.logger.debug(`Function: ${config.hotkey.func}`);
