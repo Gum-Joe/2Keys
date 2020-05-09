@@ -51,7 +51,7 @@ export default class Logger {
 	 * @param args {LoggerArgs} Logger args
 	 * @param logger Custom logger to print with
 	 */
-	public _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args): void {
+	protected _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args): void {
 		if (!this.isSilent) {
 			// Add prefix
 			let prefix = "";
