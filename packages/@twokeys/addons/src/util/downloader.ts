@@ -27,8 +27,7 @@ import { promisify } from "util";
 import stream from "stream";
 import mkdirp from "mkdirp";
 import ProgressBar from "progress";
-import got from "got";
-import type { Progress as GotProgress } from "got";
+import Axios from "axios";
 import { Logger } from "@twokeys/core";
 import { Software } from "./interfaces";
 
@@ -97,24 +96,33 @@ export default class Downloader {
 			}
 		}
 		this.logger.info("Downloading...");
-		const req = got.stream(this.software.url);
+		const { data, headers } = await Axios({
+			url: this.software.url,
+			method: "GET",
+			responseType: "stream"
+		});
+		const totalLength = headers["content-length"];
+		//const req = got.stream(this.software.url);
 		if (!this.logger.isSilent) {
 			this.logger.debug("Creating progress bar...");
 			const progressBar = new ProgressBar(":bar :percent ETA: :etas", {
 				complete: "▓",
 				incomplete: "░",
 				width: 50,
-				total: 6403580
+				total: totalLength ? parseInt(totalLength) : 6403580,
+
 			});
-			req.on("downloadProgress", (progress: GotProgress) => {
-				// Report download progress
-				progressBar.update(progress.percent);
+			this.logger.debug("Adding progres...");
+			data.on("data", (chunk) => {
+				progressBar.tick(chunk.length);
 			});
 		}
+		this.logger.debug("Piping output...");
 		// DEW IT
+		const writeStream = createWriteStream(this.savePath);
 		await pipeline(
-			req,
-			createWriteStream(this.savePath)
+			data,
+			writeStream
 		);
 		this.logger.info("Download complete.");
 		return;

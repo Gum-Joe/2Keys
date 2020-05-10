@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 
-export const PACKAGE_VERSION = require("../package.json").version;
+export const PACKAGE_VERSION = require("../../package.json").version;
 
 export const REGISTRY_FILE_NAME = "twokeys-registry.db";
 

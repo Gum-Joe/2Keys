@@ -13,7 +13,7 @@ const { expect } = chai;
 const SAVE_PATH = join(__dirname, "non-mocha", "ahk.zip");
 
 describe("Downloader tests", () => {
-	it("should download", async () => {
+	it("should download a file successfully", async () => {
 		const software: Software = {
 			name: "ahk",
 			url: "https://codeload.github.com/HotKeyIt/ahkdll-v2-release/zip/master",
@@ -26,8 +26,8 @@ describe("Downloader tests", () => {
 				}
 			]
 		};
-		const downloader = new Downloader(software, SAVE_PATH);
+		const downloader = new Downloader(software, SAVE_PATH, { force: true });
 		await downloader.download();
 		expect(SAVE_PATH).to.be.a.file();
-	});
-})
+	}).timeout(50000);
+});
