@@ -22,6 +22,6 @@
  * @packageDocumentation
  */
 export * from "./registry";
-export * from "./interfaces";
-export * from "./constants";
+export * from "./util/interfaces";
+export * from "./util/constants";
 export * from "./module-interfaces";

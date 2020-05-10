@@ -9,11 +9,17 @@
   "scripts": {
     "lint": "eslint --ext .ts --ext .js ."
   },
-  "workspaces": [
-    "packages/@twokeys/*",
-    "detectors/*/controller",
-    "executors/@twokeys/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/@twokeys/*",
+      "detectors/*/controller",
+      "executors/@twokeys/*"
+    ],
+    "nohoist": [
+      "**/node-addon-api",
+      "**/node-addon-api/**"
+    ]
+  },
   "devDependencies": {
     "eslint": "^6.8.0",
     "lerna": "3.20.2",

@@ -28,8 +28,8 @@ import { Database, open as openDB } from "sqlite";
 import uuid from "uuid";
 import sqlite3 from "sqlite3";
 import { Logger } from "@twokeys/core";
-import { Software, Executable, Package, TWOKEYS_ADDON_TYPES } from "./interfaces";
-import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./constants";
+import { Software, Executable, Package, TWOKEYS_ADDON_TYPES } from "./util/interfaces";
+import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./util/constants";
 
 // Interface to implement
 interface SoftwareRegI {
@@ -43,7 +43,7 @@ interface SoftwareRegI {
 	/** Downloads and installs a piece of software. */
 	installSoftware(software: Software): Promise<void>;
 	/** Runs install on a piece of software where {@link Software.runInstall} was false */
-	runInstall(name: string): Promise<void>;
+	runInstall(software: Software): Promise<void>;
 	/** Uninstall a piece of software */
 	uninstallSoftware(name: string): Promise<void>;
 	/** Update records for a piece of software */
@@ -150,6 +150,10 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 		this.logger.debug("DB Open.");
 	}
 
+	/**
+	 * Adds a piece of software to the DB, along with its executables.
+	 * Then run {@link SoftwareRegistry.runInstall}
+	 */
 	public async installSoftware(software: Software): Promise<void> {
 		this.logger.info(`Installing software ${software.name}...`);
 		if (!this.db || typeof this.db === "undefined") {
@@ -184,8 +188,12 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 		}
 		this.logger.debug("Now running install function...");
 	}
-	runInstall(name: string): Promise<void> {
-		throw new Error("Method not implemented.");
+	/**
+	 * Downloads and installs a piece of software
+	 * @param software Software object to install
+	 */
+	public async runInstall(software: Software): Promise<void> {
+		this.logger.info(`Downloading and install software of ${software.name}....`);
 	}
 	uninstallSoftware(name: string): Promise<void> {
 		throw new Error("Method not implemented.");

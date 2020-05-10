@@ -22,7 +22,7 @@
  */
 import path from "path";
 import { Logger } from "@twokeys/core";
-import { Package, TWOKEYS_ADDON_TYPES } from "../interfaces";
+import { Package, TWOKEYS_ADDON_TYPES } from "../util/interfaces";
 import SoftwareRegistry from "../software";
 
 /** Interface twokeys must implement */

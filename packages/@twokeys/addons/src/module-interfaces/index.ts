@@ -25,7 +25,7 @@
 
 import { Executor } from "./executor";
 import { DetectorController } from "./detector";
-import { TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPES } from "../interfaces";
+import { TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPES } from "../util/interfaces";
 import TwoKeys from "./twokeys";
 
 // TODO: Add types for TaskFunction<T, G>

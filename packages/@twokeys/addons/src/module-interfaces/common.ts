@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 import TwoKeys from "./twokeys";
-import { TWOKEYS_ADDON_TYPES } from "../interfaces";
+import { TWOKEYS_ADDON_TYPES } from "../util/interfaces";
 
 /**
  * Interface for setup descriptors.
