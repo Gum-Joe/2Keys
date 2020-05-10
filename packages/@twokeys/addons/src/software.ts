@@ -155,7 +155,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 		if (!this.db || typeof this.db === "undefined") {
 			await this.initDB();
 		}
-		this.logger.info("Adding software...");
+		this.logger.info("Adding software to registry...");
 		const softwareUUID = uuid.v4();
 		const stmt = await this.db.prepare(
 			`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed) VALUES (@id, @name, @url, @homepage, @ownerName, @installed)`,
@@ -168,7 +168,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 			"@ownerName": this.package.name,
 			"@installed": 0, // NOTE: Use 0 for false and 1 for true
 		});
-		this.logger.info("Adding executables...");
+		this.logger.info("Adding executables to registry...");
 		for (const executable of software.executables) {
 			const executablesStmt = await this.db.prepare(
 				`INSERT INTO ${EXECUTABLES_TABLE_NAME} (id, name, path, arch, os, softwareId) VALUES (@id, @name, @path, @arch, @os, @softwareId)`,
@@ -182,6 +182,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 				"@softwareId": softwareUUID,
 			});
 		}
+		this.logger.debug("Now running install function...");
 	}
 	runInstall(name: string): Promise<void> {
 		throw new Error("Method not implemented.");

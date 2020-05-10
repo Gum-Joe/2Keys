@@ -46,7 +46,7 @@ const server = (port: number = DEFAULT_PORT, argv: Arguments) => {
 
 	if (argv.hasOwnProperty("pid-file") && argv["pid-file"]) {
 		logger.debug(`Writing pid file to ${argv["pid-file"]}...`);
-		writeFile(argv["pid-file"], process.pid, (err) => {
+		writeFile(argv["pid-file"], process.pid.toString(), (err) => {
 			if (err) { logger.throw(err); }
 			logger.info("PID file Written.");
 		});

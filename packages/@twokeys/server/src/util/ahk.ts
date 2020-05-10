@@ -22,7 +22,6 @@
  * @packageDocumentation
  */
 import * as fs from "fs";
-import { promisify } from "util";
 import { Hotkey, Config, FetchHotkey } from "./interfaces";
 import { config_loader, userspace_config_loader } from "./config";
 import { AHK_LIB_PATH } from "./constants";
@@ -31,7 +30,7 @@ import { join } from "path";
 
 const ahk = require("../../build/Release/twokeys");
 const logger: Logger = new Logger({ name: "ahk" });
-const access = promisify(fs.access);
+const access = fs.promises.access;
 
 /**
  * Fetches a hotkey from the config file,
@@ -94,7 +93,7 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
 	// 1: Santise file input to prevent code injection
 	// Check it exists
 	try {
-		await access(file, fs.constants.F_OK | fs.constants.S_IFREG);
+		await access(file, fs.constants.R_OK);
 	} catch (err) {
 		logger.throw_noexit(err);
 	} finally {
