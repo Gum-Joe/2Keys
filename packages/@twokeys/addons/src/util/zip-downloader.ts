@@ -21,131 +21,49 @@
  * Contains the class to download software
  * @packageDocumentation
  */
-import { promises as fs, createWriteStream, constants as fsconstants } from "fs";
-import https from "https";
-import mkdirp from "mkdirp";
-import ProgressBar from "progress";
-import { Arguments } from "yargs";
-import { Logger } from "@twokeys/core";
+import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
-import AdmZip from "adm-zip";
+import unzip from "extract-zip";
+import Downloader, { DownloaderOptions } from "./downloader";
+import { Software } from "./interfaces";
+import ContentCopier from "./copy-contents";
 
-const { open, access } = fs;
+const { access } = fs;
 
 
-export default class ZipDownloader {
-	private logger: Logger;
-	private fullPath: string; // thus.saveTo + fetch_file().this.saveAs
+export default class ZipDownloader extends Downloader {
 
-	public argv: Arguments;
-	public url: string;
-	public name: string;
-	public saveTo: string;
-	public saveAs: string;
+	/** Path to extract zip file to */
+	protected extractToPath: string;
 
 	/**
 	 * Constructor
-	 * @param name Name of software downloading, as referenced in userspace_config.software
-	 * @param url URL to download the zip from (ONLY accepts HTTPS)
-	 * @param saveTo Dir to save file to
-	 * @param saveAs Filename to save as (including the .zip prefix)
+	 * @param software software object to download from {@link Software.url}. Please note URLs are HTTPS only
+	 * @param savePath Path, including filename, to save to
+	 * @param extractToPath Path to extract zip file to.
 	 */
-	constructor(name: string, url: string, saveTo: string, saveAs: string, argv?: Arguments) {
-		this.name = name;
-		this.logger = new Logger({
-			name,
-		});
-		this.url = url;
-		this.saveTo = saveTo;
-		this.saveAs = saveAs;
-		this.argv = typeof argv === "object" ? argv : {};
-
-		this.fullPath = join(this.saveTo, this.saveAs); // Save full path
+	constructor(software: Software, savePath: string, extractToPath: string, options: DownloaderOptions = {}) {
+		super(software, savePath, options);
+		this.extractToPath = extractToPath;
 	}
-
 	/**
-	 * Download the file
+	 * Extract the zip folder to `this.extractToPath`
 	 */
-	public fetch_file(): Promise<void> {
-		return new Promise(async (resolve, reject) => {
-			this.logger.info(`Downloading package from url ${this.url} to ${this.saveTo} as ${this.saveAs}.zip...`);
-
-			// Make dirs
-			try { await mkdirp(this.saveTo); } catch (err) {
-				this.logger.err("Error making download dirs!");
-				reject(err);
-				return;
-			}
-			this.logger.debug("Created dirs.");
-
-			// See if exists
-			// Only needed if not forcing
-			if (!this.argv.force) {
-				try {
-					await open(this.fullPath, "wx");
-				} catch (err) {
-					if (err.code === "EEXIST") {
-						this.logger.err(`${this.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
-						reject(new Error(`${this.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`));
-					} else {
-						this.logger.err("Error opening file to save to!");
-						reject(err);
-					}
-					return;
-				}
-			}
-
-			// Create request
-			const req = https.request({
-				host: this.url.split("/")[2],
-				port: 443,
-				path: this.url.slice(`https://${this.url.split("/")[2]}`.length)
-			});
-
-			req.on("response", res => {
-				const downloaded = "";
-				if (!this.logger.isSilent) {
-					const progress_bar = new ProgressBar(":bar :percent ETA: :etas", {
-						complete: "▓",
-						incomplete: "░",
-						width: 50,
-						total: typeof res.headers["content-length"] === "number" ? parseInt(res.headers["content-length"], 10) : 6403580
-					});
-					res.on("data", (chunk) => {
-						progress_bar.tick(chunk.length);
-					});
-				}
-				const fileStream = createWriteStream(this.fullPath);
-				res.pipe(fileStream); // Pipe to writer
-				res.on("end", () => {
-					// console.log("");
-					this.logger.info("Download complete.");
-					fileStream.close();
-					resolve();
-				});
-			});
-
-			req.end();
+	public async extract(): Promise<void> {
+		this.logger.info("Extracting...");
+		// Validate existence of zip
+		await access(this.savePath, fsconstants.F_OK);
+		//const tmpPath = join(this.extractToPath);
+		this.logger.debug(`Zip file found. Extracting to ${this.extractToPath}...`);
+		// DO IT
+		await unzip(this.savePath, {
+			dir: this.extractToPath,
 		});
-	}
-
-	/**
-	 * Extract the zip folder
-	 */
-	public extract() {
-		return new Promise((resolve, reject) => {
-			this.logger.info("Extracting...");
-			// Validate existence
-			access(this.fullPath, fsconstants.F_OK)
-				.then(() => {
-					this.logger.debug("Zip file found. Extracting...");
-					// DO IT
-					// From https://github.com/cthackers/adm-zip
-					const zipFile = new AdmZip(this.fullPath);
-					zipFile.extractAllTo(this.saveTo, true);
-					resolve();
-				})
-				.catch(reject);
+		// Copy contents
+		/*this.logger.info("Copying contents...");
+		const copier = new ContentCopier(tmpPath, this.extractToPath, {
+			logger: this.logger,
 		});
+		await copier.copyContents();*/
 	}
 }

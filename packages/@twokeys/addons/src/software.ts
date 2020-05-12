@@ -25,11 +25,22 @@
 import { join } from "path";
 import { constants as fsconstants, promises as fs } from "fs";
 import { Database, open as openDB } from "sqlite";
-import uuid from "uuid";
+import * as uuid from "uuid";
 import sqlite3 from "sqlite3";
 import { Logger } from "@twokeys/core";
-import { Software, Executable, Package, TWOKEYS_ADDON_TYPES } from "./util/interfaces";
+import Downloader from "./util/downloader";
+import ZipDownloader from "./util/zip-downloader";
 import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./util/constants";
+import {
+	Software,
+	Executable,
+	Package,
+	TWOKEYS_ADDON_TYPES,
+	SQLBool,
+	SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD,
+	SOFTWARE_DOWNLOAD_TYPE_STANDALONE,
+	SOFTWARE_DOWNLOAD_TYPE_ZIP
+} from "./util/interfaces";
 
 // Interface to implement
 interface SoftwareRegI {
@@ -78,7 +89,7 @@ interface SoftwareRegistryOptions<PackageType extends TWOKEYS_ADDON_TYPES> {
  * It is noted all software is stored in one table and the ownerName field used to limit software to only that used by an add-on
  */
 export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> implements SoftwareRegI {
-
+	/** Root directory of registry with software in */
 	public directory: string;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 	// @ts-ignore: DB initalised automatically.
@@ -170,7 +181,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 			"@url": software.url,
 			"@homepage": software.homepage,
 			"@ownerName": this.package.name,
-			"@installed": 0, // NOTE: Use 0 for false and 1 for true
+			"@installed": SQLBool.False, // NOTE: Use 0 for false and 1 for true
 		});
 		this.logger.info("Adding executables to registry...");
 		for (const executable of software.executables) {
@@ -180,20 +191,50 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 			await executablesStmt.all({
 				"@name": executable.name,
 				"@id": uuid.v4(),
-				"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? executable.path : join(this.getSoftwareFolder(), software.name, executable.path),
+				"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? executable.path : join(this.getOneSoftwareFolder(software.name), executable.path),
 				"@arch": executable.arch,
 				"@os": executable.os || process.platform,
 				"@softwareId": softwareUUID,
 			});
 		}
 		this.logger.debug("Now running install function...");
+		return await this.runInstall(software);
 	}
 	/**
-	 * Downloads and installs a piece of software
+	 * Downloads and installs a piece of software.
+	 * Please note {@link SOFTWARE_DOWNLOAD_TYPE_ZIP} will be directly extract to the folder where the zip is saved.
 	 * @param software Software object to install
 	 */
 	public async runInstall(software: Software): Promise<void> {
-		this.logger.info(`Downloading and install software of ${software.name}....`);
+		this.logger.info(`Downloading and installing software of ${software.name}....`);
+		if (software.noAutoInstall || software.downloadType === SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD) {
+			this.logger.warn(`Software ${software.name} not downloaded and installed as noAutoInstall was set, or download type was ${SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD}!`);
+			this.logger.warn("This could mean an add-on requires you to install software yourself!");
+			this.logger.warn(`Add-on: ${this.package.name}`);
+			this.logger.debug(`noAutoInstall: ${software.noAutoInstall}`);
+			this.logger.debug(`downloadType: ${software.downloadType}`);
+			return;
+		}
+		// Begin
+		// Create the save path
+		const savePathDir = this.getOneSoftwareFolder(software.name);
+		this.logger.debug(`Type: ${software.downloadType}`);
+		this.logger.debug(`Save dir: ${savePathDir}`);
+		switch (software.downloadType) {
+			case SOFTWARE_DOWNLOAD_TYPE_STANDALONE: {
+				const downloader = new Downloader(software, join(savePathDir, "tmp"), { logger: this.logger });
+				await downloader.download();
+				break;
+			}
+			case SOFTWARE_DOWNLOAD_TYPE_ZIP: {
+				const downloader = new ZipDownloader(software, join(savePathDir, "tmp.zip"), savePathDir, { logger: this.logger });
+				await downloader.download();
+				await downloader.extract();
+				break;
+			}
+		}
+		this.logger.info("Software downloaded.");
+		return;
 	}
 	uninstallSoftware(name: string): Promise<void> {
 		throw new Error("Method not implemented.");
@@ -214,9 +255,18 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 		throw new Error("Method not implemented.");
 	}
 
-	/** Gets software folder */
-	private getSoftwareFolder(): string {
+	/**
+	 * Gets software folder root
+	 */
+	public getSoftwareFolderRoot(): string {
 		return join(this.directory, SOFTWARE_ROOT_FOLDER, this.package.name);
+	}
+
+	/**
+	 * Gets folder for a given piece of software
+	 */
+	public getOneSoftwareFolder(softwareName: string): string {
+		return join(this.getSoftwareFolderRoot(), softwareName);
 	}
 
 

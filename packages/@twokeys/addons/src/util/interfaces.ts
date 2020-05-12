@@ -127,19 +127,41 @@ export interface Executable {
 	/** Flag if user installed (i.e. 2Keys should treat it as if as it is on PATH). */
 	userInstalled?: boolean;
 }
+/** Represents a software download where what's downloaded is the software application itself (i.e. an uncompressed EXE file) */
+export type SOFTWARE_DOWNLOAD_TYPE_STANDALONE = "SOFTWARE_DONWLOAD_TYPE_STANDALONE";
+export const SOFTWARE_DOWNLOAD_TYPE_STANDALONE: SOFTWARE_DOWNLOAD_TYPE_STANDALONE = "SOFTWARE_DONWLOAD_TYPE_STANDALONE";
+/** Software that downloads as a .zip file and so needs extracting. */
+export type SOFTWARE_DOWNLOAD_TYPE_ZIP = "SOFTWARE_DOWNLOAD_TYPE_ZIP";
+export const SOFTWARE_DOWNLOAD_TYPE_ZIP: SOFTWARE_DOWNLOAD_TYPE_ZIP = "SOFTWARE_DOWNLOAD_TYPE_ZIP";
+/** Software that the user has to download themselves, and so is probably on the PATH (use with {@link Software.noAutoInstall} */
+export type SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD = "SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD";
+export const SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD: SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD = "SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD";
+/** Download types */
+export type SoftwareDownloadTypes = SOFTWARE_DOWNLOAD_TYPE_STANDALONE | SOFTWARE_DOWNLOAD_TYPE_ZIP | SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD;
 /** Represents a single piece of installed software */
 export interface Software {
+	/** Name of software.  Must be a name compatible with OS paths (so a valid windows path name) */
 	name: string;
 	/**
 	 * Download URL of software.
 	 */
 	url: string;
+	/** Download type (so what the download comes as, whether ZIP, or stand-alone exe download, etc) */
+	downloadType: SoftwareDownloadTypes;
 	/** Homepage */
 	homepage: string;
 	/** Map of executables (such as .exe and .dll files) included with the software to string */
 	executables: Executable[];
 	/**
-	 * Installed flag. Can be set to false to signify software should not be installed, or is not installed at all (in the case of software on the PATH).
+	 * Installed flag. Can be set to true to signify software should not be installed (i.e. downloadedand installed), or is already installed (in the case of software on the PATH).
+	 * **Only set this flag if no software has to be downloaded AT ALL. A URL is still required, but will not be acted upon**
+	 * If you have some executable in the PATH (and so not downloaded), you can include these without setting this flag.
 	 */
-	autoInstall?: boolean;
+	noAutoInstall?: boolean;
+}
+
+/** Boolean ENUM for SQL */
+export enum SQLBool {
+	True = 1,
+	False = 0,
 }

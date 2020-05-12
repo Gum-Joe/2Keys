@@ -39,18 +39,19 @@ const pipeline = promisify(stream.pipeline);
  */
 export interface DownloaderOptions {
 	logger?: Logger;
-	force?: boolean;
+	noForce?: boolean;
 }
 
 /**
- * Downloads a file and saves it
+ * Downloads a file and saves it.
+ * Please note the default is to overwrite an existing download.
  */
 export default class Downloader {
-	private logger: Logger;
-	private software: Software;
-	private options: DownloaderOptions;
+	protected logger: Logger;
+	protected software: Software;
+	protected options: DownloaderOptions;
 	/** Path to save download to, INCLUDING filename */
-	private savePath: string; // thus.saveTo + fetch_file().this.saveAs
+	protected savePath: string; // thus.saveTo + fetch_file().this.saveAs
 	
 
 	/**
@@ -61,7 +62,8 @@ export default class Downloader {
 	 */
 	constructor(software: Software, savePath: string, options: DownloaderOptions = {}) {
 		this.software = software;
-		this.logger = options.logger || new Logger({ name: "downloader" });
+		this.logger = Object.assign(new Logger({ name: "downloader" }), options.logger) || new Logger({ name: "downloader" });
+		this.logger.args.name = this.logger.args.name + ":downloader";
 		this.savePath = savePath; // Save full path
 		this.options = options;
 	}
@@ -80,7 +82,7 @@ export default class Downloader {
 		}
 		// See if exists
 		// Only needed if not forcing
-		if (!this.options.force) {
+		if (!this.options.noForce) {
 			this.logger.debug("Checking if file already exists, and creating it if not...");
 			try {
 				await open(this.savePath, "wx");
@@ -92,7 +94,6 @@ export default class Downloader {
 					this.logger.err("Error opening file to save to!");
 					throw err;
 				}
-				return;
 			}
 		}
 		this.logger.info("Downloading...");

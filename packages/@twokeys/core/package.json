@@ -10,6 +10,7 @@
   "scripts": {
     "compile": "tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json --watch",
+    "lint": "eslint --ext .ts .",
     "docs": "typedoc --includes src",
     "test": "echo NONE",
     "coverage": "echo NONE",
