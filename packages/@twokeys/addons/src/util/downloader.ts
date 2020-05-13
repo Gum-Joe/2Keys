@@ -52,6 +52,8 @@ export default class Downloader {
 	protected options: DownloaderOptions;
 	/** Path to save download to, INCLUDING filename */
 	protected savePath: string; // thus.saveTo + fetch_file().this.saveAs
+	/** Used at the end of log strings */
+	protected downloaderName = "downloader";
 	
 
 	/**
@@ -63,7 +65,7 @@ export default class Downloader {
 	constructor(software: Software, savePath: string, options: DownloaderOptions = {}) {
 		this.software = software;
 		this.logger = Object.assign(new Logger({ name: "downloader" }), options.logger) || new Logger({ name: "downloader" });
-		this.logger.args.name = this.logger.args.name + ":downloader";
+		this.logger.args.name = this.logger.args.name + ":" + this.downloaderName;
 		this.savePath = savePath; // Save full path
 		this.options = options;
 	}
@@ -87,11 +89,14 @@ export default class Downloader {
 			try {
 				await open(this.savePath, "wx");
 			} catch (err) {
-				if (err.code === "EEXIST") {
+				if (err.code === "EEXIST" && this.options.noForce) {
 					this.logger.err(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
 					throw new Error(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
+				} else if (err.code === "EEXIST") {
+					this.logger.warn("File already existed.  Please note it will be overwritten.");
 				} else {
 					this.logger.err("Error opening file to save to!");
+					this.logger.err(err.message);
 					throw err;
 				}
 			}
@@ -125,6 +130,7 @@ export default class Downloader {
 			data,
 			writeStream
 		);
+		writeStream.close();
 		this.logger.info("Download complete.");
 		return;
 	}

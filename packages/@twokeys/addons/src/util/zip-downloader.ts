@@ -35,6 +35,7 @@ export default class ZipDownloader extends Downloader {
 
 	/** Path to extract zip file to */
 	protected extractToPath: string;
+	downloaderName = "zip-downloader";
 
 	/**
 	 * Constructor

@@ -147,11 +147,6 @@ export default class AddOnsRegistry {
 		try {
 			logger.info(`Loading package ${packageToLoad.name}, type ${typeOfAddOn}...`);
 			logger.debug(JSON.stringify(packageToLoad));
-			console.log(packageToLoad.entry);
-			console.log(typeof packageToLoad.entry);
-			console.log("a" + typeOfAddOn + "a");
-			console.log(Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn));
-			console.log(packageToLoad.entry[typeOfAddOn]);
 			if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
 				const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
 				logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
