@@ -15,7 +15,9 @@
     "coverage:upload": "codecov"
   },
   "twokeys": {
-    "types": ["executor"],
+    "types": [
+      "executor"
+    ],
     "entry": {
       "executor": "lib/index.js"
     }
@@ -41,8 +43,9 @@
     "instrument": true
   },
   "dependencies": {
+    "@twokeys/addons": "^1.0.0",
     "@twokeys/core": "^1.0.0",
-    "@twokeys/addons": "^1.0.0"
+    "node-addon-api": "^3.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
