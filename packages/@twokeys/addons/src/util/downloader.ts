@@ -26,7 +26,6 @@ import path from "path";
 import { promisify } from "util";
 import stream from "stream";
 import mkdirp from "mkdirp";
-import ProgressBar from "progress";
 import Axios from "axios";
 import { Logger } from "@twokeys/core";
 import { Software } from "./interfaces";
