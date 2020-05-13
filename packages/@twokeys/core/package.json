@@ -17,11 +17,13 @@
     "coverage:upload": "echo NONE"
   },
   "devDependencies": {
+    "@types/progress": "^2.0.3",
     "typedoc": "^0.17.4",
     "typescript": "^3.8.3"
   },
   "dependencies": {
     "chalk": "^4.0.0",
+    "progress": "^2.0.3",
     "yaml": "^1.9.2"
   }
 }

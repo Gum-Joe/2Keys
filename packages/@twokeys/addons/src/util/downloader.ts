@@ -64,7 +64,7 @@ export default class Downloader {
 	 */
 	constructor(software: Software, savePath: string, options: DownloaderOptions = {}) {
 		this.software = software;
-		this.logger = Object.assign(new Logger({ name: "downloader" }), options.logger) || new Logger({ name: "downloader" });
+		this.logger = Object.prototype.hasOwnProperty.call(options, "logger") ? Object.assign({}, options.logger) : new Logger({ name: "downloader" });
 		this.logger.args.name = this.logger.args.name + ":" + this.downloaderName;
 		this.savePath = savePath; // Save full path
 		this.options = options;
@@ -111,12 +111,11 @@ export default class Downloader {
 		//const req = got.stream(this.software.url);
 		if (!this.logger.isSilent) {
 			this.logger.debug("Creating progress bar...");
-			const progressBar = new ProgressBar(":bar :percent ETA: :etas", {
+			const progressBar = this.logger.createProgressBar(":bar :percent ETA: :etas", {
 				complete: "▓",
 				incomplete: "░",
 				width: 50,
 				total: totalLength ? parseInt(totalLength) : 6403580,
-
 			});
 			this.logger.debug("Adding progres...");
 			data.on("data", (chunk) => {

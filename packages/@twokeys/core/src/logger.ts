@@ -23,6 +23,7 @@
  */
 import { Chalk } from "chalk";
 import { Logger as LoggerArgs } from "./interfaces";
+import ProgressBar from "progress";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Instance } = require("chalk");
@@ -44,6 +45,21 @@ export default class Logger {
 
 	// Logger methods
 	/**
+	 * Gets the logger prefix to put before text
+	 * @param level {String} Log Level
+	 * @param colour {String} colour of string
+	 * @param args {LoggerArgs} Logger args
+	 */
+	protected _getPrefix(level: string, colour: string, args: LoggerArgs = this.args): string {
+		// Add prefix
+		let prefix = "";
+		if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
+			prefix = this.chalk.magenta(args.name) + " "; // eslint-disable-line prefer-template
+		}
+		const today = new Date();
+		return `${this.chalk.grey(`${today.toLocaleDateString("en-GB")} ${today.toLocaleTimeString("en-GB")}`)} ${prefix}${this.chalk[colour](level)}`;
+	}
+	/**
 	 * Basic Logger
 	 * @param level {String} Log Level
 	 * @param colour {String} colour of string
@@ -53,13 +69,7 @@ export default class Logger {
 	 */
 	protected _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args): void {
 		if (!this.isSilent) {
-			// Add prefix
-			let prefix = "";
-			if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
-				prefix = this.chalk.magenta(args.name) + " "; // eslint-disable-line prefer-template
-			}
-			const today  = new Date();
-			logger(`${this.chalk.grey(`${today.toLocaleDateString("en-GB")} ${today.toLocaleTimeString("en-GB")}`)} ${prefix}${this.chalk[colour](level)} ${text}`);
+			logger(`${this._getPrefix(level, colour, args)} ${text}`);
 		}
 	}
 	/*
@@ -136,6 +146,11 @@ export default class Logger {
 			}
 			this.err("");
 		}
+	}
+
+	/** Create a progress bar */
+	public createProgressBar(format: string, options: ProgressBar.ProgressBarOptions): ProgressBar {
+		return new ProgressBar(`${this._getPrefix("info", "green")} ${format}`, options);
 	}
 
 }

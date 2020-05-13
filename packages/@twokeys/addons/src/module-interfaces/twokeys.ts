@@ -45,15 +45,21 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES> implements 
 	 * @param packageObject Object containing info on add-on
 	 * @param registryDB Path to add-ons registry DB, where software table is stored (see {@link SoftwareRegistry})
 	 */
-	constructor(packageObject: Package<AddOnsType>, registryDB: string) {
-		this.logger = new Logger({
-			name: `add-on:${packageObject.name}`
-		});
+	constructor(packageObject: Package<AddOnsType>, registryDB: string, logger?: Logger) {
+		if (typeof logger !== "undefined" && logger) {
+			this.logger = Object.assign({} as Logger, logger);
+			this.logger.args.name = `add-on:${packageObject.name}`;
+		} else {
+			this.logger = new Logger({
+				name: `add-on:${packageObject.name}`
+			});
+		}
 		this.package = packageObject;
 		this.software = new SoftwareRegistry<AddOnsType>({
 			package: packageObject,
 			directory: path.dirname(registryDB),
-			dbFileName: path.basename(registryDB)
+			dbFileName: path.basename(registryDB),
+			logger: logger,
 		});
 	}
 	

@@ -22,11 +22,10 @@
  * @packageDocumentation
  */
 import { promises as fs, constants as fsconstants } from "fs";
-import { join } from "path";
 import unzip from "extract-zip";
 import Downloader, { DownloaderOptions } from "./downloader";
 import { Software } from "./interfaces";
-import ContentCopier from "./copy-contents";
+import type { Entry, ZipFile } from "yauzl";
 
 const { access } = fs;
 
@@ -57,14 +56,29 @@ export default class ZipDownloader extends Downloader {
 		//const tmpPath = join(this.extractToPath);
 		this.logger.debug(`Zip file found. Extracting to ${this.extractToPath}...`);
 		// DO IT
+		let entriesExtracted = 0;
+		let totalEntries = -1;
+		let progressBar: ProgressBar;
 		await unzip(this.savePath, {
 			dir: this.extractToPath,
+			onEntry: (entry: Entry, zipfile: ZipFile) => {
+				if (!this.logger.isSilent) {
+					if (totalEntries === -1) {
+						totalEntries = zipfile.entryCount;
+						progressBar = this.logger.createProgressBar(`:bar :percent :entryNo/${totalEntries} ETA: :etas`, {
+							complete: "▓",
+							incomplete: "░",
+							width: 50,
+							total: totalEntries,
+						});
+					}
+					entriesExtracted++;
+					progressBar.tick({
+						entryNo: entriesExtracted,
+						percent: `${Math.round(entriesExtracted / totalEntries * 100).toString()}%`
+					});
+				}
+			}
 		});
-		// Copy contents
-		/*this.logger.info("Copying contents...");
-		const copier = new ContentCopier(tmpPath, this.extractToPath, {
-			logger: this.logger,
-		});
-		await copier.copyContents();*/
 	}
 }
