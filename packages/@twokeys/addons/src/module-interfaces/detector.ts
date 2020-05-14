@@ -23,7 +23,7 @@
  */
 
 import { Keyboard } from "@twokeys/core/src/interfaces";
-import { ConfigDescriptors, StepsExplainer, TaskFunction } from "./common";
+import { ConfigDescriptors, StepsExplainer, TaskFunction, BaseAddon } from "./common";
 
 /**
  * Defines the config provided to {@link DetectorController.setup.addDetectorToProject.registerKeyboard}
@@ -48,7 +48,7 @@ export interface DetectorRegisterKDBConfig {
  * - A __detector controller__ handles detector to server interaction **outside** of hotkeys.
  * 	These are functions such as keeping configs in sync, management functions (such as applying updates) and setup.
  */
-export interface DetectorController {
+export interface DetectorController extends BaseAddon<"detector"> {
 	/** Export of the code to do with setup of a detector, specifically sertting up a new client and addin g to project */
 	setup: {
 		/** Required properties to help with setting up a new client */

@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/progress": "^2.0.3",
     "typedoc": "^0.17.4",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.2"
   },
   "dependencies": {
     "chalk": "^4.0.0",

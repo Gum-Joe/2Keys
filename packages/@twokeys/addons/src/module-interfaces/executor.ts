@@ -23,7 +23,7 @@
  */
 
 import { HotkeyTypeSingle, Keyboard } from "@twokeys/core/src/interfaces";
-import { ConfigDescriptors, TaskFunction, ConfigDescriptor } from "@twokeys/addons/src/module-interfaces";
+import { ConfigDescriptors, TaskFunction, ConfigDescriptor, BaseAddon } from "./";
 
 /**
  * Config for {@link Executor.exec}
@@ -90,19 +90,15 @@ export interface ExecutorScanMultiFileOne {
  */
 export type ExecutorScan = ExecutorScanMultiFileOne[] | ExecutorScanIndividual[];
 
-type ExecutorTaskFunction<ConfigT, ReturnG = void> = TaskFunction<ConfigT, ReturnG, "executor">
+export type ExecutorTaskFunction<ConfigT, ReturnG = void> = TaskFunction<ConfigT, ReturnG, "executor">
 
 /**
  * Defines the exports for an executor
  * @template THotkeyConfig Definition of the configuration of a hotkey in config files
  */
-export interface Executor<THotkeyConfig = { [key: string]: string }> {
-	/** Options to present to user when installing executor software */
-	installOptions: ConfigDescriptors;
-	/** Function that runs when installing the executor, doing, for example, downloading the executor software */
-	install: ExecutorTaskFunction<any>;
+export interface Executor<THotkeyConfig = { [key: string]: string }> extends BaseAddon<"executor"> {
 	/** Executes a hotkey */
-	execute: ExecutorTaskFunction<ExecutorExecConfig<HotkeyTypeSingle<THotkeyConfig>>>;
+	execute: ExecutorTaskFunction<ExecutorExecConfig<THotkeyConfig>>;
 	/** Options to present to user when defining a new hotkey (e.g. the function to execute) */
 	hotkeyOptions: ConfigDescriptor;
 	/**

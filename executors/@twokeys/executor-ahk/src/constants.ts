@@ -18,17 +18,9 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Main executor for AHK
+ * Constants
  * @packageDocumentation
  */
-import type { Executor } from "@twokeys/addons";
-import execute, { AHKExecutorConfig } from "./exec";
-import install from "./install";
-
-// @ts-ignore
-const executor: Executor<AHKExecutorConfig> = {
-	install: install, // causes compile errors
-	execute: execute,
-};
-
-export = executor;
+export const AUTO_HOTKEY_H = "AutoHotkey_H";
+export const AHK_DLL_X64 = "AHK_DLL_x64";
+export const AHK_DLL_X32 = "AHK_DLL_x32";

@@ -68,3 +68,11 @@ export interface StepsExplainer {
  * @template ReturnG An optional return type for the Promise
  */
 export type TaskFunction<GenericConfigT, ReturnG = void, AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = (twokeys: TwoKeys<AddOnsType>, config: GenericConfigT) => Promise<ReturnG>;
+
+/** Defines the base properties for ALL add-ons */
+export interface BaseAddon<AddonType extends TWOKEYS_ADDON_TYPES> {
+	/** Options to present to user when running install func */
+	installOptions?: ConfigDescriptors;
+	/** Function that runs when installing the add-on, doing, for example, downloading (executor) software */
+	install?: TaskFunction<any, void, AddonType>;
+}

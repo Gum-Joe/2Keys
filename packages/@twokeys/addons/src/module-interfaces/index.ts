@@ -27,6 +27,7 @@ import { Executor } from "./executor";
 import { DetectorController } from "./detector";
 import { TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPES } from "../util/interfaces";
 import TwoKeys from "./twokeys";
+import { BaseAddon } from "./common";
 
 // TODO: Add types for TaskFunction<T, G>
 export * from "./common";
@@ -47,5 +48,5 @@ export type AddOnModulesCollection = {
 	[key in TWOKEYS_ADDON_TYPES]:
 		key extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorController :
 		key extends TWOKEYS_ADDON_TYPE_EXECUTOR ? Executor :
-		{};
+		BaseAddon<TWOKEYS_ADDON_TYPES>;
 };

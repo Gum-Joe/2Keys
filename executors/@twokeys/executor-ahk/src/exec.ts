@@ -1,11 +1,29 @@
 /**
+ * @license
+ * Copyright 2020 Kishan Sambhi
+ *
+ * This file is part of 2Keys.
+ *
+ * 2Keys is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * 2Keys is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+ */
+/**
  * Holds the functions that handle hotkey executions
  * @packageDocumentation
  */
 import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
-import type { ExecutorExecConfig } from "@twokeys/addons/src/module-interfaces";
-import type TwoKeys from "@twokeys/addons/src/module-interfaces/twokeys";
+import type { TwoKeys, ExecutorExecConfig } from "@twokeys/addons";
 
 const ahk = require("../build/Release/executor-ahk.node");
 

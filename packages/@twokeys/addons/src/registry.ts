@@ -23,15 +23,15 @@
  */
 import mkdirp from "mkdirp";
 import npm from "npm";
+import { open as openDB, Database, Statement } from "sqlite";
 import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
-import { open as openDB, Database, Statement } from "sqlite";
 import { promises as fs } from "fs";
 import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
-import { AddOnModulesCollection, TaskFunction } from "./module-interfaces";
+import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
 import TwoKeys from "./module-interfaces/twokeys";
 
 /**
@@ -80,7 +80,7 @@ type GetPackageReturn = ValidatorReturn & { results?: Package[] };
  * @param package Package object of add-on that is loaded
  * @param call Function to run an add-ons task function
  */
-type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] &  {
+type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] & BaseAddon<AddOnsType> & {
 	/** Package object of add-on that is loaded */
 	package: Package;
 	/**
@@ -109,7 +109,7 @@ export default class AddOnsRegistry {
 	protected directory: string;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 	// @ts-ignore: Is initalised by this.initDB()
-	protected registry: Database<sqlite3.Database, sqlite3.Statement>;
+	protected registry: Database;
 	protected registryDBFilePath: string;
 	/** Path to root of registry */
 	protected registryModulesPath: string;
@@ -253,15 +253,48 @@ export default class AddOnsRegistry {
 		const packageString = options?.version ? packageName + "@" + options.version : packageName;
 		this.logger.info(`Package: ${packageString}`);
 		await this.runNpm(packageString, "install", options);
-		this.logger.debug("Adding package to registry...");
+		this.logger.info("Adding package to registry...");
 		// If local, get Name and use that
+		let addPackageReturn: ValidatorReturn;
 		if (options?.local) {
 			this.logger.debug("Local package.  Getting name...");
 			const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
-			return await this.addPackageToDB(packageJSON.name, options);
+			addPackageReturn = await this.addPackageToDB(packageJSON.name, options);
 		} else {
-			return await this.addPackageToDB(packageName, options);
+			addPackageReturn = await this.addPackageToDB(packageName, options);
 		}
+		if (!addPackageReturn.status) {
+			this.logger.err("Error adding package to DB!");
+			this.logger.err(addPackageReturn.message || "NO MESSAGE FOUND");
+			return addPackageReturn;
+			// throw new Error(addPackageReturn.message || "Unknown error adding package to DB!");
+		}
+
+		// Run install()
+		this.logger.info("Running package install functions...");
+		this.logger.debug("Grabbing package info...");
+		const packageInfo = await this.getPackagesFromDB(packageName);
+		if (!packageInfo.status || !Object.prototype.hasOwnProperty.call(packageInfo, "results")) {
+			this.logger.err("Error getting package from DB!");
+			this.logger.err(packageInfo.message || "NO MESSAGE FOUND OR NO RESULTS ENTRY.");
+			return packageInfo;
+			// throw new Error(packageInfo.message || "Unknown error adding package to DB, or results entry was missing!");
+		}
+		for (const addOn of packageInfo.results || []) {
+			this.logger.debug(`Running install()s from ${addOn.name}.`);
+			for (const addOnType of addOn.types) {
+				this.logger.info(`Running install() for add-on type ${addOnType}...`);
+				const loaded = await this.load(addOn.name, addOnType);
+				if (Object.prototype.hasOwnProperty.call(loaded, "install") && typeof loaded.install == "function") {
+					await loaded.call(loaded.install, {});
+				} else {
+					this.logger.warn(`Skipping over add-on ${addOn.name} add-on type ${addOnType}, as no install() function found or was not a function.`);
+				}
+			}
+		}
+		this.logger.info("Package install complete.");
+		return { status: true };
+
 	}
 
 	/**
@@ -483,7 +516,7 @@ export default class AddOnsRegistry {
 			}
 			this.logger.debug("About to run insert");
 			const documentConverted = this.convertPackageForDB(docToInsert);
-			let stmt: Statement<sqlite3.Statement>;
+			let stmt: Statement;
 			if (options?.update) {
 				this.logger.debug("Using an SQLite UPDATE command.");
 				stmt = await this.registry.prepare(

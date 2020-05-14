@@ -70,7 +70,7 @@
     "request": "^2.88.0",
     "request-progress": "^3.0.0",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.2",
+    "typescript": "^3.9.2",
     "yaml": "^1.0.0-rc.8",
     "yargs": "^13.1.0"
   },
