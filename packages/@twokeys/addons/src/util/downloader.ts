@@ -30,7 +30,6 @@ import Axios from "axios";
 import { Logger } from "@twokeys/core";
 import { Software } from "./interfaces";
 
-const { open } = fs;
 const pipeline = promisify(stream.pipeline);
 
 /**
@@ -74,6 +73,7 @@ export default class Downloader {
 	 */
 	public async download(): Promise<void> {
 		this.logger.info(`Downloading package from url ${this.software.url} to ${this.savePath}`);
+		// Make dirs
 		this.logger.debug("Creating diractories...");
 		try {
 			await mkdirp(path.dirname(this.savePath));
@@ -81,25 +81,7 @@ export default class Downloader {
 			this.logger.err("Error creating directory to save to!");
 			throw err;
 		}
-		// See if exists
-		// Only needed if not forcing
-		if (!this.options.noForce) {
-			this.logger.debug("Checking if file already exists, and creating it if not...");
-			try {
-				await open(this.savePath, "wx");
-			} catch (err) {
-				if (err.code === "EEXIST" && this.options.noForce) {
-					this.logger.err(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
-					throw new Error(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
-				} else if (err.code === "EEXIST") {
-					this.logger.warn("File already existed.  Please note it will be overwritten.");
-				} else {
-					this.logger.err("Error opening file to save to!");
-					this.logger.err(err.message);
-					throw err;
-				}
-			}
-		}
+		// Download
 		this.logger.info("Downloading...");
 		const { data, headers } = await Axios({
 			url: this.software.url,
@@ -122,14 +104,27 @@ export default class Downloader {
 			});
 		}
 		this.logger.debug("Piping output...");
-		// DEW IT
-		const writeStream = createWriteStream(this.savePath);
-		await pipeline(
-			data,
-			writeStream
-		);
-		writeStream.close();
-		this.logger.info("Download complete.");
-		return;
+		try {
+			// DEW IT
+			const writeStream = createWriteStream(this.savePath, {
+				flags: this.options.noForce ? "wx" : "w", // Overwrite unless not allowed to force
+			});
+			await pipeline(
+				data,
+				writeStream
+			);
+			writeStream.close();
+			this.logger.info("Download complete.");
+			return;
+		} catch (err) {
+			if (err.code === "EEXIST") {
+				this.logger.err(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
+				throw new Error(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
+			} else {
+				this.logger.err("Error opening file to save to!");
+				this.logger.err(err.message);
+				throw err;
+			}
+		}
 	}
 }

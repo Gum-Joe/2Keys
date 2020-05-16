@@ -22,7 +22,7 @@
  * Defines options for the Logger class
  * @packageDocumentation
  */
-export interface Logger {
+export interface LoggerArgs {
   name: string;
   windowLogger?: boolean;
 }
@@ -32,7 +32,7 @@ export interface LoggerTypes {
   name: string;
   colour: string;
   text: string;
-  args?: Logger;
+  args?: LoggerArgs;
 }
 
 /**

@@ -30,16 +30,16 @@ import { open } from "sqlite";
 import sqlite3 from "sqlite3";
 import AddOnsRegistry from "../src/registry";
 import { REGISTRY_FILE_NAME, REGISTRY_TABLE_NAME } from "../src/util/constants";
-import { PackageInDB, Package } from "../src/util/interfaces";
+import { PackageInDB, Package, TWOKEYS_ADDON_TYPES } from "../src/util/interfaces";
 import { TWOKEYS_ADDON_TYPE_EXECUTOR } from "../src/util/interfaces";
+import { REGISTRY_DIR, EXECUTOR_TEST } from "./constants";
+import { Logger } from "@twokeys/core";
+import { TwoKeys } from "../src/module-interfaces";
 
 chai.use(require("chai-fs"));
 chai.use(require("chai-as-promised"));
 
 const { expect } = chai;
-
-const REGISTRY_DIR = join(__dirname, "non-mocha", "registry");
-const EXECUTOR_TEST = join(__dirname, "non-mocha", "executor1");
 
 let registry: AddOnsRegistry;
 
@@ -58,19 +58,19 @@ describe("Registry tests", () => {
 			await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
 			expect(REGISTRY_DIR).to.be.a.directory();
 			expect(REGISTRY_DIR).to.include.files(["package.json", REGISTRY_FILE_NAME]);
-		});
+		}).timeout(20000);
 		it("should gracefully fail to create a new registry in the same location", async () => {
 			// tslint:disable-next-line: no-unused-expression
 			const res = await AddOnsRegistry.createNewRegistry(REGISTRY_DIR);
 			// tslint:disable-next-line: no-unused-expression
 			expect(res.status).to.be.false;
 			expect(res.message).to.include("already exists");
-		});
-		it("should error if we try to make a registry in an invalid location", () => {
+		}).timeout(20000);
+		it("should error if we try to make a registry in an invalid location", async () => {
 			// @ts-ignore: So we can make an invalid location
 			// tslint:disable:no-unused-expression
-			expect(AddOnsRegistry.createNewRegistry({ notAPath: true })).to.be.rejected; 
-		});
+			await expect(AddOnsRegistry.createNewRegistry({ notAPath: true })).to.be.rejected; 
+		}).timeout(20000);
 		it("should create a registry, with a db at a different folder when the option is given", async () => {
 			const TEST_REG_DIR = join(REGISTRY_DIR, "test2");
 			await AddOnsRegistry.createNewRegistry(TEST_REG_DIR, {
@@ -80,7 +80,7 @@ describe("Registry tests", () => {
 			expect(TEST_REG_DIR).to.include.files(["package.json", "test.db"]);
 			const reg = new AddOnsRegistry(TEST_REG_DIR, { dbFilePath: join(TEST_REG_DIR, "test.db") });
 			expect(() => reg.initDB()).to.not.throw();
-		});
+		}).timeout(20000);
 
 	});
 
@@ -90,6 +90,29 @@ describe("Registry tests", () => {
 			registry = new AddOnsRegistry(REGISTRY_DIR);
 			await registry.initDB();
 		});
+
+		describe("Initialisation", () => {
+			it("should use our custom logger and TwoKeys objects", () => {
+				const testLogger = new Logger({ name: "meap" });
+				testLogger.args.testProp = true;
+				class TwoKeysCustom<AddonType extends TWOKEYS_ADDON_TYPES> extends TwoKeys<AddonType> {
+					public static isCustom = true;
+				}
+				const testReg = new AddOnsRegistry(REGISTRY_DIR, {
+					logger: testLogger,
+					twokeys: TwoKeysCustom,
+				});
+				// @ts-ignore
+				expect(testReg.logger.args).to.haveOwnProperty("testProp");
+				// @ts-ignore
+				expect(testReg.logger.args.testProp).to.be.true;
+				// @ts-ignore
+				expect(testReg.TwoKeys).to.haveOwnProperty("isCustom");
+				// @ts-ignore
+				expect(testReg.TwoKeys.isCustom).to.be.true;
+			})
+		});
+		
 
 		describe("Package install", () => {
 			it("should sucessfully install a package and NOT add it to the registry when twokeys properties are not present", async () => {
@@ -129,7 +152,7 @@ describe("Registry tests", () => {
 
 			it("should fail on a package that is not installed", async () => {
 				// tslint:disable-next-line: no-unused-expression
-				expect(registry.addPackageToDB("express")).to.be.rejected;
+				await expect(registry.addPackageToDB("express")).to.be.rejected;
 			});
 
 			it("should not duplicate a package in the registry", async () => {
@@ -213,15 +236,15 @@ describe("Registry tests", () => {
 			// TODO:
 			// Fix above test
 			// Add error handlers:
-			it("should throw an error if npm has an error installing.", () => {
+			it("should throw an error if npm has an error installing.", async () => {
 				// tslint:disable-next-line: no-unused-expression
-				expect(registry.install("DEFINTILY_NOT_A_PACKAGE" + Math.random())).to.be.rejected;
+				await expect(registry.install("DEFINTILY_NOT_A_PACKAGE" + Math.random())).to.be.rejected;
 			}).timeout(50000);
-			it("should throw an error if encountered when adding a package.", () => {
+			it("should throw an error if encountered when adding a package.", async () => {
 				// Pass an invalid path
 				// @ts-ignore
 				// tslint:disable-next-line: no-unused-expression
-				expect(registry.addPackageToDB({ notAFilePath: true })).to.be.rejected;
+				await expect(registry.addPackageToDB({ notAFilePath: true })).to.be.rejected;
 			}).timeout(50000);
 		});
 
@@ -229,7 +252,7 @@ describe("Registry tests", () => {
 			it("should succesfuly uninstall a package", async () => {
 				const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
 				await registry.uninstall(pkgJSON.name);
-				expect(fs.access(join(REGISTRY_DIR, "node_modules", pkgJSON.name), fsConstants.F_OK)).to.be.rejected;
+				await expect(fs.access(join(REGISTRY_DIR, "node_modules", pkgJSON.name), fsConstants.F_OK)).to.be.rejected;
 				// Check DB
 				const db = await open({
 					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
@@ -239,8 +262,8 @@ describe("Registry tests", () => {
 				await db.close();
 				expect(docs).to.be.of.length(0);
 			}).timeout(50000);
-			it("should throw an error uninstalling a package that does not exist", () => {
-				expect(registry.uninstall("NOT_INSTALL")).to.be.eventually.rejected;
+			it("should throw an error uninstalling a package that does not exist", async () => {
+				await expect(registry.uninstall("NOT_INSTALL")).to.be.eventually.rejected;
 			}).timeout(50000);
 		});
 
@@ -278,11 +301,12 @@ describe("Registry tests", () => {
 				const docs = await db2.all(
 					`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE id = "UUID_0191914029374"`,
 				);
+				await db2.close();
 				expect(docs).to.be.of.length(0);
 			});
 		});
 
-		describe("Add On Loading", () => {
+		describe("Add-On Loading", () => {
 			const LOAD_TEST = join(__dirname, "non-mocha", "loadTest");
 			const pkgJson = require(join(__dirname, "non-mocha", "loadTest", "package.json"));
 			before(async function () {
@@ -295,7 +319,7 @@ describe("Registry tests", () => {
 			});
 
 			it("should load a add-on and allow us to execute it", async () => {
-				const executor = await registry.loadExecutor(pkgJson.name);
+				const executor = await registry.load(pkgJson.name, "executor");
 				const config = {
 					testValue: false,
 					expect,
@@ -305,8 +329,8 @@ describe("Registry tests", () => {
 				expect(config.testValue).to.be.true;
 			});
 
-			it("should throw an error if we ask for an add-on that is not installed", () => {
-				expect(registry.load("DEFO_NOT_IN_REG_" + Math.random(), "detector")).to.be.rejectedWith(/No packages were found (.*)/);
+			it("should throw an error if we ask for an add-on that is not installed", async () => {
+				await expect(registry.load("DEFO_NOT_IN_REG_" + Math.random(), "detector")).to.be.rejectedWith(/No packages were found (.*)/);
 			});
 
 			it("should throw an error if we load a type not in the package", async () => {
@@ -317,6 +341,18 @@ describe("Registry tests", () => {
 					return;
 				}
 				throw new Error("No error thrown when one was expected!");
+			});
+
+			it("should throw an error if loading from DB fails for other reasons", async () => {
+				await registry.install(join(__dirname, "non-mocha/loadTest3malformedDB"), { local: true });
+				const pkgJSON = require(join(__dirname, "non-mocha/loadTest3malformedDB/package.json"));
+				const db = await open({
+					filename: join(REGISTRY_DIR, REGISTRY_FILE_NAME),
+					driver: sqlite3.Database,
+				});
+				await db.exec(`UPDATE ${REGISTRY_TABLE_NAME} SET info = "{}" WHERE name = "${pkgJSON.name}"`);
+				await expect(registry.load(pkgJSON.name, "executor")).to.be.rejectedWith(/Error loading package from DB:(.*)/);
+				await registry.uninstall(pkgJSON.name);
 			});
 
 			it("should successfully load all add-ons of a given type", async () => {

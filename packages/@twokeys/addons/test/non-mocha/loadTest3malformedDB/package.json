@@ -1,0 +1,14 @@
+{
+	"name": "loading-test-3",
+	"private": true,
+	"version": "1.0.0",
+	"description": "MEAP",
+	"author": "Kishan",
+	"entry": "app.js",
+	"twokeys": {
+		"types": ["executor"],
+		"entry": {
+			"executor": "./executor.js"
+		}
+	}
+}

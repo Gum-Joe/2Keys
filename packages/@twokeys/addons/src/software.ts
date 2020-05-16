@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 
-import { join } from "path";
+import { join, basename } from "path";
 import { constants as fsconstants, promises as fs } from "fs";
 import { Database, open as openDB } from "sqlite";
 import * as uuid from "uuid";
@@ -202,7 +202,9 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 	}
 	/**
 	 * Downloads and installs a piece of software.
-	 * Please note {@link SOFTWARE_DOWNLOAD_TYPE_ZIP} will be directly extract to the folder where the zip is saved.
+	 * Please Note:
+	 * - Software of type {@link SOFTWARE_DOWNLOAD_TYPE_ZIP} will be directly extract to the folder where the zip is saved.
+	 * - Software of type {@link SOFTWARE_DOWNLOAD_TYPE_STANDALONE} will cause software to be downloaded to a file that is saved as the last part of the url, if {@link Software.filename} is not given
 	 * @param software Software object to install
 	 */
 	public async runInstall(software: Software): Promise<void> {
@@ -222,12 +224,12 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 		this.logger.debug(`Save dir: ${savePathDir}`);
 		switch (software.downloadType) {
 			case SOFTWARE_DOWNLOAD_TYPE_STANDALONE: {
-				const downloader = new Downloader(software, join(savePathDir, "tmp"), { logger: this.logger });
+				const downloader = new Downloader(software, join(savePathDir, software.filename || basename(software.url)), { logger: this.logger });
 				await downloader.download();
 				break;
 			}
 			case SOFTWARE_DOWNLOAD_TYPE_ZIP: {
-				const downloader = new ZipDownloader(software, join(savePathDir, "tmp.zip"), savePathDir, { logger: this.logger });
+				const downloader = new ZipDownloader(software, join(savePathDir, software.filename || "tmp.zip"), savePathDir, { logger: this.logger });
 				await downloader.download();
 				await downloader.extract();
 				break;

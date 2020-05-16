@@ -132,7 +132,7 @@ export default class AddOnsRegistry {
 			this.TwoKeys = options.twokeys;
 		}
 		if (typeof options?.logger !== "undefined" && options.logger) {
-			this.logger = Object.assign({}, options.logger);
+			this.logger = Object.assign(Object.create(Object.getPrototypeOf(options.logger)), options.logger);
 			this.logger.args.name = "add-ons:registry";
 		}
 		this.logger.debug(`New registry class created for ${dir}`);
@@ -191,8 +191,8 @@ export default class AddOnsRegistry {
 			// Query DB for package
 			const packagesResults = await this.getPackagesFromDB(packageName);
 			if (!packagesResults.status) {
-				this.logger.err("Error loading package!");
-				throw new Error(`Error loading package: ${packagesResults.message || "See logs above"}`);
+				this.logger.err("Error loading package from DB!");
+				throw new Error(`Error loading package from DB: ${packagesResults.message || "See logs above"}`);
 			} else if (typeof packagesResults.results === "undefined" || packagesResults.results.length < 1) {
 				this.logger.err(`No packages were found by name ${packageName}!`);
 				const err: any = new Error(`No packages were found by name ${packageName}!`);

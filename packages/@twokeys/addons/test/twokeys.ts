@@ -1,0 +1,29 @@
+/**
+ * Tests for twokeys
+ */
+import chai from "chai";
+import { join } from "path";
+import { TwoKeys } from "../src/module-interfaces";
+import { testPackage, REGISTRY_DIR } from "./constants";
+import { REGISTRY_FILE_NAME } from "../src/util/constants";
+import { Logger } from "@twokeys/core";
+import { LoggerArgs } from "@twokeys/core/src/interfaces";
+chai.use(require("chai-fs"));
+chai.use(require("chai-as-promised"));
+
+const { expect } = chai;
+
+class NewLogger extends Logger {
+	constructor(args: LoggerArgs) {
+		super(args);
+		this.args.isTest = true;
+	}
+}
+
+describe("TwoKeys Object tests", () => {
+	it("should use our custom logger", () => {
+		const twokeys = new TwoKeys(testPackage, join(REGISTRY_DIR, REGISTRY_FILE_NAME), new NewLogger({ name: "TESTED" }));
+		expect(twokeys.logger.args).to.haveOwnProperty("isTest");
+		expect(twokeys.logger.args.isTest).to.be.true;
+	})
+})

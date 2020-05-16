@@ -158,6 +158,8 @@ export interface Software {
 	 * If you have some executable in the PATH (and so not downloaded), you can include these without setting this flag.
 	 */
 	noAutoInstall?: boolean;
+	/** File name to download to */
+	filename?: string;
 }
 
 /** Boolean ENUM for SQL */

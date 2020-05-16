@@ -47,7 +47,7 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES> implements 
 	 */
 	constructor(packageObject: Package<AddOnsType>, registryDB: string, logger?: Logger) {
 		if (typeof logger !== "undefined" && logger) {
-			this.logger = Object.assign({} as Logger, logger);
+			this.logger = Object.assign(Object.create(Object.getPrototypeOf(logger)), logger);
 			this.logger.args.name = `add-on:${packageObject.name}`;
 		} else {
 			this.logger = new Logger({
