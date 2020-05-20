@@ -8,7 +8,7 @@
 	"twokeys": {
 		"types": ["detector", "notAType"],
 		"entry": {
-			"detector": "./main.js",
+			"detector": "./app.js",
 			"notAType": "./n.js"
 		},
 		"iconURL": "./not-an-icon.svg",

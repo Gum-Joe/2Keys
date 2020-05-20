@@ -250,7 +250,7 @@ describe("Registry tests", () => {
 			it("should run the package's install() function", async () => {
 				await registry.install(join(__dirname, "non-mocha", "installTest"), { local: true });
 				expect(join(REGISTRY_DIR, "test.txt")).to.be.a.file();
-			})
+			});
 		});
 
 		describe("Package uninstall", () => {
@@ -278,7 +278,7 @@ describe("Registry tests", () => {
 				await registry.install("debug", {
 					version: "3.0.0",
 				});
-				await registry.update("debug", { version: "4.0.1" });
+				await registry.update("debug", "4.0.1");
 				expect(join(REGISTRY_DIR, "node_modules", "debug")).to.be.a.directory();
 				const pkgJSON = require(join(REGISTRY_DIR, "node_modules", "debug", "package.json"));
 				expect(pkgJSON.version).to.be.equal("4.0.1");
@@ -369,7 +369,7 @@ describe("Registry tests", () => {
 				const res = await registry.loadAllOfType("executor");
 				expect(res).to.have.property(pkgJson.name);
 				expect(res).to.have.property(pkgJson2.name);
-				expect(Object.keys(res)).to.be.of.length(2);
+				expect(Object.keys(res)).to.be.of.length(3);
 				const testOBJ = {
 					testValue: false,
 					testValue2: false,

@@ -267,21 +267,33 @@ export default class AddOnsRegistry {
 		if (!addPackageReturn.status) {
 			this.logger.err("Error adding package to DB!");
 			this.logger.err(addPackageReturn.message || "NO MESSAGE FOUND");
+			this.logger.info("Please note: if you intended to install a non-2Keys package (i.e. just a normal npm package) npm has been ran and the package is installed.");
 			return addPackageReturn;
 			// throw new Error(addPackageReturn.message || "Unknown error adding package to DB!");
 		}
 
 		// Run install()
+		// `addPackageToDB()` ensure that package is a valdi 2Keys package
 		this.logger.info("Running package install functions...");
 		this.logger.debug("Grabbing package info...");
 		const packageInfo = await this.getPackagesFromDB(truePackageName);
-		if (!packageInfo.status || !Object.prototype.hasOwnProperty.call(packageInfo, "results") || (packageInfo.results || []).length < 1) {
+		if (!packageInfo.status || !Object.prototype.hasOwnProperty.call(packageInfo, "results") || typeof packageInfo.results === "undefined") {
 			this.logger.err("Error getting package from DB!");
 			this.logger.err(packageInfo.message || "NO MESSAGE FOUND OR NO RESULTS ENTRY.");
 			return packageInfo;
 			// throw new Error(packageInfo.message || "Unknown error adding package to DB, or results entry was missing!");
 		}
-		this.logger.debug(JSON.stringify(packageInfo));
+		// Length check
+		if (packageInfo.results.length < 1) {
+			this.logger.err("Got back no packages when quering for the package we just installed.");
+			this.logger.err("Something unexpected, perhaps impossible, has happened.");
+			this.logger.err("It is recommended you reindex your registry.");
+			this.logger.err("NOTE: If the package you were installing is non-2Keys (i.e. just a normal npm package), your package has been installed.");
+			this.logger.err("However, you shouldn't be seeing this error message if so, as we should have already checked if the package has 2Keys metadata.");
+			this.logger.err("Please file an issue for either of the above cases, since we think seeing this error message should be impossible.");
+			throw new Error("Got back no packages when quering for the package we just installed.");
+		}
+
 		for (const addOn of packageInfo.results || []) {
 			this.logger.debug(`Running install()s from ${addOn.name}.`);
 			for (const addOnType of addOn.types) {
@@ -377,12 +389,13 @@ export default class AddOnsRegistry {
 	/**
 	 * Update package to version
 	 * @param packageName Name of package to update
-	 * @param version SemVer compliant version to update to.
+	 * @param version Ideally, SemVer compliant version to update to, but any npm version string (e.g. latest and beta) that comes after package@... is accepted
+	 * NOTE: We can't yet test this using a 2Keys package due to lack of one in the main npm registry
 	 */
-	public async update(packageName: string, options?: ManagerOptions): Promise<ValidatorReturn> {
-		this.logger.info(`Updating package ${packageName} to version ${options?.version}...`);
+	public async update(packageName: string, version = "latest", options?: ManagerOptions & { version: never }): Promise<ValidatorReturn> {
+		this.logger.info(`Updating package ${packageName} to version ${version}...`);
 		try {
-			await this.runNpm(packageName + "@" + options?.version, "install", options);
+			await this.runNpm(packageName + "@" + version, "install", options);
 			this.logger.info("Reindexing package in registry...");
 			return await this.addPackageToDB(packageName, {
 				...options,
