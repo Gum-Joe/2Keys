@@ -150,7 +150,7 @@ describe("Registry tests", () => {
 				expect(JSON.parse(docs[0].entry).executor).to.be.equal(pkgJSON.twokeys.entry.executor);
 			}).timeout(50000);
 
-			it("should fail on a package that is not installed", async () => {
+			it("should fail to add a package to the DB that is not installed", async () => {
 				// tslint:disable-next-line: no-unused-expression
 				await expect(registry.addPackageToDB("express")).to.be.rejected;
 			});
@@ -246,6 +246,11 @@ describe("Registry tests", () => {
 				// tslint:disable-next-line: no-unused-expression
 				await expect(registry.addPackageToDB({ notAFilePath: true })).to.be.rejected;
 			}).timeout(50000);
+
+			it("should run the package's install() function", async () => {
+				await registry.install(join(__dirname, "non-mocha", "installTest"), { local: true });
+				expect(join(REGISTRY_DIR, "test.txt")).to.be.a.file();
+			})
 		});
 
 		describe("Package uninstall", () => {

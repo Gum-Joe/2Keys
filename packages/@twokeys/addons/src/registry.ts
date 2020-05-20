@@ -255,14 +255,15 @@ export default class AddOnsRegistry {
 		await this.runNpm(packageString, "install", options);
 		this.logger.info("Adding package to registry...");
 		// If local, get Name and use that
-		let addPackageReturn: ValidatorReturn;
+		let truePackageName = packageName; // packageName can be a string, hence this
 		if (options?.local) {
 			this.logger.debug("Local package.  Getting name...");
 			const packageJSON = JSON.parse((await fs.readFile(join(packageName, "package.json"))).toString("utf8"));
-			addPackageReturn = await this.addPackageToDB(packageJSON.name, options);
-		} else {
-			addPackageReturn = await this.addPackageToDB(packageName, options);
+			truePackageName = packageJSON.name;
 		}
+		// Add package
+		const addPackageReturn = await this.addPackageToDB(truePackageName, options);
+		// Error check
 		if (!addPackageReturn.status) {
 			this.logger.err("Error adding package to DB!");
 			this.logger.err(addPackageReturn.message || "NO MESSAGE FOUND");
@@ -273,13 +274,14 @@ export default class AddOnsRegistry {
 		// Run install()
 		this.logger.info("Running package install functions...");
 		this.logger.debug("Grabbing package info...");
-		const packageInfo = await this.getPackagesFromDB(packageName);
-		if (!packageInfo.status || !Object.prototype.hasOwnProperty.call(packageInfo, "results")) {
+		const packageInfo = await this.getPackagesFromDB(truePackageName);
+		if (!packageInfo.status || !Object.prototype.hasOwnProperty.call(packageInfo, "results") || (packageInfo.results || []).length < 1) {
 			this.logger.err("Error getting package from DB!");
 			this.logger.err(packageInfo.message || "NO MESSAGE FOUND OR NO RESULTS ENTRY.");
 			return packageInfo;
 			// throw new Error(packageInfo.message || "Unknown error adding package to DB, or results entry was missing!");
 		}
+		this.logger.debug(JSON.stringify(packageInfo));
 		for (const addOn of packageInfo.results || []) {
 			this.logger.debug(`Running install()s from ${addOn.name}.`);
 			for (const addOnType of addOn.types) {
@@ -599,7 +601,7 @@ export default class AddOnsRegistry {
 			}
 			const docs = await this.queryDBForPackage(packageName);
 			this.logger.debug("Raw DB output retrieved.");
-			this.logger.debug("Converting...");
+			this.logger.debug(`Converting ${docs.length} documents...`);
 			const newDocs: Package[] = [];
 			for (const doc of docs) {
 				const newDoc = this.parsePackageFromDB(doc);
