@@ -163,7 +163,7 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath);
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.logger);
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
 					return fn(loaded.twokeys, config);
 				};

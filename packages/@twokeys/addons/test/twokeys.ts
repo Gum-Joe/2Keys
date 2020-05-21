@@ -16,6 +16,8 @@ const { expect } = chai;
 class NewLogger extends Logger {
 	constructor(args: LoggerArgs) {
 		super(args);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+		// @ts-ignore: Needed for testing
 		this.args.isTest = true;
 	}
 }
@@ -24,6 +26,8 @@ describe("TwoKeys Object tests", () => {
 	it("should use our custom logger", () => {
 		const twokeys = new TwoKeys(testPackage, join(REGISTRY_DIR, REGISTRY_FILE_NAME), new NewLogger({ name: "TESTED" }));
 		expect(twokeys.logger.args).to.haveOwnProperty("isTest");
+		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+		// @ts-ignore: Needed for testing
 		expect(twokeys.logger.args.isTest).to.be.true;
 	})
 })

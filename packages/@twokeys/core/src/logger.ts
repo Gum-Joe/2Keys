@@ -22,18 +22,19 @@
  * @packageDocumentation
  */
 import { Chalk } from "chalk";
-import { Logger as LoggerArgs } from "./interfaces";
+import { LoggerArgs } from "./interfaces";
 import ProgressBar from "progress";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Instance } = require("chalk");
 
 export default class Logger {
-	private argv: string[];
-	private chalk: Chalk;
+	protected argv: string[];
+	protected chalk: Chalk;
 	public isDebug: boolean;
 	public args: LoggerArgs;
 	public isSilent: boolean;
+
 	constructor(args: LoggerArgs) {
 		this.args = args || { name: "logger" };
 		this.argv = process.argv;
