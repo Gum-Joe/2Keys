@@ -34,7 +34,7 @@ import { TWOKEYS_ADDON_TYPES } from "../util/interfaces";
  * {
  * 	"name": "IP Address",
  * 	"inputType": "LINE_TEXT",
- *  "type": "string";
+ * 	"type": "string";
  * }
  * ```
  */

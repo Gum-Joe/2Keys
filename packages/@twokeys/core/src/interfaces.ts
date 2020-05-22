@@ -62,7 +62,7 @@ export interface ProjectConfig {
   };
   /**
    * List of config files for detectors that are used with this project.
-   * This is different from the client config files
+   * This is different from the client config files, as these are stored in the project dir
    */
   detectors: string[];
 }
@@ -79,7 +79,7 @@ export interface ClientConfig {
   /** Controller to use with detector, that is the add-on that holds the server side code for interfacing with the detector */
   controller: string;
   /** Config options to pass to the controller, defined by the controller itself */
-  controllerConfig: string;
+  controllerConfig: unknown;
 }
 
 /**
@@ -90,7 +90,7 @@ export interface ClientConfig {
  * What's here can override what is in `Keyboard.executors[executor]`.
  */
 export interface BaseHotkeyTypeSingle {
-  /** Executor to use for this hotkey (defaults to `keyboard[keybaord].executors.default) */
+  /** Executor to use for this hotkey (defaults to `keyboard[keybaord].executors.default`) */
   executor?: string;
   /**
    * Macro funcion to execute.
@@ -155,14 +155,15 @@ export interface Keyboard {
     default: string;
     /**
      * @param executorName Name of executor being configured
+     * Config is {@link Executor.hotkeyOptions}
      */
-    [executorName: string]: any;
+    [executorName: string]: unknown;
   };
   /**
    * Contains detector-specific config that is required per keyboard.
    * For example, the identifier for the keyboard to watch
    */
-  detector: any;
+  detector: unknown;
   /**
    * Holds the mapping of hotkeys to macros.
    * For example, the macro to run when a hotkey combo is pressed.
@@ -177,6 +178,7 @@ export interface Keyboard {
  * Configures a detector as part of a project.
  * This is different to the client config file, which is stored the 2Keys Root Config (see interface {@link ServerConfig}).
  * This config is stored with the project config (see interface {@link ProjectConfig}).
+ * TODO:  USE A MAP
  */
 export interface DetectorConfig {
   /** Name of Detector */
@@ -189,7 +191,7 @@ export interface DetectorConfig {
     name: string;
   };
   /** Config for detector. It's up to the detector controller to decide what goes here. */
-  detector_config: object;
+  detector_config: unknown;
   /**
    * List of keyboard, where `propName` is the keyboard name,
    * that are associated with this detector in this project.

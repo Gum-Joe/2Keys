@@ -64,6 +64,7 @@ export interface DetectorController extends BaseAddon<"detector"> {
 		};
 		/** Export of the code to do with adding a detector */
 		addDetectorToProject: {
+			/** Describes the config to go in {@link DetectorConfig.detector_config} */
 			configDescriptor: ConfigDescriptors;
 			/** Function to run to add the detector to the project */
 			setup: TaskFunction<any>;
