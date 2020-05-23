@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 
-import { Keyboard } from "@twokeys/core/src/interfaces";
+import { Keyboard, DetectorConfig } from "@twokeys/core/src/interfaces";
 import { ConfigDescriptors, StepsExplainer, TaskFunction, BaseAddon } from "./common";
 
 /**
@@ -64,10 +64,15 @@ export interface DetectorController extends BaseAddon<"detector"> {
 		};
 		/** Export of the code to do with adding a detector */
 		addDetectorToProject: {
-			/** Describes the config to go in {@link DetectorConfig.detector_config} */
+			/** Describes config options to show to user when adding this detector. */
 			configDescriptor: ConfigDescriptors;
+			/**
+			 * Generates a config object to save as the detector config for this project ({@link DetectorConfig.detector_config}).
+			 * Should return a default config if no arguments given
+			 */
+			createConfig: TaskFunction<undefined | { [key: string]: any }, DetectorConfig["detector_config"]>;
 			/** Function to run to add the detector to the project */
-			setup: TaskFunction<any>;
+			setup?: TaskFunction<any>;
 			/** Function to run to register a new keyboard.  This will usually be actions such as matching the keybaord in config to a physical device */
 			registerKeyboard: TaskFunction<DetectorRegisterKDBConfig>;
 		};
