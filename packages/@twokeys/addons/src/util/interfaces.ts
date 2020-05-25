@@ -140,6 +140,8 @@ export const SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD: SOFTWARE_DOWNLOAD_TYPE_NO_DOWNL
 export type SoftwareDownloadTypes = SOFTWARE_DOWNLOAD_TYPE_STANDALONE | SOFTWARE_DOWNLOAD_TYPE_ZIP | SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD;
 /** Represents a single piece of installed software */
 export interface Software {
+	/** ID (optional, but required for DB). Is a UUID v4 */
+	id?: string;
 	/** Name of software.  Must be a name compatible with OS paths (so a valid windows path name) */
 	name: string;
 	/**
@@ -161,6 +163,9 @@ export interface Software {
 	/** File name to download to */
 	filename?: string;
 }
+
+/** Software In DB */
+export type SoftwareInDB = Software & { id: string };
 
 /** Boolean ENUM for SQL */
 export enum SQLBool {

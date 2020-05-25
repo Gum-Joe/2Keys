@@ -21,16 +21,12 @@
  * Contains the software registry code
  * @packageDocumentation
  */
-
 import { join, basename } from "path";
-import { constants as fsconstants, promises as fs } from "fs";
-import { Database, open as openDB } from "sqlite";
+import { Database } from "sqlite";
 import * as uuid from "uuid";
-import sqlite3 from "sqlite3";
-import { Logger } from "@twokeys/core";
 import Downloader from "./util/downloader";
 import ZipDownloader from "./util/zip-downloader";
-import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./util/constants";
+import { SOFTWARE_TABLE_NAME, EXECUTABLES_TABLE_NAME, SOFTWARE_ROOT_FOLDER } from "./util/constants";
 import {
 	Software,
 	Executable,
@@ -39,8 +35,10 @@ import {
 	SQLBool,
 	SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD,
 	SOFTWARE_DOWNLOAD_TYPE_STANDALONE,
-	SOFTWARE_DOWNLOAD_TYPE_ZIP
+	SOFTWARE_DOWNLOAD_TYPE_ZIP,
+	SoftwareInDB
 } from "./util/interfaces";
+import SoftwareRegistryQueryProvider, { SoftwareRegistryDBProviderOptions } from "./software-query-provider";
 
 // Interface to implement
 interface SoftwareRegI {
@@ -64,106 +62,37 @@ interface SoftwareRegI {
 	/** Get executable object */
 	getExecutable(software: string, name: string): Promise<Executable>;
 	/** Get software object */
-	getSoftware(name: string): Promise<Software>;
+	getSoftware(name: string): Promise<SoftwareInDB>;
 	/** Converts software in DB to a {@link Software} */
-	parseSoftwareFromDB(softwareFromDB: any): Software;
+	// parseSoftwareFromDB(softwareFromDB: any): Software;
 }
+
 /** Options for a new Software registry */
-interface SoftwareRegistryOptions<PackageType extends TWOKEYS_ADDON_TYPES> {
-	/**
-	 * Location of software registry root.
-	 * This folder contains folders for each installed add-on, which themselves have the registry in
-	 */
-	directory: string;
+interface SoftwareRegistryOptions<PackageType extends TWOKEYS_ADDON_TYPES> extends SoftwareRegistryDBProviderOptions {
 	/** Package object for software registry */
 	package: Package<PackageType>;
-	/** Optional File name of DB */
-	dbFileName?: string;
-	/** Logger to use */
-	logger?: Logger;
 }
 /**
- * Software registry class
+ * Software registry class.
  * This is a registry of software that is installed for a **specific** add-on.
  * It is stored as a table in the registry DB ({@link SOFTWARE_TABLE_NAME}).
- * It is noted all software is stored in one table and the ownerName field used to limit software to only that used by an add-on
+ * It is noted all software is stored in one table and the ownerName field used to limit software to only that used by an add-on.
  */
-export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> implements SoftwareRegI {
-	/** Root directory of registry with software in */
-	public directory: string;
-	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-	// @ts-ignore: DB initalised automatically.
-	public db: Database;
+export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> extends SoftwareRegistryQueryProvider implements SoftwareRegI {
 	/** Package Object representing the add-on the software reg is for */
 	public package: Package<PackageType>;
-	private dbFilePath: string;
-	private logger: Logger;
 
 	constructor(options: SoftwareRegistryOptions<PackageType>) {
+		super(options);
 		this.package = options.package;
-		this.directory = options.directory;
-		this.dbFilePath = join(this.directory, options.dbFileName || REGISTRY_FILE_NAME);
-		this.logger = options.logger || new Logger({ name: "software:" + options.package.name });
-	}
-
-	/** Creates a registry */
-	public static async createSoftwareRegistry(directory: string, fileName: string = REGISTRY_FILE_NAME): Promise<void> {
-		// Create DB
-		const logger = new Logger({ name: "add-ons:software" });
-		try {
-			const fullFilePath = join(directory, fileName);
-			logger.info("Creating a software DB...");
-			await fs.access(fullFilePath, fsconstants.F_OK); // If error throws, something went wrong
-			const db = await openDB({
-				filename: fullFilePath,
-				driver: sqlite3.Database,
-			});
-			logger.debug(`Adding ${SOFTWARE_TABLE_NAME} table...`);
-			await db.exec(CREATE_SOFTWARE_DB_QUERY);
-			logger.debug(`Adding ${EXECUTABLES_TABLE_NAME} table...`);
-			await db.exec(CREATE_EXECUTABLES_DB_QUERY);
-			logger.debug("Closing...");
-			await db.close();
-			logger.info("SQLite registry DB & tables created.");
-		} catch (err) {
-			logger.err("An error was encountered!");
-			if (err.code === "ENOENT") {
-				logger.err("Error! Registry DB likely does not exist!");
-				logger.err("This probably means your 2Keys install is corrupt!");
-				logger.err("Please (re)create the registry DB first!");
-				err.message = `Registry DB likely does not exist! Please (re)create the registry DB first! Original message: ${err.message}`;
-				throw err;
-			} else if (err.stack.includes(`table ${SOFTWARE_TABLE_NAME} already exists`)) {
-				logger.err("Software table already existed!  Executables table may not have been made!");
-				logger.throw_noexit(err);
-				throw new Error("Software table already existed!  Executables table may not have been made!");
-			} else if (err.stack.includes(`table ${EXECUTABLES_TABLE_NAME} already exists`)) {
-				logger.err("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
-				logger.throw_noexit(err);
-				throw new Error("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
-			} else {
-				throw err;
-			}
-		}
-	}
-
-	/**
-	 * Initalises the DB so we can use it
-	 * @param entry 
-	 */
-	public async initDB(): Promise<void> {
-		this.logger.debug("Opening DB...");
-		this.logger.debug("Checking for dir...");
-		this.db = await openDB({
-			filename: this.dbFilePath,
-			driver: sqlite3.cached.Database,
-		});
-		this.logger.debug("DB Open.");
+		this.logger.args.name = this.package.name;
 	}
 
 	/**
 	 * Adds a piece of software to the DB, along with its executables.
 	 * Then run {@link SoftwareRegistry.runInstall}
+	 * 
+	 * Note: Don't try to install pieces of software with the same names, it will throw an error (see {@link SoftwareRegistryQueryProvider.getSoftwares})
 	 */
 	public async installSoftware(software: Software): Promise<void> {
 		this.logger.info(`Installing software ${software.name}...`);
@@ -171,6 +100,16 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 			await this.initDB();
 		}
 		this.logger.info("Adding software to registry...");
+		// Validate if software of this name already in DB
+		this.logger.debug("Checking if already installed...");
+		const results = await super.getSoftwares(software.name);
+		if (results.length > 0) {
+			this.logger.err("Error! Attempted to install a piece of software with a name already used!");
+			this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
+			this.logger.err("Please file an issue with them.");
+			throw new Error("Error! Attempted to install a piece of software with a name already used!");
+		}
+		// Ok, add it to the DB
 		const softwareUUID = uuid.v4();
 		const stmt = await this.db.prepare(
 			`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed) VALUES (@id, @name, @url, @homepage, @ownerName, @installed)`,
@@ -236,6 +175,8 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 			}
 		}
 		this.logger.info("Software downloaded.");
+		this.logger.debug("Saving install state to DB...");
+		await this.db.run(`UPDATE ${SOFTWARE_TABLE_NAME} SET installed = ${SQLBool.True} WHERE name = ?`, software.name);
 		return;
 	}
 	uninstallSoftware(name: string): Promise<void> {
@@ -244,19 +185,31 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 	updateSoftwareRecord(name: string, newData: Software): Promise<void> {
 		throw new Error("Method not implemented.");
 	}
+
+	// Query wrappers
 	getExecutablePath(software: string, name: string): Promise<string> {
 		throw new Error("Method not implemented.");
 	}
 	getExecutable(software: string, name: string): Promise<Executable> {
 		throw new Error("Method not implemented.");
 	}
-	getSoftware(name: string): Promise<Software> {
-		this.logger.debug(`Retrieving software of name ${name} in full...`);
-		
-		throw new Error("Method not implemented.");
-	}
-	parseSoftwareFromDB(softwareFromDB: any): Software {
-		throw new Error("Method not implemented.");
+
+	/**
+	 * Retrieves a **SINGLE** piece of software from the DB.
+	 * Please look at {@link SoftwareRegistryQueryProvider.getSoftwares} for more info, such as constraints.
+	 * @param name Name of software to get.
+	 */
+	public async getSoftware(name): Promise<SoftwareInDB> {
+		const results = await super.getSoftwares(name, this.package.name)[0];
+		if (results.length > 1) {
+			this.logger.err("ERROR! More than one software found!");
+			this.logger.err("This situation is supposedly impossible, as you can't have software be the same name and also belong to the same add-on.");
+			this.logger.err("This could mean the add-on writer did something wrong, or there is an issue in 2Keys.");
+			this.logger.err("It's recomended you reinstall the offending add-on.");
+			this.logger.err("Still getting an error? Please file an issue with 2Keys.");
+			throw new Error("ERROR! More than one software found (which should be impossible)!");
+		}
+		return results[0];
 	}
 
 	/**
