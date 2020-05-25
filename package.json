@@ -17,7 +17,9 @@
     ],
     "nohoist": [
       "**/node-addon-api",
-      "**/node-addon-api/**"
+      "**/node-addon-api/**",
+      "**/chalk",
+      "**/chalk/**"
     ]
   },
   "devDependencies": {

@@ -251,6 +251,8 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> i
 		throw new Error("Method not implemented.");
 	}
 	getSoftware(name: string): Promise<Software> {
+		this.logger.debug(`Retrieving software of name ${name} in full...`);
+		
 		throw new Error("Method not implemented.");
 	}
 	parseSoftwareFromDB(softwareFromDB: any): Software {
