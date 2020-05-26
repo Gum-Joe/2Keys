@@ -80,7 +80,7 @@ interface SoftwareRegistryOptions<PackageType extends TWOKEYS_ADDON_TYPES> exten
  */
 export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> extends SoftwareRegistryQueryProvider implements SoftwareRegI {
 	/** Package Object representing the add-on the software reg is for */
-	public package: Package<PackageType>;
+	public readonly package: Package<PackageType>;
 
 	constructor(options: SoftwareRegistryOptions<PackageType>) {
 		super(options);
@@ -112,7 +112,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		// Ok, add it to the DB
 		const softwareUUID = uuid.v4();
 		const stmt = await this.db.prepare(
-			`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed) VALUES (@id, @name, @url, @homepage, @ownerName, @installed)`,
+			`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed, downloadType) VALUES (@id, @name, @url, @homepage, @ownerName, @installed, @downloadType)`,
 		);
 		await stmt.all({
 			"@name": software.name,
@@ -121,11 +121,12 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			"@homepage": software.homepage,
 			"@ownerName": this.package.name,
 			"@installed": SQLBool.False, // NOTE: Use 0 for false and 1 for true
+			"@downloadType": software.downloadType,
 		});
 		this.logger.info("Adding executables to registry...");
 		for (const executable of software.executables) {
 			const executablesStmt = await this.db.prepare(
-				`INSERT INTO ${EXECUTABLES_TABLE_NAME} (id, name, path, arch, os, softwareId) VALUES (@id, @name, @path, @arch, @os, @softwareId)`,
+				`INSERT INTO ${EXECUTABLES_TABLE_NAME} (id, name, path, arch, os, userInstalled, softwareId) VALUES (@id, @name, @path, @arch, @os, @userInstalled, @softwareId)`,
 			);
 			await executablesStmt.all({
 				"@name": executable.name,
@@ -133,6 +134,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 				"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? executable.path : join(this.getOneSoftwareFolder(software.name), executable.path),
 				"@arch": executable.arch,
 				"@os": executable.os || process.platform,
+				"@userInstalled": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? SQLBool.True : SQLBool.False,
 				"@softwareId": softwareUUID,
 			});
 		}
@@ -156,6 +158,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			this.logger.debug(`downloadType: ${software.downloadType}`);
 			return;
 		}
+		// After this point it's safe to assume the software can be installed
 		// Begin
 		// Create the save path
 		const savePathDir = this.getOneSoftwareFolder(software.name);
@@ -200,7 +203,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * @param name Name of software to get.
 	 */
 	public async getSoftware(name): Promise<SoftwareInDB> {
-		const results = await super.getSoftwares(name, this.package.name)[0];
+		const results: SoftwareInDB[] = await super.getSoftwares(name, this.package.name);
 		if (results.length > 1) {
 			this.logger.err("ERROR! More than one software found!");
 			this.logger.err("This situation is supposedly impossible, as you can't have software be the same name and also belong to the same add-on.");
@@ -210,6 +213,15 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			throw new Error("ERROR! More than one software found (which should be impossible)!");
 		}
 		return results[0];
+	}
+	/**
+	 * Prevent use of getSoftwares.
+	 * 
+	 * This placeholder exists as add-on should not be using getSoftwares()
+	 */
+	public async getSoftwares(name: string): Promise<SoftwareInDB[]> {
+		this.logger.warn("Don't use getSoftwares(): use getSoftware() instead");
+		return [await this.getSoftware(name)];
 	}
 
 	/**

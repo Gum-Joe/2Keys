@@ -21,14 +21,13 @@
  * Contains the code to provide DB querying of ANY Software Registry for ANY add-on
  * @packageDocumentation
  */
-
 import { join } from "path";
 import { constants as fsconstants, promises as fs } from "fs";
 import { Database, open as openDB } from "sqlite";
 import sqlite3 from "sqlite3";
 import { Logger } from "@twokeys/core";
 import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY } from "./util/constants";
-import { Executable, SoftwareInDB } from "./util/interfaces";
+import { Executable, SoftwareInDB, ExecutableInDB } from "./util/interfaces";
 
 /** Options for a new Software registry DB Provider */
 export interface SoftwareRegistryDBProviderOptions {
@@ -110,16 +109,13 @@ export default class SoftwareRegistryQueryProvider {
 		if (name === "*" && ownerName === "*") {
 			this.logger.debug("Getting everything...");
 			softwares = await this.db.all<SoftwareInDB[]>(`SELECT * FROM ${SOFTWARE_TABLE_NAME};`);
-		}
-		else if (name !== "*" && ownerName === "*") {
+		} else if (name !== "*" && ownerName === "*") {
 			// Get all software of a given name, regarless of ownerName
 			softwares = await this.db.all<SoftwareInDB[]>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?;`, name);
-		}
-		else if (name === "*" && ownerName !== "*") {
+		} else if (name === "*" && ownerName !== "*") {
 			// Get all software for a given add-on
 			softwares = await this.db.all<SoftwareInDB[]>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE ownerName = ?;`, ownerName);
-		}
-		else {
+		} else {
 			// Get all for a specific add-on and of a given type
 			softwares = await (await this.db.prepare(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = @name AND ownerName = @owner;`)).all<SoftwareInDB[]>({
 				"@name": name,
@@ -133,7 +129,7 @@ export default class SoftwareRegistryQueryProvider {
 		// From https://medium.com/hackernoon/async-await-essentials-for-production-loops-control-flows-limits-23eb40f171bd
 		// Note that async functions return a promise
 		const promises = softwares.map(async (item) => {
-			const executables = await this.db.all<Executable[]>(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE softwareId = ?`, [item.id]);
+			const executables = await this.db.all<ExecutableInDB[]>(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE softwareId = ?`, [item.id]);
 			item.executables = executables;
 			return item;
 		});
@@ -161,8 +157,7 @@ export default class SoftwareRegistryQueryProvider {
 			logger.debug("Closing...");
 			await db.close();
 			logger.info("SQLite registry DB & tables created.");
-		}
-		catch (err) {
+		} catch (err) {
 			logger.err("An error was encountered!");
 			if (err.code === "ENOENT") {
 				logger.err("Error! Registry DB likely does not exist!");
@@ -170,18 +165,16 @@ export default class SoftwareRegistryQueryProvider {
 				logger.err("Please (re)create the registry DB first!");
 				err.message = `Registry DB likely does not exist! Please (re)create the registry DB first! Original message: ${err.message}`;
 				throw err;
-			}
-			else if (err.stack.includes(`table ${SOFTWARE_TABLE_NAME} already exists`)) {
+			} else if (err.stack.includes(`table ${SOFTWARE_TABLE_NAME} already exists`)) {
 				logger.err("Software table already existed!  Executables table may not have been made!");
 				logger.throw_noexit(err);
 				throw new Error("Software table already existed!  Executables table may not have been made!");
-			}
-			else if (err.stack.includes(`table ${EXECUTABLES_TABLE_NAME} already exists`)) {
+			} else if (err.stack.includes(`table ${EXECUTABLES_TABLE_NAME} already exists`)) {
 				logger.err("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
 				logger.throw_noexit(err);
 				throw new Error("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
-			}
-			else {
+			} else {
+				logger.err(err.message);
 				throw err;
 			}
 		}

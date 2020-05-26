@@ -2,7 +2,7 @@
  * Software registry tests
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { join, basename } from "path";
+import { join, basename, relative, normalize } from "path";
 import chai, { expect } from "chai";
 import rimraf from "rimraf";
 import { open as openDB } from "sqlite";
@@ -14,7 +14,10 @@ import {
 	SOFTWARE_TABLE_NAME,
 	EXECUTABLES_TABLE_NAME,
 	SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD,
-	SOFTWARE_DOWNLOAD_TYPE_STANDALONE
+	SOFTWARE_DOWNLOAD_TYPE_STANDALONE,
+	SQLBool,
+	Software,
+	SOFTWARE_ROOT_FOLDER
 } from "../src";
 import { SOFTWARE_REG_ROOT, testPackage, testSoftware } from "./constants";
 import mkdirp from "mkdirp";
@@ -43,7 +46,39 @@ describe("Software Registry tests", () => {
 		await softwareRegisty.initDB();
 	});
 
-	describe("Software installation", () => {
+	describe("Software Registry Critical Methods", () => {
+		it("should get the software root for this add-on", () => {
+			expect(softwareRegisty.getSoftwareFolderRoot()).to.equal(join(SOFTWARE_REG_ROOT, SOFTWARE_ROOT_FOLDER, testPackage.name));
+		});
+		it("should get the software folder for one piece of software", () => {
+			expect(softwareRegisty.getOneSoftwareFolder(testSoftware.name)).to.equal(join(SOFTWARE_REG_ROOT, SOFTWARE_ROOT_FOLDER, testPackage.name, testSoftware.name));
+		});
+	});
+
+	describe("Software Registry Creation", () => {
+		// Mostly error checking
+		it("should throw an error creating a software DB if a registry DB doesn't already exist.", async () => {
+			await expect(SoftwareRegistry.createSoftwareRegistry(join(__dirname, "non-mocha"))).to.be.rejectedWith(/Registry DB likely does not exist!(.*)/);
+		});
+		it("should throw an error creating a software DB if one has already been made", async () => {
+			await expect(SoftwareRegistry.createSoftwareRegistry(SOFTWARE_REG_ROOT)).to.be.rejectedWith(/Software table already existed!(.*)/);
+		});
+		it("should throw an error creating a software DB if the executables table exists, but not the software", async () => {
+			const FAKE_ROOT = join(SOFTWARE_REG_ROOT, "error_test");
+			await mkdirp(FAKE_ROOT);
+			await AddOnsRegistry.createNewRegistry(FAKE_ROOT);
+			await SoftwareRegistry.createSoftwareRegistry(FAKE_ROOT);
+			const db = await openDB({
+				filename: join(FAKE_ROOT, REGISTRY_FILE_NAME),
+				driver: sqlite3.Database,
+			});
+			await db.exec(`DROP TABLE ${SOFTWARE_TABLE_NAME};`);
+			await db.close();
+			await expect(SoftwareRegistry.createSoftwareRegistry(FAKE_ROOT)).to.be.rejectedWith(/Executables table already existed!(.*)/);
+		}).timeout(20000);
+	});
+
+	describe("Software Installation", () => {
 		it("should successfully insert a software", async () => {
 			await softwareRegisty.installSoftware({
 				name: "test-software",
@@ -100,26 +135,38 @@ describe("Software Registry tests", () => {
 		}).timeout(30000);
 	});
 
-	describe("Software registry creation", () => {
-		// Mostly error checking
-		it("should throw an error creating a software DB if a registry DB doesn't already exist.", async () => {
-			await expect(SoftwareRegistry.createSoftwareRegistry(join(__dirname, "non-mocha"))).to.be.rejectedWith(/Registry DB likely does not exist!(.*)/);
+	describe("Software Registry Querying", () => {
+		// Just in case
+		before(async () => {
+			try { 
+				await softwareRegisty.installSoftware(testSoftware);
+			} catch (err) {
+				if (!err.message.includes("name already used")) {
+					throw err;
+				}
+			}
 		});
-		it("should throw an error creating a software DB if one has already been made", async () => {
-			await expect(SoftwareRegistry.createSoftwareRegistry(SOFTWARE_REG_ROOT)).to.be.rejectedWith(/Software table already existed!(.*)/);
+
+		it("should successfully retrieve a piece of software", async () => {
+			// Assumes testSoftware has been instaleed
+			const result = await softwareRegisty.getSoftware(testSoftware.name);
+			// Data check
+			// Check for non DB keys
+			expect(result).to.haveOwnProperty("id");
+			expect(result).to.haveOwnProperty("installed");
+			expect(result.installed).to.equal(SQLBool.True);
+			expect(result.ownerName).to.equal(testPackage.name);
+			expect(result.executables).to.be.of.length(1);
+			expect(result.executables[0]).to.haveOwnProperty("id");
+			expect(result.executables[0]).to.haveOwnProperty("os");
+			expect(result.executables[0]).to.haveOwnProperty("softwareId");
+			expect(relative(softwareRegisty.getOneSoftwareFolder(testSoftware.name), result.executables[0].path)).to.equal(normalize(testSoftware.executables[0].path));
+			// Hack to change properties so that the deep include works (since the DB has the abolsute path)
+			// Combine the executable DB props with the ones we provided
+			const testSoftware2: Software = Object.assign(testSoftware);
+			testSoftware2.executables[0].path = join(softwareRegisty.getOneSoftwareFolder(testSoftware.name), testSoftware2.executables[0].path);
+			expect(result).to.deep.include({ ...testSoftware2, executables: result.executables.map((value, index) => { return { ...value, ...testSoftware2.executables[index] }; })});
 		});
-		it("should throw an error creating a software DB if the executables table exists, but not the software", async () => {
-			const FAKE_ROOT = join(SOFTWARE_REG_ROOT, "error_test");
-			await mkdirp(FAKE_ROOT);
-			await AddOnsRegistry.createNewRegistry(FAKE_ROOT);
-			await SoftwareRegistry.createSoftwareRegistry(FAKE_ROOT);
-			const db = await openDB({
-				filename: join(FAKE_ROOT, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
-			});
-			await db.exec(`DROP TABLE ${SOFTWARE_TABLE_NAME};`);
-			await db.close();
-			await expect(SoftwareRegistry.createSoftwareRegistry(FAKE_ROOT)).to.be.rejectedWith(/Executables table already existed!(.*)/);
-		}).timeout(20000);
 	});
+	
 });
