@@ -29,5 +29,10 @@ describe("TwoKeys Object tests", () => {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 		// @ts-ignore: Needed for testing
 		expect(twokeys.logger.args.isTest).to.be.true;
-	})
-})
+	});
+
+	it("should use a regular logger", () => {
+		const twokeys = new TwoKeys(testPackage, join(REGISTRY_DIR, REGISTRY_FILE_NAME));
+		expect(twokeys.logger.args).to.not.haveOwnProperty("isTest");
+	});
+});

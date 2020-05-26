@@ -7,6 +7,7 @@ import chai, { expect } from "chai";
 import rimraf from "rimraf";
 import { open as openDB } from "sqlite";
 import sqlite3 from "sqlite3";
+import * as uuid from "uuid";
 import SoftwareRegistry from "../src/software";
 import AddOnsRegistry from "../src/registry";
 import {
@@ -17,10 +18,13 @@ import {
 	SOFTWARE_DOWNLOAD_TYPE_STANDALONE,
 	SQLBool,
 	Software,
-	SOFTWARE_ROOT_FOLDER
+	SOFTWARE_ROOT_FOLDER,
+	ExecutableInDB,
+	SoftwareInDB
 } from "../src";
 import { SOFTWARE_REG_ROOT, testPackage, testSoftware } from "./constants";
 import mkdirp from "mkdirp";
+import SoftwareRegistryQueryProvider from "../src/software-query-provider";
 
 chai.use(require("chai-fs"));
 chai.use(require("chai-as-promised"));
@@ -43,7 +47,8 @@ describe("Software Registry tests", () => {
 			directory: SOFTWARE_REG_ROOT,
 			package: testPackage
 		});
-		await softwareRegisty.initDB();
+		// Implicitly tested as part of functions
+		// await softwareRegisty.initDB();
 	});
 
 	describe("Software Registry Critical Methods", () => {
@@ -79,7 +84,7 @@ describe("Software Registry tests", () => {
 	});
 
 	describe("Software Installation", () => {
-		it("should successfully insert a software", async () => {
+		it("should successfully insert a software (noAutoInstall = true)", async () => {
 			await softwareRegisty.installSoftware({
 				name: "test-software",
 				url: "https://google.com",
@@ -124,6 +129,11 @@ describe("Software Registry tests", () => {
 			// Installed?
 			expect(join(softwareRegisty.getOneSoftwareFolder(testSoftware2.name), basename(testSoftware2.url))).to.be.a.file();
 		}).timeout(30000);
+
+		it("should fail to install a piece of software already installed", async () => {
+			await expect(softwareRegisty.installSoftware(testSoftware)).to.be.rejectedWith(/(.*)name already used(.*)/);
+		});
+
 		it("should respect custom filenames", async () => {
 			const testSoftware2 = Object.assign({}, testSoftware);
 			testSoftware2.downloadType = SOFTWARE_DOWNLOAD_TYPE_STANDALONE;
@@ -133,6 +143,20 @@ describe("Software Registry tests", () => {
 			// Installed?
 			expect(join(softwareRegisty.getOneSoftwareFolder(testSoftware2.name), "ahk-filename-test.zip")).to.be.a.file();
 		}).timeout(30000);
+
+		it("should respect userInstalled for executables, by using the path provided purely", async () => {
+			// HACK: Hack used as JS doesn't support deep cloning
+			const testSoftware2: Software = JSON.parse(JSON.stringify(testSoftware));
+			testSoftware2.name = testSoftware2.name + Math.random().toString();
+			testSoftware2.executables[0].name = testSoftware2.executables[0].name + "2";
+			testSoftware2.executables[0].userInstalled = true;
+			testSoftware2.executables[0].path = "python3";
+			await softwareRegisty.installSoftware(testSoftware2);
+			const docs = await softwareRegisty.db.all<ExecutableInDB[]>(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = "${testSoftware2.executables[0].name}"`);
+			expect(docs).to.be.of.length(1);
+			expect(docs[0].path).to.equal(testSoftware2.executables[0].path);
+			expect(docs[0].userInstalled).to.equal(SQLBool.True);
+		});
 	});
 
 	describe("Software Registry Querying", () => {
@@ -163,9 +187,80 @@ describe("Software Registry tests", () => {
 			expect(relative(softwareRegisty.getOneSoftwareFolder(testSoftware.name), result.executables[0].path)).to.equal(normalize(testSoftware.executables[0].path));
 			// Hack to change properties so that the deep include works (since the DB has the abolsute path)
 			// Combine the executable DB props with the ones we provided
-			const testSoftware2: Software = Object.assign(testSoftware);
+			const testSoftware2: Software = Object.assign({}, testSoftware);
 			testSoftware2.executables[0].path = join(softwareRegisty.getOneSoftwareFolder(testSoftware.name), testSoftware2.executables[0].path);
 			expect(result).to.deep.include({ ...testSoftware2, executables: result.executables.map((value, index) => { return { ...value, ...testSoftware2.executables[index] }; })});
+		});
+
+		// If this is failing, copy over the insertion code from installSoftware()
+		it("should throw an error if > 1 piece of software found (supposedly impossible)", async () => {
+			const softwareTestUUID = uuid.v4();
+			const stmt = await softwareRegisty.db.prepare(
+				`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed, downloadType) VALUES (@id, @name, @url, @homepage, @ownerName, @installed, @downloadType)`,
+			);
+			await stmt.all({
+				"@name": testSoftware.name,
+				"@id": softwareTestUUID,
+				"@url": testSoftware.url,
+				"@homepage": testSoftware.homepage,
+				"@ownerName": testPackage.name,
+				"@installed": SQLBool.False, // NOTE: Use 0 for false and 1 for true
+				"@downloadType": testSoftware.downloadType,
+			});
+			// Inserted, now should throw
+			await expect(softwareRegisty.getSoftware(testSoftware.name)).to.be.rejectedWith(/(.*)More than one software found(.*)/);
+			// Now delete
+			await softwareRegisty.db.run(`DELETE FROM ${SOFTWARE_TABLE_NAME} WHERE id = ?`, softwareTestUUID);
+		});
+
+		it("should return an array when we call getSoftwares() on SoftwareRegistry (warning also displayed, but this is not testable)", async () => {
+			const results = await Promise.all([softwareRegisty.getSoftwares(testSoftware.name), softwareRegisty.getSoftware(testSoftware.name)])
+			expect(results[0]).to.deep.equal([results[1]]);
+		});
+
+		describe("Base class SoftwareRegistryQueryProvider tests", () => {
+			let softwareQueryRegistry: SoftwareRegistryQueryProvider;
+			before(async () => {
+				softwareQueryRegistry = new SoftwareRegistryQueryProvider({
+					directory: SOFTWARE_REG_ROOT,
+				});
+				// DB init is implicitly tested
+			});
+
+			describe("getSoftwares()", () => {
+				it("should retrieve all softwares when no argument passed", async () => {
+					const results = await softwareQueryRegistry.getSoftwares();
+					const comparsion = await softwareQueryRegistry.db.all<SoftwareInDB[]>(`SELECT * FROM ${SOFTWARE_TABLE_NAME};`);
+					// Length tells us if it has all been fetched
+					expect(results.length).to.equal(comparsion.length);
+					return;
+				});
+				it("should retrieve all software for a specific add-on when no software name is passed, both for the query class and the main software registry class", async () => {
+					const oldPackage = Object.assign({}, softwareRegisty.package);
+					softwareRegisty.package.name = "test-addon-10";
+					await softwareRegisty.installSoftware(testSoftware);
+					// Test doubles added, now test
+					const results = await softwareQueryRegistry.getSoftwares(null, "test-addon-10");
+					const results2 = await softwareRegisty.getSoftware();
+					// Checks
+					expect(results).to.be.of.length(1);
+					expect(results[0].ownerName).to.equal("test-addon-10");
+					// Length tells us if it has all been fetched
+					expect([results2]).to.deep.equal(results);
+					// Reassign
+					softwareRegisty.package.name = oldPackage.name;
+				});
+				it("should get all software of a given name, when no ownerName is passed", async () => {
+					const results = await softwareQueryRegistry.getSoftwares(testSoftware.name);
+					expect(results).to.be.of.length(2);
+					expect(results[0].ownerName).to.not.equal(results[1].ownerName)
+				});
+				it("should not mix up software with the same name from mulltiple add-ons", async () => {
+					const results = await softwareQueryRegistry.getSoftwares(testSoftware.name, testPackage.name);
+					expect(results).to.be.of.length(1);
+					expect(results[0].ownerName).to.equal(testPackage.name);
+				});
+			});
 		});
 	});
 	

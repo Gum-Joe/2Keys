@@ -83,11 +83,11 @@ export default class SoftwareRegistryQueryProvider {
 	 *
 	 * Please note that whilst this function allows software with the same name belonging to the same add-on **WE DO NOT RECCOMMEND THIS AT ALL**
 	 * as it will throw an error when trying to install a software with a name already in the DB.
-	 * However, please note software from separate add-ons can have the same name, just not software from the same add-on
+	 * However, please note software from separate add-ons can have the same names, just not software from the same add-on
 	 *
 	 * NOTE:
-	 * - "*" for name means retrieve all software
-	 * - "*" for ownerName (you can only provide this when using a raw {@link SoftwareRegistryQueryProvider}) means retrieve all software of name
+	 * - `null` for name means retrieve all software
+	 * - `null` for ownerName (you can only provide this when using a raw {@link SoftwareRegistryQueryProvider}) means retrieve all software of name
 	 *
 	 * Example:
 	 * ```typescript
@@ -99,7 +99,7 @@ export default class SoftwareRegistryQueryProvider {
 	 * @param name Name of software to get
 	 * @param ownerName Add-on that installed the software
 	 */
-	public async getSoftwares(name = "*", ownerName = "*"): Promise<SoftwareInDB[]> {
+	public async getSoftwares(name: string | undefined | null = "*", ownerName = "*"): Promise<SoftwareInDB[]> {
 		this.logger.debug(`Retrieving software of name ${name} for add-on ${ownerName || "*"} in full...`);
 		if (!this.db || typeof this.db === "undefined") {
 			await this.initDB();
@@ -112,7 +112,7 @@ export default class SoftwareRegistryQueryProvider {
 		} else if (name !== "*" && ownerName === "*") {
 			// Get all software of a given name, regarless of ownerName
 			softwares = await this.db.all<SoftwareInDB[]>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?;`, name);
-		} else if (name === "*" && ownerName !== "*") {
+		} else if ((name === "*" || !name) && ownerName !== "*") {
 			// Get all software for a given add-on
 			softwares = await this.db.all<SoftwareInDB[]>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE ownerName = ?;`, ownerName);
 		} else {

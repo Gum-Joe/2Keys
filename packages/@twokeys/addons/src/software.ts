@@ -92,7 +92,8 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * Adds a piece of software to the DB, along with its executables.
 	 * Then run {@link SoftwareRegistry.runInstall}
 	 * 
-	 * Note: Don't try to install pieces of software with the same names, it will throw an error (see {@link SoftwareRegistryQueryProvider.getSoftwares})
+	 * Note: Don't try to install pieces of software with the same names, it will throw an error (see {@link SoftwareRegistryQueryProvider.getSoftwares}),
+	 * if and only if the already registered software belongs to the same add-on
 	 */
 	public async installSoftware(software: Software): Promise<void> {
 		this.logger.info(`Installing software ${software.name}...`);
@@ -102,7 +103,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		this.logger.info("Adding software to registry...");
 		// Validate if software of this name already in DB
 		this.logger.debug("Checking if already installed...");
-		const results = await super.getSoftwares(software.name);
+		const results = await super.getSoftwares(software.name, this.package.name);
 		if (results.length > 0) {
 			this.logger.err("Error! Attempted to install a piece of software with a name already used!");
 			this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
@@ -202,7 +203,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * Please look at {@link SoftwareRegistryQueryProvider.getSoftwares} for more info, such as constraints.
 	 * @param name Name of software to get.
 	 */
-	public async getSoftware(name): Promise<SoftwareInDB> {
+	public async getSoftware(name: string | null = null): Promise<SoftwareInDB> {
 		const results: SoftwareInDB[] = await super.getSoftwares(name, this.package.name);
 		if (results.length > 1) {
 			this.logger.err("ERROR! More than one software found!");
