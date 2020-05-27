@@ -157,6 +157,17 @@ describe("Software Registry tests", () => {
 			expect(docs[0].path).to.equal(testSoftware2.executables[0].path);
 			expect(docs[0].userInstalled).to.equal(SQLBool.True);
 		});
+
+		it("should throw an error if executables have the same names in the same piece of software, and then delete the software", async () => {
+			// HACK: Hack used as JS doesn't support deep cloning
+			const testSoftware4: Software = JSON.parse(JSON.stringify(testSoftware));
+			testSoftware4.executables.push(testSoftware4.executables[0]);
+			// Change name
+			testSoftware4.name = testSoftware4.name + Math.random() + Math.random();
+			// DEW IT, and check
+			await expect(softwareRegisty.installSoftware(testSoftware4)).to.be.rejectedWith(/(.*)executable(.*)already used/);
+			await expect(softwareRegisty.db.all(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?`, testSoftware4.name)).to.eventually.deep.equal([]);
+		});
 	});
 
 	describe("Software Registry Querying", () => {
@@ -192,27 +203,6 @@ describe("Software Registry tests", () => {
 			expect(result).to.deep.include({ ...testSoftware2, executables: result.executables.map((value, index) => { return { ...value, ...testSoftware2.executables[index] }; })});
 		});
 
-		// If this is failing, copy over the insertion code from installSoftware()
-		it("should throw an error if > 1 piece of software found (supposedly impossible)", async () => {
-			const softwareTestUUID = uuid.v4();
-			const stmt = await softwareRegisty.db.prepare(
-				`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed, downloadType) VALUES (@id, @name, @url, @homepage, @ownerName, @installed, @downloadType)`,
-			);
-			await stmt.all({
-				"@name": testSoftware.name,
-				"@id": softwareTestUUID,
-				"@url": testSoftware.url,
-				"@homepage": testSoftware.homepage,
-				"@ownerName": testPackage.name,
-				"@installed": SQLBool.False, // NOTE: Use 0 for false and 1 for true
-				"@downloadType": testSoftware.downloadType,
-			});
-			// Inserted, now should throw
-			await expect(softwareRegisty.getSoftware(testSoftware.name)).to.be.rejectedWith(/(.*)More than one software found(.*)/);
-			// Now delete
-			await softwareRegisty.db.run(`DELETE FROM ${SOFTWARE_TABLE_NAME} WHERE id = ?`, softwareTestUUID);
-		});
-
 		it("should return an array when we call getSoftwares() on SoftwareRegistry (warning also displayed, but this is not testable)", async () => {
 			const results = await Promise.all([softwareRegisty.getSoftwares(testSoftware.name), softwareRegisty.getSoftware(testSoftware.name)])
 			expect(results[0]).to.deep.equal([results[1]]);
@@ -235,18 +225,18 @@ describe("Software Registry tests", () => {
 					expect(results.length).to.equal(comparsion.length);
 					return;
 				});
-				it("should retrieve all software for a specific add-on when no software name is passed, both for the query class and the main software registry class", async () => {
+				it("should retrieve all software for a specific add-on when no software name is passed, both for the query class and the main software registry class (getAllSoftware()", async () => {
 					const oldPackage = Object.assign({}, softwareRegisty.package);
 					softwareRegisty.package.name = "test-addon-10";
 					await softwareRegisty.installSoftware(testSoftware);
 					// Test doubles added, now test
 					const results = await softwareQueryRegistry.getSoftwares(null, "test-addon-10");
-					const results2 = await softwareRegisty.getSoftware();
+					const results2 = await softwareRegisty.getAllSoftware();
 					// Checks
 					expect(results).to.be.of.length(1);
 					expect(results[0].ownerName).to.equal("test-addon-10");
 					// Length tells us if it has all been fetched
-					expect([results2]).to.deep.equal(results);
+					expect(results2).to.deep.equal(results);
 					// Reassign
 					softwareRegisty.package.name = oldPackage.name;
 				});
@@ -261,6 +251,13 @@ describe("Software Registry tests", () => {
 					expect(results[0].ownerName).to.equal(testPackage.name);
 				});
 			});
+
+			describe("getExecutable()", () => {
+				it("should successfully get an executable", async () => {
+					// TODO
+					const results = softwareRegisty.getExecutable(testSoftware.name, testSoftware.executables[0].name);
+				});
+			})
 		});
 	});
 	

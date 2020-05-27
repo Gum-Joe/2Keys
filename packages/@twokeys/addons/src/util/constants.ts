@@ -67,6 +67,7 @@ export const CREATE_SOFTWARE_DB_QUERY = `CREATE TABLE ${SOFTWARE_TABLE_NAME} (
 	installed BOOLEAN NOT NULL CHECK (installed IN (0,1)),
 	downloadType TEXT,
 	PRIMARY KEY (id),
+	UNIQUE (name, ownerName),
 	FOREIGN KEY (ownerName)
        REFERENCES ${REGISTRY_TABLE_NAME} (name)
 )`;
@@ -80,6 +81,7 @@ export const CREATE_EXECUTABLES_DB_QUERY = `CREATE TABLE ${EXECUTABLES_TABLE_NAM
 	userInstalled BOOLEAN NOT NULL CHECK (userInstalled IN (0,1)),
 	softwareId TEXT,
 	PRIMARY KEY (id),
+	UNIQUE (name, softwareId),
 	FOREIGN KEY (softwareId)
        REFERENCES ${SOFTWARE_TABLE_NAME} (id)
 )`;

@@ -62,7 +62,8 @@ export default class Downloader {
 	 */
 	constructor(software: Software, savePath: string, options: DownloaderOptions = {}) {
 		this.software = software;
-		this.logger = Object.prototype.hasOwnProperty.call(options, "logger") ? Object.assign(new Logger({ name: this.downloaderName }), options.logger) : new Logger({ name: this.downloaderName });
+		this.logger = Object.prototype.hasOwnProperty.call(options, "logger") ?
+			Object.assign(Object.create(Object.getPrototypeOf(options.logger)), options.logger) : new Logger({ name: this.downloaderName });
 		this.logger.args.name = this.logger.args.name + ":" + this.downloaderName;
 		this.savePath = savePath; // Save full path
 		this.options = options;

@@ -36,7 +36,8 @@ import {
 	SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD,
 	SOFTWARE_DOWNLOAD_TYPE_STANDALONE,
 	SOFTWARE_DOWNLOAD_TYPE_ZIP,
-	SoftwareInDB
+	SoftwareInDB,
+	ExecutableInDB
 } from "./util/interfaces";
 import SoftwareRegistryQueryProvider, { SoftwareRegistryDBProviderOptions } from "./software-query-provider";
 
@@ -57,8 +58,6 @@ interface SoftwareRegI {
 	uninstallSoftware(name: string): Promise<void>;
 	/** Update records for a piece of software */
 	updateSoftwareRecord(name: string, newData: Software): Promise<void>;
-	/** Get full path to an executable */
-	getExecutablePath(software: string, name: string): Promise<string>;
 	/** Get executable object */
 	getExecutable(software: string, name: string): Promise<Executable>;
 	/** Get software object */
@@ -92,8 +91,10 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * Adds a piece of software to the DB, along with its executables.
 	 * Then run {@link SoftwareRegistry.runInstall}
 	 * 
-	 * Note: Don't try to install pieces of software with the same names, it will throw an error (see {@link SoftwareRegistryQueryProvider.getSoftwares}),
-	 * if and only if the already registered software belongs to the same add-on
+	 * Note: Don't try to install pieces of software (or register executables) with the same names, it will throw an error (see {@link SoftwareRegistryQueryProvider.getSoftwares}),
+	 * if and only if the already registered software/execuatble belongs to the same add-on/software.
+	 * 
+	 * SQL constraints ensure no duplicates can exist.
 	 */
 	public async installSoftware(software: Software): Promise<void> {
 		this.logger.info(`Installing software ${software.name}...`);
@@ -101,46 +102,64 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			await this.initDB();
 		}
 		this.logger.info("Adding software to registry...");
-		// Validate if software of this name already in DB
-		this.logger.debug("Checking if already installed...");
-		const results = await super.getSoftwares(software.name, this.package.name);
-		if (results.length > 0) {
-			this.logger.err("Error! Attempted to install a piece of software with a name already used!");
-			this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
-			this.logger.err("Please file an issue with them.");
-			throw new Error("Error! Attempted to install a piece of software with a name already used!");
-		}
-		// Ok, add it to the DB
-		const softwareUUID = uuid.v4();
-		const stmt = await this.db.prepare(
-			`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed, downloadType) VALUES (@id, @name, @url, @homepage, @ownerName, @installed, @downloadType)`,
-		);
-		await stmt.all({
-			"@name": software.name,
-			"@id": softwareUUID,
-			"@url": software.url,
-			"@homepage": software.homepage,
-			"@ownerName": this.package.name,
-			"@installed": SQLBool.False, // NOTE: Use 0 for false and 1 for true
-			"@downloadType": software.downloadType,
-		});
-		this.logger.info("Adding executables to registry...");
-		for (const executable of software.executables) {
-			const executablesStmt = await this.db.prepare(
-				`INSERT INTO ${EXECUTABLES_TABLE_NAME} (id, name, path, arch, os, userInstalled, softwareId) VALUES (@id, @name, @path, @arch, @os, @userInstalled, @softwareId)`,
+		try {
+			// Ok, add it to the DB
+			const softwareUUID = uuid.v4();
+			const stmt = await this.db.prepare(
+				`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed, downloadType) VALUES (@id, @name, @url, @homepage, @ownerName, @installed, @downloadType)`,
 			);
-			await executablesStmt.all({
-				"@name": executable.name,
-				"@id": uuid.v4(),
-				"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? executable.path : join(this.getOneSoftwareFolder(software.name), executable.path),
-				"@arch": executable.arch,
-				"@os": executable.os || process.platform,
-				"@userInstalled": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? SQLBool.True : SQLBool.False,
-				"@softwareId": softwareUUID,
+			await stmt.all({
+				"@name": software.name,
+				"@id": softwareUUID,
+				"@url": software.url,
+				"@homepage": software.homepage,
+				"@ownerName": this.package.name,
+				"@installed": SQLBool.False, // NOTE: Use 0 for false and 1 for true
+				"@downloadType": software.downloadType,
 			});
+			this.logger.info("Adding executables to registry...");
+			for (const executable of software.executables) {
+				const executablesStmt = await this.db.prepare(
+					`INSERT INTO ${EXECUTABLES_TABLE_NAME} (id, name, path, arch, os, userInstalled, softwareId) VALUES (@id, @name, @path, @arch, @os, @userInstalled, @softwareId)`,
+				);
+				await executablesStmt.all({
+					"@name": executable.name,
+					"@id": uuid.v4(),
+					"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? executable.path : join(this.getOneSoftwareFolder(software.name), executable.path),
+					"@arch": executable.arch,
+					"@os": executable.os || process.platform,
+					"@userInstalled": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? SQLBool.True : SQLBool.False,
+					"@softwareId": softwareUUID,
+				});
+			}
+			this.logger.debug("Now running install function...");
+			return this.runInstall(software);
+		} catch (err) {
+			this.logger.err("ERROR! " + err.message);
+			if (err.code === "SQLITE_CONSTRAINT") {
+				// Dot needed so we see table name
+				if (err.message.includes(SOFTWARE_TABLE_NAME + ".")) {
+					this.logger.err("Error! Attempted to install a piece of software with a name already used!");
+					this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
+					this.logger.err("Please file an issue with them.");
+					throw new Error("Error! Attempted to install a piece of software with a name already used!");
+				} else if (err.message.includes(EXECUTABLES_TABLE_NAME) + ".") {
+					this.logger.err("Error! Attempted to register an executable with a name already used!");
+					this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
+					this.logger.err("Please file an issue with them.");
+					// Roll back changes
+					this.logger.info("Rolling back changes by deleting software from DB...");
+					await this.db.run(`DELETE FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [software.name, this.package.name]);
+					// Now throw
+					throw new Error("Error! Attempted to register an executable with a name already used!");
+				} else {
+					// THis should be impossible, but just in case:
+					throw err;
+				}
+			} else {
+				throw err;
+			}
 		}
-		this.logger.debug("Now running install function...");
-		return await this.runInstall(software);
 	}
 	/**
 	 * Downloads and installs a piece of software.
@@ -191,11 +210,26 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	}
 
 	// Query wrappers
-	getExecutablePath(software: string, name: string): Promise<string> {
-		throw new Error("Method not implemented.");
+	/**
+	 * Retrieves a **SINGLE** executable for a **SINGLE** piece software from the DB.
+	 * Use getExecutables for multiple.
+	 * 
+	 * @see SoftwareRegistryQueryProvider.getExecutables
+	 * @param software Name of software
+	 * @param name Name of executable
+	 */
+	public async getExecutable(software: string, name: string): Promise<ExecutableInDB> {
+		// It's impossible to have duplicates, so just getting 1 is fine
+		return (await this.getExecutables(software, name))[0];
 	}
-	getExecutable(software: string, name: string): Promise<Executable> {
-		throw new Error("Method not implemented.");
+
+	/**
+	 * Prevent use of getExecutables.
+	 *
+	 * This placeholder exists as add-on should not be using getExecutables()
+	 */
+	public async getExecutables(software: string, name: string | null = null): Promise<ExecutableInDB[]> {
+		return super.getExecutables(software, name, this.package.name);
 	}
 
 	/**
@@ -203,18 +237,20 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * Please look at {@link SoftwareRegistryQueryProvider.getSoftwares} for more info, such as constraints.
 	 * @param name Name of software to get.
 	 */
-	public async getSoftware(name: string | null = null): Promise<SoftwareInDB> {
+	public async getSoftware(name: string): Promise<SoftwareInDB> {
 		const results: SoftwareInDB[] = await super.getSoftwares(name, this.package.name);
-		if (results.length > 1) {
-			this.logger.err("ERROR! More than one software found!");
-			this.logger.err("This situation is supposedly impossible, as you can't have software be the same name and also belong to the same add-on.");
-			this.logger.err("This could mean the add-on writer did something wrong, or there is an issue in 2Keys.");
-			this.logger.err("It's recomended you reinstall the offending add-on.");
-			this.logger.err("Still getting an error? Please file an issue with 2Keys.");
-			throw new Error("ERROR! More than one software found (which should be impossible)!");
-		}
+		// I should note it's impossible to get > 1 result back
 		return results[0];
 	}
+
+	/**
+	 * Retrieves all pieces of software from the DB.
+	 * Please look at {@link SoftwareRegistryQueryProvider.getSoftwares} for more info, such as constraints.
+	 */
+	public async getAllSoftware(): Promise<SoftwareInDB[]> {
+		return super.getSoftwares(null, this.package.name);
+	}
+
 	/**
 	 * Prevent use of getSoftwares.
 	 * 

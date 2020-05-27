@@ -78,6 +78,7 @@ export default class SoftwareRegistryQueryProvider {
 		});
 		this.logger.debug("DB Open.");
 	}
+
 	/**
 	 * Retrieves software from the DB and it's executables.
 	 *
@@ -92,9 +93,9 @@ export default class SoftwareRegistryQueryProvider {
 	 * Example:
 	 * ```typescript
 	 * const software =  new SoftwareRegistryQueryProvider(...arguments)
-	 * software.getSoftware() // Get everything from the DB
-	 * software.getSoftware("a") // Get all software of name "a"
-	 * software.getSoftware(null, "b") // Get all software that add-on "b" has added to the DB
+	 * software.getSoftwares() // Get everything from the DB
+	 * software.getSoftwares("a") // Get all software of name "a"
+	 * software.getSoftwares(null, "b") // Get all software that add-on "b" has added to the DB
 	 * ```
 	 * @param name Name of software to get
 	 * @param ownerName Add-on that installed the software
@@ -133,12 +134,47 @@ export default class SoftwareRegistryQueryProvider {
 			item.executables = executables;
 			return item;
 		});
-		const results = await Promise.all(promises);
-		this.logger.debug("Retrieval done.");
-		return results;
+		this.logger.debug("Retrievals now running.");
+		return Promise.all(promises);
 	}
+
+	/**
+	 * Gets an execuatble from the DB.
+	 * 
+	 * For anything outside of a single executable
+	 * (or getting all executables for a single piece of software),
+	 * please just query the DB directly.
+	 * 
+	 * @param software Name of software executable belongs to
+	 * @param name Name of executable (omit this parameter or use null to get all executables)
+	 * @param ownerName Name of owner (add-on) of the software in question
+	 */
+	public async getExecutables(software: string, name: string | null, ownerName: string):
+		Promise<ExecutableInDB[]> {
+		this.logger.debug(`Retrieving executable of name ${name ?? "*"} from software ${software} for add-on ${ownerName} in full...`);
+		// Auto load
+		if (!this.db || typeof this.db === "undefined") {
+			await this.initDB();
+		}
+		// 
+		// Query
+		this.logger.debug("Querying...");
+		return this.db.all<ExecutableInDB[]>(`
+				WITH softwareResult AS (
+					SELECT * FROM ${SOFTWARE_TABLE_NAME}
+					WHERE name = ?
+				)
+				SELECT * FROM ${EXECUTABLES_TABLE_NAME}
+				WHERE ${!name ? "" : "name = ?"} softwareId = softwareResult.id;
+			`, [software, name]);
+	}
+
 	// Static methods
-	/** Creates a registry */
+	/**
+	 * Creates a registry
+	 * @param directory Directory to create registry in
+	 * @param fileName Filename of registry, defaulting to {@link REGISTRY_FILE_NAME} (it is recomended you leave it as the default)
+	 */
 	public static async createSoftwareRegistry(directory: string, fileName: string = REGISTRY_FILE_NAME): Promise<void> {
 		// Create DB
 		const logger = new Logger({ name: "add-ons:software" });
