@@ -103,7 +103,7 @@ export default class ZipDownloader {
 			});
 
 			req.on("response", res => {
-				const len = parseInt(res.headers["content-length"], 10);
+				const len = parseInt(res.headers["content-length"] || "", 10);
 				const downloaded = "";
 				if (!this.logger.isSilent) {
 					const progress_bar = new ProgressBar(":bar :percent ETA: :etas", {
