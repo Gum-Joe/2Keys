@@ -159,15 +159,19 @@ export default class SoftwareRegistryQueryProvider {
 		// 
 		// Query
 		this.logger.debug("Querying...");
-		return this.db.all<ExecutableInDB[]>(`
-				SELECT * FROM ${EXECUTABLES_TABLE_NAME}
-				WHERE ${!name ? "" : "name = @executableName AND"}
-				softwareId = (
-					SELECT id FROM ${SOFTWARE_TABLE_NAME}
-					WHERE name = @softwareName AND ownerName = @ownerName
-				);
-		`, {
-			"@executableName": name,
+		const queryText = `
+			SELECT * FROM ${EXECUTABLES_TABLE_NAME}
+			WHERE ${!name ? "" : "name = @executableName AND"}
+			softwareId = (
+				SELECT id FROM ${SOFTWARE_TABLE_NAME}
+				WHERE name = @softwareName AND ownerName = @ownerName
+			);
+		`;
+		this.logger.debug(queryText);
+		// Hack to only use executable name in prepared query if provided
+		const useExecutableName = !name ? {} : { "@executableName": name };
+		return this.db.all<ExecutableInDB[]>(queryText, {
+			...useExecutableName,
 			"@softwareName": software,
 			"@ownerName": ownerName,
 		});

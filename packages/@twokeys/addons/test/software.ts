@@ -257,7 +257,7 @@ describe("Software Registry tests", () => {
 					// TODO
 					const result = await softwareRegisty.getExecutable(testSoftware.name, testSoftware.executables[0].name);
 					// Self query
-					const softwareRes = await softwareRegisty.db.get<SoftwareInDB>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?;`, testSoftware.name);
+					const softwareRes = await softwareRegisty.db.get<SoftwareInDB>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?;`, [testSoftware.name, softwareRegisty.package.name]);
 					if (typeof softwareRes === "undefined") {
 						throw new Error("Got back no software when looking for our test software!");
 					}
@@ -272,7 +272,7 @@ describe("Software Registry tests", () => {
 					// TODO
 					const result = await softwareRegisty.getExecutables(testSoftware.name);
 					// Self query
-					const softwareRes = await softwareRegisty.db.get<SoftwareInDB>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?;`, testSoftware.name);
+					const softwareRes = await softwareRegisty.db.get<SoftwareInDB>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?;`, [testSoftware.name, softwareRegisty.package.name]);
 					if (typeof softwareRes === "undefined") {
 						throw new Error("Got back no software when looking for our test software!");
 					}
