@@ -204,7 +204,7 @@ describe("Software Registry tests", () => {
 		});
 
 		it("should return an array when we call getSoftwares() on SoftwareRegistry (warning also displayed, but this is not testable)", async () => {
-			const results = await Promise.all([softwareRegisty.getSoftwares(testSoftware.name), softwareRegisty.getSoftware(testSoftware.name)])
+			const results = await Promise.all([softwareRegisty.getSoftwares(testSoftware.name), softwareRegisty.getSoftware(testSoftware.name)]);
 			expect(results[0]).to.deep.equal([results[1]]);
 		});
 
@@ -243,7 +243,7 @@ describe("Software Registry tests", () => {
 				it("should get all software of a given name, when no ownerName is passed", async () => {
 					const results = await softwareQueryRegistry.getSoftwares(testSoftware.name);
 					expect(results).to.be.of.length(2);
-					expect(results[0].ownerName).to.not.equal(results[1].ownerName)
+					expect(results[0].ownerName).to.not.equal(results[1].ownerName);
 				});
 				it("should not mix up software with the same name from mulltiple add-ons", async () => {
 					const results = await softwareQueryRegistry.getSoftwares(testSoftware.name, testPackage.name);
@@ -255,9 +255,35 @@ describe("Software Registry tests", () => {
 			describe("getExecutable()", () => {
 				it("should successfully get an executable", async () => {
 					// TODO
-					const results = softwareRegisty.getExecutable(testSoftware.name, testSoftware.executables[0].name);
+					const result = await softwareRegisty.getExecutable(testSoftware.name, testSoftware.executables[0].name);
+					// Self query
+					const softwareRes = await softwareRegisty.db.get<SoftwareInDB>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?;`, testSoftware.name);
+					if (typeof softwareRes === "undefined") {
+						throw new Error("Got back no software when looking for our test software!");
+					}
+					const executable = await softwareRegisty.db.get<ExecutableInDB>(
+						`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?;`,
+						[testSoftware.executables[0].name, softwareRes.id]
+					);
+					// Check
+					await expect(result).to.deep.equal(executable);
 				});
-			})
+				it("should successfully get all executables when no name is passed", async () => {
+					// TODO
+					const result = await softwareRegisty.getExecutables(testSoftware.name);
+					// Self query
+					const softwareRes = await softwareRegisty.db.get<SoftwareInDB>(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?;`, testSoftware.name);
+					if (typeof softwareRes === "undefined") {
+						throw new Error("Got back no software when looking for our test software!");
+					}
+					const executables = await softwareRegisty.db.all<ExecutableInDB[]>(
+						`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?;`,
+						[testSoftware.executables[0].name, softwareRes.id]
+					);
+					// Check
+					await expect(result).to.deep.equal(executables);
+				});
+			});
 		});
 	});
 	

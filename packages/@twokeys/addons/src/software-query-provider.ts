@@ -160,13 +160,17 @@ export default class SoftwareRegistryQueryProvider {
 		// Query
 		this.logger.debug("Querying...");
 		return this.db.all<ExecutableInDB[]>(`
-				WITH softwareResult AS (
-					SELECT * FROM ${SOFTWARE_TABLE_NAME}
-					WHERE name = ?
-				)
 				SELECT * FROM ${EXECUTABLES_TABLE_NAME}
-				WHERE ${!name ? "" : "name = ?"} softwareId = softwareResult.id;
-			`, [software, name]);
+				WHERE ${!name ? "" : "name = @executableName AND"}
+				softwareId = (
+					SELECT id FROM ${SOFTWARE_TABLE_NAME}
+					WHERE name = @softwareName AND ownerName = @ownerName
+				);
+		`, {
+			"@executableName": name,
+			"@softwareName": software,
+			"@ownerName": ownerName,
+		});
 	}
 
 	// Static methods

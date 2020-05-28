@@ -224,9 +224,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	}
 
 	/**
-	 * Prevent use of getExecutables.
-	 *
-	 * This placeholder exists as add-on should not be using getExecutables()
+	 * Allow multiple executables for one piece of software to be retrieved (by omitting the name field)
 	 */
 	public async getExecutables(software: string, name: string | null = null): Promise<ExecutableInDB[]> {
 		return super.getExecutables(software, name, this.package.name);
