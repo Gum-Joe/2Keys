@@ -24,11 +24,12 @@
 import { join } from "path";
 import { constants as fsconstants, promises as fs } from "fs";
 import sqlite3 from "sqlite3";
-import { Database, open as openDB } from "sqlite";
+import { Database, open as openDB, Statement } from "sqlite";
 import type { ISqlite } from "sqlite";
+import * as uuid from "uuid";
 import { Logger } from "@twokeys/core";
-import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY } from "./util/constants";
-import { SoftwareInDB, ExecutableInDB } from "./util/interfaces";
+import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./util/constants";
+import { SoftwareInDB, ExecutableInDB, Executable, SQLBool, Software } from "./util/interfaces";
 
 /** Options for a new Software registry DB Provider */
 export interface SoftwareRegistryDBProviderOptions {
@@ -78,6 +79,127 @@ export default class SoftwareRegistryQueryProvider {
 			driver: sqlite3.cached.Database,
 		});
 		this.logger.debug("DB Open.");
+	}
+
+	/**
+	 * Updates a software record.
+	 * 
+	 * Notes:
+	 * - If providing s new executable, all props must be provided (as you would to {@link SoftwareRegistry.installSoftware}) - see {@link Executable}
+	 * 	- for this, the path should also be relative to the software root - if a new name for the software is set, we handle using the right path ourselves.
+	 * 
+	 * Dev notes: schema of SQL needs to be kept in sync with {@link SoftwareRegistry.installSoftware}
+	 * @param name Name of software to update
+	 * @param newData Software object with only the properties to change in.
+	 * 	It is Recomended you combine new props with those already in the DB.
+	 * 	As name is a separate param, you can change the name in here.
+	 * 	The software will be auto copied into a new folder under the new name (TODO)
+	 * @param ownerName Name of add-on that owns software
+	 */
+	public async updateSoftwareRecord<SoftwareType extends Software = SoftwareInDB>
+	(name: string, newData: Partial<SoftwareType> & { executables?: SoftwareType extends SoftwareInDB ?
+		Array<Partial<ExecutableInDB>> : Array<Partial<Executable>>;
+	}, ownerName: string): Promise<void> {
+		this.logger.debug(`Updating software record of ${name}...`);
+		// Checks if the property is in newData
+		const objectHasProperty = (obj: object, field: string): boolean => {
+			return Object.prototype.hasOwnProperty.call(obj, field) && typeof newData[field] !== "undefined";
+		};
+		const newDataHasProperty = (field: string): boolean => {
+			return objectHasProperty(newData, field);
+		};
+		// Generate update key = value s
+		const generateKeyValues = (params): string => {
+			let stmt = "";
+			for (const param in params) {
+				if (Object.prototype.hasOwnProperty.call(params, param)) {
+					// Add it
+					// Chop off the A
+					stmt += ` ${param.slice(1)} = ${param}\n`; // \n so statments are not joined
+				}
+			}
+			return stmt;
+		}
+		// Params
+		const params = {
+			"@originalName": name,
+			"@ownerName": ownerName,
+			...newDataHasProperty("name") && { "@name": newData.name },
+			...newDataHasProperty("url") && { "@url": newData.url },
+			...newDataHasProperty("homepage") && { "@homepage": newData.homepage },
+			...newDataHasProperty("downloadType") && { "@downloadType": newData.downloadType },
+		};
+		const queryText = `
+		UPDATE ${SOFTWARE_TABLE_NAME} SET
+		${generateKeyValues(params)}
+		WHERE name = @originalName AND ownerName = @ownerName;
+		`;
+		this.logger.debug(queryText);
+		// Generate statement
+		const stmt = await this.db.prepare(queryText);
+		this.logger.debug("Running query...");
+		await stmt.all(params);
+		// Update executables
+		this.logger.debug("Updating executables in DB...");
+		// Safeguard in case user changed ID in newData
+		const softwareId = await this.db.get(`SELECT id FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [name, ownerName]);
+		// ID is required so we can locate it, this is easier than an originalName field
+		const executableUpdatePromises = newData.executables?.map(async (executable: Partial<ExecutableInDB>) => {
+			let executableParams;
+			let executablesStmt: Statement;
+			// Create params
+			if (typeof this.db.get(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?`, [name, softwareId]) === "undefined") {
+				if (typeof executable.path === "undefined") {
+					throw Error(`No path found on executable ${executable.name}!`);
+				}
+				// Not there
+				// Get params
+				executableParams = {
+					"@name": executable.name,
+					"@id": uuid.v4(),
+					"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ?
+						executable.path : join(this.getOneSoftwareFolder(newData.name || name, ownerName), executable.path),
+					"@arch": executable.arch,
+					"@os": executable.os || process.platform,
+					"@userInstalled": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? SQLBool.True : SQLBool.False,
+					"@softwareId": softwareId,
+				};
+				// Use an INSERT
+				// Literally copied from installSoftware()
+				executablesStmt = await this.db.prepare(
+					`INSERT INTO ${EXECUTABLES_TABLE_NAME}
+					(id, name, path, arch, os, userInstalled, softwareId)
+					VALUES (@id, @name, @path, @arch, @os, @userInstalled, @softwareId)`
+				);
+			} else {
+				executableParams = {
+					"@name": executable.name,
+					"@softwareId": softwareId,
+					// Typeof requred here so TS listens to it
+					...typeof executable.path !== "undefined" && {
+						"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ?
+							executable.path : join(this.getOneSoftwareFolder(newData.name || name, ownerName), executable.path)
+					},
+					...objectHasProperty(executable, "arch") && { "@arch": executable.arch },
+					...objectHasProperty(executable, "os") && { "@os": executable.os }, // process.platform is already in DB
+					...objectHasProperty(executable, "userInstalled") && { "@userInstalled": executable.userInstalled ? SQLBool.True : SQLBool.False }
+				};
+				executablesStmt = await this.db.prepare(
+					`UPDATE ${EXECUTABLES_TABLE_NAME}
+					SET 
+					${generateKeyValues(params)}
+					WHERE name = @name AND softwareId = @softwareId`
+				);
+			}
+			// Provide params and do it
+			return executablesStmt.all(executableParams);
+		}); 
+		// Do inserts
+		this.logger.debug("Running executable inserts...");
+		await Promise.all(executableUpdatePromises || []);
+		// DONE!
+		this.logger.debug("Done.");
+		return;
 	}
 
 	public async uninstallSoftware(name: string, ownerName: string): Promise<ISqlite.RunResult> {
@@ -202,6 +324,23 @@ export default class SoftwareRegistryQueryProvider {
 			"@softwareName": software,
 			"@ownerName": ownerName,
 		});
+	}
+
+	// Util methods
+	/**
+	 * Gets software folder root
+	 * @param ownerName Add-on that software folder is for
+	 */
+	public getSoftwareFolderRoot(ownerName: string): string {
+		return join(this.directory, SOFTWARE_ROOT_FOLDER, ownerName);
+	}
+
+	/**
+	 * Gets folder for a given piece of software
+	 * @param ownerName Add-on that software folder is for
+	 */
+	public getOneSoftwareFolder(softwareName: string, ownerName: string): string {
+		return join(this.getSoftwareFolderRoot(ownerName), softwareName);
 	}
 
 	// Static methods

@@ -63,7 +63,7 @@ interface SoftwareRegI {
 	/** Uninstall a piece of software */
 	uninstallSoftware(name: string): Promise<ISqlite.RunResult>;
 	/** Update records for a piece of software */
-	updateSoftwareRecord(name: string, newData: Software): Promise<void>;
+	updateSoftwareRecord(name: string, newData: Partial<Software>): Promise<void>;
 	/** Get executable object */
 	getExecutable(software: string, name: string): Promise<Executable>;
 	/** Get software object */
@@ -112,7 +112,9 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			// Ok, add it to the DB
 			const softwareUUID = uuid.v4();
 			const stmt = await this.db.prepare(
-				`INSERT INTO ${SOFTWARE_TABLE_NAME} (id, name, url, homepage, ownerName, installed, downloadType) VALUES (@id, @name, @url, @homepage, @ownerName, @installed, @downloadType)`,
+				`INSERT INTO ${SOFTWARE_TABLE_NAME}
+				(id, name, url, homepage, ownerName, installed, downloadType)
+				VALUES (@id, @name, @url, @homepage, @ownerName, @installed, @downloadType)`,
 			);
 			await stmt.all({
 				"@name": software.name,
@@ -124,11 +126,13 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 				"@downloadType": software.downloadType,
 			});
 			this.logger.info("Adding executables to registry...");
-			for (const executable of software.executables) {
+			const executablesInsertors = software.executables.map(async (executable) => {
 				const executablesStmt = await this.db.prepare(
-					`INSERT INTO ${EXECUTABLES_TABLE_NAME} (id, name, path, arch, os, userInstalled, softwareId) VALUES (@id, @name, @path, @arch, @os, @userInstalled, @softwareId)`,
+					`INSERT INTO ${EXECUTABLES_TABLE_NAME}
+					(id, name, path, arch, os, userInstalled, softwareId)
+					VALUES (@id, @name, @path, @arch, @os, @userInstalled, @softwareId)`,
 				);
-				await executablesStmt.all({
+				return executablesStmt.all({
 					"@name": executable.name,
 					"@id": uuid.v4(),
 					"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? executable.path : join(this.getOneSoftwareFolder(software.name), executable.path),
@@ -137,7 +141,9 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 					"@userInstalled": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? SQLBool.True : SQLBool.False,
 					"@softwareId": softwareUUID,
 				});
-			}
+			});
+			// DO THEM ALL
+			await Promise.all(executablesInsertors);
 			this.logger.debug("Now running install function...");
 			return this.runInstall(software);
 		} catch (err) {
@@ -227,8 +233,15 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		return result;
 	}
 
-	updateSoftwareRecord(name: string, newData: Software): Promise<void> {
-		throw new Error("Method not implemented.");
+	/**
+	 * PLEASE SEE {@link SoftwareRegistryQueryProvider.updateSoftwareRecord} FIRST
+	 * 
+	 * Please note you will most likely have to combine DB data with your edits combined with this,
+	 * but you are still restricted by {@link SoftwareRegistryQueryProvider.updateSoftwareRecord}
+	 */
+	public async updateSoftwareRecord(name: string, newData: Partial<Software>): Promise<void> {
+		// pass through
+		return super.updateSoftwareRecord(name, newData, this.package.name);
 	}
 
 	// Query wrappers
@@ -293,14 +306,14 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * Gets software folder root
 	 */
 	public getSoftwareFolderRoot(): string {
-		return join(this.directory, SOFTWARE_ROOT_FOLDER, this.package.name);
+		return super.getSoftwareFolderRoot(this.package.name);
 	}
 
 	/**
 	 * Gets folder for a given piece of software
 	 */
 	public getOneSoftwareFolder(softwareName: string): string {
-		return join(this.getSoftwareFolderRoot(), softwareName);
+		return super.getOneSoftwareFolder(softwareName, this.package.name);
 	}
 
 

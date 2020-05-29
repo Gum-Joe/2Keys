@@ -130,7 +130,7 @@ export interface Executable {
 	softwareId?: string;
 }
 /** ID is required in the DB */
-export type ExecutableInDB = Executable & { softwareId: string };
+export type ExecutableInDB = Executable & { id: string; softwareId: string };
 /** Represents a software download where what's downloaded is the software application itself (i.e. an uncompressed EXE file) */
 export type SOFTWARE_DOWNLOAD_TYPE_STANDALONE = "SOFTWARE_DONWLOAD_TYPE_STANDALONE";
 export const SOFTWARE_DOWNLOAD_TYPE_STANDALONE: SOFTWARE_DOWNLOAD_TYPE_STANDALONE = "SOFTWARE_DONWLOAD_TYPE_STANDALONE";
