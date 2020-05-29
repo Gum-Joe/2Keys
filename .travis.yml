@@ -21,4 +21,5 @@ before_script:
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts
 script:
   - yarn workspaces run coverage
-  - yarn run codecov
+  - yarn workspace @twokeys/addons run codecov
+  - yarn workspace @twokeys/server run codecov
