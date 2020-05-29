@@ -22,7 +22,7 @@ import {
 	ExecutableInDB,
 	SoftwareInDB
 } from "../src";
-import { SOFTWARE_REG_ROOT, testPackage, testSoftware } from "./constants";
+import { SOFTWARE_REG_ROOT, testPackage, testSoftware, testSoftwareUninstalled } from "./constants";
 import mkdirp from "mkdirp";
 import SoftwareRegistryQueryProvider from "../src/software-query-provider";
 
@@ -170,6 +170,30 @@ describe("Software Registry tests", () => {
 		});
 	});
 
+	describe("Software uninstall", () => {
+		before(async () => {
+			// Add software
+			await softwareRegisty.installSoftware(testSoftwareUninstalled);
+			expect(softwareRegisty.getOneSoftwareFolder(testSoftwareUninstalled.name)).to.be.a.directory();
+			await expect(softwareRegisty.getSoftware(testSoftwareUninstalled.name)).to.eventually.be.fulfilled;
+		});
+
+		it("should successfully uninstall a piece of software", async () => {
+			const dir = softwareRegisty.getOneSoftwareFolder(testSoftwareUninstalled.name);
+			const softwareOriginal = await softwareRegisty.getSoftware(testSoftwareUninstalled.name);
+			expect(softwareOriginal).to.not.be.null;
+			await softwareRegisty.uninstallSoftware(testSoftwareUninstalled.name);
+			expect(dir).to.not.be.a.path();
+			// Check if still in DB
+			await expect(softwareRegisty.db.all(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?;`, testSoftwareUninstalled.name)).to.eventually.deep.equal([]);
+			await expect(softwareRegisty.db.all(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE softwareId = ?;`, softwareOriginal.id)).to.eventually.deep.equal([]);
+		});
+
+		it("should not throw an error uninstalling non-existant software", async () => {
+			await expect(softwareRegisty.uninstallSoftware("NOT_A_PIECE_OF_SOFTWARE")).to.eventually.be.fulfilled;
+		});
+	});
+
 	describe("Software Registry Querying", () => {
 		// Just in case
 		before(async () => {
@@ -201,6 +225,14 @@ describe("Software Registry tests", () => {
 			const testSoftware2: Software = Object.assign({}, testSoftware);
 			testSoftware2.executables[0].path = join(softwareRegisty.getOneSoftwareFolder(testSoftware.name), testSoftware2.executables[0].path);
 			expect(result).to.deep.include({ ...testSoftware2, executables: result.executables.map((value, index) => { return { ...value, ...testSoftware2.executables[index] }; })});
+		});
+
+		it("should throw an error getting a piece of software not in the DB", async () => {
+			await expect(softwareRegisty.getSoftware("NOT_IN_DB")).to.eventually.be.rejectedWith(/ENOENT(.*)/);
+		});
+
+		it("should return empty array getting a executable not in the DB", async () => {
+			await expect(softwareRegisty.getExecutable("NOT_IN_DB", "NOT_IN_DB")).to.eventually.be.rejectedWith(/ENOENT(.*)/);
 		});
 
 		it("should return an array when we call getSoftwares() on SoftwareRegistry (warning also displayed, but this is not testable)", async () => {

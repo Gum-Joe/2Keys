@@ -59,13 +59,13 @@ export const SOFTWARE_TABLE_NAME = "software";
 export const EXECUTABLES_TABLE_NAME = "executables";
 /** SQL Query to create software table. Owner field is the add-on that is repsonsible for that software */
 export const CREATE_SOFTWARE_DB_QUERY = `CREATE TABLE ${SOFTWARE_TABLE_NAME} (
-	id TEXT,
-	name TEXT,
-	url TEXT,
-	homepage TEXT,
-	ownerName TEXT,
+	id TEXT NOT NULL,
+	name TEXT NOT NULL,
+	url TEXT NOT NULL,
+	homepage TEXT NOT NULL,
+	ownerName TEXT NOT NULL,
 	installed BOOLEAN NOT NULL CHECK (installed IN (0,1)),
-	downloadType TEXT,
+	downloadType TEXT NOT NULL,
 	PRIMARY KEY (id),
 	UNIQUE (name, ownerName),
 	FOREIGN KEY (ownerName)

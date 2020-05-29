@@ -82,19 +82,24 @@ export default class SoftwareRegistryQueryProvider {
 	public async uninstallSoftware(name: string, ownerName: string): Promise<ISqlite.RunResult<Statement>> {
 		this.logger.debug(`Deleting software ${name} from DB...`);
 		this.logger.debug("Deleting all executables first, and then software...");
-		const queryText = `
-			SELECT * FROM ${EXECUTABLES_TABLE_NAME}
+		const deleteExecutables = `
+			DELETE FROM ${EXECUTABLES_TABLE_NAME}
 			WHERE softwareId = (
 				SELECT id FROM ${SOFTWARE_TABLE_NAME}
 				WHERE name = @softwareName AND ownerName = @ownerName
-			);
+			);`;
+		const deleteSoftware = `
 			-- Then delete the software
 			DELETE FROM ${SOFTWARE_TABLE_NAME}
-			WHERE name = @softwareName;
+			WHERE name = @softwareName AND ownerName = @ownerName;
 		`;
-		this.logger.debug(queryText);
-		// Hack to only use executable name in prepared query if provided
-		return this.db.run(queryText, {
+		this.logger.debug(deleteExecutables);
+		this.logger.debug(deleteSoftware);
+		await this.db.run(deleteExecutables, {
+			"@softwareName": name,
+			"@ownerName": ownerName,
+		});
+		return this.db.run(deleteSoftware, {
 			"@softwareName": name,
 			"@ownerName": ownerName,
 		});

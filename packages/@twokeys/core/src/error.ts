@@ -17,8 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
-export { default as Logger } from "./logger";
-export * as interfaces from "./interfaces";
-export * as constants from "./constants";
-export * as config from "./config";
-export * from "./error";
+/**
+ * Error helper function
+ * @packageDocumentation
+ */
+
+/**
+ * Error with a code
+ */
+export class CodedError extends Error {
+	public code?: string;
+	constructor(message?: string, code?: string) {
+		// Add code to message
+		if (typeof code !== "undefined") {
+			if (typeof message !== "undefined") {
+				message = code + ": " + message;
+			} else {
+				message = code;
+			}
+		}
+		// Call super()
+		super(message);
+		// Set code as var
+		this.code = code;
+	}
+}

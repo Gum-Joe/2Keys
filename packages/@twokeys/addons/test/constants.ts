@@ -30,3 +30,8 @@ export const testSoftware: Software = {
 		}
 	]
 };
+
+export const testSoftwareUninstalled: Software = {
+	...testSoftware,
+	name: "ahkUninstalled",
+};

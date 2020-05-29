@@ -43,6 +43,7 @@ import SoftwareRegistryQueryProvider, { SoftwareRegistryDBProviderOptions } from
 import { Statement } from "sqlite3";
 import rimrafCalledBack from "rimraf";
 import { promisify } from "util";
+import { CodedError } from "@twokeys/core";
 
 const rimraf = promisify(rimrafCalledBack);
 
@@ -66,7 +67,7 @@ interface SoftwareRegI {
 	/** Get executable object */
 	getExecutable(software: string, name: string): Promise<Executable>;
 	/** Get software object */
-	getSoftware(name: string): Promise<SoftwareInDB>;
+	getSoftware(name: string): Promise<SoftwareInDB | null>;
 	/** Converts software in DB to a {@link Software} */
 	// parseSoftwareFromDB(softwareFromDB: any): Software;
 }
@@ -208,6 +209,12 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		return;
 	}
 
+	/**
+	 * Uninstalles a piece of software,
+	 * first by deleting the software files
+	 * and then deleting the registry entry
+	 * @param name Name of software to uninstall
+	 */
 	public async uninstallSoftware(name: string): Promise<ISqlite.RunResult<Statement>> {
 		this.logger.info(`Uninstalling software ${name}`);
 		this.logger.debug("Deleteing diretory...");
@@ -215,7 +222,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		this.logger.debug("Now for the DB...");
 		const result = await super.uninstallSoftware(name, this.package.name);
 		if (typeof result.changes === "undefined" || !result.changes || result.changes < 1) {
-			this.logger.warn("No changes to DB detected! Software may not have been removed!");
+			this.logger.warn("No changes to DB detected! Software may not have been removed (or just didn't exist!");
 		}
 		return result;
 	}
@@ -235,7 +242,11 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 */
 	public async getExecutable(software: string, name: string): Promise<ExecutableInDB> {
 		// It's impossible to have duplicates, so just getting 1 is fine
-		return (await this.getExecutables(software, name))[0];
+		const results = await this.getExecutables(software, name);
+		if (results.length < 1) {
+			throw new CodedError(`Could not find executable ${name} in DB! (note: not a Node.js FS Error)`, "ENOENT");
+		}
+		return results[0];
 	}
 
 	/**
@@ -252,7 +263,11 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 */
 	public async getSoftware(name: string): Promise<SoftwareInDB> {
 		const results: SoftwareInDB[] = await super.getSoftwares(name, this.package.name);
-		// I should note it's impossible to get > 1 result back
+		// I should note it's impossible to get > 1 result back (SQL Constraints prevent it)
+		// Handle no results
+		if (results.length < 1) {
+			throw new CodedError(`Could not find software ${name} in DB! (note: not a Node.js FS Error)`, "ENOENT");
+		}
 		return results[0];
 	}
 
@@ -271,7 +286,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 */
 	public async getSoftwares(name: string): Promise<SoftwareInDB[]> {
 		this.logger.warn("Don't use getSoftwares(): use getSoftware() instead");
-		return [await this.getSoftware(name)];
+		return [ await this.getSoftware(name) ];
 	}
 
 	/**
