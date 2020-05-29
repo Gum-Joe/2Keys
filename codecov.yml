@@ -19,6 +19,10 @@ coverage:
         target: auto
         flags:
           - executor-ahk
+      detector-pi:
+        target: auto
+        flags:
+          - detector-pi
 flags:
   addons:
     paths:
@@ -32,3 +36,6 @@ flags:
   executor-ahk:
     paths:
       - executors/@twokeys/executor-ahk/**/*.ts
+  detector-pi:
+    paths:
+      - detectors/detector-pi/detector/twokeys/**/*.py

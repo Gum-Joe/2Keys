@@ -33,7 +33,7 @@ jobs:
       working-directory: ./detectors/detector-pi/detector/
       run: |
         pipenv run coverage run -m unittest discover -s ./tests -p "test*.py"
-    #- uses: codecov/codecov-action@v1
-    #  with:
-    #    file: ./detectors/detector-pi/detector/.coverage # optional
-    #    name: detector # optional
+    - uses: codecov/codecov-action@v1
+      with:
+        file: ./detectors/detector-pi/detector/.coverage # optional
+        name: detector # optional
