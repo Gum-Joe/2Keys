@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 import { join, basename } from "path";
-import { Database } from "sqlite";
+import { Database, ISqlite } from "sqlite";
 import * as uuid from "uuid";
 import Downloader from "./util/downloader";
 import ZipDownloader from "./util/zip-downloader";
@@ -40,6 +40,11 @@ import {
 	ExecutableInDB
 } from "./util/interfaces";
 import SoftwareRegistryQueryProvider, { SoftwareRegistryDBProviderOptions } from "./software-query-provider";
+import { Statement } from "sqlite3";
+import rimrafCalledBack from "rimraf";
+import { promisify } from "util";
+
+const rimraf = promisify(rimrafCalledBack);
 
 // Interface to implement
 interface SoftwareRegI {
@@ -55,7 +60,7 @@ interface SoftwareRegI {
 	/** Runs install on a piece of software where {@link Software.runInstall} was false */
 	runInstall(software: Software): Promise<void>;
 	/** Uninstall a piece of software */
-	uninstallSoftware(name: string): Promise<void>;
+	uninstallSoftware(name: string): Promise<ISqlite.RunResult<Statement>>;
 	/** Update records for a piece of software */
 	updateSoftwareRecord(name: string, newData: Software): Promise<void>;
 	/** Get executable object */
@@ -202,9 +207,19 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		await this.db.run(`UPDATE ${SOFTWARE_TABLE_NAME} SET installed = ${SQLBool.True} WHERE name = ?`, software.name);
 		return;
 	}
-	uninstallSoftware(name: string): Promise<void> {
-		throw new Error("Method not implemented.");
+
+	public async uninstallSoftware(name: string): Promise<ISqlite.RunResult<Statement>> {
+		this.logger.info(`Uninstalling software ${name}`);
+		this.logger.debug("Deleteing diretory...");
+		await rimraf(this.getOneSoftwareFolder(name));
+		this.logger.debug("Now for the DB...");
+		const result = await super.uninstallSoftware(name, this.package.name);
+		if (typeof result.changes === "undefined" || !result.changes || result.changes < 1) {
+			this.logger.warn("No changes to DB detected! Software may not have been removed!");
+		}
+		return result;
 	}
+
 	updateSoftwareRecord(name: string, newData: Software): Promise<void> {
 		throw new Error("Method not implemented.");
 	}
