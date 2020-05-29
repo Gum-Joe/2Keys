@@ -22,4 +22,3 @@ before_script:
 script:
   - yarn workspaces run coverage
   - yarn workspace @twokeys/addons run codecov
-  - yarn workspace @twokeys/server run codecov
