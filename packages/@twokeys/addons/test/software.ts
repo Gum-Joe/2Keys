@@ -7,7 +7,6 @@ import chai, { expect } from "chai";
 import rimraf from "rimraf";
 import { open as openDB } from "sqlite";
 import sqlite3 from "sqlite3";
-import * as uuid from "uuid";
 import SoftwareRegistry from "../src/software";
 import AddOnsRegistry from "../src/registry";
 import {

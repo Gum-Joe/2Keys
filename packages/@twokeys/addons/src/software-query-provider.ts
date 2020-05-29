@@ -23,11 +23,12 @@
  */
 import { join } from "path";
 import { constants as fsconstants, promises as fs } from "fs";
-import { Database, open as openDB, ISqlite } from "sqlite";
-import sqlite3, { Statement } from "sqlite3";
+import sqlite3 from "sqlite3";
+import { Database, open as openDB } from "sqlite";
+import type { ISqlite } from "sqlite";
 import { Logger } from "@twokeys/core";
 import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY } from "./util/constants";
-import { Executable, SoftwareInDB, ExecutableInDB } from "./util/interfaces";
+import { SoftwareInDB, ExecutableInDB } from "./util/interfaces";
 
 /** Options for a new Software registry DB Provider */
 export interface SoftwareRegistryDBProviderOptions {
@@ -79,7 +80,7 @@ export default class SoftwareRegistryQueryProvider {
 		this.logger.debug("DB Open.");
 	}
 
-	public async uninstallSoftware(name: string, ownerName: string): Promise<ISqlite.RunResult<Statement>> {
+	public async uninstallSoftware(name: string, ownerName: string): Promise<ISqlite.RunResult> {
 		this.logger.debug(`Deleting software ${name} from DB...`);
 		this.logger.debug("Deleting all executables first, and then software...");
 		const deleteExecutables = `

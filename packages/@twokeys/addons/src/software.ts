@@ -22,7 +22,8 @@
  * @packageDocumentation
  */
 import { join, basename } from "path";
-import { Database, ISqlite } from "sqlite";
+import { Database } from "sqlite";
+import type { ISqlite } from "sqlite";
 import * as uuid from "uuid";
 import Downloader from "./util/downloader";
 import ZipDownloader from "./util/zip-downloader";
@@ -40,7 +41,6 @@ import {
 	ExecutableInDB
 } from "./util/interfaces";
 import SoftwareRegistryQueryProvider, { SoftwareRegistryDBProviderOptions } from "./software-query-provider";
-import { Statement } from "sqlite3";
 import rimrafCalledBack from "rimraf";
 import { promisify } from "util";
 import { CodedError } from "@twokeys/core";
@@ -61,7 +61,7 @@ interface SoftwareRegI {
 	/** Runs install on a piece of software where {@link Software.runInstall} was false */
 	runInstall(software: Software): Promise<void>;
 	/** Uninstall a piece of software */
-	uninstallSoftware(name: string): Promise<ISqlite.RunResult<Statement>>;
+	uninstallSoftware(name: string): Promise<ISqlite.RunResult>;
 	/** Update records for a piece of software */
 	updateSoftwareRecord(name: string, newData: Software): Promise<void>;
 	/** Get executable object */
@@ -215,7 +215,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * and then deleting the registry entry
 	 * @param name Name of software to uninstall
 	 */
-	public async uninstallSoftware(name: string): Promise<ISqlite.RunResult<Statement>> {
+	public async uninstallSoftware(name: string): Promise<ISqlite.RunResult> {
 		this.logger.info(`Uninstalling software ${name}`);
 		this.logger.debug("Deleteing diretory...");
 		await rimraf(this.getOneSoftwareFolder(name));

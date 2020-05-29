@@ -21,7 +21,7 @@
  * Contains the class to download software
  * @packageDocumentation
  */
-import { promises as fs, createWriteStream } from "fs";
+import { createWriteStream } from "fs";
 import path from "path";
 import { promisify } from "util";
 import stream from "stream";
