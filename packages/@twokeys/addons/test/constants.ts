@@ -46,6 +46,19 @@ export const testSoftwareToUpdate: Software = {
 			name: "AHK_DLL",
 			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
 			arch: "x64",
+		},
+		{
+			// (doesn't actually exist, but serves to test things)
+			name: "AHK_DLL_X16",
+			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
+			arch: "arm",
+		},
+		// Deleted
+		{
+			// (doesn't actually exist, but serves to test things)
+			name: "AHK_DLL_ARM_64",
+			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
+			arch: "arm64",
 		}
 	]
 };

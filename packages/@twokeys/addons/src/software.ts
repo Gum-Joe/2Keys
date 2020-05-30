@@ -391,14 +391,14 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * @param executableName Original executable name
 	 */
 	public async renameExecutable(softwareOwner: string, executableName: string, newName: string): Promise<ISqlite.RunResult> {
-		this.logger.info(`Deleting executable ${executableName} from DB...`);
+		this.logger.info(`Renming executable ${executableName} to ${newName} in DB...`);
 		const { id } = await this.getSoftware(softwareOwner);
 		// Delete
 		return this.db.run(`
-			UPDATE TABLE ${EXECUTABLES_TABLE_NAME}
+			UPDATE ${EXECUTABLES_TABLE_NAME}
 			SET
 			name = ?
-			WHERE name = ? AND softwareId = ?`, [newName, executableName, id]);
+			WHERE name = ? AND softwareId = ?;`, [newName, executableName, id]);
 	}
 
 	/**
