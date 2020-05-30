@@ -66,6 +66,7 @@ export const CREATE_SOFTWARE_DB_QUERY = `CREATE TABLE ${SOFTWARE_TABLE_NAME} (
 	ownerName TEXT NOT NULL,
 	installed BOOLEAN NOT NULL CHECK (installed IN (0,1)),
 	downloadType TEXT NOT NULL,
+	noAutoInstall BOOLEAN NOT NULL CHECK (installed IN (0,1)),
 	PRIMARY KEY (id),
 	UNIQUE (name, ownerName),
 	FOREIGN KEY (ownerName)

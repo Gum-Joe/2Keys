@@ -127,7 +127,7 @@ describe("Software Registry tests", () => {
 			await softwareRegisty.installSoftware(testSoftware2);
 			// Installed?
 			expect(join(softwareRegisty.getOneSoftwareFolder(testSoftware2.name), basename(testSoftware2.url))).to.be.a.file();
-		}).timeout(30000);
+		}).timeout(50000);
 
 		it("should fail to install a piece of software already installed", async () => {
 			await expect(softwareRegisty.installSoftware(testSoftware)).to.be.rejectedWith(/(.*)name already used(.*)/);
@@ -212,7 +212,7 @@ describe("Software Registry tests", () => {
 			// Check for non DB keys
 			expect(result).to.haveOwnProperty("id");
 			expect(result).to.haveOwnProperty("installed");
-			expect(result.installed).to.equal(SQLBool.True);
+			expect(result.installed).to.be.true;
 			expect(result.ownerName).to.equal(testPackage.name);
 			expect(result.executables).to.be.of.length(1);
 			expect(result.executables[0]).to.haveOwnProperty("id");

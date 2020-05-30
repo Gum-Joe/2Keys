@@ -108,10 +108,20 @@ export type SOFTWARE_ARCH_X32 = "x32";
 export type SOFTWARE_ARCH_X64 = "x64";
 export type SOFTWARE_ARCH_ARM = "arm";
 export type SOFTWARE_ARCH_ARM64 = "arm64";
+
+// DB Stuff
+
+/** Boolean ENUM for SQL */
+export enum SQLBool {
+	True = 1,
+	False = 0,
+}
+
 /**
  * Defines a single executable that's included in software
+ * NB: for boolean types make sure they are parsed accordingly in {@link SoftwareRegistryQueryProvider.getSoftwares}
  */
-export interface Executable {
+export interface BaseExecutable {
 	name: string;
 	/**
 	 * Path to this executable. This is:
@@ -124,13 +134,34 @@ export interface Executable {
 	arch: SOFTWARE_ARCH_X32 | SOFTWARE_ARCH_X64 | SOFTWARE_ARCH_ARM | SOFTWARE_ARCH_ARM64;
 	/** OS.  Optional as it is assumed otherwise it is the current OS (`os.platform()`) */
 	os?: NodeJS.Platform;
-	/** Flag if user installed (i.e. 2Keys should treat it as if as it is on PATH). */
-	userInstalled?: boolean;
 	/** ID of software the executable corresponse to */
 	softwareId?: string;
 }
+/**
+ * {@link BaseExecutable} with added boolean values (since they are stored in the DB as {@link SQLBool}s)
+ * 
+ * **PLEASE SEE {@link BaseExecutable}**
+ * @see BaseExecutable
+ */
+export interface Executable extends BaseExecutable {
+	/** Flag if user installed (i.e. 2Keys should treat it as if as it is on PATH). */
+	userInstalled?: boolean;
+}
+/** Base type for executables from DB */
+export interface BaseExecutableInDB extends BaseExecutable {
+	id: string;
+	softwareId: string;
+}
 /** ID is required in the DB */
-export type ExecutableInDB = Executable & { id: string; softwareId: string };
+export interface ExecutableInDB extends BaseExecutableInDB {
+	userInstalled: boolean;
+}
+
+/** Executable directly from DB (i.e. {@link SQLBool}s not yet parsed to JS bools*/
+export interface ExecutableDirectlyFromDB extends BaseExecutableInDB {
+	userInstalled: SQLBool;
+}
+
 /** Represents a software download where what's downloaded is the software application itself (i.e. an uncompressed EXE file) */
 export type SOFTWARE_DOWNLOAD_TYPE_STANDALONE = "SOFTWARE_DONWLOAD_TYPE_STANDALONE";
 export const SOFTWARE_DOWNLOAD_TYPE_STANDALONE: SOFTWARE_DOWNLOAD_TYPE_STANDALONE = "SOFTWARE_DONWLOAD_TYPE_STANDALONE";
@@ -142,8 +173,11 @@ export type SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD = "SOFTWARE_DOWNLOAD_TYPE_NO_DOWN
 export const SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD: SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD = "SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD";
 /** Download types */
 export type SoftwareDownloadTypes = SOFTWARE_DOWNLOAD_TYPE_STANDALONE | SOFTWARE_DOWNLOAD_TYPE_ZIP | SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD;
-/** Represents a single piece of installed software */
-export interface Software {
+/**
+ * Base properties for a single piece of installed software
+ * NB: for boolean types make sure they are parsed accordingly in {@link SoftwareRegistryQueryProvider.getSoftwares}
+ */
+export interface BaseSoftware {
 	/** ID (optional, but required for DB). Is a UUID v4 */
 	id?: string;
 	/** Name of software.  Must be a name compatible with OS paths (so a valid windows path name) */
@@ -156,8 +190,17 @@ export interface Software {
 	downloadType: SoftwareDownloadTypes;
 	/** Homepage */
 	homepage: string;
-	/** Map of executables (such as .exe and .dll files) included with the software to string */
-	executables: Executable[];
+	/** File name to download to */
+	filename?: string;
+}
+
+/**
+ * A piece of software a user provides
+ * 
+ * **PLEASE SEE {@link BaseSoftware}**
+ * @see BaseSoftware
+ */
+export interface Software extends BaseSoftware {
 	/**
 	 * Installed flag. Can be set to true to signify software should not be installed (i.e. downloadedand installed), or is already installed (in the case of software on the PATH).
 	 * 
@@ -166,20 +209,42 @@ export interface Software {
 	 * If you have __some__ executable in the PATH (and so not downloaded), you can include these without setting this flag (see {@link Executable.userInstalled}).
 	 * 
 	 * To install the software, {@link SoftwareRegistry.runInstall} must be invoked manually.
+	 * 
+	 * NB: This is only here because the DB doesn't store it as a bool(it stores it as a {@link SQLBool}),
+	 * and TS complains if we try to override this with {@link SQLBool}
 	 */
 	noAutoInstall?: boolean;
-	/** File name to download to */
-	filename?: string;
+	/** Array of executables (such as .exe and .dll files) included with the software to string */
+	executables: Executable[];
 }
 
 /**
  * Software In DB.
+ * Removes stuff not for the DB, and adds stuff DB specific
+ */
+export interface BaseSoftwareInDB extends BaseSoftware {
+	/** ID is required in DB */
+	id: string;
+	ownerName: string;
+}
+
+/**
+ * Adds the correct JS boolean types to {@link BaseSoftwareInDB}
+ */
+export interface SoftwareInDB extends BaseSoftwareInDB {
+	executables: ExecutableInDB[];
+	installed: boolean;
+	noAutoInstall: boolean;
+}
+
+/**
+ * Software direclty from the DB ({@link SQLBool}s not yet parsed to JS bools)
  * Removes stuff not for the DB, and ads stuff DB specific
  */
-export type SoftwareInDB = Software & { id: string; executables: ExecutableInDB[]; installed: boolean; noAutoInstall: never; ownerName: string };
-
-/** Boolean ENUM for SQL */
-export enum SQLBool {
-	True = 1,
-	False = 0,
+export interface SoftwareDirectlyFromDB extends BaseSoftwareInDB {
+	// NOTE: executables not included directly from DB Table.
+	//executables: ExecutableDirectlyFromDB[];
+	installed: SQLBool;
+	/** Override {@link Software.noAutoInstall} so it's an SQLBool */
+	noAutoInstall: SQLBool;
 }
