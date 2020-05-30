@@ -45,12 +45,13 @@ export const testSoftwareToUpdate: Software = {
 	executables: [
 		{
 			name: "AHK_DLL",
-			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
+			path: "ahkdll-v2-release-master/x64a/AutoHotkey.dll",
 			arch: "x64",
 		},
 		{
 			// (doesn't actually exist, but serves to test things)
 			name: "AHK_DLL_X16",
+			userInstalled: false,
 			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
 			arch: "arm",
 		},
@@ -72,14 +73,17 @@ export const testSoftwareUpdated: Software = {
 	executables: [
 		{
 			name: "AHK_DLL",
-			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
+			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll", // Test path updates
 			arch: "x64",
 		},
 		{
 			// (doesn't actually exist, but serves to test things)
 			name: "AHK_DLL_X16",
-			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
-			arch: "arm",
+			// Also tests updates to these fields
+			path: "ahk.exe", // testing for user Install updates
+			userInstalled: true,
+			arch: "x32",
+			os: "linux",
 		},
 		// Deleted
 		{
@@ -92,6 +96,19 @@ export const testSoftwareUpdated: Software = {
 		{
 			name: "AHK_DLL_INSERTED",
 			path: "ahkdll-v2-release-master/Win32a/AutoHotkey.dll",
+			arch: "x32",
+		},
+		// These is inserted & tests for userInstalled in INSERTs
+		{
+			name: "AHK_EXE_INSERTED",
+			path: "ahk.exe",
+			userInstalled: true,
+			arch: "x32",
+		},
+		{
+			name: "AHK_DLL_INSERTED_2",
+			path: "ahkdll-v2-release-master/Win32a/AutoHotkey.dll",
+			userInstalled: false,
 			arch: "x32",
 		},
 	]

@@ -248,3 +248,9 @@ export interface SoftwareDirectlyFromDB extends BaseSoftwareInDB {
 	/** Override {@link Software.noAutoInstall} so it's an SQLBool */
 	noAutoInstall: SQLBool;
 }
+
+/** Partial software */
+export interface PartialSoftware extends Partial<BaseSoftware> {
+	executables?: Partial<Executable>[];
+	noAutoInstall?: boolean;
+}

@@ -224,13 +224,33 @@ describe("Software Registry tests", () => {
 			// Now check
 			expect(results.executables.length).to.equal(testSoftwareUpdated.executables.length);
 			// Chack executables
-			// NOTE: m
 			results.executables.forEach((value) => {
 				const valueToTestAgainst = testSoftwareUpdated.executables.find(value2 => value2.name === value.name);
 				expect(valueToTestAgainst).to.not.be.undefined;
 				expect(value).to.deep.include(valueToTestAgainst);
 			});
 		});
+
+		it("should set the right bool when using noAutoInstall", async () => {
+			await softwareRegistry.updateSoftware(testSoftwareUpdated.name, { noAutoInstall: true });
+			await expect(softwareRegistry.db.get(`SELECT noAutoInstall FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?`, testSoftwareUpdated.name))
+				.to.eventually.deep.equal({ noAutoInstall: SQLBool.True });
+			// And the reverse
+			await softwareRegistry.updateSoftware(testSoftwareUpdated.name, { noAutoInstall: false });
+			await expect(softwareRegistry.db.get(`SELECT noAutoInstall FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?`, testSoftwareUpdated.name))
+				.to.eventually.deep.equal({ noAutoInstall: SQLBool.False });
+		});
+
+		it("should fail when we try to modify a non existant software", async () => {
+			await expect(softwareRegistry.updateSoftware("DEFO_NOT_IN_DB_lqisajhdfk", { noAutoInstall: true }))
+				.to.be.rejectedWith(/(.*)Could not find the ID(.*)/);
+		});
+
+		it("should throw an error adding an executable without a path", async () => {
+			await expect(softwareRegistry.updateSoftware(testSoftwareUpdated.name, { executables: [{ name: "NO_PATH" }] }))
+				.to.be.rejectedWith(/(.*)No path(.*)/);
+		});
+
 		describe("Reinstalling & copying tests", () => {
 			const testSoftwareReinstall = cloneDeep(testSoftware);
 			const eventualNewName = testSoftwareReinstall.name + ".COPIED"; // What testSoftwareReinstall is renamed to

@@ -38,7 +38,8 @@ import {
 	SOFTWARE_DOWNLOAD_TYPE_STANDALONE,
 	SOFTWARE_DOWNLOAD_TYPE_ZIP,
 	SoftwareInDB,
-	ExecutableInDB
+	ExecutableInDB,
+	PartialSoftware
 } from "./util/interfaces";
 import SoftwareRegistryQueryProvider, { SoftwareRegistryDBProviderOptions } from "./software-query-provider";
 import rimrafCalledBack from "rimraf";
@@ -235,7 +236,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * 	(you don't need to pass this if you just want the software copied to a new folder if the name has been changed).
 	 * 	Note: {@link Software.noAutoInstall} must be set to false to allow reinstalling
 	 */
-	public async updateSoftware(name: string, newData: Partial<Software>, reinstall = false): Promise<void> {
+	public async updateSoftware(name: string, newData: PartialSoftware, reinstall = false): Promise<void> {
 		this.logger.info(`Updating software of ${name}...`);
 		// pass through
 		// Since an empty newData is posssible, test for it here
@@ -243,7 +244,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			// EMPTY!
 			this.logger.warn("Got an empty newData object, so no updates applied.");
 		} else {
-			await this.updateSoftwareRecord(name, newData);
+			await this.updateSoftwareRecord(name, newData as Partial<SoftwareInDB>);
 		}
 		const newSoftwareRecord = await this.getSoftware(newData.name || name);
 		// Auto copy to new path if name changed
@@ -296,7 +297,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		this.logger.debug(`Updating software record of ${name}...`);
 		// Checks if the property is in newData
 		const objectHasProperty = (obj: object, field: string): boolean => {
-			return Object.prototype.hasOwnProperty.call(obj, field) && typeof newData[field] !== "undefined";
+			return Object.prototype.hasOwnProperty.call(obj, field) && typeof obj[field] !== "undefined";
 		};
 		const newDataHasProperty = (field: string): boolean => {
 			return objectHasProperty(newData, field);
@@ -314,9 +315,15 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			}
 			return stmt;
 		};
-		// Params
+		// ID is required so we can locate software in DB, this is easier than an originalName field
+		const softwareIdQueryResults = await this.db.get<{ id: string }>(`SELECT id FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [name, this.package.name]);
+		if (typeof softwareIdQueryResults === "undefined") {
+			throw new Error(`Could not find the ID of software ${newData.name || name} in DB! The software may not be in the DB.`);
+		}
+		this.logger.debug("Software ID: " + softwareIdQueryResults.id);
+		// Params for software UPDATE
 		const params = {
-			"@originalName": name,
+			"@id": softwareIdQueryResults.id,
 			"@ownerName": this.package.name,
 			...newDataHasProperty("name") && { "@name": newData.name },
 			...newDataHasProperty("url") && { "@url": newData.url },
@@ -324,25 +331,24 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			...newDataHasProperty("downloadType") && { "@downloadType": newData.downloadType },
 			...newDataHasProperty("noAutoInstall") && { "@noAutoInstall": newData.noAutoInstall ? SQLBool.True : SQLBool.False },
 		};
-		const queryText = `
-		UPDATE ${SOFTWARE_TABLE_NAME} SET
-		${generateKeyValues(params, ["@originalName", "@ownerName"])}
-		WHERE name = @originalName AND ownerName = @ownerName;
-		`;
-		this.logger.debug(queryText);
-		// Generate statement
-		const stmt = await this.db.prepare(queryText);
-		this.logger.debug("Running query...");
-		await stmt.all(params);
+		const queryKeyValues = generateKeyValues(params, ["@id", "@ownerName"]);
+		if (queryKeyValues !== "") {
+			// Update as there is stuff to update
+			const queryText = `
+			UPDATE ${SOFTWARE_TABLE_NAME} SET
+			${generateKeyValues(params, ["@id", "@ownerName"])}
+			WHERE id = @id AND ownerName = @ownerName;
+			`;
+			this.logger.debug(queryText);
+			// Generate statement
+			const stmt = await this.db.prepare(queryText);
+			this.logger.debug("Running query...");
+			await stmt.all(params);
+		} else {
+			this.logger.warn("Nothing updated as no params to update.");
+		}
 		// Update executables
 		this.logger.debug("Updating executables in DB...");
-		// Safeguard in case user changed ID in newData
-		const softwareIdQueryResults = await this.db.get<{ id: string }>(`SELECT id FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [newData.name || name, this.package.name]);
-		if (typeof softwareIdQueryResults === "undefined") {
-			throw new Error(`Could not find the ID of software ${newData.name || name} in DB!`);
-		}
-		this.logger.debug("Software ID: " + softwareIdQueryResults.id);
-		// ID is required so we can locate it, this is easier than an originalName field
 		this.logger.debug("Generating promises...");
 		const executableUpdatePromises = newData.executables?.map(async (executable: Partial<ExecutableInDB> & { name: string }) => { // Name is required
 			this.logger.debug(`Updating executable ${executable.name || "*"}...`);
