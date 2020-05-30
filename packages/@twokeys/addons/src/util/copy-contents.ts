@@ -20,11 +20,13 @@
 import mkdirp from "mkdirp";
 import path from "path";
 import ProgressBar from "progress";
-import { pipeline } from "stream";
+import { pipeline as pipelineWithCB } from "stream";
 import fs from "fs";
+import { promisify } from "util";
 import { Logger } from "@twokeys/core";
 
 const { readdir, stat } = fs.promises;
+const pipeline = promisify(pipelineWithCB);
 
 /**
  * Interface for each section of the file tree
@@ -70,7 +72,9 @@ export default class ContentCopier {
 	constructor(root: string, destination: string, options?: ContentCopierOptions) {
 		this.root = root;
 		this.destination = destination;
-		this.logger = typeof options !== "undefined" && Object.prototype.hasOwnProperty.call(options, "logger") ? Object.assign(new Logger({ name: "copy" }), options?.logger) : new Logger({ name: "copy" });
+		this.logger = typeof options !== "undefined" && typeof options.logger !== "undefined" ?
+			Object.assign(Object.create(Object.getPrototypeOf(options.logger)), options.logger) :
+			new Logger({ name: "copy" });
 		this.logger.args.name = this.logger.args.name + ":copy";
 	}
 
@@ -131,6 +135,9 @@ export default class ContentCopier {
 					reader,
 					writer,
 				);
+				// Now close stuff
+				writer.close();
+				reader.close();
 			}
 			// We're done!
 			return;

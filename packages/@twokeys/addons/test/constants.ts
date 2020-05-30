@@ -41,6 +41,7 @@ export const testSoftwareToUpdate: Software = {
 	url: testSoftware.url,
 	homepage: testSoftware.homepage,
 	downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP,
+	noAutoInstall: true,
 	executables: [
 		{
 			name: "AHK_DLL",
@@ -63,10 +64,11 @@ export const testSoftwareToUpdate: Software = {
 	]
 };
 export const testSoftwareUpdated: Software = {
-	name: testSoftwareToUpdate + Math.random().toString(),
-	url: testSoftwareToUpdate.url,
-	homepage: testSoftwareToUpdate.homepage,
-	downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP,
+	name: testSoftwareToUpdate.name,
+	url: testSoftwareToUpdate.url + Math.random().toString(),
+	homepage: testSoftwareToUpdate.homepage + Math.random().toString(),
+	downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP, // Should not change
+	noAutoInstall: false,
 	executables: [
 		{
 			name: "AHK_DLL",
@@ -74,9 +76,28 @@ export const testSoftwareUpdated: Software = {
 			arch: "x64",
 		},
 		{
-			name: "AHK_DLL_2",
-			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
-			arch: "x64",
-		}
+			// (doesn't actually exist, but serves to test things)
+			name: "AHK_DLL_X16",
+			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
+			arch: "arm",
+		},
+		// Deleted
+		{
+			// (doesn't actually exist, but serves to test things)
+			name: "AHK_DLL_ARM_64",
+			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
+			arch: "arm64",
+		},
+		// This is inserted
+		{
+			name: "AHK_DLL_INSERTED",
+			path: "ahkdll-v2-release-master/Win32a/AutoHotkey.dll",
+			arch: "x32",
+		},
 	]
+};
+// Used for executables testing
+export const testSoftwareExecutablesTest: Software = {
+	...testSoftwareToUpdate,
+	name: "ahkUpdatedExecutableFuncTesting",
 };

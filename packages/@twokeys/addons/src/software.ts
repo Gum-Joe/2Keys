@@ -44,6 +44,7 @@ import SoftwareRegistryQueryProvider, { SoftwareRegistryDBProviderOptions } from
 import rimrafCalledBack from "rimraf";
 import { promisify } from "util";
 import { CodedError } from "@twokeys/core";
+import ContentCopier from "./util/copy-contents";
 
 const rimraf = promisify(rimrafCalledBack);
 
@@ -224,27 +225,46 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * 
 	 * Please note you will most likely have to combine DB data with your edits,
 	 * but you are still restricted by {@link SoftwareRegistry.updateSoftwareRecord}
+	 * @see SoftwareRegistry.updateSoftwareRecord
 	 * @param name Name of software to update
 	 * @param newData Software object with only the properties to change in.
 	 * 	It is Recomended you combine new props with those already in the DB.
 	 * 	As name is a separate param, you can change the name in here.
-	 * 	The software will be auto copied into a new folder under the new name
-	 * @param reinstall Fully deletes the software from disk and reinstalls it using 
+	 * 	The software will be auto copied into a new folder under the new name if name !== newData.name
+	 * @param updateRootPath Copies over the software to a folder under the name of the software
+	 * 	(you don't need to pass this if you just want the software copied to a new folder if the name has been changed).
+	 * 	Note: {@link Software.noAutoInstall} must be set to false to allow reinstalling
 	 */
 	public async updateSoftware(name: string, newData: Partial<Software>, reinstall = false): Promise<void> {
 		this.logger.info(`Updating software of ${name}...`);
 		// pass through
-		await this.updateSoftwareRecord(name, newData);
+		// Since an empty newData is posssible, test for it here
+		if (Object.keys(newData).length === 0 && newData.constructor === Object) {
+			// EMPTY!
+			this.logger.warn("Got an empty newData object, so no updates applied.");
+		} else {
+			await this.updateSoftwareRecord(name, newData);
+		}
 		const newSoftwareRecord = await this.getSoftware(newData.name || name);
+		// Auto copy to new path if name changed
+		if (typeof newData.name !== "undefined" && name !== newData.name) {
+			const source = this.getOneSoftwareFolder(name);
+			const dest = this.getOneSoftwareFolder(newData.name);
+			this.logger.info(`Copying software from old folder of ${source} to ${dest}...`);
+			const copier = new ContentCopier(source, dest, { logger: this.logger });
+			await copier.copyContents();
+			// Now delete the old
+			this.logger.info(`Deleting old folder (${source})...`);
+			await rimraf(this.getOneSoftwareFolder(name));
+		}
 		// Reinstall
-		// Please note: ideally in an update situation we'd just run the update function the add-on provides
 		if (reinstall) {
 			if (newSoftwareRecord.noAutoInstall) {
 				this.logger.warn("Not reinstalling as the noAutoInstall flag was set.");
 			} else {
-				this.logger.info(`Reinstalling software of ${name}...`);
+				this.logger.info(`Reinstalling software of ${newData.name || name}...`);
 				this.logger.info("Deleting....");
-				await rimraf(this.getOneSoftwareFolder(name));
+				await rimraf(this.getOneSoftwareFolder(newData.name || name));
 				// Get software back and run
 				await this.runInstall((await this.getSoftware(newData.name || name)));
 			}
@@ -271,7 +291,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	protected async updateSoftwareRecord<SoftwareType extends Software = SoftwareInDB>
 	(name: string, newData: Partial<SoftwareType> & {
 			executables?: SoftwareType extends SoftwareInDB ?
-			Array<Partial<ExecutableInDB>> : Array<Partial<Executable>>;
+			Array<Partial<ExecutableInDB> & { name: string }> : Array<Partial<Executable> & { name: string }>; // Name is required
 	}): Promise<void> {
 		this.logger.debug(`Updating software record of ${name}...`);
 		// Checks if the property is in newData
@@ -281,14 +301,15 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		const newDataHasProperty = (field: string): boolean => {
 			return objectHasProperty(newData, field);
 		};
-		// Generate update key = value s
-		const generateKeyValues = (params): string => {
+		// Generate update key = value pairs
+		const generateKeyValues = (params, exclude: string[] = []): string => {
 			let stmt = "";
+			const lastKey = Object.entries(params)[Object.entries(params).length - 1][0]; // So we know when NOT to add the comma
 			for (const param in params) {
-				if (Object.prototype.hasOwnProperty.call(params, param)) {
+				if (Object.prototype.hasOwnProperty.call(params, param) && !exclude.includes(param)) {
 					// Add it
-					// Chop off the A
-					stmt += ` ${param.slice(1)} = ${param}\n`; // \n so statments are not joined
+					// Chop off the `@` as well
+					stmt += ` ${param.slice(1)} = ${param}${param !== lastKey ? "," : ""}\n`; // \n so statments are not joined
 				}
 			}
 			return stmt;
@@ -305,7 +326,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		};
 		const queryText = `
 		UPDATE ${SOFTWARE_TABLE_NAME} SET
-		${generateKeyValues(params)}
+		${generateKeyValues(params, ["@originalName", "@ownerName"])}
 		WHERE name = @originalName AND ownerName = @ownerName;
 		`;
 		this.logger.debug(queryText);
@@ -316,13 +337,22 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		// Update executables
 		this.logger.debug("Updating executables in DB...");
 		// Safeguard in case user changed ID in newData
-		const softwareId = await this.db.get(`SELECT id FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [name, this.package.name]);
+		const softwareIdQueryResults = await this.db.get<{ id: string }>(`SELECT id FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [newData.name || name, this.package.name]);
+		if (typeof softwareIdQueryResults === "undefined") {
+			throw new Error(`Could not find the ID of software ${newData.name || name} in DB!`);
+		}
+		this.logger.debug("Software ID: " + softwareIdQueryResults.id);
 		// ID is required so we can locate it, this is easier than an originalName field
-		const executableUpdatePromises = newData.executables?.map(async (executable: Partial<ExecutableInDB>) => {
+		this.logger.debug("Generating promises...");
+		const executableUpdatePromises = newData.executables?.map(async (executable: Partial<ExecutableInDB> & { name: string }) => { // Name is required
+			this.logger.debug(`Updating executable ${executable.name || "*"}...`);
 			let executableParams;
 			let executablesStmt: Statement;
 			// Create params
-			if (typeof this.db.get(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?`, [name, softwareId]) === "undefined") {
+			const testRetrival = await this.db.get(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?`, [executable.name, softwareIdQueryResults.id]);
+			// If it is inside the DB, the above value will NOT be undefined, and so we update
+			if (typeof testRetrival === "undefined") {
+				this.logger.debug(`Using an INSERT on ${executable.name}...`);
 				if (typeof executable.path === "undefined") {
 					throw Error(`No path found on executable ${executable.name}!`);
 				}
@@ -336,7 +366,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 					"@arch": executable.arch,
 					"@os": executable.os || process.platform,
 					"@userInstalled": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ? SQLBool.True : SQLBool.False,
-					"@softwareId": softwareId,
+					"@softwareId": softwareIdQueryResults.id,
 				};
 				// Use an INSERT
 				// Literally copied from installSoftware()
@@ -346,9 +376,10 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 					VALUES (@id, @name, @path, @arch, @os, @userInstalled, @softwareId)`
 				);
 			} else {
+				this.logger.debug(`Using an UPDATE on ${executable.name}...`);
 				executableParams = {
 					"@name": executable.name,
-					"@softwareId": softwareId,
+					"@softwareId": softwareIdQueryResults.id,
 					// Typeof requred here so TS listens to it
 					...typeof executable.path !== "undefined" && {
 						"@path": Object.prototype.hasOwnProperty.call(executable, "userInstalled") && executable.userInstalled ?
@@ -361,7 +392,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 				executablesStmt = await this.db.prepare(
 					`UPDATE ${EXECUTABLES_TABLE_NAME}
 					SET 
-					${generateKeyValues(params)}
+					${generateKeyValues(executableParams)}
 					WHERE name = @name AND softwareId = @softwareId`
 				);
 			}

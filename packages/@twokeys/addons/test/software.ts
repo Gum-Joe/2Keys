@@ -3,7 +3,9 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { join, basename, relative, normalize } from "path";
+import { promises as fs } from "fs";
 import chai, { expect } from "chai";
+import cloneDeep from "lodash.clonedeep";
 import rimraf from "rimraf";
 import { open as openDB } from "sqlite";
 import sqlite3 from "sqlite3";
@@ -21,7 +23,7 @@ import {
 	ExecutableInDB,
 	SoftwareInDB
 } from "../src";
-import { SOFTWARE_REG_ROOT, testPackage, testSoftware, testSoftwareUninstalled, testSoftwareToUpdate } from "./constants";
+import { SOFTWARE_REG_ROOT, testPackage, testSoftware, testSoftwareUninstalled, testSoftwareToUpdate, testSoftwareUpdated, testSoftwareExecutablesTest } from "./constants";
 import mkdirp from "mkdirp";
 import SoftwareRegistryQueryProvider from "../src/software-query-provider";
 
@@ -172,22 +174,107 @@ describe("Software Registry tests", () => {
 	describe("Software Updating", () => {
 		before(async () => {
 			await softwareRegistry.installSoftware(testSoftwareToUpdate);
+			await softwareRegistry.installSoftware(testSoftwareExecutablesTest);
 		});
 
 		it("should successfully rename an executable", async () => {
-			const newExecName = testSoftwareToUpdate.executables[1].name + Math.random();
-			await softwareRegistry.renameExecutable(testSoftwareToUpdate.name, testSoftwareToUpdate.executables[1].name, newExecName);
-			await expect(softwareRegistry.db.all(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ?`, newExecName)).to.eventually.be.of.length(1);
+			const newExecName = testSoftwareExecutablesTest.executables[1].name + Math.random();
+			await softwareRegistry.renameExecutable(testSoftwareExecutablesTest.name, testSoftwareExecutablesTest.executables[1].name, newExecName);
+			await expect(softwareRegistry.db.all(
+				`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?`,
+				[
+					newExecName,
+					(
+						await softwareRegistry.db.get(
+							`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`,
+							[testSoftwareExecutablesTest.name, testPackage.name]
+						)
+					).id
+				]
+			)).to.eventually.be.of.length(1);
 		});
 
 		it("should successfully delete an executable", async () => {
-			await softwareRegistry.deleteExecutable(testSoftwareToUpdate.name, testSoftwareToUpdate.executables[2].name);
-			await expect(softwareRegistry.db.all(`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ?`, testSoftwareToUpdate.executables[2].name))
+			await softwareRegistry.deleteExecutable(testSoftwareExecutablesTest.name, testSoftwareExecutablesTest.executables[2].name);
+			await expect(softwareRegistry.db.all(
+				`SELECT * FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?`,
+				[
+					testSoftwareExecutablesTest.executables[2].name,
+					(
+						await softwareRegistry.db.get(
+							`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`,
+							[testSoftwareExecutablesTest.name, testPackage.name]
+						)
+					).id
+				]
+			))
 				.to.eventually.be.of.length(0);
 		});
 
-		it("should successfully update a piece of software", async () => {
-			
+		it("should successfully update a piece of software in the DB", async () => {
+			await softwareRegistry.updateSoftware(testSoftwareToUpdate.name, testSoftwareUpdated);
+			const results = await softwareRegistry.getSoftware(testSoftwareUpdated.name);
+			const testSoftwareUpdatedWithoutExecutable = cloneDeep(testSoftwareUpdated);
+			delete testSoftwareUpdatedWithoutExecutable.executables;
+			// check everything
+			expect(results).to.deep.include(testSoftwareUpdatedWithoutExecutable);
+			// Now check executables
+			// Delete paths because thje DB has absolute paths, not relative
+			testSoftwareUpdated.executables.forEach(value => delete value.path);
+			// Now check
+			expect(results.executables.length).to.equal(testSoftwareUpdated.executables.length);
+			// Chack executables
+			// NOTE: m
+			results.executables.forEach((value) => {
+				const valueToTestAgainst = testSoftwareUpdated.executables.find(value2 => value2.name === value.name);
+				expect(valueToTestAgainst).to.not.be.undefined;
+				expect(value).to.deep.include(valueToTestAgainst);
+			});
+		});
+		describe("Reinstalling & copying tests", () => {
+			const testSoftwareReinstall = cloneDeep(testSoftware);
+			const eventualNewName = testSoftwareReinstall.name + ".COPIED"; // What testSoftwareReinstall is renamed to
+			testSoftwareReinstall.name += "REINSTALLED";
+			testSoftwareReinstall.noAutoInstall = false;
+			before(async () => {
+				await softwareRegistry.installSoftware(testSoftwareReinstall);
+				expect(softwareRegistry.getOneSoftwareFolder(testSoftwareReinstall.name)).to.be.a.directory();
+			});
+
+			describe("Copy tests", () => {
+				it("should successfully copy software to a new path when name is changed", async () => {
+					await softwareRegistry.updateSoftware(testSoftwareReinstall.name, { name: eventualNewName });
+					// Check rename happened in DB
+					await expect(softwareRegistry.db.get(`SELECT * FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [eventualNewName, testPackage.name]))
+						.to.eventually.not.be.undefined;
+					// Check path
+					expect(softwareRegistry.getOneSoftwareFolder(testSoftwareReinstall.name)).to.not.be.a.path(); // Deleted old?
+					expect(softwareRegistry.getOneSoftwareFolder(eventualNewName)).to.be.a.directory(); // Copied to new?
+					expect(join(softwareRegistry.getOneSoftwareFolder(eventualNewName), testSoftwareReinstall.executables[0].path)).to.be.a.file();
+				});
+			});
+
+			describe("Reinstall tests", () => {
+				it("should successfully reinstall a piece of software (and also handle having no DB updates to do)", async () => {
+					// Create a test file
+					const testFilePath = join(softwareRegistry.getOneSoftwareFolder(eventualNewName), "testfile.txt");
+					await (await fs.open(testFilePath, "w")).close();
+					await softwareRegistry.updateSoftware(eventualNewName, {}, true);
+					// Did it work?
+					expect(testFilePath).to.not.be.a.path();
+					expect(softwareRegistry.getOneSoftwareFolder(eventualNewName)).to.be.a.directory(); // Still there?
+					expect(softwareRegistry.getOneSoftwareFolder(eventualNewName)).to.be.a.directory(); // Copied to new?
+					expect(join(softwareRegistry.getOneSoftwareFolder(eventualNewName), testSoftwareReinstall.executables[0].path)).to.be.a.file();
+				});
+				it("should not reinstall a piece of software if noAutoInstall is false", async () => {
+					// Create dummy tests file
+					const testFilePath = join(softwareRegistry.getOneSoftwareFolder(eventualNewName), "testfile2.txt");
+					await (await fs.open(testFilePath, "w")).close();
+					await softwareRegistry.updateSoftware(eventualNewName, { noAutoInstall: true }, true);
+					// Did it (not) work?
+					expect(testFilePath).to.be.a.file();
+				});
+			});
 		});
 	});
 	

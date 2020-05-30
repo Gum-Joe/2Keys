@@ -157,7 +157,7 @@ export default class SoftwareRegistryQueryProvider {
 		const softwares = softwaresFromDB.map((software: SoftwareDirectlyFromDB) => {
 			// NOTE: Keep in syn with {@link SoftwareDirectlyFromDB} and 
 			(software as unknown as SoftwareInDB).installed = software.installed === SQLBool.False ? false : true;
-			(software as unknown as SoftwareInDB).installed = software.installed === SQLBool.False ? false : true;
+			(software as unknown as SoftwareInDB).noAutoInstall = software.noAutoInstall === SQLBool.False ? false : true;
 			return software as unknown as SoftwareInDB;
 		});
 		// Retrieve executables for each
