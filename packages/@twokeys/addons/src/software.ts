@@ -258,6 +258,8 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 * Notes:
 	 * - If providing a new executable, all props must be provided (as you would to {@link SoftwareRegistry.installSoftware}) - see {@link Executable}
 	 * 	- for this, the path should also be relative to the software root - if a new name for the software is set, we handle using the right path ourselves.
+	 * - If renaming or deleting an executable please see {@link SoftwareRegistry.renameExecutable} and {@link SoftwareRegistry.deleteExecutable} respectivly
+	 * 	- This function does not automatically invoke these methods
 	 * 
 	 * Dev notes: schema of SQL needs to be kept in sync with {@link SoftwareRegistry.installSoftware}
 	 * @param name Name of software to update
@@ -372,6 +374,31 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		// DONE!
 		this.logger.debug("Done.");
 		return;
+	}
+	/**
+	 * Deletes an executable from the DB
+	 * @param softwareOwner Software that the executable belongs to
+	 */
+	public async deleteExecutable(softwareOwner: string, executableName: string): Promise<ISqlite.RunResult> {
+		this.logger.info(`Deleting executable ${executableName} from DB...`);
+		const { id } = await this.getSoftware(softwareOwner);
+		// Delete
+		return this.db.run(`DELETE FROM ${EXECUTABLES_TABLE_NAME} WHERE name = ? AND softwareId = ?`, [ executableName, id ]);
+	}
+	/**
+	 * Renames an executable in the DB
+	 * @param softwareOwner Software that the executable belongs to
+	 * @param executableName Original executable name
+	 */
+	public async renameExecutable(softwareOwner: string, executableName: string, newName: string): Promise<ISqlite.RunResult> {
+		this.logger.info(`Deleting executable ${executableName} from DB...`);
+		const { id } = await this.getSoftware(softwareOwner);
+		// Delete
+		return this.db.run(`
+			UPDATE TABLE ${EXECUTABLES_TABLE_NAME}
+			SET
+			name = ?
+			WHERE name = ? AND softwareId = ?`, [newName, executableName, id]);
 	}
 
 	/**

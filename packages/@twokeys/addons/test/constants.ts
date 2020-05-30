@@ -35,3 +35,35 @@ export const testSoftwareUninstalled: Software = {
 	...testSoftware,
 	name: "ahkUninstalled",
 };
+
+export const testSoftwareToUpdate: Software = {
+	name: "ahkUpdated",
+	url: testSoftware.url,
+	homepage: testSoftware.homepage,
+	downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP,
+	executables: [
+		{
+			name: "AHK_DLL",
+			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
+			arch: "x64",
+		}
+	]
+};
+export const testSoftwareUpdated: Software = {
+	name: testSoftwareToUpdate + Math.random().toString(),
+	url: testSoftwareToUpdate.url,
+	homepage: testSoftwareToUpdate.homepage,
+	downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP,
+	executables: [
+		{
+			name: "AHK_DLL",
+			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
+			arch: "x64",
+		},
+		{
+			name: "AHK_DLL_2",
+			path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
+			arch: "x64",
+		}
+	]
+};

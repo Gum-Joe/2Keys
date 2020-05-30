@@ -169,7 +169,14 @@ describe("Software Registry tests", () => {
 		});
 	});
 
-	describe("Software uninstall", () => {
+	describe("Software Updating", () => {
+		it("should successfully update a piece of software", async () => {
+			
+		});
+	});
+	
+
+	describe("Software Uninstall", () => {
 		before(async () => {
 			// Add software
 			await softwareRegisty.installSoftware(testSoftwareUninstalled);
