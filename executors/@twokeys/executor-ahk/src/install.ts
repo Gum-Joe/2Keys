@@ -23,30 +23,12 @@
  */
 
 import type { TaskFunction, TwoKeys, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
-import { SOFTWARE_DOWNLOAD_TYPE_ZIP } from "@twokeys/addons";
-import { AUTO_HOTKEY_H, AHK_DLL_X64, AHK_DLL_X32 } from "./constants";
+import { AHK_SOFTWARE_DEF } from "./constants";
 
 const install: TaskFunction<any, void, TWOKEYS_ADDON_TYPE_EXECUTOR> = async (twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>, config: any): Promise<void> => {
 	twokeys.logger.info("Installing AutoHotkey_H v2 alpha, to execute macro scripts...");
-	await twokeys.software.installSoftware({
-		name: AUTO_HOTKEY_H,
-		url: "https://codeload.github.com/HotKeyIt/ahkdll-v2-release/zip/master",
-		homepage: "https://autohotkey.org",
-		downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP,
-		executables: [
-			{
-				name: AHK_DLL_X64,
-				path: "ahkdll-v2-release-master/x64w/AutoHotkey.dll",
-				arch: "x64",
-			},
-			{
-				name: AHK_DLL_X32,
-				path: "ahkdll-v2-release-master/Win32w/AutoHotkey.dll",
-				arch: "x32",
-			}
-		]
-	});
-	twokeys.logger.info("AutoHotkey installed");
+	await twokeys.software.installSoftware(AHK_SOFTWARE_DEF);
+	twokeys.logger.info("AutoHotkey_H installed");
 	return;
 };
 

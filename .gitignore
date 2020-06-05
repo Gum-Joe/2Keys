@@ -251,5 +251,6 @@ typings/
 # Serverless directories
 .serverless
 
-# Dpcs
-docs
+# Compiled Docs
+typedoc
+packages/**/*/docs

@@ -24,6 +24,7 @@
 import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
 import type { TwoKeys, ExecutorExecConfig } from "@twokeys/addons";
+import { AUTO_HOTKEY_H, AHK_DLL_X64 } from "./constants";
 
 const ahk = require("../build/Release/executor-ahk.node");
 
@@ -88,18 +89,24 @@ export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig):
 	// 0: Validate. Throw error.
 	await validateConfig(twokeys, config);
 
+	// 1: Grab execution path
+	twokeys.logger.debug("Grabbing executables from the registry...");
+	const ahkExecutable = await twokeys.software.getExecutable(AUTO_HOTKEY_H, AHK_DLL_X64);
+
 	// 0: Create execution string 
 	const execString = `
 	; 2KEYS EXECUTOR AHK EXECUTION
 	${getPrelude(config)}
 
 	; GRAB FILE
-	${join(config.keyboard.root, config.hotkey.root)}
+	#Include ${join(config.keyboard.root, config.hotkey.root)}
 
 	; EXECUTE
 	${config.hotkey.func}()
 	`;
 	twokeys.logger.info("Exec string created & config validated. Executing...");
 	twokeys.logger.debug(execString);
-	// ahk.run_ahk_text("PATH", execString);
+	ahk.run_ahk_text("PATH", ahkExecutable.path);
+	// DONE!
+	twokeys.logger.info("Execution done.");
 };
