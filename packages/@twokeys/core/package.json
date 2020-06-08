@@ -12,9 +12,9 @@
     "watch": "tsc -p tsconfig.build.json --watch",
     "lint": "eslint --ext .ts .",
     "docs": "typedoc --includes src",
-    "test": "cross-env NODE_ENV=test mocha",
+    "test": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true mocha",
     "test:log": "cross-env mocha",
-    "coverage": "cross-env NODE_ENV=test nyc mocha",
+    "coverage": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha",
     "coverage:upload": "codecov"
   },
   "nyc": {
@@ -39,12 +39,14 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
+    "@types/mkdirp": "^1.0.1",
     "@types/mocha": "^7.0.2",
     "@types/progress": "^2.0.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.7.0",
     "cross-env": "^7.0.2",
+    "mkdirp": "^1.0.4",
     "mocha": "^7.2.0",
     "nyc": "^15.1.0",
     "ts-node": "^8.10.2",

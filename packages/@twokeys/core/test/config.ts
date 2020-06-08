@@ -21,6 +21,7 @@
  * Tests config parsing
  */
 import path from "path";
+import mkdirp from "mkdirp";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { promises as fs, constants as fsconstants } from  "fs";
@@ -55,9 +56,12 @@ describe("Config tests", () => {
 			try {
 				await fs.access(CONFIG_DEFAULT_FILE_SERVER, fsconstants.F_OK);
 			} catch (err) {
-				if (err?.code === "ENOENT") {
+				if (err.code === "ENOENT") {
 					// Create
+					await mkdirp(path.dirname(CONFIG_DEFAULT_FILE_SERVER));
 					await fs.writeFile(CONFIG_DEFAULT_FILE_SERVER, "name: test\nversion: 1.0.0\n");
+				} else {
+					throw err;
 				}
 			}
 		});
