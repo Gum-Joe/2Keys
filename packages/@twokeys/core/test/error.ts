@@ -24,7 +24,7 @@
 import { CodedError } from "../src/error";
 import { expect } from "chai";
 
-describe("CodedError Test", () => {
+describe("CodedError tests", () => {
 	it("should have an error code", () => {
 		expect(new CodedError("HI", "ECODE")).to.deep.include({ message: "ECODE: HI", code: "ECODE" });
 	});

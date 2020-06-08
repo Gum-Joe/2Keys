@@ -25,6 +25,7 @@
 import { expect } from "chai";
 import Logger from "../src/logger";
 import { Instance } from "chalk";
+import ProgressBar from "progress";
 
 const chalk = new Instance({
 	level: 3
@@ -157,7 +158,7 @@ describe("Logger tests", () => {
 		});
 	});
 
-	describe("Individual methods", () => {
+	describe("Base logging methods", () => {
 		const LOG_PREFIX = "testMethods";
 		const TEST_STR = "HELLOWORLD";
 		
@@ -254,5 +255,87 @@ describe("Logger tests", () => {
 			logger.isSilent = false;
 			logger.err(TEST_STR);
 		});
+
+		it("throw_noexit(): should not give a stack if isDebug is false", (done) => {
+			const errorMessage = "Error: No cheese Grommit!";
+			const logger = new Logger({
+				name: "errTest",
+				// @ts-ignore
+				loggingMethods: {
+					error: (message: string): void => {
+						//console.log(message);
+						if (message.includes(errorMessage)) {
+							// If things have gone wrong, the error message won't be given
+							done();
+						}
+					}
+				}
+			});
+			logger.isDebug = false;
+			logger.isSilent = false;
+			logger.throw_noexit(new Error(errorMessage));
+		});
+
+		it("throw_noexit(): should not print stack if none is there", (done) => {
+			const errorMessage = "Error: No cheese Grommit!";
+			const logger = new Logger({
+				name: "errTest",
+				// @ts-ignore
+				loggingMethods: {
+					error: (message: string): void => {
+						//console.log(message);
+						if (message.includes("at ")) {
+							// We got a stack trace!
+							done(new Error("Got a stack trace logged when none expected!"));
+						}
+					}
+				}
+			});
+			logger.isDebug = true;
+			logger.isSilent = false;
+			const err = new Error(errorMessage);
+			err.stack = undefined;
+			logger.throw_noexit(err);
+			done();
+		});
+
+		it("throw_noexit(): should give a stack if isDebug is true", (done) => {
+			const errorMessage = "Error: No cheese Grommit!";
+			let isDone = 0; // 0: message not printed yet 1: stack not printed yet 2: both printed & done called.
+			const logger = new Logger({
+				name: "errTest",
+				// @ts-ignore
+				loggingMethods: {
+					error: (message: string): void => {
+						//console.log(message);
+						if (message.includes(errorMessage) && isDone === 0) {
+							// If things have gone wrong, the error message won't be given
+							isDone = 1;
+							// don't call done, the next if handles this
+						}
+						// If here, first line printed, check for stack
+						// Since logger.ts will be on the stack, check for it
+						if (message.includes("logger") && isDone === 1) {
+							isDone = 2;
+							return done();
+						}
+						// If done is never called, something went wrong
+					}
+				}
+			});
+			logger.isDebug = true;
+			logger.isSilent = false;
+			logger.throw_noexit(new Error(errorMessage));
+		});
 	});
+
+	describe("Other methods", () => {
+		it("should create a progress bar", () => {
+			const logger = new Logger({
+				name: "PROGRESS"
+			});
+			expect(logger.createProgressBar("", { total: 100 })).to.be.instanceOf(ProgressBar);
+		});
+	});
+	
 });

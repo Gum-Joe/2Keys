@@ -146,22 +146,21 @@ export default class Logger {
 	 * @public
 	 */
 	public throw_noexit(err: Error): void { // eslint-disable-line @typescript-eslint/camelcase
-		if (!this.isSilent) {
-			this.err("");
-			this.err(`${err.message}`);
-			this.err("");
-			if (this.isDebug || process.env.NODE_ENV !== "production") {
-				if (typeof err.stack !== "undefined") {
-					this.err("Full error:");
-					this.err("");
-					let e = "";
-					for (e of err.stack.split("\n")) {
-						this.err(e);
-					}
+		// Don't check for isSilent as _log checks for that
+		this.err("");
+		this.err(`${err.message}`);
+		this.err("");
+		if (this.isDebug) {
+			if (typeof err.stack !== "undefined") {
+				this.err("Full error:");
+				this.err("");
+				let e = "";
+				for (e of err.stack.split("\n")) {
+					this.err(e);
 				}
 			}
-			this.err("");
 		}
+		this.err("");
 	}
 
 	/** Create a progress bar */
