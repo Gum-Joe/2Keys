@@ -1,0 +1,9 @@
+# TEST config
+hello: world
+a: AN_A
+complexOBJ:
+  hello: world2
+  someArray:
+    - hi
+someArray:
+  - hi
