@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 import { Chalk } from "chalk";
-import { LoggerArgs } from "./interfaces";
+import { LoggerArgs, LoggingMethods, defaultLoggingMethods } from "./interfaces";
 import ProgressBar from "progress";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -34,14 +34,33 @@ export default class Logger {
 	public isDebug: boolean;
 	public args: LoggerArgs;
 	public isSilent: boolean;
+	/** Methods used for logging. See type */
+	public loggingMethods: LoggingMethods = defaultLoggingMethods;
 
 	constructor(args: LoggerArgs) {
 		this.args = args;
-		this.argv = process.argv;
-		this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.TWOKEYS_DEBUG === "true" || (process.env.NODE_ENV === "development" && process.env.TWOKEYS_DEBUG !== "false");
-		const chalkOpts = (process.env.TWOKEYS_USE_COLOUR === "true" || this.argv.includes("--color")) && !this.argv.includes("--no-color") ? { level: 3 } : {}; // Development hack to enable colour in electron-forge
+		this.argv = args.argv || process.argv;
+		this.isDebug = // Are any of these true????
+			this.argv.includes("--debug") ||
+			this.argv.includes("--verbose") ||
+			this.argv.includes("-v") ||
+			process.env.TWOKEYS_DEBUG === "true" ||
+			(
+				process.env.NODE_ENV === "development"
+				&& process.env.TWOKEYS_DEBUG !== "false"
+			);
+		const chalkOpts = // if TWOKEYS_USE_COLOUR is true OR --color given, and provided --no-color is not there as well, color is enabled
+			(
+				process.env.TWOKEYS_USE_COLOUR === "true" ||
+				this.argv.includes("--color")
+			) && !this.argv.includes("--no-color") ?
+				{ level: 3 } : { level: 0 }; // Development hack to enable colour in electron-forge
 		this.chalk = new Instance(chalkOpts);
 		this.isSilent = this.argv.includes("--silent") || process.env.NODE_ENV === "test";
+		// Set logging methods
+		if (Object.prototype.hasOwnProperty.call(this.args, "loggingMethods") && typeof this.args.loggingMethods !== "undefined") {
+			this.loggingMethods = this.args.loggingMethods;
+		}
 	}
 
 	// Logger methods
@@ -54,7 +73,7 @@ export default class Logger {
 	protected _getPrefix(level: string, colour: string, args: LoggerArgs = this.args): string {
 		// Add prefix
 		let prefix = "";
-		if (Object.prototype.hasOwnProperty.call(this.args, "name")) {
+		if (Object.prototype.hasOwnProperty.call(args, "name") && typeof args.name === "string") {
 			prefix = this.chalk.magenta(args.name) + " "; // eslint-disable-line prefer-template
 		}
 		const today = new Date();
@@ -68,7 +87,7 @@ export default class Logger {
 	 * @param args {LoggerArgs} Logger args
 	 * @param logger Custom logger to print with
 	 */
-	protected _log(level: string, colour: string, text: string, logger = console.log, args: LoggerArgs = this.args): void {
+	protected _log(level: string, colour: string, text: string, logger = this.loggingMethods.log, args: LoggerArgs = this.args): void {
 		if (!this.isSilent) {
 			logger(`${this._getPrefix(level, colour, args)} ${text}`);
 		}
@@ -88,9 +107,7 @@ export default class Logger {
 	 * @color green
 	 */
 	public warn(text: string): void {
-		if (!this.isSilent) {
-			this._log("warn", "yellow", text, console.warn);
-		}
+		this._log("warn", "yellow", text, this.loggingMethods.warn);
 	}
 	/*
 	 * Error method
@@ -98,9 +115,7 @@ export default class Logger {
 	 * @public
 	 */
 	public err(text: string): void {
-		if (!this.isSilent) {
-			this._log("err", "red", text, console.error);
-		}
+		this._log("err", "red", text, this.loggingMethods.error);
 	}
 
 	/*

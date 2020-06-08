@@ -23,16 +23,42 @@
  * @packageDocumentation
  */
 export interface LoggerArgs {
-  name: string;
-  windowLogger?: boolean;
+	/**
+	 * Name of logger, printed in magenta before level and message
+	 */
+	name: string;
+	windowLogger?: boolean;
+	/** Optional: provide CLI args to use when decided if to use isDebug, etc */
+	argv?: string[];
+	loggingMethods?: LoggingMethods;
 }
 
+/**
+ * Logging methods
+ * 
+ * Defined the methods a loggers needs
+ * in order to log messages
+ */
+export interface LoggingMethods {
+	/** Used for info and debug messages (STDOUT) */
+	log(message?: any, ...optionalParams: any[]): void;
+	/** Used for warning messages */
+	warn(message?: any, ...optionalParams: any[]): void;
+	/** Used for error messages (STDERR) */
+	error(message?: any, ...optionalParams: any[]): void;
+}
+
+/**
+ * Default logging methods
+ */
+export const defaultLoggingMethods: LoggingMethods = console;
+
 export interface LoggerTypes {
-  level: "info" | "warn" | "err" | "debug";
-  name: string;
-  colour: string;
-  text: string;
-  args?: LoggerArgs;
+	level: "info" | "warn" | "err" | "debug";
+	name: string;
+	colour: string;
+	text: string;
+	args?: LoggerArgs;
 }
 
 /**
@@ -44,27 +70,27 @@ export interface LoggerTypes {
  * This is the root `config.yml` and is first loaded when 2Keys loads a project
  */
 export interface ProjectConfig {
-  /** Name of project */
-  name: string;
-  /** Project UUID, used to uniquely identify projects */
-  id: string;
-  /** Identify the SemVer version of 2Keys used to create the config, in case of future config changes */
-  version: string;
-  /** Server settings */
-  server: {
-    /** Port server runs on */
-    port: number;
-    /** Permission for the server */
-    perms: {
-      /** Allow the server to start on startup */
-      startOnStartup: boolean;
-    };
-  };
-  /**
-   * List of config files for detectors that are used with this project.
-   * This is different from the client config files, as these are stored in the project dir
-   */
-  detectors: string[];
+	/** Name of project */
+	name: string;
+	/** Project UUID, used to uniquely identify projects */
+	id: string;
+	/** Identify the SemVer version of 2Keys used to create the config, in case of future config changes */
+	version: string;
+	/** Server settings */
+	server: {
+		/** Port server runs on */
+		port: number;
+		/** Permission for the server */
+		perms: {
+			/** Allow the server to start on startup */
+			startOnStartup: boolean;
+		};
+	};
+	/**
+	 * List of config files for detectors that are used with this project.
+	 * This is different from the client config files, as these are stored in the project dir
+	 */
+	detectors: string[];
 }
 
 /**
@@ -72,14 +98,14 @@ export interface ProjectConfig {
  * This config is project-agnostic and is stored with the 2Keys Root Config (see interface {@link ServerConfig}).
  */
 export interface ClientConfig {
-  /** UUID of client, used to reference it in project config so it can be used in projects */
-  id: string;
-  /** Name of detector */
-  name: string;
-  /** Controller to use with detector, that is the add-on that holds the server side code for interfacing with the detector */
-  controller: string;
-  /** Config options to pass to the controller, defined by the controller itself */
-  controllerConfig: unknown;
+	/** UUID of client, used to reference it in project config so it can be used in projects */
+	id: string;
+	/** Name of detector */
+	name: string;
+	/** Controller to use with detector, that is the add-on that holds the server side code for interfacing with the detector */
+	controller: string;
+	/** Config options to pass to the controller, defined by the controller itself */
+	controllerConfig: unknown;
 }
 
 /**
@@ -90,15 +116,15 @@ export interface ClientConfig {
  * What's here can override what is in `Keyboard.executors[executor]`.
  */
 export interface BaseHotkeyTypeSingle {
-  /** Executor to use for this hotkey (defaults to `keyboard[keybaord].executors.default`) */
-  executor?: string;
-  /**
-   * Macro funcion to execute.
-   * Ideally this would be a string,
-   * however, as different executor may want it to be e.g. an object, `unknown` is used
-   * so that executors can override this.
-   */
-  func: unknown;
+	/** Executor to use for this hotkey (defaults to `keyboard[keybaord].executors.default`) */
+	executor?: string;
+	/**
+	 * Macro funcion to execute.
+	 * Ideally this would be a string,
+	 * however, as different executor may want it to be e.g. an object, `unknown` is used
+	 * so that executors can override this.
+	 */
+	func: unknown;
 }
 
 /**
@@ -113,12 +139,12 @@ export type HotkeyTypeSingle<ExecutorConfig = { [key: string]: any }> = BaseHotk
  * where there are separate events for up and down and hold keypresses
  */
 export interface HotkeyTypeKeypressValue {
-  /** Up event */
-  up?: HotkeyTypeSingle;
-  /** Down event */
-  down?: HotkeyTypeSingle;
-  /** Hold event */
-  hold?: HotkeyTypeSingle;
+	/** Up event */
+	up?: HotkeyTypeSingle;
+	/** Down event */
+	down?: HotkeyTypeSingle;
+	/** Hold event */
+	hold?: HotkeyTypeSingle;
 }
 
 /** Hotkey type. Is either {@link HotkeyTypeSingle} or {@link HotkeyTypeKeypressValue} */
@@ -128,10 +154,10 @@ export type Hotkey = HotkeyTypeSingle | HotkeyTypeKeypressValue;
  * Represents the hotkey map
  */
 export interface Hotkeys {
-  /**
-   * @param hotkey The hotkey code (e.g. ^C) that corresponds to the keys that are pressed to trigger the hotkey
-   */
-  [hotkey: string]: Hotkey;
+	/**
+	 * @param hotkey The hotkey code (e.g. ^C) that corresponds to the keys that are pressed to trigger the hotkey
+	 */
+	[hotkey: string]: Hotkey;
 }
 
 /**
@@ -139,39 +165,39 @@ export interface Hotkeys {
  * Used in the detector config (interface {@link DetectorConfig})
  */
 export interface Keyboard {
-  /**
-   * Root folder where all macros are stored
-   * TODO: **Map this to an absolute path when using it**
-   */
-  root: string;
-  /**
-   * Contains the executor specific config for executors.
-   * This is, for example, the file to load that includes all macros.
-   * The key here is the name of the executor.
-   * Also contains a `default` key to sepcify the default executor.
-   */
-  executors: {  
-    /** Default executor */
-    default: string;
-    /**
-     * @param executorName Name of executor being configured
-     * Config is {@link Executor.hotkeyOptions}
-     */
-    [executorName: string]: unknown;
-  };
-  /**
-   * Contains detector-specific config that is required per keyboard.
-   * For example, the identifier for the keyboard to watch
-   */
-  detector: unknown;
-  /**
-   * Holds the mapping of hotkeys to macros.
-   * For example, the macro to run when a hotkey combo is pressed.
-   * The key here is the hotkey code.
-   * It is up to detectors to decide what hotkey codes (such as ^C) are used
-   * as well as what hotkey codes keyboard scan code map to.
-   */
-  hotkeys: Hotkeys;
+	/**
+	 * Root folder where all macros are stored
+	 * TODO: **Map this to an absolute path when using it**
+	 */
+	root: string;
+	/**
+	 * Contains the executor specific config for executors.
+	 * This is, for example, the file to load that includes all macros.
+	 * The key here is the name of the executor.
+	 * Also contains a `default` key to sepcify the default executor.
+	 */
+	executors: {  
+		/** Default executor */
+		default: string;
+		/**
+		 * @param executorName Name of executor being configured
+		 * Config is {@link Executor.hotkeyOptions}
+		 */
+		[executorName: string]: unknown;
+	};
+	/**
+	 * Contains detector-specific config that is required per keyboard.
+	 * For example, the identifier for the keyboard to watch
+	 */
+	detector: unknown;
+	/**
+	 * Holds the mapping of hotkeys to macros.
+	 * For example, the macro to run when a hotkey combo is pressed.
+	 * The key here is the hotkey code.
+	 * It is up to detectors to decide what hotkey codes (such as ^C) are used
+	 * as well as what hotkey codes keyboard scan code map to.
+	 */
+	hotkeys: Hotkeys;
 }
 
 /**
@@ -181,25 +207,25 @@ export interface Keyboard {
  * TODO:  USE A MAP
  */
 export interface DetectorConfig {
-  /** Name of Detector */
-  name: string;
-  /** Identifies the client this config file is for */
-  client: {
-    /** UUID of client to use */
-    id: string;
-    /** Name of client, added so it's clear to the end-user which device this is referred to.  Is not paid attention to by code. */
-    name: string;
-  };
-  /** Config for detector. It's up to the detector controller to decide what goes here. */
-  detector_config: unknown;
-  /**
-   * List of keyboard, where `propName` is the keyboard name,
-   * that are associated with this detector in this project.
-   * @param keyboardName Keyboard name
-   */
-  keyboards: {
-    [keyboardName: string]: Keyboard;
-  };
+	/** Name of Detector */
+	name: string;
+	/** Identifies the client this config file is for */
+	client: {
+		/** UUID of client to use */
+		id: string;
+		/** Name of client, added so it's clear to the end-user which device this is referred to.  Is not paid attention to by code. */
+		name: string;
+	};
+	/** Config for detector. It's up to the detector controller to decide what goes here. */
+	detector_config: unknown;
+	/**
+	 * List of keyboard, where `propName` is the keyboard name,
+	 * that are associated with this detector in this project.
+	 * @param keyboardName Keyboard name
+	 */
+	keyboards: {
+		[keyboardName: string]: Keyboard;
+	};
 }
 
 /**
@@ -209,25 +235,25 @@ export interface DetectorConfig {
  * @interface ServerConfig
  */
 export interface ServerConfig {
-  /** Name of server */
-  name: string;
-  /** SemVer version of 2Keys used as server */
-  version: string;
-  /**
-   * Theme to use.
-   * This is disabled as there are no themes
-   */
-  theme?: "dark" | "light";
-  /**
-   * Accent colour.
-   * Disabled as there's no way to set it.
-   * Defaults to system accent
-   */
-  accent: string;
-  /**
-   * Location of installed add-ons
-   */
-  add_ons_location: string;
+	/** Name of server */
+	name: string;
+	/** SemVer version of 2Keys used as server */
+	version: string;
+	/**
+	 * Theme to use.
+	 * This is disabled as there are no themes
+	 */
+	theme?: "dark" | "light";
+	/**
+	 * Accent colour.
+	 * Disabled as there's no way to set it.
+	 * Defaults to system accent
+	 */
+	accent: string;
+	/**
+	 * Location of installed add-ons
+	 */
+	add_ons_location: string;
 }
 
 /**
