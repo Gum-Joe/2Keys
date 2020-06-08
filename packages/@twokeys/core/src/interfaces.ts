@@ -229,3 +229,8 @@ export interface ServerConfig {
    */
   add_ons_location: string;
 }
+
+/**
+ * Type to represent one of the above configs (that is loaded from a file)
+ */
+export type CombinedConfigs = ServerConfig | DetectorConfig | ClientConfig | ProjectConfig;

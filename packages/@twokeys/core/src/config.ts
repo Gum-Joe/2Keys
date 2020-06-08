@@ -24,7 +24,7 @@
  */
 import { promises as fs } from "fs";
 import YAML from "yaml";
-import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig } from "./interfaces";
+import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs } from "./interfaces";
 import Logger from "./logger";
 import { CONFIG_DEFAULT_FILE_SERVER } from "./constants";
 
@@ -41,11 +41,11 @@ const logger = new Logger({
  * - Config for a detector that is used in a project (see interface {@link DetectorConfig})
  * @param configFile File to load config from
  */
-export async function loadConfig(configFile: string): Promise<ServerConfig | DetectorConfig | ClientConfig | ProjectConfig> {
+export async function loadConfig<ConfigType extends CombinedConfigs>(configFile: string): Promise<ConfigType> {
 	try {
 		logger.debug("Reading config from file " + configFile);
 		const config: Buffer = await fs.readFile(configFile);
-		const parsedConfig: ServerConfig | DetectorConfig | ClientConfig | ProjectConfig = YAML.parse(config.toString());
+		const parsedConfig: ConfigType = YAML.parse(config.toString());
 		return parsedConfig;
 	} catch (err) {
 		logger.err("ERROR READING CONFIG FILE " + configFile);
@@ -58,5 +58,5 @@ export async function loadConfig(configFile: string): Promise<ServerConfig | Det
  */
 export async function loadServerConfig(file = CONFIG_DEFAULT_FILE_SERVER): Promise<ServerConfig> {
 	logger.debug(`Loading server config from file ${file}...`);
-	return loadConfig(file) as Promise<ServerConfig>;
+	return loadConfig<ServerConfig>(file);
 }

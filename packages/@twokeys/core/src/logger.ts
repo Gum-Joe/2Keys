@@ -36,7 +36,7 @@ export default class Logger {
 	public isSilent: boolean;
 
 	constructor(args: LoggerArgs) {
-		this.args = args || { name: "logger" };
+		this.args = args;
 		this.argv = process.argv;
 		this.isDebug = this.argv.includes("--debug") || this.argv.includes("--verbose") || this.argv.includes("-v") || process.env.TWOKEYS_DEBUG === "true" || (process.env.NODE_ENV === "development" && process.env.TWOKEYS_DEBUG !== "false");
 		const chalkOpts = (process.env.TWOKEYS_USE_COLOUR === "true" || this.argv.includes("--color")) && !this.argv.includes("--no-color") ? { level: 3 } : {}; // Development hack to enable colour in electron-forge
