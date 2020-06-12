@@ -37,7 +37,7 @@ export default class ZipDownloader {
 	private logger: Logger;
 	private fullPath: string; // thus.saveTo + fetch_file().this.saveAs
 
-	public argv: Arguments;
+	public argv?: Arguments;
 	public url: string;
 	public name: string;
 	public saveTo: string;
@@ -58,7 +58,7 @@ export default class ZipDownloader {
 		this.url = url;
 		this.saveTo = saveTo;
 		this.saveAs = saveAs;
-		this.argv = typeof argv === "object" ? argv : {};
+		this.argv = typeof argv === "object" ? argv : undefined;
 
 		this.fullPath = join(this.saveTo, this.saveAs); // Save full path
 	}
@@ -80,7 +80,7 @@ export default class ZipDownloader {
 
 			// See if exists
 			// Only needed if not forcing
-			if (!this.argv.force) {
+			if (!this.argv?.force) {
 				try {
 					await open(this.fullPath, "wx");
 				} catch (err) {
