@@ -14,8 +14,6 @@ export type InstanceGenerator<T> = (commandInfo: CommandInfo, TypeToGenerate: Co
 const map = new Map<Constructor<any>, any>();
 
 /**
- * This decorator takes a variable of the factory that is typeof TwoKeys
- * and uses instance Generator to create an instance of it
  * This decorator is used to map types (specifically those with constructors, so classes) that would be in the final CommandFactory
  * to command arguments inside the command factory wrappers. It adds the types to a map (see {@link BaseCommand.commandTypeMap}),
  * which is then used to create instances of given types
