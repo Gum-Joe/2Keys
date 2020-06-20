@@ -71,12 +71,11 @@ export abstract class BaseCommand {
 	 * Please remeber to define a return type in your actual function.
 	 */
 	public abstract async run(): Promise<unknown>;
-	public abstract run(): unknown;
 
 	/**
 	 * Here's where the decorator functions put information about the command.
 	 * It will be there when it is added via a decorator,
 	 * if the decorator is not used a runtime error will be thrown in the final code.
 	 */
-	public commandInfo!: CommandInfo;
+	public static commandInfo: CommandInfo;
 }
