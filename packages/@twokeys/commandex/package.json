@@ -43,7 +43,6 @@
     "@types/chai-fs": "^2.0.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "codecov": "^3.6.5",
     "cross-env": "^7.0.2",
     "mocha": "^7.1.1",
     "nyc": "^15.0.1",
