@@ -66,7 +66,7 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
-var exports = module.exports = isValidES2015VarName;
+exports = module.exports = isValidES2015VarName;
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 exports.es5 = isValidES5VarName;

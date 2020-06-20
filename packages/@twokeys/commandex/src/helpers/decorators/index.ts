@@ -18,6 +18,7 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * This folder contains contains all the decorators we need
+ * This folder contains contains all the decorators we need.
+ * Note: Really what these do is set stuff up for the compiler.
  */
 export const MODULE_IS = "decorators";

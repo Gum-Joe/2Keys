@@ -46,6 +46,7 @@
  * @packageDocumentation
  */
 import type { CommandInfo } from "../util/interfaces";
+import { CommandTypeMap } from "../util/types";
 
 /**
  * Base command class (for stateful commands, that is, commands with a state),
@@ -78,4 +79,12 @@ export abstract class BaseCommand {
 	 * if the decorator is not used a runtime error will be thrown in the final code.
 	 */
 	public static commandInfo: CommandInfo;
+
+	/**
+	 * Type map
+	 * Stores the mapping of class types to function arguments.
+	 * This is so we can use our own 2Keys class in commands and create instances of it.
+	 * Provided by a decorator function
+	 */
+	public static commandTypeMap: CommandTypeMap = new CommandTypeMap();
 }

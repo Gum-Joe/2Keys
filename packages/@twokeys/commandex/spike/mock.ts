@@ -100,7 +100,8 @@ class CommandFactory2 {
 	constructor(public TwoKeysConstructor: typeof TwoKeys) { }
 
 	public CommandA(config: ConstructorParameters<typeof Command>[1]) {
-		return new Command(new this.TwoKeysConstructor(), config);
+		new Command(new this.TwoKeysConstructor(), config);
+		return new Command(Command.instanceGenerator(this.TwoKeysConstructor), config);
 	}
 
 	// And a wrapped function looks like this
