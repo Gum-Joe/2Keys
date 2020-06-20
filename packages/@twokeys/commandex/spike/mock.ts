@@ -18,6 +18,7 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 // Mock of how it will all work
+// NOTE: This will not compile; it is not supposed to
 
 // What would be the TwoKeys object that we will pass through
 class TwoKeys { }

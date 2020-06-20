@@ -68,7 +68,7 @@ describe("Decorator tests", () => {
 			}
 			const instanceGenerator: InstanceGenerator<InstanceOfThisCreated> = (commandInfo: CommandInfo, TypeToGenerate: Constructor<InstanceOfThisCreated>) => {
 				return new TypeToGenerate();
-			} 
+			} ;
 			@fromFactoryCreateInstanceOf(0, InstanceOfThisCreated, instanceGenerator)
 			class TestClass1 extends BaseCommand {
 				async run(): Promise<void> {
@@ -77,14 +77,14 @@ describe("Decorator tests", () => {
 			}
 
 			// Assert
-			expect(TestClass1.commandTypeMap.has(0)).to.be.true;
-			expect(TestClass1.commandTypeMap.get(0)).to.deep.equal({
+			expect(TestClass1.commandArgumentsMap.has(0)).to.be.true;
+			expect(TestClass1.commandArgumentsMap.get(0)).to.deep.equal({
 				type: MappingTypes.FromFactoryInstanceOf,
 				forArgumentIndex: 0,
 				instanceGenerator,
 				argumentType: InstanceOfThisCreated
 			});
-			expect((TestClass1.commandTypeMap.get(0) as OneMappedType<InstanceOfThisCreated>).instanceGenerator({
+			expect((TestClass1.commandArgumentsMap.get(0) as OneMappedType<InstanceOfThisCreated>).instanceGenerator({
 				name: "test"
 			}, InstanceOfThisCreated)).to.be.instanceOf(InstanceOfThisCreated);
 		});
@@ -92,15 +92,22 @@ describe("Decorator tests", () => {
 
 	describe("@mapCommandArgumentToWrapper", () => {
 		it("should map an argument into the Map", () => {
-			@mapCommandArgumentToWrapper<TestClass1, typeof TestClass1>(0, 0, "argument1")
+			@mapCommandArgumentToWrapper(0, 1, "argument1")
+			@mapCommandArgumentToWrapper(1, 0, "argument2")
 			class TestClass1 extends BaseCommand {
-				constructor(someArgumentToMap: string) {
+				constructor(someArgumentToMap: string, someArgumentToMap2: string) {
 					super();
 				}
 				async run(): Promise<void> {
 					throw new Error("If this is thrown, it ran");
 				}
 			}
+			expect(TestClass1.commandArgumentsMap.has(0)).to.be.true;
+			expect(TestClass1.commandArgumentsMap.get(0)).to.deep.equal({
+				wrapperArgumentName: "argument1",
+				desiredWrapperArgumentIndex: 1,
+				type: MappingTypes.MappedArgument,
+			});
 		});
 	});
 	

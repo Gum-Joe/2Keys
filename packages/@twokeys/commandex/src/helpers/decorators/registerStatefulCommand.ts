@@ -18,7 +18,7 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { BaseCommand } from "../commands";
+import type { BaseCommandInterface } from "../commands";
 const isVarName = require("../../util/isValidVarName");
 
 /**
@@ -28,11 +28,11 @@ const isVarName = require("../../util/isValidVarName");
  * 2. Add the command to the final CommandFactory
  * @param commandName Name of command being registered, used to set the name of the command in the final command factory
  */
-export default function registerStatefulCommand(commandName: string): (construtor: typeof BaseCommand) => void {
+export default function registerStatefulCommand(commandName: string): (construtor: BaseCommandInterface) => void {
 	if (!isVarName(commandName)) {
 		throw new Error("Error! Invalid command name - it must be a valid JS varibale name!");
 	}
-	return function (construtor: typeof BaseCommand): void {
+	return function (construtor: BaseCommandInterface): void {
 		construtor.commandInfo = {
 			name: commandName
 		};

@@ -26,7 +26,7 @@
 
 import { MappingTypes } from "../../util/interfaces";
 import type { Constructor, InstanceGenerator } from "../../util/types";
-import type { BaseCommand } from "../commands";
+import type { BaseCommandInterface, BaseCommandStaticProperties } from "../commands";
 
 /**
  * This decorator is used to map types (specifically those with constructors, so classes) that would be in the final CommandFactory
@@ -41,9 +41,10 @@ import type { BaseCommand } from "../commands";
  * @template T the type to create/use.  The constructor type for this is auto-inferred/computed.
  */
 export default function fromFactoryCreateInstanceOf<T>(argumentIndex: number, argumentType: Constructor<T>, instanceGenerator: InstanceGenerator<T>) {
-	return function (constructor: typeof BaseCommand): void {
+	// The BaseCommandStaticProperties here to allow abstract classes to be used
+	return function (constructor: BaseCommandInterface | BaseCommandStaticProperties): void {
 		// Add it to the map
-		constructor.commandTypeMap.set(argumentIndex, {
+		constructor.commandArgumentsMap.set(argumentIndex, {
 			type: MappingTypes.FromFactoryInstanceOf,
 			argumentType,
 			instanceGenerator,

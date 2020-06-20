@@ -23,7 +23,7 @@
  */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
-import type { BaseCommand } from "../commands";
+import type { BaseCommandInterface, BaseCommandStaticProperties } from "../commands";
 import { MappingTypes } from "../../util/interfaces";
 
 const isVarName = require("../../util/isValidVarName");
@@ -34,16 +34,17 @@ const isVarName = require("../../util/isValidVarName");
  * @param desiredWrapperArgumentIndex Index of the argument in the wrapper function
  * @param wrapperArgumentName Name of argumnent in the wrappper function
  */
-export default function mapCommandArgumentToWrapper<CommandClass extends BaseCommand, CommandClassConstructor extends typeof BaseCommand>
+export default function mapCommandArgumentToWrapper
 (commandArgumentIndex: number, desiredWrapperArgumentIndex: number, wrapperArgumentName: string){
 	// Validation
 	if (!isVarName(wrapperArgumentName)) {
 		throw new Error("Error! Invalid command name - it must be a valid JS varibale name!");
 	}
 	// Return decorator
-	return function (constructor: CommandClassConstructor): void {
+	// The BaseCommandStaticProperties here to allow abstract classes to be used
+	return function (constructor: BaseCommandInterface | BaseCommandStaticProperties): void {
 		// Add it to the map
-		constructor.commandTypeMap.set(commandArgumentIndex, {
+		constructor.commandArgumentsMap.set(commandArgumentIndex, {
 			type: MappingTypes.MappedArgument,
 			wrapperArgumentName,
 			desiredWrapperArgumentIndex,

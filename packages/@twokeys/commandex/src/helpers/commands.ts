@@ -46,6 +46,23 @@
  * @packageDocumentation
  */
 import { CommandInfo, CommandArgumentsMap } from "../util/interfaces";
+import implementsStaticProperties from "./decorators/implementsStaticProperties";
+
+/**
+ * Helper interfaces that defines the static properties {@link BaseCommand} implements
+ * See {@link BaseCommand} for info on these
+ */
+export interface BaseCommandStaticProperties {
+	commandInfo: CommandInfo;
+	commandArgumentsMap: CommandArgumentsMap;
+}
+
+/**
+ * Interface describing a constructor for a BaseCommand, with static props
+ */
+export interface BaseCommandInterface extends BaseCommandStaticProperties {
+	new(...args: any[]): BaseCommand;
+}
 
 /**
  * Base command class (for stateful commands, that is, commands with a state),
@@ -56,6 +73,7 @@ import { CommandInfo, CommandArgumentsMap } from "../util/interfaces";
  * 
  * It is recomended you extend this with your own abstract `BaseCommand` class that defines a construtor that your commands need.
  */
+@implementsStaticProperties<BaseCommandStaticProperties>()
 export abstract class BaseCommand {
 	/**
 	 * Function that must be defined, and is what would contain the logic that the command does.
@@ -72,6 +90,8 @@ export abstract class BaseCommand {
 	 */
 	public abstract async run(): Promise<unknown>;
 
+	// NOTE: Before changing the below also change BaseCommandStaticProperties
+
 	/**
 	 * Here's where the decorator functions put information about the command.
 	 * It will be there when it is added via a decorator,
@@ -85,5 +105,5 @@ export abstract class BaseCommand {
 	 * This is so we can use our own 2Keys class in commands and create instances of it.
 	 * Provided by a decorator function
 	 */
-	public static commandTypeMap: CommandArgumentsMap = new CommandArgumentsMap();
+	public static commandArgumentsMap: CommandArgumentsMap = new CommandArgumentsMap();
 }
