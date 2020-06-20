@@ -25,8 +25,8 @@ import { BaseCommand } from "../src/helpers";
 import registerStatefulCommand from "../src/helpers/decorators/registerStatefulCommand";
 import fromFactoryCreateInstanceOf from "../src/helpers/decorators/fromFactoryCreateInstanceOf";
 import { InstanceGenerator, Constructor } from "../src/util/types";
-import { Test } from "mocha";
-import { CommandInfo } from "../src/util/interfaces";
+import { CommandInfo, OneMappedType, MappingTypes } from "../src/util/interfaces";
+import mapCommandArgumentToWrapper from "../src/helpers/decorators/mapCommandArgumentToWrapper";
 
 chai.use(require("chai-as-promised"));
 
@@ -77,16 +77,33 @@ describe("Decorator tests", () => {
 			}
 
 			// Assert
-			expect(TestClass1.commandTypeMap.has(InstanceOfThisCreated)).to.be.true;
-			expect(TestClass1.commandTypeMap.get(InstanceOfThisCreated)).to.deep.equal({
+			expect(TestClass1.commandTypeMap.has(0)).to.be.true;
+			expect(TestClass1.commandTypeMap.get(0)).to.deep.equal({
+				type: MappingTypes.FromFactoryInstanceOf,
 				forArgumentIndex: 0,
 				instanceGenerator,
+				argumentType: InstanceOfThisCreated
 			});
-			expect(instanceGenerator({
+			expect((TestClass1.commandTypeMap.get(0) as OneMappedType<InstanceOfThisCreated>).instanceGenerator({
 				name: "test"
 			}, InstanceOfThisCreated)).to.be.instanceOf(InstanceOfThisCreated);
-		})
+		});
 	});
+
+	describe("@mapCommandArgumentToWrapper", () => {
+		it("should map an argument into the Map", () => {
+			@mapCommandArgumentToWrapper<TestClass1, typeof TestClass1>(0, 0, "argument1")
+			class TestClass1 extends BaseCommand {
+				constructor(someArgumentToMap: string) {
+					super();
+				}
+				async run(): Promise<void> {
+					throw new Error("If this is thrown, it ran");
+				}
+			}
+		});
+	});
+	
 	
 	
 });

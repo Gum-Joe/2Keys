@@ -20,18 +20,5 @@ export type AbstractConstructor<T> = Function & { prototype: T } // From https:/
  */
 export type InstanceGenerator<T> = (commandInfo: CommandInfo, TypeToGenerate: Constructor<T>) => T;
 
-/**
- * A single type in the map that has been mapped
- * @template T Type being mapped
- */
-export type OneMappedType<T> = {
-	instanceGenerator: InstanceGenerator<T>;
-	/** Index of argument in the function that this instance of type is for */
-	forArgumentIndex: number;
-}
-/**
- * Type map
- * Stores the mapping of class types to function arguments.
- * This is so we can use our own 2Keys class in commands and create instances of it.
- */
-export class CommandTypeMap extends Map<Constructor<any>, OneMappedType<any>> {}
+
+

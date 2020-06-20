@@ -1,17 +1,32 @@
 /**
+ * @license
+ * Copyright 2020 Kishan Sambhi
+ *
+ * This file is part of 2Keys.
+ *
+ * 2Keys is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * 2Keys is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+ */
+/**
  * Below: this decorator automatically maps a constrcutor, stored in the command factory,
  * to an argument for the constrcutor of a stateful command,
  * that is of a given type
+ * @packageDocumentation
  */
 
-import { CommandInfo } from "../../util/interfaces";
-import { Constructor } from "../../util/types";
-import { BaseCommand } from "../commands";
-
-//type Constructor<T> = new (...args: any[]) => T; // From https://www.simonholywell.com/post/typescript-constructor-type.html
-export type InstanceGenerator<T> = (commandInfo: CommandInfo, TypeToGenerate: Constructor<T>) => T;
-
-const map = new Map<Constructor<any>, any>();
+import { MappingTypes } from "../../util/interfaces";
+import type { Constructor, InstanceGenerator } from "../../util/types";
+import type { BaseCommand } from "../commands";
 
 /**
  * This decorator is used to map types (specifically those with constructors, so classes) that would be in the final CommandFactory
@@ -28,7 +43,9 @@ const map = new Map<Constructor<any>, any>();
 export default function fromFactoryCreateInstanceOf<T>(argumentIndex: number, argumentType: Constructor<T>, instanceGenerator: InstanceGenerator<T>) {
 	return function (constructor: typeof BaseCommand): void {
 		// Add it to the map
-		constructor.commandTypeMap.set(argumentType, {
+		constructor.commandTypeMap.set(argumentIndex, {
+			type: MappingTypes.FromFactoryInstanceOf,
+			argumentType,
 			instanceGenerator,
 			forArgumentIndex: argumentIndex,
 		});

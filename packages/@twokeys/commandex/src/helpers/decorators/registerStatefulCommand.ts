@@ -18,7 +18,7 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BaseCommand } from "../commands";
+import type { BaseCommand } from "../commands";
 const isVarName = require("../../util/isValidVarName");
 
 /**

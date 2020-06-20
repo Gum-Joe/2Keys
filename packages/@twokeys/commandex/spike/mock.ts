@@ -51,7 +51,7 @@ abstract class BaseCommandInModule {
 @fromFactoryCreateInstanceOf(0, TwoKeys, instanceGenerator)
 /// Below: tells compiler to map argument 0 of the wrapper function to argument of index 1 of the command
 // and name the argument "config" in the factory
-@mapCommandArgumentFromFactory(0, 1, "config")
+@mapCommandArgumentFromFactory(1, 0, "config")
 abstract class BaseCommand<Config> extends BaseCommandInModule {
 	constructor(public twokeys: TwoKeys, public config: Config) {
 		super();

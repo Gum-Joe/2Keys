@@ -26,7 +26,8 @@
     "codecov": "^3.6.5",
     "eslint": "^6.8.0",
     "lerna": "3.20.2",
-    "node-gyp": "^6.1.0"
+    "node-gyp": "^6.1.0",
+    "wsrun": "^5.2.1"
   },
   "dependencies": {
     "chalk": "4.0.0"

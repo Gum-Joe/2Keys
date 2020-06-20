@@ -45,8 +45,7 @@
  * 	- And extension of this is that commands should be atomic, that is, isolated from other operations.  However, for e.g. writing to a DB, this may not be possible
  * @packageDocumentation
  */
-import type { CommandInfo } from "../util/interfaces";
-import { CommandTypeMap } from "../util/types";
+import { CommandInfo, CommandArgumentsMap } from "../util/interfaces";
 
 /**
  * Base command class (for stateful commands, that is, commands with a state),
@@ -86,5 +85,5 @@ export abstract class BaseCommand {
 	 * This is so we can use our own 2Keys class in commands and create instances of it.
 	 * Provided by a decorator function
 	 */
-	public static commandTypeMap: CommandTypeMap = new CommandTypeMap();
+	public static commandTypeMap: CommandArgumentsMap = new CommandArgumentsMap();
 }
