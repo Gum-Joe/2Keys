@@ -29,10 +29,10 @@ interface ConfigType {
 const someCommand: Command<ConfigType> = (twokeys: TwoKeys, config: ConfigType) => {
 	twokeys.logger.info("IT worked!");
 	twokeys.logger.info(config.name);
-}
+};
 
 // Next, wrap it to create a command
 const wrappedCommand = CommandFactory.wrapCommand(someCommand, "someCommand");
 
 // And now we call it
-commandFactory.callCommand(someCommand, { name: "someName" });	
+commandFactory.callCommand(wrappedCommand, { name: "someName" });	

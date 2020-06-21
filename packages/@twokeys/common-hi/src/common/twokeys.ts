@@ -22,9 +22,8 @@
  * @packageDocumentation
  */
 
-import { TwoKeys, Logger, Constructor, implementsStaticProperties } from "@twokeys/core";
+import { TwoKeys, Logger } from "@twokeys/core";
 import { CommandInfo } from "./base-commands";
-import { LoggerArgs } from "@twokeys/core/lib/interfaces";
 
 /**
  * The TwoKeys child class to use for commands

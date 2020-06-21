@@ -20,7 +20,6 @@
 /**
  * Contains the 2Keys base class that is provided to {@link TaskFunction}s & {@link StatefulTaskRunner}.
  */
-import path from "path";
 import Logger from "./logger";
 
 
