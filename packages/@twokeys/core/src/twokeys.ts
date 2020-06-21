@@ -26,11 +26,14 @@ import Logger from "./logger";
 
 /**
  * Base TwoKeys class, used for commands, logic and add-ons.
- * This is an abstract class as we don't know what to call the logger
+ * This is an abstract class as we don't know what to call the logger.
+ * 
+ * The TwoKeys class provides essential methods for commands and add-ons.
+ * This base class provides a logger, and should be extended to add additonal functions, e.g. software registery access
  * @param logger Constrcutor for the logger to use
  * @param logName Name to use as log prefix, see {@link Logger.args.name}
  */
-export default abstract class TwoKeys {
+export abstract class TwoKeys {
 	public logger: Logger;
 	constructor(logger: typeof Logger, logName: string) {
 		this.logger = new logger({
