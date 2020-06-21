@@ -71,11 +71,11 @@ export default class CommandFactory {
 
 	/**
 	 * Wraps a stateless command, adding CommandInfo, so it can be used as command.
-	 * If this is not done {@link Com} will throw an error
+	 * If this is not done {@link CommandFactory} will throw an error
 	 * @param command Command to wrap
 	 * @param name Name of command, particularly useful for the logger's prefix
 	 */
-	public static wrapCommand<T, U>(command: Command<T, U>, name: string) {
+	public static wrapCommand<T, U>(command: Command<T, U>, name: string): Command<T, U> {
 		const info: CommandInfo = {
 			commandName: name,
 		};
