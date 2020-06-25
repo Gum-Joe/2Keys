@@ -1,10 +1,10 @@
 /**
  * Contains a complete example of how commands works (at least stateless ones)
  */
-import BaseTwoKeysForCommands, { ensureIsValidTwoKeysClass } from "../src/common/twokeys";
+import BaseTwoKeysForCommands, { ensureIsValidTwoKeysClass } from "../../src/common/twokeys";
 import { Logger } from "@twokeys/core";
-import CommandFactory from "../src/common/command-factory";
-import { CommandInfo, Command } from "../src/common/base-commands";
+import CommandFactory from "../../src/common/command-factory";
+import { CommandInfo, Command } from "../../src/common/base-commands";
 
 // First create a TwoKeys class to use:
 @ensureIsValidTwoKeysClass // It's reccomended you add this line, it ensures you have the right constructor

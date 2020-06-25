@@ -21,7 +21,7 @@
  * Contains the 2Keys class that is provided to {@link TaskFunction}s
  */
 import path from "path";
-import { Logger } from "@twokeys/core";
+import { Logger, TwoKeys as BaseTwoKeys } from "@twokeys/core";
 import { Package, TWOKEYS_ADDON_TYPES } from "../util/interfaces";
 import SoftwareRegistry from "../software";
 
