@@ -1,7 +1,7 @@
 import CommandFactory from "@twokeys/common-hi/src/common/command-factory";
 import { expect } from "chai";
 import BaseTwoKeysForCommands, { ensureIsValidTwoKeysClass } from "@twokeys/common-hi/src/common/twokeys";
-import { CommandInfo } from "@twokeys/common-hi/src/common/base-commands";
+import { CommandInfo, BaseStatefulCommand } from "@twokeys/common-hi/src/common/base-commands";
 import { Logger } from "@twokeys/core";
 
 @ensureIsValidTwoKeysClass
@@ -20,6 +20,18 @@ describe("Command factory tests", () => {
 			const wrapped = CommandFactory.wrapCommand(theCommand, "someCommand");
 			expect(wrapped).to.haveOwnProperty("commandInfo");
 			expect(wrapped.commandInfo?.commandName).to.equal("someCommand");
+		});
+
+		it("should add commandInfo property to a stateful command class (as a static property", () => {
+			const commandName = "someStatefulCommandName";
+			@CommandFactory.wrapStatefulCommand(commandName)
+			class TheCommand extends BaseStatefulCommand {
+				public async run(config: boolean): Promise<void> {
+					console.log(config);
+				}
+			}
+			expect(TheCommand).to.haveOwnProperty("commandInfo");
+			expect(TheCommand.commandInfo?.commandName).to.equal(commandName);
 		});
 	});
 

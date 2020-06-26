@@ -46,8 +46,9 @@
  * 	- And extension of this is that commands should be atomic, that is, isolated from other operations.  However, for e.g. writing to a DB, this may not be possible
  * @packageDocumentation
  */
-import { Logger } from "@twokeys/core";
+import { implementsStaticProperties } from "@twokeys/core";
 import TwoKeysForCommands from "./twokeys";
+import BaseTwoKeysForCommands from "./twokeys";
 
 /**
  * Defines information about a command, used for e.g. the logger
@@ -66,24 +67,38 @@ export interface CommandInfo {
 export type Command<ConfigT, ReturnU = void> = ((twokeys: TwoKeysForCommands, config: ConfigT) => ReturnU) & { commandInfo?: Partial<CommandInfo> };
 
 /**
+ * Static props for a stateful command
+ */
+export interface StatefulCommandStaticProps {
+	commandInfo: CommandInfo;
+}
+
+/**
+ * Defines what the constructor for a stateful command should look like
+ * @template StatefulCommandType The class that the constructor will return
+ */
+export interface StatefulCommandConstructor<StatefulCommandType extends BaseStatefulCommand> extends StatefulCommandStaticProps {
+	new(twokeys: BaseTwoKeysForCommands): StatefulCommandType;
+}
+
+/**
  * The base command, that all other stateful commands must extend.
  * It provides the constructor for all commands and provides the logger.
  * Stateful commands are ones with a state
  * 
  * This class can be extended to create other base commands, for example, a base command which includes access to the software registry.
  * 
- * @see base-commands.ts
+ * @param twokeys The TwoKeys object that the command will use; use this for logging, etc.
+ * 
+ * @see base-commands.ts for information about commands and the rules for them
   */
+@implementsStaticProperties<StatefulCommandStaticProps>()
 export abstract class BaseStatefulCommand {
-
-	protected logger: Logger;
-
-	constructor(commandName: string, logger: typeof Logger) {
-		this.logger = new logger({
-			name: "command:" + commandName
-		});
-	}
+	/** Properties about the command.  Inserted by the register command decorator */
+	public static commandInfo: CommandInfo;
+	
+	constructor(protected twokeys: BaseTwoKeysForCommands) {}
 
 	/** The actual method that runs the command */
-	public async abstract run(): Promise<any>;
+	public abstract run(config: unknown): unknown;
 }

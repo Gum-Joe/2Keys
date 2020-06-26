@@ -4,7 +4,7 @@
  */
 
 import { FinalTwoKeysConstructor } from "./twokeys";
-import { Command, CommandInfo } from "./base-commands";
+import { Command, CommandInfo, BaseStatefulCommand, StatefulCommandConstructor } from "./base-commands";
 
 /**
  * Provides the needed methods to call commands,
@@ -70,16 +70,54 @@ export default class CommandFactory {
 	}
 
 	/**
-	 * Wraps a stateless command, adding CommandInfo, so it can be used as command.
+	 * Creates an instance of a Stateful Command (see {@link BaseStatefulCommand}) so we can use it
+	 * @param command Command to create instance of
+	 */
+	public createStatefulCommand<CommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<CommandClass>): CommandClass {
+		if (typeof command.commandInfo === "undefined") {
+			throw new Error("Attempted to call a non-command!");
+		}
+		if (typeof command.commandInfo.commandName !== "string") {
+			throw new TypeError("Property commandName was either undefined or not of type string!");
+		}
+		return new command(new this.TwokeysConstructor(command.commandInfo));
+	}
+
+	/**
+	 * (overload) Wraps a stateless command, adding CommandInfo, so it can be used as command.
 	 * If this is not done {@link CommandFactory} will throw an error
-	 * @param command Command to wrap
+	 * @param command Command (stateless or stateful) to wrap
 	 * @param name Name of command, particularly useful for the logger's prefix
 	 */
-	public static wrapCommand<T, U>(command: Command<T, U>, name: string): Command<T, U> {
+	/** @template T Command class that is being wrapped (inferred from type of {@link StatefulCommandConstructor}) */
+	public static wrapCommand<T extends BaseStatefulCommand>(command: StatefulCommandConstructor<T>, name: string): StatefulCommandConstructor<T>
+	/**
+	 * Overload for stateful command
+	 * @template T Config type for {@link Command}
+	 * @template U Return type for {@link Command}
+	 */
+	public static wrapCommand<T, U>(command: Command<T, U>, name: string): Command<T, U>
+	/**
+	 * Actual implementation of {@link CommandFactory.wrapCommand}, that takes either a stateful or stateless command and add commandInfo.
+	 * 
+	 * Generics should be autoinferred by the compiler.
+	 * @template T Config type for {@link Command} (only used for stateless commands)
+	 * @template U Return type for {@link Command} (only used for stateless commands)
+	 * @template V The class that the stateful class constructor will return (only used for stateful commands)
+	 */
+	public static wrapCommand<T, U, V extends BaseStatefulCommand>(command: Command<T, U> | StatefulCommandConstructor<V>, name: string): Command<T, U> | StatefulCommandConstructor<V> {
 		const info: CommandInfo = {
 			commandName: name,
 		};
 		Object.defineProperty(command, "commandInfo", { value: info });
 		return command;
+	}
+
+	/**
+	 * Wraps a stateful command
+	 */
+	public static wrapStatefulCommand(name: string) {
+		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+		return <StatefulCommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<StatefulCommandClass>) => CommandFactory.wrapCommand(command, name);
 	}
 }

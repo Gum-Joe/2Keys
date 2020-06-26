@@ -4,7 +4,7 @@
 import BaseTwoKeysForCommands, { ensureIsValidTwoKeysClass } from "../../src/common/twokeys";
 import { Logger } from "@twokeys/core";
 import CommandFactory from "../../src/common/command-factory";
-import { CommandInfo, Command } from "../../src/common/base-commands";
+import { CommandInfo, Command, BaseStatefulCommand } from "../../src/common/base-commands";
 
 // First create a TwoKeys class to use:
 @ensureIsValidTwoKeysClass // It's reccomended you add this line, it ensures you have the right constructor
@@ -36,3 +36,21 @@ const wrappedCommand = CommandFactory.wrapCommand(someCommand, "someCommand");
 
 // And now we call it
 commandFactory.callCommand(wrappedCommand, { name: "someName" });	
+
+// STATEFUL COMMANDS
+// Define the command itself
+// And also wrap
+@CommandFactory.wrapStatefulCommand("someStatefulCommand")
+class SomeStatefulCommand extends BaseStatefulCommand {
+	public run(config: ConfigType): void {
+		this.twokeys.logger.info("IT worked!");
+		this.twokeys.logger.info(config.name);
+	}
+}
+
+// Now use it
+const TheCommand = commandFactory.createStatefulCommand(SomeStatefulCommand);
+
+TheCommand.run({
+	name: "hi"
+});
