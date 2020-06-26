@@ -18,16 +18,28 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Defines the twokeys class we want to use
+ * Defines types for the TwoKeys class that commands should use.
+ * 
+ * Example of a final TwoKeys class:
+ * ```typescript
+ * import { Logger } from "@twokeys/core";
+ * @ensureIsValidTwoKeysClass
+ * class FinalTwoKeys extends BaseTwoKeysForCommands {
+ * 	constructor(commandInfo: CommandInfo) {
+ * 		super(Logger, commandInfo);
+ * 	}
+ * }
+ * ```
  * @packageDocumentation
  */
-
 import { TwoKeys, Logger } from "@twokeys/core";
 import { CommandInfo } from "./base-commands";
 
 /**
- * The TwoKeys child class to use for commands
- * This has to be extended to use the logger you want (either the GUI one or the CLI one)
+ * The TwoKeys child class to use for commands as a base class.
+ * Please don't use this directly, create an extended version that has a constructor matching {@link FinalTwoKeysConstructor}.
+ * This has to be extended to use the logger you want (either the GUI one or the CLI one).
+ * @see TwoKeys
  */
 export default class BaseTwoKeysForCommands extends TwoKeys {
 	constructor(logger: typeof Logger, commandInfo: CommandInfo) {
@@ -37,6 +49,18 @@ export default class BaseTwoKeysForCommands extends TwoKeys {
 
 /**
  * The final constructor that should be implemented by a child of {@link BaseTwoKeysForCommands}
+ * 
+ * Example of a final TwoKeys class:
+ * @example
+ * ```typescript
+ * import { Logger } from "@twokeys/core";
+ * @ensureIsValidTwoKeysClass
+ * class FinalTwoKeys extends BaseTwoKeysForCommands {
+ * 	constructor(commandInfo: CommandInfo) {
+ * 		super(Logger, commandInfo);
+ * 	}
+ * }
+ * ```
  */
 export interface FinalTwoKeysConstructor {
 	new(commandInfo: CommandInfo): BaseTwoKeysForCommands;

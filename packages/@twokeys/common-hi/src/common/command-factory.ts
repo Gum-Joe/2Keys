@@ -1,4 +1,23 @@
 /**
+ * @license
+ * Copyright 2020 Kishan Sambhi
+ *
+ * This file is part of 2Keys.
+ *
+ * 2Keys is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * 2Keys is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+ */
+/**
  * Class used to call commands
  * @packageDocumentation
  */
@@ -9,6 +28,8 @@ import { Command, CommandInfo, BaseStatefulCommand, StatefulCommandConstructor }
 /**
  * Provides the needed methods to call commands,
  * allowing commands to be called without having to create a instance of TwoKeys manually every time.
+ * 
+ * @param TwokeysConstructor The TwoKeys class to use when calling commands
  * 
  * Full Usage:
  * @example
@@ -47,15 +68,13 @@ import { Command, CommandInfo, BaseStatefulCommand, StatefulCommandConstructor }
  * ```
  */
 export default class CommandFactory {
-	/**
-	 * Create a CommandFactory
-	 * @param TwokeysConstructor The TwoKeys class to use when calling commands
-	 */
+
 	constructor(public TwokeysConstructor: FinalTwoKeysConstructor) {}
 
 	/**
-	 * Calls a stateless command
-	 * **Note: Make sure all properties in {@link CommandInfo} are checked for**
+	 * Calls a stateless command (that has been wrapped with {@link CommandFactory.wrapCommand})
+	 * 
+	 * **Note: Make sure all properties in {@link CommandInfo} are checked for.  This is because we can't guarentee {@link CommandFactory.wrapCommand} has been called**
 	 * @param func Function to call
 	 * @param config Config to pass to it (type inferred from function)
 	 */
@@ -71,6 +90,8 @@ export default class CommandFactory {
 
 	/**
 	 * Creates an instance of a Stateful Command (see {@link BaseStatefulCommand}) so we can use it
+	 * 
+	 * **Note: Make sure all properties in {@link CommandInfo} are checked for.  This is because we can't guarentee {@link CommandFactory.wrapStatefulCommand} has been called**
 	 * @param command Command to create instance of
 	 */
 	public createStatefulCommand<CommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<CommandClass>): CommandClass {
@@ -84,26 +105,33 @@ export default class CommandFactory {
 	}
 
 	/**
-	 * (overload) Wraps a stateless command, adding CommandInfo, so it can be used as command.
-	 * If this is not done {@link CommandFactory} will throw an error
-	 * @param command Command (stateless or stateful) to wrap
+	 * (overload) Wraps a stateful command, adding CommandInfo, so it can be used as command.
+	 * If this is not done {@link CommandFactory} will throw an error.
+	 * 
+	 * This function is used internally by {@link CommandFactory.wrapStatefulCommand} - use {@link CommandFactory.wrapStatefulCommand} instead as a decorator when wrapping stateful commands
+	 * @param command Command (stateful) to wrap
 	 * @param name Name of command, particularly useful for the logger's prefix
+	 * @template T Command class that is being wrapped (inferred from type of {@link StatefulCommandConstructor})
+	 * @private
 	 */
-	/** @template T Command class that is being wrapped (inferred from type of {@link StatefulCommandConstructor}) */
 	public static wrapCommand<T extends BaseStatefulCommand>(command: StatefulCommandConstructor<T>, name: string): StatefulCommandConstructor<T>
 	/**
-	 * Overload for stateful command
+	 * Overload for stateless commands - wraps a stateless command so it can be used as a command, adding commandInfo ({@link CommandInfo})
 	 * @template T Config type for {@link Command}
 	 * @template U Return type for {@link Command}
+	 * @public
 	 */
 	public static wrapCommand<T, U>(command: Command<T, U>, name: string): Command<T, U>
 	/**
-	 * Actual implementation of {@link CommandFactory.wrapCommand}, that takes either a stateful or stateless command and add commandInfo.
+	 * Actual implementation of {@link CommandFactory.wrapCommand}, that takes either a stateful or stateless command and add commandInfo, so it can be used as a command.
+	 * 
+	 * Please only call this with stateless commands; use {@link CommandFactory.wrapStatefulCommand} as a decorator for stateful commands (it uses this function internally)
 	 * 
 	 * Generics should be autoinferred by the compiler.
 	 * @template T Config type for {@link Command} (only used for stateless commands)
 	 * @template U Return type for {@link Command} (only used for stateless commands)
 	 * @template V The class that the stateful class constructor will return (only used for stateful commands)
+	 * @public
 	 */
 	public static wrapCommand<T, U, V extends BaseStatefulCommand>(command: Command<T, U> | StatefulCommandConstructor<V>, name: string): Command<T, U> | StatefulCommandConstructor<V> {
 		const info: CommandInfo = {
@@ -114,7 +142,18 @@ export default class CommandFactory {
 	}
 
 	/**
-	 * Wraps a stateful command
+	 * Wraps a stateful command using {@link CommandFactory.wrapCommand}.
+	 * 
+	 * Usage:
+	 * @example
+	 * ```typescript
+	 * @CommandFactory.wrapStatefulCommand("bob")
+	 * class ACommandCalledBob extends BaseStatefulCommand {
+	 * 	public run(config: any) { // Please specifiy an actual config type
+	 * 		// Some run body
+	 * 	}
+	 * }
+	 * ```
 	 */
 	public static wrapStatefulCommand(name: string) {
 		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type

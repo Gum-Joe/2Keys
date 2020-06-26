@@ -51,7 +51,7 @@ import TwoKeysForCommands from "./twokeys";
 import BaseTwoKeysForCommands from "./twokeys";
 
 /**
- * Defines information about a command, used for e.g. the logger
+ * Defines information about a command, used for e.g. creating the logger
  */
 export interface CommandInfo {
 	commandName: string;
@@ -60,9 +60,9 @@ export interface CommandInfo {
 /**
  * Defines a stateless command.
  * We use a `Partial` for {@link CommandInfo} as it has to be set by a wrapper function, and we can't guarentee it has been called
- * @template ConfigT the type used as the config param for the command
+ * @template ConfigT The type used as the config param for the command
  * @template ReturnU Return type of command
- * @param twokeys TwoKeys object to use in the command, see {@link TwoKeysForCommands} and {@link TwoKeys}
+ * @param twokeys TwoKeys object to use in the command, see {@link BaseTwoKeysForCommands} and {@link TwoKeys}
  */
 export type Command<ConfigT, ReturnU = void> = ((twokeys: TwoKeysForCommands, config: ConfigT) => ReturnU) & { commandInfo?: Partial<CommandInfo> };
 
@@ -70,6 +70,7 @@ export type Command<ConfigT, ReturnU = void> = ((twokeys: TwoKeysForCommands, co
  * Static props for a stateful command
  */
 export interface StatefulCommandStaticProps {
+	/** @see BaseStatefulCommand.commandInfo */
 	commandInfo: CommandInfo;
 }
 
@@ -78,27 +79,29 @@ export interface StatefulCommandStaticProps {
  * @template StatefulCommandType The class that the constructor will return
  */
 export interface StatefulCommandConstructor<StatefulCommandType extends BaseStatefulCommand> extends StatefulCommandStaticProps {
+	/** @param twokeys The TwoKeys object that the command will use; use this for logging, etc. (see {@link BaseTwoKeysForCommands}) */
 	new(twokeys: BaseTwoKeysForCommands): StatefulCommandType;
 }
 
 /**
  * The base command, that all other stateful commands must extend.
  * It provides the constructor for all commands and provides the logger.
- * Stateful commands are ones with a state
+ * Stateful commands are ones with a state.
  * 
  * This class can be extended to create other base commands, for example, a base command which includes access to the software registry.
  * 
- * @param twokeys The TwoKeys object that the command will use; use this for logging, etc.
+ * @param twokeys The TwoKeys object that the command will use; use this for logging, etc. (see {@link BaseTwoKeysForCommands})
  * 
- * @see base-commands.ts for information about commands and the rules for them
+ * @see base-commands for information about commands and the rules for them
   */
 @implementsStaticProperties<StatefulCommandStaticProps>()
 export abstract class BaseStatefulCommand {
-	/** Properties about the command.  Inserted by the register command decorator */
+	/** Properties about the command.  Inserted by the register command decorator. */
 	public static commandInfo: CommandInfo;
 	
+	/** @param twokeys The TwoKeys object that the command will use; use this for logging, etc. (see {@link BaseTwoKeysForCommands}) */
 	constructor(protected twokeys: BaseTwoKeysForCommands) {}
 
-	/** The actual method that runs the command */
+	/** The actual method that runs the command (can be async and use a Promise as well). */
 	public abstract run(config: unknown): unknown;
 }
