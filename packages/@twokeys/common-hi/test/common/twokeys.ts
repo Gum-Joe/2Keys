@@ -17,6 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
-/**
- * Note: I've decided not to export everything here, given how much is in this dir, please require directories directly
- */
+import BaseTwoKeysForCommands from "@twokeys/common-hi/src/common/twokeys";
+import { Logger } from "@twokeys/core";
+import { expect } from "chai";
+
+describe("TwoKeys object tests", () => {
+	it("should create a BaseTwoKeys class with the right logger name", () => {
+		const twokeys = new BaseTwoKeysForCommands(Logger, {
+			commandName: "test",
+		});
+		expect(twokeys.logger.args.name).to.equal("command:test");
+	});
+});

@@ -22,3 +22,6 @@ export * as interfaces from "./interfaces";
 export * as constants from "./constants";
 export * as config from "./config";
 export * from "./error";
+export * from "./task-functions";
+export * from "./twokeys";
+export * from "./util";

@@ -18,5 +18,11 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Note: I've decided not to export everything here, given how much is in this dir, please require directories directly
+ * Exports everything from common
+ * @packageDocumentation
  */
+export * from "./base-commands";
+export * from "./command-factory";
+export { default as CommandFactory } from "./command-factory";
+export * from "./twokeys";
+export { default as BaseTwoKeysForCommands } from "./twokeys";
