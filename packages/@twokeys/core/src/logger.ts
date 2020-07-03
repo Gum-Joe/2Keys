@@ -131,6 +131,15 @@ export default class Logger {
 	public status(message: string): void {
 		this.info(message);
 	}
+
+	/**
+	 * Used to log the status of a subtask in progress (i.e. part of the task that was logged with {@link Logger.statis})
+	 * Here it just log to info, but will be overriden with a proper implementation for CLI and GUI
+	 * @param message Us
+	 */
+	public substatus(message: string): void {
+		this.info(message);
+	}
 	
 	/*
 	 * Debug/verbose method
