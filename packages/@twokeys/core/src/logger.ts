@@ -118,6 +118,20 @@ export default class Logger {
 		this._log("err", "red", text, this.loggingMethods.error);
 	}
 
+	/**
+	 * The below methods are supplememtary methods, designed to allow tasks that are being ran to update user on state.  See explanations below.
+	 * These are overriden by the GUI in the install screen
+	 */
+
+	/**
+	 * Used to log the main status of the task in progress, for example, the overarching task currently in progress.
+	 * Here it just log to info, but will be overriden with a proper implementation for CLI and GUI
+	 * @param message Us
+	 */
+	public status(message: string): void {
+		this.info(message);
+	}
+	
 	/*
 	 * Debug/verbose method
 	 * @color green
