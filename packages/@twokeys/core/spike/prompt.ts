@@ -8,6 +8,11 @@ const logger = new Logger({
 	await logger.prompts.info("IMPORTANT! PLEASE READ!");
 
 	logger.info("GENERAL KENOBI");
+	logger.warn("GENERAL KENOBI");
 	console.log(await logger.prompts.warning("Do you wish to proceed?"));
+	console.log(await logger.prompts.warning("Do you wish to proceed?", { defaultButton: 0 }));
+	console.log(await logger.prompts.question("Do you wish to proceed?", { buttons: ["Maybe", "Nope"], defaultButton: 1 }));
+	logger.info("SEPARATOR");
+	logger.prompts.error(new Error("Hello there"));
 })();
 

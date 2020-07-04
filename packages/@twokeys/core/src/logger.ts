@@ -96,7 +96,7 @@ export default class Logger {
 			logger(`${this._getPrefix(level, colour, args)} ${text}`);
 		}
 	}
-	/*
+	/**
 	 * Info method
 	 * @public
 	 * @color green
@@ -105,7 +105,7 @@ export default class Logger {
 		this._log("info", "green", text);
 	}
 
-	/*
+	/**
 	 * Warn method
 	 * @public
 	 * @color green
@@ -113,13 +113,76 @@ export default class Logger {
 	public warn(text: string): void {
 		this._log("warn", "yellow", text, this.loggingMethods.warn);
 	}
-	/*
+	/**
 	 * Error method
 	 * @color green
 	 * @public
 	 */
 	public err(text: string): void {
 		this._log("err", "red", text, this.loggingMethods.error);
+	}
+	
+	/**
+	 * Debug/verbose method
+	 * @color green
+	 * @public
+	 */
+	public debug(text: string): void {
+		if (this.isDebug) { this._log("debug", "cyan", text); }
+	}
+
+	/**
+	 * Throw an Error
+	 * @param err {Error} Error to throw
+	 * @throw Error
+	 * @public
+	 * @deprecated Please just throw your errors, and let 2Keys handle it.
+	 */
+	public throw(err: Error): void {
+		this.warn("logger.throw() is depreacted.  Please just throw your errors, and let 2Keys handle it.");
+		this.throw_noexit(err);
+		process.exit(1);
+	}
+
+	/**
+	 * Throw without exit method
+	 * @colour red
+	 * @param err {Error} error to throw
+	 * From Bedel
+	 * @public
+	 * @deprecated Use {@link Logger.printError} instead
+	 */
+	public throw_noexit(err: Error): void { // eslint-disable-line @typescript-eslint/camelcase
+		this.warn("logger.throw_noexit() is depreacted.  Please just throw your errors, and let 2Keys handle it, or use logger.printError().");
+		this.printError(err);
+	}
+
+	/**
+	 * Print out an error message, and the stack if isDebug is true.
+	 * @colour red
+	 * @param err Error to print
+	 */
+	public printError(err: Error): void {
+		// Don't check for isSilent as _log checks for that
+		this.err("");
+		this.err(`${err.message}`);
+		this.err("");
+		if (this.isDebug) {
+			if (typeof err.stack !== "undefined") {
+				this.err("Full error:");
+				this.err("");
+				let e = "";
+				for (e of err.stack.split("\n")) {
+					this.err(e);
+				}
+			}
+			this.err(""); // Spacing
+		}
+	}
+
+	/** Create a progress bar */
+	public createProgressBar(format: string, options: ProgressBar.ProgressBarOptions): ProgressBar {
+		return new ProgressBar(`${this._getPrefix("info", "green")} ${format}`, options);
 	}
 
 	/**
@@ -143,58 +206,6 @@ export default class Logger {
 	 */
 	public substatus(message: string): void {
 		this.info(message);
-	}
-
-	
-	
-	/*
-	 * Debug/verbose method
-	 * @color green
-	 * @public
-	 */
-	public debug(text: string): void {
-		if (this.isDebug) { this._log("debug", "cyan", text); }
-	}
-
-	/*
-	 * Throw an Error
-	 * @param err {Error} Error to throw
-	 * @throw Error
-	 * @public
-	 */
-	public throw(err: Error): void {
-		this.throw_noexit(err);
-		process.exit(1);
-	}
-
-	/**
-	 * Throw without exit method
-	 * @colour red
-	 * @param err {Error} error to throw
-	 * From Bedel
-	 * @public
-	 */
-	public throw_noexit(err: Error): void { // eslint-disable-line @typescript-eslint/camelcase
-		// Don't check for isSilent as _log checks for that
-		this.err("");
-		this.err(`${err.message}`);
-		this.err("");
-		if (this.isDebug) {
-			if (typeof err.stack !== "undefined") {
-				this.err("Full error:");
-				this.err("");
-				let e = "";
-				for (e of err.stack.split("\n")) {
-					this.err(e);
-				}
-			}
-		}
-		this.err("");
-	}
-
-	/** Create a progress bar */
-	public createProgressBar(format: string, options: ProgressBar.ProgressBarOptions): ProgressBar {
-		return new ProgressBar(`${this._getPrefix("info", "green")} ${format}`, options);
 	}
 
 }

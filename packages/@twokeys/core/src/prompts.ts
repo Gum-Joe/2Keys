@@ -65,7 +65,7 @@ export interface PromptsInterfaces {
 	[PromptTypes.info]: PromptFunctionType;
 	[PromptTypes.question]: PromptFunctionType;
 	[PromptTypes.warning]: PromptFunctionType;
-	[PromptTypes.error]: PromptFunctionType;
+	[PromptTypes.error]: (err: Error) => void;
 }
 
 /**
@@ -76,20 +76,22 @@ export interface PromptsInterfaces {
 export type PromptFunctionType = (message: string, config?: any) => Promise<PromptResponse>;
 
 /**
- * Base config type for the private basePrompt func
- * The specific config for the GUI is somewhere else.
+ * Config type for prompt function that ask a question (warning and question)
  */
-export interface BasePromptConfig {
-	type: PromptTypes[];
-	message: string;
-	logger: (text: string) => void;
-}
-
 export interface PromptConfig {
 	/** Button to use. defaults to yes or no (y/n) */
 	buttons?: string[];
 	/** Index of default button (option) in button array. */
 	defaultButton?: number;
+}
+
+/**
+ * Config type for the private basePrompt func
+ * The specific config for the GUI is somewhere else.
+ */
+export interface BasePromptFunctionConfig extends PromptConfig {
+	// type: PromptTypes[];
+	logger: (text: string) => void;
 }
 
 /** The response type that is returned by all promps */
@@ -132,17 +134,9 @@ export default class Prompts implements PromptsInterfaces {
 		await getInputPromise("");
 		return { response: 0 };
 	}
-	private async basePrompt(config: BasePromptConfig) {
+
+	private async basePrompt(message: string, config: BasePromptFunctionConfig) {
 		config.logger("");
-		config.logger(config.message);
-	}
-	// @ts-ignore
-	question(message: string) {
-
-	}
-
-	async warning(message: string, config: PromptConfig = {}) {
-		this.logger.warn("");
 		if (typeof config.buttons === "undefined") {
 			config.buttons = this.YES_NO;
 		}
@@ -157,20 +151,27 @@ export default class Prompts implements PromptsInterfaces {
 		}
 		const options = optionsArray.join(SEPARATOR);
 
-		this.logger.warn(`${message} [${options}]`);
-		
+		config.logger(`${message} [${options}]`);
+
 		// Get response index
 		const responseLiteral = await getInputPromise();
 		const responseIndex = normalisedOptions.indexOf(responseLiteral.toLowerCase());
 		if (responseIndex < 0) {
-			this.logger.warn("Invalid response.");
-			return this.warning(message, config);
+			config.logger("Invalid response.");
+			return this.basePrompt(message, config);
 		}
 		return { response: responseIndex };
 	}
 
-	// @ts-ignore
-	error(message: string) {
+	question(message: string, config: PromptConfig = {}) {
+		return this.basePrompt(message, { ...config, logger: (message: string) => this.logger.info(message) });
+	}
 
+	warning(message: string, config: PromptConfig = {}) {
+		return this.basePrompt(message, { ...config, logger: (message: string) => this.logger.warn(message) });
+	}
+
+	error(err: Error) {
+		this.logger.printError(err);
 	}
 }
