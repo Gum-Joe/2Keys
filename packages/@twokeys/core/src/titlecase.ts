@@ -2,7 +2,7 @@
  * Util function to make things titlecase.
  * From https://www.freecodecamp.org/news/three-ways-to-title-case-a-sentence-in-javascript-676a9175eb27/
  */
-export default function titleCase(str) {
+export default function titleCase(str): string {
 	// Step 1. Lowercase the string
 	str = str.toLowerCase() // str = "i'm a little tea pot";
 

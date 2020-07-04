@@ -21,7 +21,8 @@
  * Defines everything to do with prompts, and getting user input.
  * The implementation here, which are for the CLI, should be overrided by the GUI.
  * 
- * **THE GUI SHOULD NOT CALL THESE AS IT MAY HANG EXECUTION, as there will be no way to provide CLI input (STDIN) on the GUI**
+ * **THE GUI VERSION OF THE PROMPTS CLASS SHOULD NOT CALL THESE (FROM SUPER.METHOD()) AS IT MAY HANG EXECUTION,
+ * as there will be no way to provide CLI input (STDIN) on the GUI**
  * @packageDocumentation
  */
 import { createInterface } from "readline";
@@ -76,7 +77,7 @@ export interface PromptsInterfaces {
 export type PromptFunctionType = (message: string, config?: any) => Promise<PromptResponse>;
 
 /**
- * Config type for prompt function that ask a question (warning and question)
+ * Config type for prompt function that asks a question ({@link Prompts.warning} and {@link Prompts.question})
  */
 export interface PromptConfig {
 	/** Button to use. defaults to yes or no (y/n) */
@@ -109,7 +110,8 @@ export interface PromptResponse {
 
 
 /**
- * Handles prompts for the logger, so that commands using a twokeys object can have interactivity with users aon both CLI and GUI.
+ * Handles prompts for the logger, so that commands using a twokeys object can have interactivity with users on both CLI and GUI,
+ * especially for alerts (see {@link Prompts.warning}) and important info messages
  */
 export default class Prompts implements PromptsInterfaces {
 	/** Constants */
@@ -122,20 +124,35 @@ export default class Prompts implements PromptsInterfaces {
 	constructor(protected logger: Logger) {}
 
 	/**
-	 * On CLI, pauses execution so the user can read an important piece of info.
-	 * TO not halt execution, please just use {@link Logger.info}
-	 * @see BasePromptType
+	 * Base function used to prompt for a simple, mutli-choice response from the user.
+	 * Allows defaults as well.
+	 * 
+	 * Options (buttons) are printed in lowercase, with default in titlecase.  Responses are normalised and compared to normalised options (all in lower case).
+	 * 
+	 * **Please use one of the wrappers of this function, {@link Prompts.question} or {@link Prompts.warning}, instead of this.**
+	 * 
+	 * @param message Message (question) to prompt with 
+	 * @param config Config - see type.
+	 * @returns Index of button (option) that was selected - see {@link Promps.YES_NO} for default buttons
+	 * 
+	 * Example (NB: Omit buttons field to use {@link Prompts.YES_NO} as default):
+	 * @example
+	 * ```typescript
+	 * const logger = new Logger({ name: "example" })
+	 * // NOTE: omit buttons below to use Prompts.YES_NO as default
+	 * // NOTE: Use .warning for alerts and non-critcal errors where the user is given several options to proceed (including proceeding or halting).
+	 * const res = await logger.prompts.question("Install this optional package?", { buttons: ["Yes", "No"], defaultButton: 0 })
+	 * console.log(res);
+	 * ```
+	 * Output:
+	 * ```
+	 * 7/4/2020 10:05:12 PM spike info
+	 * 7/4/2020 10:05:12 PM spike info Install this optional package? [Yes/no]
+	 * yes // inputed by user, if they hit enter it automatically selects Yes
+	 * { response: 0 } // return to you by the function (see: console.log(res))
+	 * ```
 	 */
-	public async info(message: string) {
-		this.logger.info("");
-		this.logger.info(message);
-		//this.logger.info("");
-		this.logger.info("Press enter to continue.");
-		await getInputPromise("");
-		return { response: 0 };
-	}
-
-	private async basePrompt(message: string, config: BasePromptFunctionConfig) {
+	protected async basePrompt(message: string, config: BasePromptFunctionConfig) {
 		config.logger("");
 		if (typeof config.buttons === "undefined") {
 			config.buttons = this.YES_NO;
@@ -163,14 +180,51 @@ export default class Prompts implements PromptsInterfaces {
 		return { response: responseIndex };
 	}
 
+	/**
+	 * On CLI, pauses execution so the user can read an important piece of info.
+	 * To not halt execution, please just use {@link Logger.info}.
+	 * 
+	 * **Only use this function for information you want the user to definitly see and confirm they have seen - {@link Logger.info} is enough for most things**
+	 * @see BasePromptType
+	 * @returns On CLI this means nothing, on GUI it indicates if OK was pressed.
+	 */
+	public async info(message: string) {
+		this.logger.info("");
+		this.logger.info(message);
+		//this.logger.info("");
+		this.logger.info("Press enter to continue.");
+		await getInputPromise("");
+		return { response: 0 };
+	}
+
+	/**
+	 * Asks a question, using .info as the logger.
+	 * Used for simple, multichoice questions (or info boxes in the GUI)
+	 * @see Prompts.basePrompt (for more (important) info & example)
+	 * @see PromptFunctionType
+	 */
 	question(message: string, config: PromptConfig = {}) {
 		return this.basePrompt(message, { ...config, logger: (message: string) => this.logger.info(message) });
 	}
 
+	/**
+	 * Alerts the user to something (usually a non-critical error) and provides them options to proceed with (including proceeding vs. halting).
+	 * Akin is JS's own alert(), expect async. (**Do not user the global alert() as it blocking**)
+	 * @see Prompts.basePrompt (for more (important) info & example)
+	 * @see PromptFunctionType
+	 */
 	warning(message: string, config: PromptConfig = {}) {
 		return this.basePrompt(message, { ...config, logger: (message: string) => this.logger.warn(message) });
 	}
 
+	/**
+	 * Used to display an error.
+	 * In the CLI this is a wrapper around {@link Logger.printError},
+	 * but in the GUI this will display a error message box to the user.
+	 * 
+	 * **Please don't use this yourself, instead, throw an error and let 2Keys handle the error.  2Keys will log the error and show it to the user.**
+	 * @param err Error the display
+	 */
 	error(err: Error) {
 		this.logger.printError(err);
 	}
