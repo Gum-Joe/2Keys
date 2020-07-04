@@ -152,7 +152,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * { response: 0 } // return to you by the function (see: console.log(res))
 	 * ```
 	 */
-	protected async basePrompt(message: string, config: BasePromptFunctionConfig) {
+	protected async basePrompt(message: string, config: BasePromptFunctionConfig): Promise<PromptResponse> {
 		config.logger("");
 		if (typeof config.buttons === "undefined") {
 			config.buttons = this.YES_NO;
@@ -174,8 +174,13 @@ export default class Prompts implements PromptsInterfaces {
 		const responseLiteral = await getInputPromise();
 		const responseIndex = normalisedOptions.indexOf(responseLiteral.toLowerCase());
 		if (responseIndex < 0) {
-			config.logger("Invalid response.");
-			return this.basePrompt(message, config);
+			// if the raw input is nothing, then just use default
+			if (typeof config.defaultButton !== "undefined" && responseLiteral === "") {
+				return { response: config.defaultButton };
+			} else {
+				config.logger("Invalid response.");
+				return this.basePrompt(message, config);
+			}
 		}
 		return { response: responseIndex };
 	}
