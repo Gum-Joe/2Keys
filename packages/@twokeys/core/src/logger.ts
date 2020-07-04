@@ -24,6 +24,7 @@
 import { Chalk } from "chalk";
 import { LoggerArgs, LoggingMethods, defaultLoggingMethods } from "./interfaces";
 import ProgressBar from "progress";
+import Prompts from "./prompts";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Instance } = require("chalk");
@@ -36,6 +37,9 @@ export default class Logger {
 	public isSilent: boolean;
 	/** Methods used for logging. See type */
 	public loggingMethods: LoggingMethods = defaultLoggingMethods;
+
+	/** Prompts stuff */
+	public prompts = new Prompts(this);
 
 	constructor(args: LoggerArgs) {
 		this.args = args;
@@ -140,6 +144,8 @@ export default class Logger {
 	public substatus(message: string): void {
 		this.info(message);
 	}
+
+	
 	
 	/*
 	 * Debug/verbose method
