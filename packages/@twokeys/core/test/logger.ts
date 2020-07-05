@@ -185,6 +185,27 @@ describe("Logger tests", () => {
 			logger.info(TEST_STR);
 		});
 
+		it("status() & substatus(): should just call info() (extra method)", () => {
+			const loggingMethods = {
+				log: (str): void => {
+					expect(str.split(" ")).to.include.members([
+						chalk.magenta(LOG_PREFIX),
+						chalk.green("info"),
+						TEST_STR
+					]);
+				}
+			};
+			const logger = new Logger({
+				name: LOG_PREFIX,
+				// @ts-ignore
+				loggingMethods: loggingMethods,
+			});
+			logger.isSilent = false;
+			logger.status(TEST_STR);
+			logger.substatus(TEST_STR);
+		});
+
+
 		it("debug(): should log when isDebug is true", () => {
 			const loggingMethods = {
 				log: (str): void => {

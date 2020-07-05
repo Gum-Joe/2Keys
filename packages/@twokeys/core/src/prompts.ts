@@ -150,7 +150,7 @@ export default class Prompts implements PromptsInterfaces {
 		const optionsArray = [...normalisedOptions]; // Copy for options
 		// Use this to generate the options -> the default is made into titlecase
 		if (typeof config.defaultButton !== "undefined") {
-			optionsArray[config.defaultButton] = titleCase(optionsArray[config.defaultButton])
+			optionsArray[config.defaultButton] = titleCase(optionsArray[config.defaultButton]);
 		}
 		const options = optionsArray.join(SEPARATOR);
 
@@ -217,6 +217,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * @param err Error the display
 	 */
 	// NOTE: Not tested as it just calls logger.printError, which is already tested
+	/* istanbul ignore next */
 	error(err: Error) {
 		this.logger.printError(err);
 	}
@@ -224,6 +225,9 @@ export default class Prompts implements PromptsInterfaces {
 	/**
  	 * Wrap rl in a promise for us
  	 */
+	// NOTE: Tested by test/non-mocha/call-readline.js
+	// This file is spawned by the tests, so nyc can't track it, hence we ask nyc (istanbul) to ignore it
+	/* istanbul ignore next */
 	public static getInputPromise(question = ""): Promise<string> {
 		const rl = createInterface({
 			input: process.stdin,

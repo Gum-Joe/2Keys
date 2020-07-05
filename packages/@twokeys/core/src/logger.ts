@@ -138,6 +138,7 @@ export default class Logger {
 	 * @public
 	 * @deprecated Please just throw your errors, and let 2Keys handle it.
 	 */
+	/* istanbul ignore next */
 	public throw(err: Error): void {
 		this.warn("logger.throw() is depreacted.  Please just throw your errors, and let 2Keys handle it.");
 		this.throw_noexit(err);
@@ -152,6 +153,7 @@ export default class Logger {
 	 * @public
 	 * @deprecated Use {@link Logger.printError} instead
 	 */
+	/* istanbul ignore next */
 	public throw_noexit(err: Error): void { // eslint-disable-line @typescript-eslint/camelcase
 		this.warn("logger.throw_noexit() is depreacted.  Please just throw your errors, and let 2Keys handle it, or use logger.printError().");
 		this.printError(err);
