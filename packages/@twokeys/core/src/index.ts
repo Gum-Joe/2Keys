@@ -18,9 +18,11 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 export { default as Logger } from "./logger";
+export { default as Prompts } from "./logger";
 export * as interfaces from "./interfaces";
 export * as constants from "./constants";
 export * as config from "./config";
+export * from "./prompts";
 export * from "./error";
 export * from "./task-functions";
 export * from "./twokeys";

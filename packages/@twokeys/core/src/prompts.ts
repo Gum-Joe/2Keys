@@ -31,20 +31,6 @@ import titleCase from "./titlecase";
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
-/**
- * Wrap rl in a promise for us
- */
-function getInputPromise(question = ""): Promise<string> {
-	const rl = createInterface({
-		input: process.stdin,
-		output: process.stdout
-	});
-	return new Promise((resolve) => rl.question(question, input => {
-		resolve(input);
-		rl.close();
-	}));
-}
-
 
 /**
  * Valid types for prompts, in order of severity
@@ -171,7 +157,7 @@ export default class Prompts implements PromptsInterfaces {
 		config.logger(`${message} [${options}]`);
 
 		// Get response index
-		const responseLiteral = await getInputPromise();
+		const responseLiteral = await Prompts.getInputPromise();
 		const responseIndex = normalisedOptions.indexOf(responseLiteral.toLowerCase());
 		if (responseIndex < 0) {
 			// if the raw input is nothing, then just use default
@@ -198,7 +184,7 @@ export default class Prompts implements PromptsInterfaces {
 		this.logger.info(message);
 		//this.logger.info("");
 		this.logger.info("Press enter to continue.");
-		await getInputPromise("");
+		await Prompts.getInputPromise("");
 		return { response: 0 };
 	}
 
@@ -214,7 +200,7 @@ export default class Prompts implements PromptsInterfaces {
 
 	/**
 	 * Alerts the user to something (usually a non-critical error) and provides them options to proceed with (including proceeding vs. halting).
-	 * Akin is JS's own alert(), expect async. (**Do not user the global alert() as it blocking**)
+	 * Akin is JS's own alert(), except async. (**Do not user the global alert() as it blocking**)
 	 * @see Prompts.basePrompt (for more (important) info & example)
 	 * @see PromptFunctionType
 	 */
@@ -232,5 +218,19 @@ export default class Prompts implements PromptsInterfaces {
 	 */
 	error(err: Error) {
 		this.logger.printError(err);
+	}
+
+	/**
+ 	 * Wrap rl in a promise for us
+ 	 */
+	public static getInputPromise(question = ""): Promise<string> {
+		const rl = createInterface({
+			input: process.stdin,
+			output: process.stdout
+		});
+		return new Promise((resolve) => rl.question(question, input => {
+			resolve(input);
+			rl.close();
+		}));
 	}
 }

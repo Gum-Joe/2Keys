@@ -22,10 +22,14 @@
  * Tests for the logger
  */
 
-import { expect } from "chai";
+import chai, { expect } from "chai";
+import chaiAsPromised from "chai-as-promised";
 import Logger from "../src/logger";
 import { Instance } from "chalk";
 import ProgressBar from "progress";
+
+
+chai.use(chaiAsPromised);
 
 const chalk = new Instance({
 	level: 3
@@ -256,7 +260,7 @@ describe("Logger tests", () => {
 			logger.err(TEST_STR);
 		});
 
-		it("throw_noexit(): should not give a stack if isDebug is false", (done) => {
+		it("printError(): should not give a stack if isDebug is false", (done) => {
 			const errorMessage = "Error: No cheese Grommit!";
 			const logger = new Logger({
 				name: "errTest",
@@ -273,10 +277,10 @@ describe("Logger tests", () => {
 			});
 			logger.isDebug = false;
 			logger.isSilent = false;
-			logger.throw_noexit(new Error(errorMessage));
+			logger.printError(new Error(errorMessage));
 		});
 
-		it("throw_noexit(): should not print stack if none is there", (done) => {
+		it("printError(): should not print stack if none is there", (done) => {
 			const errorMessage = "Error: No cheese Grommit!";
 			const logger = new Logger({
 				name: "errTest",
@@ -295,11 +299,11 @@ describe("Logger tests", () => {
 			logger.isSilent = false;
 			const err = new Error(errorMessage);
 			err.stack = undefined;
-			logger.throw_noexit(err);
+			logger.printError(err);
 			done();
 		});
 
-		it("throw_noexit(): should give a stack if isDebug is true", (done) => {
+		it("printError(): should give a stack if isDebug is true", (done) => {
 			const errorMessage = "Error: No cheese Grommit!";
 			let isDone = 0; // 0: message not printed yet 1: stack not printed yet 2: both printed & done called.
 			const logger = new Logger({
@@ -325,7 +329,7 @@ describe("Logger tests", () => {
 			});
 			logger.isDebug = true;
 			logger.isSilent = false;
-			logger.throw_noexit(new Error(errorMessage));
+			logger.printError(new Error(errorMessage));
 		});
 	});
 
@@ -337,5 +341,4 @@ describe("Logger tests", () => {
 			expect(logger.createProgressBar("", { total: 100 })).to.be.instanceOf(ProgressBar);
 		});
 	});
-	
 });
