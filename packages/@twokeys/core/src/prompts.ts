@@ -146,7 +146,7 @@ export default class Prompts implements PromptsInterfaces {
 		// Generate options
 		const SEPARATOR = "/";
 		// Normalise the buttons to lowercase so it's easier to look for it
-		const normalisedOptions = config.buttons?.map(value => value.toLowerCase());
+		const normalisedOptions = config.buttons.map(value => value.toLowerCase());
 		const optionsArray = [...normalisedOptions]; // Copy for options
 		// Use this to generate the options -> the default is made into titlecase
 		if (typeof config.defaultButton !== "undefined") {
@@ -216,6 +216,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * **Please don't use this yourself, instead, throw an error and let 2Keys handle the error.  2Keys will log the error and show it to the user.**
 	 * @param err Error the display
 	 */
+	// NOTE: Not tested as it just calls logger.printError, which is already tested
 	error(err: Error) {
 		this.logger.printError(err);
 	}
