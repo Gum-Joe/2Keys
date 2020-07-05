@@ -218,11 +218,13 @@ export default class Prompts implements PromptsInterfaces {
 	}
 
 	/**
-	 * Used to display an error.
+	 * Used to _display_ an error.
 	 * In the CLI this is a wrapper around {@link Logger.printError},
 	 * but in the GUI this will display a error message box to the user.
 	 * 
 	 * **Please don't use this yourself, instead, throw an error and let 2Keys handle the error.  2Keys will log the error and show it to the user.**
+	 * 
+	 * An error in this context is either "this function can't continue" or "this entire process must be stopped because xyz" - but 2Keys itself will handle what to do for each case
 	 * @param err Error the display
 	 */
 	// NOTE: Not tested as it just calls logger.printError, which is already tested
