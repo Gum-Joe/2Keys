@@ -97,7 +97,9 @@ export interface PromptResponse {
 
 /**
  * Handles prompts for the logger, so that commands using a twokeys object can have interactivity with users on both CLI and GUI,
- * especially for alerts (see {@link Prompts.warning}) and important info messages
+ * especially for alerts (see {@link Prompts.warning}) and important info messages.
+ * 
+ * NOTE: If logger.isSilent is true, prompts will still be given, but info messages will be skipped.
  */
 export default class Prompts implements PromptsInterfaces {
 	/** Constants */
@@ -139,6 +141,8 @@ export default class Prompts implements PromptsInterfaces {
 	 * ```
 	 */
 	protected async basePrompt(message: string, config: BasePromptFunctionConfig): Promise<PromptResponse> {
+		const originalState = this.logger.isSilent ? true : false;
+		this.logger.isSilent = false; // Allow logging
 		config.logger("");
 		if (typeof config.buttons === "undefined") {
 			config.buttons = this.YES_NO;
@@ -168,6 +172,9 @@ export default class Prompts implements PromptsInterfaces {
 				return this.basePrompt(message, config);
 			}
 		}
+		if (originalState) { // I.e. was silent
+			this.logger.isSilent = true; // Reset back to true
+		}
 		return { response: responseIndex };
 	}
 
@@ -180,11 +187,13 @@ export default class Prompts implements PromptsInterfaces {
 	 * @returns On CLI this means nothing, on GUI it indicates if OK was pressed.
 	 */
 	public async info(message: string) {
-		this.logger.info("");
-		this.logger.info(message);
-		//this.logger.info("");
-		this.logger.info("Press enter to continue.");
-		await Prompts.getInputPromise("");
+		if (!this.logger.isSilent) {
+			this.logger.info("");
+			this.logger.info(message);
+			//this.logger.info("");
+			this.logger.info("Press enter to continue.");
+			await Prompts.getInputPromise("");
+		} // If it is silent, we skil info messages
 		return { response: 0 };
 	}
 

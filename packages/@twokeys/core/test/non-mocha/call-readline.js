@@ -1,5 +1,5 @@
 // NOTE: Ensure you have compiled things before running
-import { Logger } from "@twokeys/core";
+const { Logger } = require("../../lib");
 
 const logger = new Logger({ name: "test" });
 logger.prompts.info("Please read this.").then(() => {

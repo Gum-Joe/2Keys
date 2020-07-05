@@ -73,7 +73,7 @@ describe("Prompts test (prompts.ts)", () => {
 				});
 			// Check if message printed
 			expect(messagePrinted).to.be.true;
-			// Check for status after  1 sec: not yet fulfilled
+			// Check for status after  1 sec: should not yet fulfilled
 			setTimeout(() => {
 				expect(isPending).to.be.true;
 			}, 500);
@@ -83,6 +83,24 @@ describe("Prompts test (prompts.ts)", () => {
 				// Wait to be done
 				expect(promptPromise).to.be.eventually.fulfilled.notify(done);
 			}, 500);
+		}).timeout(5000);
+
+		it("should not log or ask for input when isSilent is true (if it hangs/timesout, this test case has failed)", (done) => {
+			const logger = new Logger({
+				name: "prompts", loggingMethods: {
+					...console,
+					log: (message: string) => {
+						// CHeck for "Press enter to continue"
+						if (message.includes("Press enter to continue")) {
+							done(new Error("Got a log message when not expect!"));
+						}
+					}
+				}
+			});
+			logger.isSilent = true;
+			const prompts = new MockedPrompts(logger);
+
+			expect(prompts.info("IMPORTANT! Read this.")).to.be.eventually.fulfilled.notify(done);
 		}).timeout(5000);
 	});
 	
@@ -147,6 +165,39 @@ describe("Prompts test (prompts.ts)", () => {
 			await expect(promptPromise).to.eventually.deep.equal({
 				response: 2,
 			});
+		});
+
+		it("should still print, even when isSilent is true", (done) => {
+			const [MockedPrompts, mockedStdinStream] = mockPrompts(Prompts);
+
+			let messagePrinted = false;
+			const logger = new Logger({
+				name: "prompts", loggingMethods: {
+					...console,
+					log: (message: string) => {
+						// CHeck for:
+						// 1. The prompt message
+						// 2. that we are using the info logger (which the calling of this method proves)
+						if (message.includes("Do you wish to continue?")) {
+							expect(message).to.include("Do you wish to continue? [option a/Option B/option c]");
+							messagePrinted = true;
+						} else if (message.includes("should not be logged")) {
+							done(new Error("Regular logging still occured! Silent mode may not be properly enabled!"));
+						}
+					}
+				}
+			});
+			logger.isSilent = true;
+			// check regular logger works
+			logger.info("should not be logged");
+			const prompts = new MockedPrompts(logger);
+			const promptPromise = prompts.question("Do you wish to continue?", {
+				buttons: ["Option A", "Option B", "Option C"],
+				defaultButton: 1
+			});
+			expect(messagePrinted).to.be.true;
+			mockedStdinStream.write("option c"); // SO as to resolve
+			done();
 		});
 
 		it("should continue asking for input until valid input given", async () => {
