@@ -110,7 +110,7 @@ export default class AddOnsRegistry {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 	// @ts-ignore: Is initalised by this.initDB()
 	protected registry: Database;
-	protected registryDBFilePath: string;
+	public readonly registryDBFilePath: string;
 	/** Path to root of registry */
 	protected registryModulesPath: string;
 	/** TwoKeys class to use in {@link TaskFunction}s, when loading add-ons */
@@ -153,8 +153,8 @@ export default class AddOnsRegistry {
 		try {
 			this.logger.info(`Loading package ${packageToLoad.name}, type ${typeOfAddOn}...`);
 			this.logger.debug(JSON.stringify(packageToLoad));
-			if (Object.prototype.hasOwnProperty.call(packageToLoad.entry, typeOfAddOn)) {
-				const file: string = join(this.registryModulesPath, packageToLoad.name, packageToLoad.entry[typeOfAddOn]);
+			if (typeof packageToLoad.entry[typeOfAddOn] !== "undefined") {
+				const file: string = join(this.registryModulesPath, packageToLoad.name, (packageToLoad.entry[typeOfAddOn] as string));
 				this.logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
 				// load
 				const loaded: LoadedAddOn<AddOnsType> = require(file);
@@ -509,28 +509,10 @@ export default class AddOnsRegistry {
 			}
 			// Check if has entry point
 			this.logger.debug("Inserting...");
-			// Type cast & promisify
-			// Filters out types that are invalid in twokeys.types
-			// Entries are not filtered, just ignored, as it's not worth the compute cycles, as it can just be ignored
-			const docToInsert: Package = {
-				name: packageJSON.name,
-				types: packageJSON.twokeys.types.filter(theType => TWOKEYS_ADDON_TYPES_ARRAY.includes(theType)),
-				entry: packageJSON.twokeys.entry,
-				info: {
-					version: packageJSON.version,
-					description: packageJSON.description,
-					size: null, // Inserted later
-				},
-			};
-			// Add optional stuff
-			if (packageJSON.twokeys.displayName) {
-				docToInsert.info.displayName = packageJSON.twokeys.displayName;
-			}
-			if (packageJSON.twokeys.iconURL) {
-				docToInsert.info.iconURL = packageJSON.twokeys.iconURL;
-			}
+			this.logger.debug("Creating document structure for registry...");
+			const docToInsert: Package = AddOnsRegistry.convertPackageJSONToDBDocument(packageJSON);
 			this.logger.debug("About to run insert");
-			const documentConverted = this.convertPackageForDB(docToInsert);
+			const documentConverted = AddOnsRegistry.convertPackageForDB(docToInsert);
 			let stmt: Statement;
 			if (options?.update) {
 				this.logger.debug("Using an SQLite UPDATE command.");
@@ -648,20 +630,6 @@ export default class AddOnsRegistry {
 			await this.initDB();
 		}
 		return await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
-	}
-
-	/**
-	 * Converts a package object for storage in the sqlite DB
-	 * @param packageToAdd Package object to convert for storage
-	 */
-	private convertPackageForDB(packageToAdd: Package): PackageInDB {
-		return {
-			id: uuidv4(),
-			name: packageToAdd.name,
-			types: JSON.stringify(packageToAdd.types),
-			info: JSON.stringify(packageToAdd.info),
-			entry: JSON.stringify(packageToAdd.entry),
-		};
 	}
 
 	/**
@@ -790,6 +758,49 @@ export default class AddOnsRegistry {
 		}
 		logger.info("package.json is valid");
 		return { status: true };
+	}
+
+	/**
+	 * Converts a add-ons's package.json into a document that can then be converted for the DB.
+	 * This is public so it can be used for testing.
+	 * @param packageJSON Package.json to convert
+	 */
+	public static convertPackageJSONToDBDocument(packageJSON: { [key: string]: any; twokeys: TwokeysPackageInfo }): Package {
+		// Type cast & promisify
+		// Filters out types that are invalid in twokeys.types
+		// Entries are not filtered, just ignored, as it's not worth the compute cycles, as it can just be ignored
+		const docToInsert: Package = {
+			name: packageJSON.name,
+			types: packageJSON.twokeys.types.filter(theType => TWOKEYS_ADDON_TYPES_ARRAY.includes(theType)),
+			entry: packageJSON.twokeys.entry,
+			info: {
+				version: packageJSON.version,
+				description: packageJSON.description,
+				size: null,
+			},
+		};
+		// Add optional stuff
+		if (packageJSON.twokeys.displayName) {
+			docToInsert.info.displayName = packageJSON.twokeys.displayName;
+		}
+		if (packageJSON.twokeys.iconURL) {
+			docToInsert.info.iconURL = packageJSON.twokeys.iconURL;
+		}
+		return docToInsert;
+	}
+
+	/**
+	 * Converts a package object for storage in the sqlite DB
+	 * @param packageToAdd Package object to convert for storage
+	 */
+	private static convertPackageForDB(packageToAdd: Package): PackageInDB {
+		return {
+			id: uuidv4(),
+			name: packageToAdd.name,
+			types: JSON.stringify(packageToAdd.types),
+			info: JSON.stringify(packageToAdd.info),
+			entry: JSON.stringify(packageToAdd.entry),
+		};
 	}
 
 }

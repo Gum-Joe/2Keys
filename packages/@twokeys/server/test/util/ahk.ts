@@ -46,11 +46,11 @@ describe("AHK execution tests", () => {
 		).to.equal("IT WORKED!");
 	});
 
-	it("should throw a ReferenceError when attmepting to call a non-existant keyboard", async () => {
+	it("should throw a ReferenceError when attmepting to call a non-existant hotkey", async () => {
 		await expect(fetch_hotkey(MOCK_KEYBAORD_NAME + "NOTAKEYBOARD", "+B$HOME$")).to.be.rejectedWith(ReferenceError);
 	});
 
-	it("should throw a ReferenceError when attmepting to call a non-existant host", async () => {
+	it("should throw a ReferenceError when attmepting to call from a non-existant keyboard", async () => {
 		await expect(fetch_hotkey(MOCK_KEYBAORD_NAME, "INVALID")).to.be.rejectedWith(ReferenceError);
 	});
 

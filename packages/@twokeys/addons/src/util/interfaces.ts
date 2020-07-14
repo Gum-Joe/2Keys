@@ -52,7 +52,7 @@ export const TWOKEYS_ADDON_TYPES_ARRAY = [TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_A
 export interface TwokeysPackageInfo {
 	types: TWOKEYS_ADDON_TYPES[];
 	/** Entry point file of package with requireed exports for a given add-on type (for types see {@link TWOKEYS_ADDON_TYPE}) */
-	entry: { [key in TWOKEYS_ADDON_TYPES]: string };
+	entry: { [key in TWOKEYS_ADDON_TYPES]?: string };
 	/** Optional displayname of package in package browser */
 	displayName?: string;
 	/** Location (URL, so file:// for local files) of icon */
@@ -79,7 +79,7 @@ export interface Package<Types extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES
 		displayName?: string;
 	};
 	/** Entry point file of package with requireed exports for a given add-on type (for types see {@link TWOKEYS_ADDON_TYPE}) */
-	entry: { [key in Types]: string };
+	entry: { [key in Types]?: string };
 }
 
 /**

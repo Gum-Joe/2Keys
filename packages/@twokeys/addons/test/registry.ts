@@ -111,7 +111,7 @@ describe("Registry tests", () => {
 				expect(testReg.TwoKeys).to.haveOwnProperty("isCustom");
 				// @ts-ignore
 				expect(testReg.TwoKeys.isCustom).to.be.true;
-			})
+			});
 		});
 		
 

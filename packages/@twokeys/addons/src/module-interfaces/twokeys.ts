@@ -35,7 +35,7 @@ interface TwoKeysI<AddOnsType extends TWOKEYS_ADDON_TYPES> {
 /**
  * Class provided to add-on function that allows them to access 
  */
-export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES> implements TwoKeysI<AddOnsType> {
+export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> implements TwoKeysI<AddOnsType> {
 	public logger: Logger;
 	public package: Package<AddOnsType>;
 	public software: SoftwareRegistry<AddOnsType>;

@@ -62,7 +62,7 @@ function getPrelude(config: ThisExecutorConfig): string {
  * If it throws an error, you've had a problem.
  */
 async function validateConfig(twokeys: TwoKeys<"executor">, config: ThisExecutorConfig): Promise<void> {
-	// Check it exists
+	// 1: Check root AHK exists
 	try {
 		await fs.access(join(config.keyboard.root, config.hotkey.root), fsconstants.F_OK | fsconstants.S_IFREG);
 		// 2: Verify func ok
@@ -93,6 +93,8 @@ export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig):
 	twokeys.logger.debug("Grabbing executables from the registry...");
 	const ahkExecutable = await twokeys.software.getExecutable(AUTO_HOTKEY_H, AHK_DLL_X64);
 
+	console.log(ahkExecutable);
+
 	// 0: Create execution string 
 	const execString = `
 	; 2KEYS EXECUTOR AHK EXECUTION
@@ -106,7 +108,7 @@ export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig):
 	`;
 	twokeys.logger.info("Exec string created & config validated. Executing...");
 	twokeys.logger.debug(execString);
-	ahk.run_ahk_text("PATH", ahkExecutable.path);
-	// DONE!
+	// DEW IT
+	ahk.run_ahk_text(execString, ahkExecutable.path);
 	twokeys.logger.info("Execution done.");
 };
