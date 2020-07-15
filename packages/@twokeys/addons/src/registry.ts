@@ -417,7 +417,7 @@ export default class AddOnsRegistry {
 	public async initDB(): Promise<void> {
 		this.registry = await openDB({
 			filename: this.registryDBFilePath,
-			driver: sqlite3.cached.Database,
+			driver: sqlite3.Database,
 		});
 	}
 

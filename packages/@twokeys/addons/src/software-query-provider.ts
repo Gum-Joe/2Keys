@@ -77,7 +77,7 @@ export default class SoftwareRegistryQueryProvider {
 		this.logger.debug("Checking for dir...");
 		this.db = await openDB({
 			filename: this.dbFilePath,
-			driver: sqlite3.cached.Database,
+			driver: sqlite3.Database,
 		});
 		this.logger.debug("DB Open.");
 	}
