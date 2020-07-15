@@ -28,15 +28,23 @@ import TwoKeys, { TwoKeysProperties, TwoKeysForAProject } from "./module-interfa
 import AddOnsRegistry from "./registry";
 
 /**
- * Set the types key to a string array so that any package.json can be used
+ * Hack to typecast the types key to any so we can do what we want with it.
+ * DO NOT USE DIRECTLY.
  */
-// @ts-expect-error: Forceably override types key
-interface UnknownTwoKeysPackageInfo extends TwokeysPackageInfo {
+interface BaseUnknownTwoKeysPackageInfo extends TwokeysPackageInfo {
+	types: any[];
+}
+
+/**
+ * Set the types key to a string array so that any package.json can be used.
+ * Use with {@link BaseUnknownTwoKeysPackageInfo}
+ */
+export interface UnknownTwoKeysPackageInfo extends BaseUnknownTwoKeysPackageInfo {
 	types: string[];
 }
 
 
-interface AddOnsPackageJSON {
+export interface AddOnsPackageJSON {
 	[key: string]: any;
 	twokeys: UnknownTwoKeysPackageInfo;
 }

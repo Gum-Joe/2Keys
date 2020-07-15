@@ -7,7 +7,9 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .ts --ext .js ."
+    "lint": "eslint --ext .ts --ext .js .",
+    "compile:all": "yarn wsrun -tc compile",
+    "test:all": "mocha"
   },
   "workspaces": {
     "packages": [
