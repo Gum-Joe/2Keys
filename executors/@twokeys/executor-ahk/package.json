@@ -24,15 +24,10 @@
     }
   },
   "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
     "include": [
       "src/**/*.ts",
       "src/*.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
     ],
     "reporter": [
       "text-summary",
@@ -49,14 +44,16 @@
     "node-addon-api": "^3.0.0"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.11",
     "@types/chai-fs": "^2.0.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "cross-env": "^7.0.2",
     "codecov": "^3.6.5",
+    "cross-env": "^7.0.2",
     "mocha": "^7.1.1",
     "nyc": "^15.0.1",
+    "source-map-support": "^0.5.19",
     "typedoc": "^0.17.4",
     "typescript": "^3.9.2"
   }

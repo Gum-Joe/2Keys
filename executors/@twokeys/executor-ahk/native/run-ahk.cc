@@ -63,6 +63,7 @@ namespace twokeys {
     typedef BOOL (*pahkReady)(void);
     typedef BOOL (*pahkExec)(LPCWSTR script); // Co
     typedef UINT (*pahkdll)(LPTSTR script, LPTSTR p1, LPTSTR p2);
+    typedef void(*pahkTerminate)(int timeout);
 
     // Load
     // HINSTANCE handle =
@@ -81,17 +82,38 @@ namespace twokeys {
       pahkdll ahkdll = (pahkdll)GetProcAddress(handle, "ahkdll");
       pahkReady ahkReady = (pahkReady)GetProcAddress(handle, "ahkReady");
       pahkExec ahkExec = (pahkExec)GetProcAddress(handle, "ahkExec");
-
+      pahkTerminate ahkTerminate = (pahkTerminate)GetProcAddress(handle, "ahkTerminate");
       // free memory
       ahkdll(L"", L"", L"");
 
       // debug
       while (!ahkReady()) Sleep(10);
 
-      ahkExec(text);
 
-      // Chdir
+      BOOL execStatus = ahkExec(text);
+
+      if (!execStatus) {
+        // ERROR!
+        error_handler->message = "Unknown error executing script!";
+        error_handler->is_error = true;
+        error_handler->code = 1;
+        return;
+      }
+
+      // Done, end execution
+      ahkTerminate(0);
+
+      // Chdir back
       _chdir(cwd.c_str());
+
+      BOOL libFreer = FreeLibrary(handle);
+      if (libFreer == 0) {
+        DWORD err = GetLastError();
+        error_handler->code = err;
+        error_handler->is_error = true;
+        handle_getting_err_message(error_handler, library);
+      }
+      return;
     }
   }
 }

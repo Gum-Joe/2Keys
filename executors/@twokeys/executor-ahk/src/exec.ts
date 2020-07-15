@@ -97,8 +97,6 @@ export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig):
 	twokeys.logger.debug("Grabbing executables from the registry...");
 	const ahkExecutable = await twokeys.software.getExecutable(AUTO_HOTKEY_H, AHK_DLL_X64);
 
-	console.log(ahkExecutable);
-
 	// 0: Create execution string 
 	const execString = `
 	; 2KEYS EXECUTOR AHK EXECUTION
