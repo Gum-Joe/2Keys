@@ -76,11 +76,6 @@ describe("AHK execution tests", () => {
 		twokeys.logger.debug("Running after hook." );
 		await fs.unlink(join(MOCK_ROOT, MOCK_KEYBAORD_NAME, "./RunTestForExecution1.txt"));
 		twokeys.logger.debug("Test file gone.");
-		await twokeys.software.db.close();
-		twokeys.logger.debug("DB closed.");
-		// Delete file
-		await rimraf(MOCK_REGISTRY_LOCATION);
-		twokeys.logger.debug("Files delted.");
 		twokeys.logger.debug("Tests done.");
 	});
 });
