@@ -16,19 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
-/**
- * Header file for ahk runner
- */
+TestFunc() {
+  MsgBox "It works!"
+}
 
-#include <windows.h>
+RunTestForExecution1() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution1.txt")
+}
 
-namespace twokeys {
-  struct AHKRunError {
-    DWORD code; // Code from windows, function GetLastError()
-    std::string message; // Message from 2Keys
-    bool is_error; // Is there or is there not an error?
-  };
-  void run_ahk_text(LPCWSTR library, LPCWSTR text, AHKRunError *error_handler);
-  void handle_getting_err_message(AHKRunError *err, LPCWSTR library);
-  AHKRunError new_ahk_run_err();
+RunTestForExecution2() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution2.txt")
+}
+
+RunTestForExecution3() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution3.txt")
+}
+
+RunTestForExecution4() {
+  FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution4.txt")
 }

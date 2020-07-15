@@ -167,7 +167,7 @@ export interface Hotkeys {
 export interface Keyboard {
 	/**
 	 * Root folder where all macros are stored
-	 * TODO: **Map this to an absolute path when using it**
+	 * TODO: **Map this to an absolute path when using it. This is not yet done, so please use `twokeys.properties.projectDir` to get project directory, which is what this is relative to**
 	 */
 	root: string;
 	/**

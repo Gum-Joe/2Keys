@@ -1,9 +1,30 @@
 /**
- * Development tools for add-ons to use
+ * @license
+ * Copyright 2020 Kishan Sambhi
+ *
+ * This file is part of 2Keys.
+ *
+ * 2Keys is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * 2Keys is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
+ */
+/**
+ * Development tools for add-ons to use,
+ * Includes tools for testing, as well as helpers
+ * @packageDocumentation
  */
 import assert from "assert";
 import { TwokeysPackageInfo, TWOKEYS_ADDON_TYPES_ARRAY } from "./util/interfaces";
-import TwoKeys from "./module-interfaces/twokeys";
+import TwoKeys, { TwoKeysProperties, TwoKeysForAProject } from "./module-interfaces/twokeys";
 import AddOnsRegistry from "./registry";
 
 /**
@@ -33,8 +54,22 @@ function assertTwoKeysKeyIsCorrect(packageJSON: { [key: string]: any; twokeys: U
  * Creates a mock TwoKeys object for testing purposes
  * @param packageJSON Package.json of the add-on
  * @param registryLocation Mock registry location
+ * @param properties Properties for {@link TwoKeys.properties}
  */
-export function createMockTwoKeys(packageJSON: AddOnsPackageJSON, registryLocation: string): TwoKeys {
+export function createMockTwoKeys(packageJSON: AddOnsPackageJSON, registryLocation: string, properties?: TwoKeysProperties): TwoKeys {
 	assertTwoKeysKeyIsCorrect(packageJSON);
-	return new TwoKeys(AddOnsRegistry.convertPackageJSONToDBDocument(packageJSON), registryLocation);
+	return new TwoKeys(AddOnsRegistry.convertPackageJSONToDBDocument(packageJSON), registryLocation, undefined, properties);
+}
+
+/**
+ * Asserts that TwoKeys.properties has projectDir, so you don't have to
+ * Will throw AssertionError: please use try catch to handle it yourself (and throw an error due to it if you want)
+ */
+export function assertIsForProject(twokeys: TwoKeys): asserts twokeys is TwoKeysForAProject {
+	assert(typeof twokeys.properties !== "undefined", "No `properties` key present on twokeys! The function may not been called for a project");
+	assert(
+		typeof twokeys.properties !== "undefined"
+		&& typeof twokeys.properties.projectDir !== "undefined",
+		"twokeys.properties.projectDir not present! The function has not been called for a project."
+	);
 }

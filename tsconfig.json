@@ -4,7 +4,7 @@
   "compilerOptions": {
     "baseUrl": "./packages",
     "paths": {
-      "@twokeys/core": [
+      /*"@twokeys/core": [
         "@twokeys/core/src"
       ],
       "@twokeys/server": [
@@ -12,7 +12,7 @@
       ],
       "@twokeys/addons": [
         "@twokeys/addons/src"
-      ]
+      ]*/
     }
   }
 }

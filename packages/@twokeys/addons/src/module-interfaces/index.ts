@@ -33,6 +33,7 @@ import { BaseAddon } from "./common";
 export * from "./common";
 export * from "./detector";
 export * from "./executor";
+export * from "./twokeys";
 export { TwoKeys };
 
 /**

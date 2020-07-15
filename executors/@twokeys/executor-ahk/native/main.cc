@@ -31,6 +31,11 @@
 // Own files
 #include "run-ahk.h"
 
+/**
+ * Parameters of exported function:
+ * Arg 0: Path to AHK Library
+ * Arg 1: Text to execute
+ */
 namespace twokeys {
   Napi::Value AHK_NAPI(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
@@ -46,8 +51,8 @@ namespace twokeys {
       return env.Null();
     }
 
-    std::string const run_text_str = info[1].As<Napi::String>().Utf8Value();
     std::string const ahk_path_str = info[0].As<Napi::String>().Utf8Value();
+    std::string const run_text_str = info[1].As<Napi::String>().Utf8Value();
 
     std::wstring ahk_path_wstr =
       std::wstring(ahk_path_str.begin(), ahk_path_str.end());

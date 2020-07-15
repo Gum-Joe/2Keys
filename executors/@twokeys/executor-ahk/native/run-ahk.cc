@@ -27,13 +27,12 @@
 #include <iostream>
 #include <windows.h>
 // Own files
+#include "atlstr.h"
 #include "current-dir.h"
 #include "run-ahk.h"
 
 using namespace std;
 
-// @param: text {LPTSTR} a non-const TCHAR string that is the script to run
-// @param: library {LPCWSTR} Const string that says where AutoHtkey_H is stored
 namespace twokeys {
   AHKRunError new_ahk_run_err() {
     AHKRunError ahk_run_err;
@@ -41,16 +40,19 @@ namespace twokeys {
     return ahk_run_err;
   }
 
-  void handle_getting_err_message(AHKRunError *err) {
+  void handle_getting_err_message(AHKRunError *err, LPCWSTR library) {
     if (err->code == 126) {
-      err->message = "AHK DLL not found!";
+      err->message = (std::string) "AHK DLL not found at" +
+                     (std::string) CW2A(library) + (std::string) " !";
     } else {
       err->message =
         "See code for error.  Lookup error codes for LoadLibrary(). CODE:" +
         err->code;
     };
   }
-
+  // @param: text {LPTSTR} a non-const TCHAR string that is the script to run
+  // @param: library {LPCWSTR} Const string that says where AutoHtkey_H is
+  // stored
   void run_ahk_text(LPCWSTR library, LPCWSTR text, AHKRunError *error_handler) {
 
     // Keep a copy of current dir for later
@@ -72,7 +74,7 @@ namespace twokeys {
       // cerr << "Error opening AHK library: " << err;
       error_handler->code = err;
       error_handler->is_error = true;
-      handle_getting_err_message(error_handler);
+      handle_getting_err_message(error_handler, library);
     } else {
       // No err, safe to run
       // pointers

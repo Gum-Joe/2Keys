@@ -23,10 +23,11 @@
  */
 import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
-import type { TwoKeys, ExecutorExecConfig } from "@twokeys/addons";
+import type { TwoKeys, ExecutorExecConfig, TwoKeysForAProject } from "@twokeys/addons";
+import { assertIsForProject } from "@twokeys/addons/lib/dev-tools";
 import { AUTO_HOTKEY_H, AHK_DLL_X64 } from "./constants";
-
-const ahk = require("../build/Release/executor-ahk.node");
+import ahk from "./ahk";
+import { exec } from "child_process";
 
 /** Defines the config expected by this executor */
 export interface AHKExecutorConfig {
@@ -47,11 +48,11 @@ export type ThisExecutorConfig = ExecutorExecConfig<AHKExecutorConfig>;
  * - `Global TWOKEYS_CWD`: Current working directory where hotkeys should be being run.
  * 	This is because the AHK `A_WorkingDir` is not set properly.  Defaults to root of keyboard files
  */
-function getPrelude(config: ThisExecutorConfig): string {
+function getPrelude(twokeys: TwoKeysForAProject<"executor">, config: ThisExecutorConfig): string {
 	return `
 	; 2KEYS EXECUTOR AHK PRELUDE
 	; CWD
-	Global TWOKEYS_CWD := ${config.keyboard.root}
+	Global TWOKEYS_CWD := "${join(twokeys.properties.projectDir, config.keyboard.root)}"
 	`;
 }
 
@@ -61,15 +62,15 @@ function getPrelude(config: ThisExecutorConfig): string {
  * AHK root files must exist, and be in the root dir.
  * If it throws an error, you've had a problem.
  */
-async function validateConfig(twokeys: TwoKeys<"executor">, config: ThisExecutorConfig): Promise<void> {
+async function validateConfig(twokeys: TwoKeysForAProject<"executor">, config: ThisExecutorConfig): Promise<void> {
 	// 1: Check root AHK exists
 	try {
-		await fs.access(join(config.keyboard.root, config.hotkey.root), fsconstants.F_OK | fsconstants.S_IFREG);
+		await fs.access(join(twokeys.properties.projectDir, config.keyboard.root, config.hotkey.root), fsconstants.F_OK | fsconstants.S_IFREG);
 		// 2: Verify func ok
 		// Check if matches FuncName() format
 		const regexp = /^[a-z0-9]+$/i; // From https://stackoverflow.com/questions/388996/regex-for-javascript-to-allow-only-alphanumeric
-		if (regexp.test(config.hotkey.func)) {
-			throw new SyntaxError("Hotkey function was not alphanumeric! (must match regexp /^[a-z0-9]+$/i)");
+		if (!regexp.test(config.hotkey.func)) {
+			throw new SyntaxError(`Hotkey function ${config.hotkey.func} was not alphanumeric! (must match regexp ${regexp})`);
 		}
 		// Valid!
 		twokeys.logger.debug("Hotkey validated & OK.");
@@ -82,6 +83,9 @@ async function validateConfig(twokeys: TwoKeys<"executor">, config: ThisExecutor
 
 export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig): Promise<void> => {
 	twokeys.logger.info("Starting execution...");
+	// 0: Validate is for projects
+	assertIsForProject(twokeys);
+
 	twokeys.logger.debug(`Hotkey: ${config.hotkeyCode}`);
 	twokeys.logger.debug(`Function: ${config.hotkey.func}`);
 	twokeys.logger.debug(`Root: ${config.hotkey.root}`);
@@ -98,10 +102,10 @@ export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig):
 	// 0: Create execution string 
 	const execString = `
 	; 2KEYS EXECUTOR AHK EXECUTION
-	${getPrelude(config)}
+	${getPrelude(twokeys, config)}
 
 	; GRAB FILE
-	#Include ${join(config.keyboard.root, config.hotkey.root)}
+	#Include ${join(twokeys.properties.projectDir, config.keyboard.root, config.hotkey.root)}
 
 	; EXECUTE
 	${config.hotkey.func}()
@@ -109,6 +113,6 @@ export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig):
 	twokeys.logger.info("Exec string created & config validated. Executing...");
 	twokeys.logger.debug(execString);
 	// DEW IT
-	ahk.run_ahk_text(execString, ahkExecutable.path);
+	ahk.run_ahk_text(ahkExecutable.path, execString);
 	twokeys.logger.info("Execution done.");
 };

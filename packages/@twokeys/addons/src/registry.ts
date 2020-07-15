@@ -32,7 +32,7 @@ import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
 import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
-import TwoKeys from "./module-interfaces/twokeys";
+import TwoKeys, { TwoKeysProperties } from "./module-interfaces/twokeys";
 
 /**
  * Options for add-on registry constructor
@@ -149,7 +149,7 @@ export default class AddOnsRegistry {
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
 	 * @returns A loaded add-on.  Use .call(config) to call a {@link TaskFunction}
 	 */
-	private async loadPackage<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageToLoad: Package, typeOfAddOn: AddOnsType): Promise<LoadedAddOn<AddOnsType>> {
+	private async loadPackage<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageToLoad: Package, typeOfAddOn: AddOnsType, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<AddOnsType>> {
 		try {
 			this.logger.info(`Loading package ${packageToLoad.name}, type ${typeOfAddOn}...`);
 			this.logger.debug(JSON.stringify(packageToLoad));
@@ -163,7 +163,7 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.logger);
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.logger, propertiesForAddOn);
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
 					return fn(loaded.twokeys, config);
 				};
@@ -185,7 +185,7 @@ export default class AddOnsRegistry {
 	 * @param typeOfAddOn SINGLE type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
 	 */
-	public async load<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageName: string, typeOfAddOn: AddOnsType): Promise<LoadedAddOn<AddOnsType>> {
+	public async load<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageName: string, typeOfAddOn: AddOnsType, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<AddOnsType>> {
 		this.logger.info(`Loading add-on ${packageName}...`);
 		try {
 			// Query DB for package
@@ -205,20 +205,22 @@ export default class AddOnsRegistry {
 				throw new Error("Got back multiple packages! Registry DB may be corrupt!");
 			} else {
 				// Everything OK, so we can load
-				return await this.loadPackage<AddOnsType>(packagesResults.results[0], typeOfAddOn);
+				return this.loadPackage<AddOnsType>(packagesResults.results[0], typeOfAddOn, propertiesForAddOn);
 			}
 		} catch (err) {
 			this.logger.err("Error loading package!");
 			throw err;
 		}
 	}
+
+	// TODO: refactory loadExecutor and the below functions like it to use decorators and generate those functions on the fly.
 	/** Loads an executor */
-	public async loadExecutor(packageName: string): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_EXECUTOR>> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, TWOKEYS_ADDON_TYPE_EXECUTOR));
+	public async loadExecutor(packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_EXECUTOR>> {
+		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, TWOKEYS_ADDON_TYPE_EXECUTOR, propertiesForAddOn));
 	}
 	/** Loads a detector */
-	public async loadDetector(packageName: string): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_DETECTOR>> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, TWOKEYS_ADDON_TYPE_DETECTOR));
+	public async loadDetector(packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_DETECTOR>> {
+		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, TWOKEYS_ADDON_TYPE_DETECTOR, propertiesForAddOn));
 	}
 	/**
 	 * Loads all add-ons of a given type

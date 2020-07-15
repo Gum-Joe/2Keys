@@ -130,6 +130,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			});
 			this.logger.info("Adding executables to registry...");
 			const executablesInsertors = software.executables.map(async (executable) => {
+				this.logger.debug(`Adding executable ${executable.name}...`);
 				const executablesStmt = await this.db.prepare(
 					`INSERT INTO ${EXECUTABLES_TABLE_NAME}
 					(id, name, path, arch, os, userInstalled, softwareId)

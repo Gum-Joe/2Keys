@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2020 Kishan Sambhi
  *
  * This file is part of 2Keys.
@@ -17,18 +18,21 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Header file for ahk runner
+ * Contains typedefs for ahk lib
+ * @packageDocumentation
  */
+const ahk = require("../build/Release/executor-ahk.node");
 
-#include <windows.h>
-
-namespace twokeys {
-  struct AHKRunError {
-    DWORD code; // Code from windows, function GetLastError()
-    std::string message; // Message from 2Keys
-    bool is_error; // Is there or is there not an error?
-  };
-  void run_ahk_text(LPCWSTR library, LPCWSTR text, AHKRunError *error_handler);
-  void handle_getting_err_message(AHKRunError *err, LPCWSTR library);
-  AHKRunError new_ahk_run_err();
+/**
+ * What the AHK lib exports
+ */
+export interface AHKNativeModule {
+	/**
+	 * Runs a string of AHK text
+	 * @param libraryPath Path to AHK DLL
+	 * @param execString AHK code to execute
+	 */
+	run_ahk_text: (libraryPath: string, execString: string) => void;
 }
+
+export default ahk as AHKNativeModule;

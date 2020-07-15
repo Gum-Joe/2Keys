@@ -1,7 +1,7 @@
 import chai, { expect } from "chai";
 import { join } from "path";
 import { promises as fs } from "fs";
-import rimraf from "rimraf";
+import rimrafCB from "rimraf";
 
 import { config as configLoader } from "@twokeys/core";
 import { DetectorConfig } from "@twokeys/core/lib/interfaces";
@@ -15,12 +15,15 @@ import { MOCK_REGISTRY_LOCATION, MOCK_CONFIG_LOCATION, MOCK_KEYBAORD_NAME, MOCK_
 
 import run_hotkey, { ThisExecutorConfig } from "../src/exec";
 import install from "../src/install";
+import { promisify } from "util";
+
+const rimraf = promisify(rimrafCB);
 
 chai.use(require("chai-as-promised"));
 
 let config: DetectorConfig | any;
 
-const twokeys = createMockTwoKeys(packageJSON, new AddOnsRegistry(MOCK_REGISTRY_LOCATION).registryDBFilePath) as unknown as TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>;
+const twokeys = createMockTwoKeys(packageJSON, new AddOnsRegistry(MOCK_REGISTRY_LOCATION).registryDBFilePath, { projectDir: MOCK_ROOT }) as unknown as TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>;
 
 describe("AHK execution tests", () => {
 
@@ -32,8 +35,9 @@ describe("AHK execution tests", () => {
 	});
 
 	it("should successfully execute a hotkey", async () => {
+		// TODO: Map root file to absolute path
 		const configHere: ThisExecutorConfig = {
-			hotkey: config.keyboards[MOCK_KEYBAORD_NAME].hotkeys["^RT"],
+			hotkey: { ...config.keyboards[MOCK_KEYBAORD_NAME].hotkeys["^RT"], ...config.keyboards[MOCK_KEYBAORD_NAME].executors["executor-ahk"] },
 			executorDefaultConfig: config.keyboards[MOCK_KEYBAORD_NAME].executors["executor-ahk"],
 			hotkeyCode: "^RT",
 			keyboard: config.keyboards[MOCK_KEYBAORD_NAME],
@@ -43,8 +47,10 @@ describe("AHK execution tests", () => {
 			configHere,
 		);
 		expect(
-			(await fs.readFile(join(MOCK_ROOT, "./RunTestForExecution1.txt"))).toString(),
+			(await fs.readFile(join(MOCK_ROOT, MOCK_KEYBAORD_NAME, "./RunTestForExecution1.txt"))).toString(),
 		).to.equal("IT WORKED!");
+		twokeys.logger.debug("Test done.");
+		return;
 	});
 
 	/**it("should throw a ReferenceError when attmepting to call a non-existant keyboard", async () => {
@@ -55,9 +61,15 @@ describe("AHK execution tests", () => {
 		await expect(fetch_hotkey(MOCK_KEYBAORD_NAME, "INVALID")).to.be.rejectedWith(ReferenceError);
 	});**/
 
-	after((done) => {
+	after(async () => {
+		twokeys.logger.debug("Running after hook." );
+		await twokeys.software.db.close();
+		twokeys.logger.debug("DB closed.");
 		// Delete file
-		rimraf(MOCK_REGISTRY_LOCATION, done);
-		//await fs.unlink(join(MOCK_ROOT, "./RunTestForExecution1.txt"));
+		await rimraf(MOCK_REGISTRY_LOCATION);
+		twokeys.logger.debug("Files delted.");
+		await fs.unlink(join(MOCK_ROOT, MOCK_KEYBAORD_NAME, "./RunTestForExecution1.txt"));
+		twokeys.logger.debug("Test file gone.");
+		twokeys.logger.debug("Tests done.");
 	});
 });
