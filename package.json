@@ -9,7 +9,8 @@
   "scripts": {
     "lint": "eslint --ext .ts --ext .js .",
     "compile:all": "yarn wsrun -tc compile",
-    "test:all": "cross-env NODE_ENV=test mocha"
+    "test:all": "cross-env NODE_ENV=test mocha",
+    "coverage:all": "nyc yarn run test:all"
   },
   "workspaces": {
     "packages": [

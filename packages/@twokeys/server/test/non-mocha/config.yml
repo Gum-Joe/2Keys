@@ -1,7 +1,7 @@
 keyboards:
   keyboard_test:
     dir: ./keyboard_test
-    path: /dev/input/by-id/0.1534136028482127
+    path: /dev/input/by-id/0.7523297506844948
     root: index.ahk
     hotkeys:
       +A$HOME$:

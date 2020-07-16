@@ -1,9 +1,6 @@
 // Mocha config file
 
 module.exports = {
-	"r": "ts-node/register",
-	"recursive": true,
-	"spec": "test/*.ts",
-	"unhandled-rejections": "strict",
-	"timeout": 5000,
+	extends: "../../../config/.mocharc.js",
+	timeout: 5000,
 }
