@@ -38,17 +38,5 @@
   "dependencies": {
     "@twokeys/core": "^1.0.0"
   },
-  "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/chai-fs": "^2.0.2",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
-    "mocha": "^7.1.1",
-    "nyc": "^15.0.1",
-    "ts-node": "^8.9.0",
-    "typedoc": "^0.17.4",
-    "typescript": "^3.8.3"
-  }
+  "devDependencies": {}
 }

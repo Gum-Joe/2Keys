@@ -75,22 +75,13 @@
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.32",
-    "@types/chai": "^4.2.11",
-    "@types/chai-as-promised": "^7.1.2",
+    "@types/chai-fs": "^2.0.2",
     "@types/inquirer": "^6.5.0",
-    "@types/mocha": "^5.2.7",
     "@types/mustache": "^0.8.32",
     "@types/node": "^10.14.19",
     "@types/supertest": "^2.0.8",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
     "chai-fs": "^2.0.0",
-    "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
-    "mocha": "^6.2.2",
-    "nyc": "^14.1.1",
     "rimraf": "^3.0.2",
-    "supertest": "^4.0.2",
-    "typedoc": "^0.17.4"
+    "supertest": "^4.0.2"
   }
 }
