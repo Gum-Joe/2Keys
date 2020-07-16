@@ -1,7 +1,7 @@
 // Mocha config file
 
 module.exports = {
-	"r": "ts-node/register",
+	"r": ["ts-node/register", "source-map-support/register"],
 	"recursive": true,
 	"spec": ["packages/@twokeys/*/test/*.ts", " packages/@twokeys/*/test/**/*.ts", "executors/@twokeys/*/test/*.ts"],
 	"exclude": ["packages/@twokeys/server/test/**/*.ts"],

@@ -14,25 +14,6 @@
     "coverage:upload": "codecov",
     "docs": "typedoc --ignoreCompilerErrors"
   },
-  "nyc": {
-    "include": [
-      "src/**/*.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html",
-      "lcov",
-      "json"
-    ],
-    "sourceMap": true,
-    "instrument": true
-  },
   "bin": {
     "2Keys": "./bin/2Keys"
   },

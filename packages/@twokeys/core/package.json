@@ -17,26 +17,6 @@
     "coverage": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha",
     "coverage:upload": "codecov"
   },
-  "nyc": {
-    "include": [
-      "src/**/*.ts",
-      "src/*.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html",
-      "lcov",
-      "json"
-    ],
-    "sourceMap": true,
-    "instrument": true
-  },
   "devDependencies": {
     "@types/mkdirp": "^1.0.1",
     "@types/progress": "^2.0.3",
