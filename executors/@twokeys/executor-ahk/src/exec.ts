@@ -65,7 +65,7 @@ function getPrelude(twokeys: TwoKeysForAProject<"executor">, config: ThisExecuto
 async function validateConfig(twokeys: TwoKeysForAProject<"executor">, config: ThisExecutorConfig): Promise<void> {
 	// 1: Check root AHK exists
 	try {
-		await fs.access(join(twokeys.properties.projectDir, config.keyboard.root, config.hotkey.root), fsconstants.F_OK | fsconstants.S_IFREG);
+		await fs.access(join(twokeys.properties.projectDir, config.keyboard.root, config.hotkey.root), fsconstants.F_OK);
 		// 2: Verify func ok
 		// Check if matches FuncName() format
 		const regexp = /^[a-z0-9]+$/i; // From https://stackoverflow.com/questions/388996/regex-for-javascript-to-allow-only-alphanumeric
