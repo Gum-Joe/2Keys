@@ -8,5 +8,8 @@ module.exports = {
 		"packages/@twokeys/*/src/**",
 		"executors/@twokeys/*/src/**"
 	],
+	exclude: [
+		"packages/@twokeys/server/src/**"
+	],
 	all: true,
 };

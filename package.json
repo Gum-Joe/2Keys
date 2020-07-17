@@ -12,8 +12,8 @@
     "clean": "tsc -b --clean && yarn run build",
     "lint": "eslint --ext .ts --ext .js .",
     "compile:all": "yarn wsrun -tc compile",
-    "test:all": "cross-env NODE_ENV=test mocha",
-    "coverage:all": "cross-env NODE_ENV=test nyc mocha"
+    "test:all": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true mocha && yarn workspace @twokeys/server test",
+    "coverage:all": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha && yarn workspace @twokeys/server coverage"
   },
   "workspaces": {
     "packages": [
