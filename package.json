@@ -13,7 +13,7 @@
     "lint": "eslint --ext .ts --ext .js .",
     "compile:all": "yarn wsrun -tc compile",
     "test:all": "cross-env NODE_ENV=test mocha",
-    "coverage:all": "nyc yarn run test:all"
+    "coverage:all": "cross-env NODE_ENV=test nyc mocha"
   },
   "workspaces": {
     "packages": [

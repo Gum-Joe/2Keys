@@ -18,6 +18,8 @@ install:
 before_script:
   - yarn build -v
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts
+# NB: server tests ran separately as they assume the CWD is the server package
 script:
-  - yarn workspaces run coverage
+  - yarn coverage:all
+  - yarn workspace @twokeys/server coverage
   - bash <(curl -s https://codecov.io/bash)

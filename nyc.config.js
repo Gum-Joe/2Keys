@@ -1,16 +1,12 @@
+
+
+// NOTE: Use ./config/nyc.config.js for modules"
+
 module.exports = {
-	extends: "@istanbuljs/nyc-config-typescript",
-	all: true,
+	...require("./config/nyc.config.js"),
 	include: [
-		"src/**/*.ts",
-		"src/*.ts"
+		"packages/@twokeys/*/src/**",
+		"executors/@twokeys/*/src/**"
 	],
-	reporter: [
-		"text-summary",
-		"html",
-		"lcov",
-		"json"
-	],
-	sourceMap: true,
-	instrument: true
+	all: true,
 };
