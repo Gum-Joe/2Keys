@@ -1,3 +1,0 @@
-# Applies path fixes for modules so it points to the right path
-fixes:
-   - "::packages/@twokeys/addons/"

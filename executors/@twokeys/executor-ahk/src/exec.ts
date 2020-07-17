@@ -27,7 +27,6 @@ import type { TwoKeys, ExecutorExecConfig, TwoKeysForAProject } from "@twokeys/a
 import { assertIsForProject } from "@twokeys/addons";
 import { AUTO_HOTKEY_H, AHK_DLL_X64 } from "./constants";
 import ahk from "./ahk";
-import { exec } from "child_process";
 
 /** Defines the config expected by this executor */
 export interface AHKExecutorConfig {

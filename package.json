@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -b",
+    "watch": "tsc -b --watch",
     "clean": "tsc -b --clean && yarn run build",
     "lint": "eslint --ext .ts --ext .js .",
     "compile:all": "yarn wsrun -tc compile",
