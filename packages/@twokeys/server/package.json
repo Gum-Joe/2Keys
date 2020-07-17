@@ -11,7 +11,6 @@
     "lint": "eslint --ext .ts .",
     "test": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
     "coverage": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
-    "coverage:upload": "codecov",
     "docs": "typedoc --ignoreCompilerErrors"
   },
   "bin": {

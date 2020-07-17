@@ -12,8 +12,7 @@
     "docs": "typedoc",
     "test": "cross-env NODE_ENV=test mocha",
     "test:log": "mocha",
-    "coverage": "cross-env NODE_ENV=test nyc mocha",
-    "coverage:upload": "codecov"
+    "coverage": "cross-env NODE_ENV=test nyc mocha"
   },
   "twokeys": {
     "types": [
