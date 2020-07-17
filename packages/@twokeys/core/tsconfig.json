@@ -1,7 +1,12 @@
 {
-	"extends": "../../../tsconfig.json",
-	"compilerOptions": {},
-	"exclude": [
-		"lib"
+	"extends": "../../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./lib",
+		"tsBuildInfoFile": "../../../.build-cache/core.tsbuildinfo"
+	},
+	"references": [],
+	"include": [
+		"src"
 	]
 }

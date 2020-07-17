@@ -7,6 +7,8 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean && yarn run build",
     "lint": "eslint --ext .ts --ext .js .",
     "compile:all": "yarn wsrun -tc compile",
     "test:all": "cross-env NODE_ENV=test mocha",

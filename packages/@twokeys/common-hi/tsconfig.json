@@ -1,9 +1,17 @@
 {
-	"extends": "../../../tsconfig.json",
+	"extends": "../../../tsconfig.base.json",
 	"compilerOptions": {
-		"experimentalDecorators": true,
+		"rootDir": "./src",
+		"outDir": "./lib",
+		"tsBuildInfoFile": "../../../.build-cache/common-hi.tsbuildinfo"
 	},
-	"exclude": [
-		"lib"
+	"include": [
+		"src"
+	],
+	"references": [
+		{
+			"path": "../core",
+			"prepend": false
+		}
 	]
 }

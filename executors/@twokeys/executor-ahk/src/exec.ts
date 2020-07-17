@@ -24,7 +24,7 @@
 import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
 import type { TwoKeys, ExecutorExecConfig, TwoKeysForAProject } from "@twokeys/addons";
-import { assertIsForProject } from "@twokeys/addons/lib/dev-tools";
+import { assertIsForProject } from "@twokeys/addons";
 import { AUTO_HOTKEY_H, AHK_DLL_X64 } from "./constants";
 import ahk from "./ahk";
 import { exec } from "child_process";

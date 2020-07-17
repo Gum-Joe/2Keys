@@ -8,8 +8,8 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "compile": "tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json --watch",
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch",
     "lint": "eslint --ext .ts .",
     "docs": "typedoc --includes src",
     "test": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true mocha",

@@ -1,0 +1,17 @@
+{
+	"files": [],
+	"references": [
+		{
+			"path": "./@twokeys/core"
+		},
+		{
+			"path": "./@twokeys/addons"
+		},
+		{
+			"path": "./@twokeys/common-hi"
+		},
+		{
+			"path": "./@twokeys/server"
+		}
+	]
+}

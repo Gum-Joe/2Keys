@@ -7,8 +7,8 @@
   "author": "Kishan <kishansambhi@hotmail.co.uk>",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "compile": "tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json --watch",
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch",
     "lint": "eslint --ext .ts .",
     "docs": "typedoc",
     "test": "cross-env NODE_ENV=test mocha",
