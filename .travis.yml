@@ -9,12 +9,17 @@ os: windows
 env:
   - YARN_GPG=no
 
+cache:
+  npm: true
+  yarn: true
+  directories:
+    - .build-cache # Cache build
 # Default is fine here
 before_install:
   # Convery lock file
   - choco install yarn
 install:
-  - "\"/c/Program Files (x86)/Yarn/bin/yarn\""
+  - "\"/c/Program Files (x86)/Yarn/bin/yarn\" --frozen-lockfile"
 before_script:
   - yarn build -v
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts

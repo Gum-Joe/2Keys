@@ -257,3 +257,6 @@ packages/**/*/docs
 
 # Build cache
 .build-cache
+
+# Test reports
+mochawesome-report
