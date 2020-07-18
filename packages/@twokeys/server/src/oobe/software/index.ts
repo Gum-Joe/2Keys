@@ -28,7 +28,6 @@ import { join } from "path";
 import ContentCopier from "@twokeys/addons/lib/util/copy-contents";
 import Logger from "../../util/logger";
 import { Software, SOFTWARE_DOWNLOAD_TYPE_ZIP } from "@twokeys/addons/lib/util/interfaces";
-import ContentCopier from "../../util/copy-contents-class";
 
 
 const logger = new Logger({
