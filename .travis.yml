@@ -12,8 +12,6 @@ env:
 cache:
   npm: true
   yarn: true
-  directories:
-    - .build-cache # Cache build
 # Default is fine here
 before_install:
   # Convery lock file
