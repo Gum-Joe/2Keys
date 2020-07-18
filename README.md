@@ -20,15 +20,14 @@ This will download a copy of [AutoHotkey_H](https://hotkeyit.github.io/v2/), a D
 ## Building
 To build & install the server, where hotkeys are run (for development purposes):
 ```
-$ cd server
 $ yarn
-$ yarn run compile
+$ yarn build
 $ yarn link
 ```
 
 To build the detector (after installing [Pipenv](https://github.com/pypa/pipenv)) (for development purposes):
 ```
-$ cd detector
+$ cd detectors/detector-pi/detector
 $ pipenv install
 $ pipenv shell
 ```
@@ -36,7 +35,7 @@ You can then install it in the Pipenv shell's PATH with `pip link -e .`
 
 If you want to install it globally, so you can use it with the 2Keys `systemctl` services:
 ```
-$ cd detector
+$ cd detectors/detector-pi/detector
 $ pipenv lock -r > required_tmp.txt
 $ pip3 install -r required_tmp.txt
 $ pip3 link -e .

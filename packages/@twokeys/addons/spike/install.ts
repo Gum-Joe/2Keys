@@ -8,7 +8,7 @@ const directory = join(__dirname, "test");
 AddOnsRegistry.createNewRegistry(directory)
 	.then(() => {
 		const reg = new AddOnsRegistry(directory);
-		reg.addPackage("")
+		reg.install("")
 			.catch((err) => { console.log(err.stack); });
 	})
 	.catch((err) => {

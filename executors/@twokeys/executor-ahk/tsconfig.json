@@ -1,7 +1,28 @@
 {
-	"extends": "../../../tsconfig.json",
-	"compilerOptions": {},
-	"exclude": [
-		"lib"
+	"extends": "../../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./lib",
+		"tsBuildInfoFile": "../../../.build-cache/executor-ahk.tsbuildinfo",
+		"baseUrl": "../../../",
+		"paths": {
+			"@twokeys/*": [
+				"packages/@twokeys/*/src",
+				"executors/@twokeys/*/src"
+			],
+		}
+	},
+	"include": [
+		"src"
+	],
+	"references": [
+		{
+			"path": "../../../packages/@twokeys/core",
+			"prepend": false
+		},
+		{
+			"path": "../../../packages/@twokeys/addons",
+			"prepend": false
+		}
 	]
 }

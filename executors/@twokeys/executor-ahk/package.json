@@ -7,13 +7,12 @@
   "author": "Kishan <kishansambhi@hotmail.co.uk>",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "compile": "tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json --watch",
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch",
     "docs": "typedoc",
     "test": "cross-env NODE_ENV=test mocha",
     "test:log": "mocha",
-    "coverage": "cross-env NODE_ENV=test nyc mocha",
-    "coverage:upload": "codecov"
+    "coverage": "cross-env NODE_ENV=test nyc mocha"
   },
   "twokeys": {
     "types": [
@@ -23,38 +22,9 @@
       "executor": "lib/index.js"
     }
   },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "include": [
-      "src/**/*.ts",
-      "src/*.ts"
-    ],
-    "reporter": [
-      "text-summary",
-      "html",
-      "lcov",
-      "json"
-    ],
-    "sourceMap": true,
-    "instrument": true
-  },
   "dependencies": {
     "@twokeys/addons": "^1.0.0",
     "@twokeys/core": "^1.0.0",
     "node-addon-api": "^3.0.0"
-  },
-  "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/chai": "^4.2.11",
-    "@types/chai-fs": "^2.0.2",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
-    "mocha": "^7.1.1",
-    "nyc": "^15.0.1",
-    "source-map-support": "^0.5.19",
-    "typedoc": "^0.17.4",
-    "typescript": "^3.9.2"
   }
 }

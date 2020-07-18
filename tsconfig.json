@@ -1,18 +1,21 @@
 {
-  "extends": "./tsconfig.build.json",
-
-  "compilerOptions": {
-    "baseUrl": "./packages",
-    "paths": {
-      /*"@twokeys/core": [
-        "@twokeys/core/src"
-      ],
-      "@twokeys/server": [
-        "@twokeys/server/src"
-      ],
-      "@twokeys/addons": [
-        "@twokeys/addons/src"
-      ]*/
-    }
-  }
+	"extends": "./tsconfig.base.json",
+	"files": [],
+	"references": [
+		{
+			"path": "./packages/@twokeys/core"
+		},
+		{
+			"path": "./packages/@twokeys/addons"
+		},
+		{
+			"path": "./packages/@twokeys/common-hi"
+		},
+		{
+			"path": "./packages/@twokeys/server"
+		},
+		{
+			"path": "./executors/@twokeys/executor-ahk"
+		}
+	]
 }

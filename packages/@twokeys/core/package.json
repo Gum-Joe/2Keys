@@ -8,49 +8,18 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "compile": "tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json --watch",
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch",
     "lint": "eslint --ext .ts .",
     "docs": "typedoc --includes src",
     "test": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true mocha",
     "test:log": "cross-env mocha",
-    "coverage": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha",
-    "coverage:upload": "codecov"
-  },
-  "nyc": {
-    "include": [
-      "src/**/*.ts",
-      "src/*.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html",
-      "lcov",
-      "json"
-    ],
-    "sourceMap": true,
-    "instrument": true
+    "coverage": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.11",
     "@types/mkdirp": "^1.0.1",
-    "@types/mocha": "^7.0.2",
     "@types/progress": "^2.0.3",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "codecov": "^3.7.0",
-    "cross-env": "^7.0.2",
-    "mkdirp": "^1.0.4",
-    "mocha": "^7.2.0",
-    "nyc": "^15.1.0",
-    "typedoc": "^0.17.4",
-    "typescript": "^3.9.2"
+    "mkdirp": "^1.0.4"
   },
   "dependencies": {
     "chalk": "^4.0.0",

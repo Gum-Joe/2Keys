@@ -9,16 +9,19 @@ os: windows
 env:
   - YARN_GPG=no
 
+cache:
+  npm: true
+  yarn: true
 # Default is fine here
 before_install:
   # Convery lock file
   - choco install yarn
 install:
-  - "\"/c/Program Files (x86)/Yarn/bin/yarn\""
+  - "\"/c/Program Files (x86)/Yarn/bin/yarn\" --frozen-lockfile"
 before_script:
-  - yarn workspace @twokeys/core run compile
-  - yarn workspaces run compile
+  - yarn build -v
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts
+# NB: server tests ran separately as they assume the CWD is the server package
 script:
-  - yarn workspaces run coverage
+  - yarn coverage:all
   - bash <(curl -s https://codecov.io/bash)

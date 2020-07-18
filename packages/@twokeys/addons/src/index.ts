@@ -25,3 +25,4 @@ export * from "./registry";
 export * from "./util/interfaces";
 export * from "./util/constants";
 export * from "./module-interfaces";
+export * from "./dev-tools";
