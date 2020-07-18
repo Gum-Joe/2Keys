@@ -6,19 +6,22 @@
 - To clean all `lib` files and then build from scratch: `yarn clean`
 
 ## Testing
-- To test everything: `yarn workspaces run test`	
-- To run all tests together, excluding those in `@twokeys/server`: `yarn test:all`
+- To test everything, package by package: `yarn workspaces run test`	
+- To run all tests together: `yarn test:all`
 - To get coverage per package: `yarn workspaces run coverage`
+- To run all tests together for coverage (note: server coverage report will be in the server package, coverage for everything else will be in `coverage` in the root): `yarn coverage:all`
 
 ## Adding monorepo dependencies
 Say I want to add `@twokeys/addons` to the package `@twokeys/common-hi` (assuming both are in the `packages` dir):@
 1. Add `"@twokeys/addons": "^1.0.0"` as an entry to `common-hi`'s `package.json
-2. Add a TS reference.  Under `references` in `commom-hi`'s `tsconfig.json` add this: ```json
+2. Add a TS reference.  Under `references` in `commom-hi`'s `tsconfig.json` add this:
+```json
 {
 	"path": "../addons",
 	"prepend": false
 }
-	1. This way, when `common-hi` is compiled `addons` is automatically compiled first
+```
+3. This way, when `common-hi` is compiled, `addons` is automatically compiled first
 
 ## Creating a new package
 1. Copy the contents of `misc/template` to a new package dir (e.g `package/@twokeys/a-package`)
