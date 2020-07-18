@@ -22,11 +22,12 @@
  * @packageDocumentation
  */
 import { Arguments } from "yargs";
-import ZipDownloader from "./zip-downloader";
+import ZipDownloader from "@twokeys/addons/lib/util/zip-downloader";
 import { AHK_DOWNLOAD_PATH, DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, AHK_VERSION, DEFAULT_USERSPACE_SOFTWARE_PATHS } from "../../util/constants";
 import { join } from "path";
 import copy_contents from "../../util/copy-contents";
 import Logger from "../../util/logger";
+import { Software, SOFTWARE_DOWNLOAD_TYPE_ZIP } from "@twokeys/addons/lib/util/interfaces";
 
 
 const logger = new Logger({
@@ -38,15 +39,22 @@ const logger = new Logger({
  * @param argv Args from CLI
  */
 export default async function fetch_software(argv: Arguments) {
-	return new Promise(async (resolve, reject) => {
-		try {
-			const ahk = new ZipDownloader("ahk", AHK_DOWNLOAD_PATH, join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`), `ahk-${AHK_VERSION}.zip`, argv);
-			await ahk.fetch_file();
-			await ahk.extract();
-			await copy_contents(join(ahk.saveTo, `ahkdll-v${AHK_VERSION.split(".")[0]}-release-master`), join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
-			resolve();
-		} catch (err) {
-			logger.throw(err);
+	try {
+		const soft: Software = {
+			name: "ahk",
+			url: AHK_DOWNLOAD_PATH,
+			downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP,
+			executables: [],
+			homepage: "",
 		}
-	});
+		const savePath = join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`);
+		const ahk = new ZipDownloader(soft, savePath + ".zip", savePath, {
+			noForce: argv.force ? false : true
+		});
+		await ahk.download();
+		await ahk.extract();
+		await copy_contents(join(savePath, `ahkdll-v${AHK_VERSION.split(".")[0]}-release-master`), join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
+	} catch (err) {
+		logger.throw(err);
+	}
 }
