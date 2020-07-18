@@ -133,20 +133,23 @@ export default class ZipDownloader {
 	/**
 	 * Extract the zip folder
 	 */
-	public extract() {
-		return new Promise((resolve, reject) => {
-			this.logger.info("Extracting...");
-			// Validate existence
-			access(this.fullPath, fs.constants.F_OK)
-				.then(() => {
-					this.logger.debug("Zip file found. Extracting...");
-					// DO IT
-					// From https://github.com/cthackers/adm-zip
-					const zipFile = new AdmZip(this.fullPath);
-					zipFile.extractAllTo(this.saveTo, true);
-					resolve();
-				})
-				.catch(reject);
-		});
+	public async extract() {
+		this.logger.info("Extracting...");
+		// Validate existence
+		try {
+			await access(this.fullPath, fs.constants.F_OK)
+			this.logger.debug("Zip file found. Extracting...");
+			// DO IT
+			// From https://github.com/cthackers/adm-zip
+			const zipFile = new AdmZip(this.fullPath);
+			zipFile.extractAllTo(this.saveTo, true);
+		} catch (err) {
+			this.logger.err("Error encountered extracting zip file!");
+			this.logger.err(err.message);
+			if (this.logger.isDebug) {
+				console.log(err);
+			}
+			throw err;
+		}
 	}
 }
