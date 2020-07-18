@@ -25,9 +25,10 @@ import { Arguments } from "yargs";
 import ZipDownloader from "@twokeys/addons/lib/util/zip-downloader";
 import { AHK_DOWNLOAD_PATH, DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, AHK_VERSION, DEFAULT_USERSPACE_SOFTWARE_PATHS } from "../../util/constants";
 import { join } from "path";
-import copy_contents from "../../util/copy-contents";
+import ContentCopier from "@twokeys/addons/lib/util/copy-contents";
 import Logger from "../../util/logger";
 import { Software, SOFTWARE_DOWNLOAD_TYPE_ZIP } from "@twokeys/addons/lib/util/interfaces";
+import ContentCopier from "../../util/copy-contents-class";
 
 
 const logger = new Logger({
@@ -53,7 +54,8 @@ export default async function fetch_software(argv: Arguments) {
 		});
 		await ahk.download();
 		await ahk.extract();
-		await copy_contents(join(savePath, `ahkdll-v${AHK_VERSION.split(".")[0]}-release-master`), join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
+		const copier = new ContentCopier(join(savePath, `ahkdll-v${AHK_VERSION.split(".")[0]}-release-master`), join(DEFAULT_USERSPACE_SOFTWARE_PATHS.ahk.root));
+		await copier.copyContents();
 	} catch (err) {
 		logger.throw(err);
 	}
