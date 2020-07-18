@@ -46,7 +46,7 @@ export default async function fetch_software(argv: Arguments) {
 			downloadType: SOFTWARE_DOWNLOAD_TYPE_ZIP,
 			executables: [],
 			homepage: "",
-		}
+		};
 		const savePath = join(DEFAULT_USERSPACE_SOFTWARE_DOWNLOAD, `ahk-${AHK_VERSION}`);
 		const ahk = new ZipDownloader(soft, savePath + ".zip", savePath, {
 			noForce: argv.force ? false : true
