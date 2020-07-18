@@ -10,8 +10,8 @@ env:
   - YARN_GPG=no
 
 cache:
-  # npm: true
-  # yarn: true
+  npm: true
+  yarn: true
   directories:
     - .build-cache # Cache build
 # Default is fine here
