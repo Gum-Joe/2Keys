@@ -157,7 +157,7 @@ export default class AddOnsRegistry {
 				const file: string = join(this.registryModulesPath, packageToLoad.name, (packageToLoad.entry[typeOfAddOn] as string));
 				this.logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
 				// load
-				const loaded: LoadedAddOn<AddOnsType> = require(file);
+				const loaded: LoadedAddOn<AddOnsType> = await import(file);
 				this.logger.debug("Type of add-on loaded.");
 				// Add package object
 				loaded.package = packageToLoad;
@@ -237,9 +237,8 @@ export default class AddOnsRegistry {
 		});
 		this.logger.debug(JSON.stringify(addOnsList));
 		const loadedAddOns: { [name: string]: LoadedAddOn<AddOnsType> } = {};
-		for (const addOn of addOnsList) {
-			loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(addOn, typeOfAddOn);
-		}
+		const promiseLoaders = addOnsList.map(async addOn => loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(addOn, typeOfAddOn));
+		await Promise.all(promiseLoaders);
 		return loadedAddOns;
 
 	}
@@ -297,14 +296,15 @@ export default class AddOnsRegistry {
 		}
 
 		for (const addOn of packageInfo.results || []) {
-			this.logger.debug(`Running install()s from ${addOn.name}.`);
-			for (const addOnType of addOn.types) {
-				this.logger.info(`Running install() for add-on type ${addOnType}...`);
-				const loaded = await this.load(addOn.name, addOnType);
-				if (Object.prototype.hasOwnProperty.call(loaded, "install") && typeof loaded.install == "function") {
-					await loaded.call(loaded.install, {});
+			this.logger.debug(`Running install()s for ${addOn.name}.`);
+			this.logger.debug("Loading scripts for each included add-on type ready for execution...");
+			const loadedScript = await Promise.all(addOn.types.map(async addOnType => { return { loadedScript: await this.load(addOn.name, addOnType), addOnType }; }));
+			for (const script of loadedScript) {
+				this.logger.info(`Running install() for add-on type ${script.addOnType}...`);
+				if ("install" in script.loadedScript && typeof script.loadedScript.install == "function") {
+					await script.loadedScript.call(script.loadedScript.install, {});
 				} else {
-					this.logger.warn(`Skipping over add-on ${addOn.name} add-on type ${addOnType}, as no install() function found or was not a function.`);
+					this.logger.warn(`Skipping over add-on ${addOn.name} add-on type ${script.addOnType}, as no install() function found or was not a function.`);
 				}
 			}
 		}
@@ -399,7 +399,7 @@ export default class AddOnsRegistry {
 		try {
 			await this.runNpm(packageName + "@" + version, "install", options);
 			this.logger.info("Reindexing package in registry...");
-			return await this.addPackageToDB(packageName, {
+			return this.addPackageToDB(packageName, {
 				...options,
 				force: true,
 				update: true,
@@ -631,7 +631,7 @@ export default class AddOnsRegistry {
 		if (!this.registry) {
 			await this.initDB();
 		}
-		return await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
+		return this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
 	}
 
 	/**
