@@ -265,14 +265,6 @@ export default class SoftwareRegistryQueryProvider {
 				logger.err("Please (re)create the registry DB first!");
 				err.message = `Registry DB likely does not exist! Please (re)create the registry DB first! Original message: ${err.message}`;
 				throw err;
-			} else if (err.stack.includes(`table ${SOFTWARE_TABLE_NAME} already exists`)) {
-				logger.err("Software table already existed!  Executables table may not have been made!");
-				logger.throw_noexit(err);
-				throw new Error("Software table already existed!  Executables table may not have been made!");
-			} else if (err.stack.includes(`table ${EXECUTABLES_TABLE_NAME} already exists`)) {
-				logger.err("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
-				logger.throw_noexit(err);
-				throw new Error("Executables table already existed! This means software table did not, so there may be corruption in the DB!");
 			} else {
 				logger.err(err.message);
 				throw err;

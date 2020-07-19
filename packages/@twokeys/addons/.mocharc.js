@@ -1,6 +1,9 @@
 // Mocha config file
 
 module.exports = {
-	extends: "../../../config/.mocharc.js",
-	"timeout": 50000,
+	...require("../../../config/.mocharc.js"),
+	recursive: false,
+	spec: ["test/*"],
+	exclude: ["test/non-mocha/*", "test/non-mocha/**/*"],
+	timeout: 50000,
 }

@@ -26,7 +26,7 @@ import npm from "npm";
 import { open as openDB, Database, Statement } from "sqlite";
 import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
-import { promises as fs } from "fs";
+import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
 import { Logger } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
@@ -686,6 +686,18 @@ export default class AddOnsRegistry {
 			logger.info("Writing default package.json...");
 			await fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
 			logger.info("Creating registry DB...");
+			logger.debug("Checking if registry DB file already exists...");
+			try {
+				await fs.access(options?.dbFilePath || join(dir, REGISTRY_FILE_NAME), fsconstants.F_OK);
+				return { status: false, message: "DB already exists." }; // If we get here, ENOENT not thrown
+			} catch (err) {
+				if (err.code === "ENOENT") {
+					logger.debug("DB did not exist, so creating it...");
+				} else {
+					logger.err("Other error encountered checking if DB file already existed!");
+					throw err;
+				}
+			}
 			const db = await openDB({
 				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
 				driver: sqlite3.Database,
@@ -695,15 +707,9 @@ export default class AddOnsRegistry {
 			logger.debug("Closing...");
 			await db.close();
 			logger.info("SQLite registry DB & tables created.");
-			// await fd.close(); // CLose immediately
 		} catch (err) {
 			logger.err("An error was encountered!");
-			if (err.stack.includes(`table ${REGISTRY_TABLE_NAME} already exists`)) {
-				logger.warn("Table (registry) already exists.");
-				return { status: false, message: "Table (registry) already exists." };
-			} else {
-				throw err;
-			}
+			throw err;
 		}
 		logger.info("Registry created.");
 		return { status: true };

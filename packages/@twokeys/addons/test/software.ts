@@ -66,22 +66,6 @@ describe("Software Registry tests", () => {
 		it("should throw an error creating a software DB if a registry DB doesn't already exist.", async () => {
 			await expect(SoftwareRegistry.createSoftwareRegistry(join(__dirname, "non-mocha"))).to.be.rejectedWith(/Registry DB likely does not exist!(.*)/);
 		});
-		it("should throw an error creating a software DB if one has already been made", async () => {
-			await expect(SoftwareRegistry.createSoftwareRegistry(SOFTWARE_REG_ROOT)).to.be.rejectedWith(/Software table already existed!(.*)/);
-		});
-		it("should throw an error creating a software DB if the executables table exists, but not the software", async () => {
-			const FAKE_ROOT = join(SOFTWARE_REG_ROOT, "error_test");
-			await mkdirp(FAKE_ROOT);
-			await AddOnsRegistry.createNewRegistry(FAKE_ROOT);
-			await SoftwareRegistry.createSoftwareRegistry(FAKE_ROOT);
-			const db = await openDB({
-				filename: join(FAKE_ROOT, REGISTRY_FILE_NAME),
-				driver: sqlite3.Database,
-			});
-			await db.exec(`DROP TABLE ${SOFTWARE_TABLE_NAME};`);
-			await db.close();
-			await expect(SoftwareRegistry.createSoftwareRegistry(FAKE_ROOT)).to.be.rejectedWith(/Executables table already existed!(.*)/);
-		}).timeout(20000);
 	});
 
 	describe("Software Installation", () => {
