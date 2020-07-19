@@ -20,7 +20,7 @@ install:
   - "\"/c/Program Files (x86)/Yarn/bin/yarn\" --frozen-lockfile"
 before_script:
   - yarn build -v
-  - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts
+  - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
   - yarn coverage:all

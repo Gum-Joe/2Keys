@@ -12,6 +12,10 @@
 		{
 			"path": "../core",
 			"prepend": false
+		},
+		{
+			"path": "../addons",
+			"prepend": false
 		}
 	]
 }

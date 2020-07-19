@@ -80,5 +80,6 @@ export default class ZipDownloader extends Downloader {
 				}
 			}
 		});
+		this.logger.debug("File extracted.");
 	}
 }
