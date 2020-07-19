@@ -40,10 +40,10 @@ import TwoKeys, { TwoKeysProperties } from "./module-interfaces/twokeys";
 interface AddOnsRegistryOptions {
 	/** Absolute path of registry database (a sqlite3 .db file) */
 	dbFilePath?: string;
-	/** Custom twokeys class to use when loading modules */
-	twokeys?: typeof TwoKeys;
-	/** Custom logger to use */
-	logger?: Logger;
+	/** Custom twokeys class to use when loading modules - please provide the contructor! */
+	TwoKeys?: typeof TwoKeys;
+	/** Custom logger to use - please provide the contructor! */
+	Logger?: typeof Logger;
 }
 
 /**
@@ -119,6 +119,8 @@ export default class AddOnsRegistry {
 	protected logger = new Logger({
 		name: "add-ons:registry",
 	});
+	/** Constrcutor for the logger */
+	protected LoggerConstructor: typeof Logger = Logger;
 
 	/**
 	 * Initalises a new registry class for the registry at `dir`
@@ -128,12 +130,14 @@ export default class AddOnsRegistry {
 		this.directory = dir;
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
 		this.registryModulesPath = join(this.directory, REGISTRY_MODULE_FOLDER);
-		if (typeof options?.twokeys !== "undefined" && options.twokeys) {
-			this.TwoKeys = options.twokeys;
+		if (typeof options?.TwoKeys !== "undefined" && options.TwoKeys) {
+			this.TwoKeys = options.TwoKeys;
 		}
-		if (typeof options?.logger !== "undefined" && options.logger) {
-			this.logger = Object.assign(Object.create(Object.getPrototypeOf(options.logger)), options.logger);
-			this.logger.args.name = "add-ons:registry";
+		if (typeof options?.Logger !== "undefined" && options.Logger) {
+			this.logger = new options.Logger({
+				name: "add-ons:registry",
+			});
+			this.LoggerConstructor = options.Logger;
 		}
 		this.logger.debug(`New registry class created for ${dir}`);
 	}
@@ -163,7 +167,7 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.logger, propertiesForAddOn);
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.LoggerConstructor, propertiesForAddOn);
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
 					return fn(loaded.twokeys, config);
 				};
@@ -225,7 +229,7 @@ export default class AddOnsRegistry {
 	/** Loads an executor */
 	public loadExecutor = this.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_EXECUTOR);
 	/** Loads an detector */
-	public loadDetector = this.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_EXECUTOR);
+	public loadDetector = this.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_DETECTOR);
 
 	/**
 	 * Loads all add-ons of a given type
@@ -682,8 +686,7 @@ export default class AddOnsRegistry {
 	 * @param dir Directory to create registry in
 	 */
 	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions): Promise<ValidatorReturn> {
-		const logger = Object.prototype.hasOwnProperty.call(options || {}, "logger") && typeof options?.logger !== "undefined" ? options.logger : new Logger({ name: "add-ons:registry" });
-		logger.args.name = "add-ons:registry";
+		const logger = new Logger({ name: "add-ons:registry" });
 		logger.info(`Creating new registry in ${dir}...`);
 		try {
 			await mkdirp(dir);

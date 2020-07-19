@@ -35,6 +35,7 @@ import { TWOKEYS_ADDON_TYPE_EXECUTOR } from "../src/util/interfaces";
 import { REGISTRY_DIR, EXECUTOR_TEST } from "./constants";
 import { Logger } from "@twokeys/core";
 import { TwoKeys } from "../src/module-interfaces";
+import { LoggerArgs } from "@twokeys/core/src/interfaces";
 
 chai.use(require("chai-fs"));
 chai.use(require("chai-as-promised"));
@@ -93,15 +94,19 @@ describe("Registry tests", () => {
 
 		describe("Initialisation", () => {
 			it("should use our custom logger and TwoKeys objects", () => {
-				const testLogger = new Logger({ name: "meap" });
-				// @ts-ignore: Needed for testing
-				testLogger.args.testProp = true;
+				class TestLogger extends Logger {
+					constructor(args: LoggerArgs) {
+						super(args);
+						// @ts-expect-error
+						this.args.testProp = true;
+					}
+				}
 				class TwoKeysCustom<AddonType extends TWOKEYS_ADDON_TYPES> extends TwoKeys<AddonType> {
 					public static isCustom = true;
 				}
 				const testReg = new AddOnsRegistry(REGISTRY_DIR, {
-					logger: testLogger,
-					twokeys: TwoKeysCustom,
+					Logger: TestLogger,
+					TwoKeys: TwoKeysCustom,
 				});
 				// @ts-ignore
 				expect(testReg.logger.args).to.haveOwnProperty("testProp");

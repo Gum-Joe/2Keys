@@ -50,7 +50,7 @@ export type FileTreeNode = FileTreeDir | FileTreeFile;
 export type FileTreeNodes<T> = T extends FileTreeDir ? FileTreeDir : FileTreeFile;
 
 export interface ContentCopierOptions {
-	logger?: Logger;
+	Logger?: typeof Logger;
 }
 
 /**
@@ -62,7 +62,8 @@ export default class ContentCopier {
 	public root: string;
 	public destination: string;
 
-	private logger: Logger;
+	protected logger: Logger = new Logger({ name: "copy" });
+	protected LoggerConstructor: typeof Logger = Logger;
 
 	/**
 	* Copies the contents of root to the directory destination (i.e. no sub-dir created at dest with the name of root)
@@ -72,10 +73,10 @@ export default class ContentCopier {
 	constructor(root: string, destination: string, options?: ContentCopierOptions) {
 		this.root = root;
 		this.destination = destination;
-		this.logger = typeof options !== "undefined" && typeof options.logger !== "undefined" ?
-			Object.assign(Object.create(Object.getPrototypeOf(options.logger)), options.logger) :
-			new Logger({ name: "copy" });
-		this.logger.args.name = this.logger.args.name + ":copy";
+		if (typeof options !== "undefined" && typeof options.Logger !== "undefined") {
+			this.logger = new options.Logger({ name: "copy" });
+			this.LoggerConstructor = options.Logger;
+		}
 	}
 
 	/**

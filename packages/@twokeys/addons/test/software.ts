@@ -24,7 +24,6 @@ import {
 	SoftwareInDB
 } from "../src";
 import { SOFTWARE_REG_ROOT, testPackage, testSoftware, testSoftwareUninstalled, testSoftwareToUpdate, testSoftwareUpdated, testSoftwareExecutablesTest } from "./constants";
-import mkdirp from "mkdirp";
 import SoftwareRegistryQueryProvider from "../src/software-query-provider";
 
 chai.use(require("chai-fs"));

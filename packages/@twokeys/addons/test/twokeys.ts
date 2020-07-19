@@ -24,7 +24,7 @@ class NewLogger extends Logger {
 
 describe("TwoKeys Object tests", () => {
 	it("should use our custom logger", () => {
-		const twokeys = new TwoKeys(testPackage, join(REGISTRY_DIR, REGISTRY_FILE_NAME), new NewLogger({ name: "TESTED" }));
+		const twokeys = new TwoKeys(testPackage, join(REGISTRY_DIR, REGISTRY_FILE_NAME), NewLogger);
 		expect(twokeys.logger.args).to.haveOwnProperty("isTest");
 		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 		// @ts-ignore: Needed for testing

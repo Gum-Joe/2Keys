@@ -40,7 +40,7 @@ export interface SoftwareRegistryDBProviderOptions {
 	/** Optional File name of DB */
 	dbFileName?: string;
 	/** Logger to use */
-	logger?: Logger;
+	Logger?: typeof Logger;
 }
 
 /**
@@ -63,10 +63,12 @@ export default class SoftwareRegistryQueryProvider {
 	public db!: Database;
 	protected dbFilePath: string;
 	protected logger: Logger;
+	protected LoggerConstructor: typeof Logger = Logger;
 	constructor(options: SoftwareRegistryDBProviderOptions) {
 		this.directory = options.directory;
 		this.dbFilePath = join(this.directory, options.dbFileName || REGISTRY_FILE_NAME);
-		this.logger = options.logger || new Logger({ name: "software" });
+		this.logger = new (options.Logger || Logger)({ name: "software" });
+		this.LoggerConstructor = options.Logger || Logger;
 	}
 	/**
 	 * Initalises the DB so we can use it (if the DB is yet to be opened)
