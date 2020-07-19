@@ -106,9 +106,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 */
 	public async installSoftware(software: Software): Promise<void> {
 		this.logger.info(`Installing software ${software.name}...`);
-		if (!this.db || typeof this.db === "undefined") {
-			await this.initDB();
-		}
+		await this.initDB();
 		this.logger.info("Adding software to registry...");
 		try {
 			// Ok, add it to the DB
@@ -316,6 +314,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			}
 			return stmt;
 		};
+		await this.initDB();
 		// ID is required so we can locate software in DB, this is easier than an originalName field
 		const softwareIdQueryResults = await this.db.get<{ id: string }>(`SELECT id FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [name, this.package.name]);
 		if (typeof softwareIdQueryResults === "undefined") {

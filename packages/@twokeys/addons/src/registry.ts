@@ -108,8 +108,8 @@ export default class AddOnsRegistry {
 
 	protected directory: string;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-	// @ts-ignore: Is initalised by this.initDB()
-	protected registry: Database;
+	// Is initalised by this.initDB()
+	protected registry!: Database;
 	public readonly registryDBFilePath: string;
 	/** Path to root of registry */
 	protected registryModulesPath: string;
@@ -415,10 +415,12 @@ export default class AddOnsRegistry {
 	 * Initalises the DB so we can use it
 	 */
 	public async initDB(): Promise<void> {
-		this.registry = await openDB({
-			filename: this.registryDBFilePath,
-			driver: sqlite3.Database,
-		});
+		if (typeof this.registry === "undefined" || !this.registry) {
+			this.registry = await openDB({
+				filename: this.registryDBFilePath,
+				driver: sqlite3.Database,
+			});
+		}
 	}
 
 	/**
@@ -429,9 +431,7 @@ export default class AddOnsRegistry {
 		this.logger.warn("Wiping registry..."); // Wipe DB
 		try {
 			this.logger.debug("Loading DB if not loaded...");
-			if (!this.registry) {
-				await this.initDB();
-			}
+			await this.initDB();
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME};`);
 			this.logger.info("DB wiped. Will now readd packages from package.json");
 			const pkgJSON = JSON.parse((await fs.readFile(join(this.directory, "package.json"))).toString("utf8"));
@@ -461,9 +461,7 @@ export default class AddOnsRegistry {
 	public async addPackageToDB(name: string, options?: AddPackageOptions): Promise<ValidatorReturn> {
 		this.logger.info(`Adding package (add-on) ${name} to DB...`);
 		this.logger.debug("Loading DB if not loaded...");
-		if (!this.registry) {
-			await this.initDB();
-		}
+		await this.initDB();
 		const packageLocation = join(this.registryModulesPath, name);
 		this.logger.debug(`Package location: ${packageLocation}`);
 		this.logger.debug("Checking if package already in registry...");
@@ -556,9 +554,7 @@ export default class AddOnsRegistry {
 		this.logger.info(`Removing any packages by name ${packageName} in registry DB.`);
 		try {
 			this.logger.debug("Loading DB if not loaded...");
-			if (!this.registry) {
-				await this.initDB();
-			}
+			await this.initDB();
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
 			this.logger.debug("Documents removed.");
 		} catch (err) {
@@ -593,9 +589,7 @@ export default class AddOnsRegistry {
 		this.logger.info(`Getting info for package ${packageName} from DB...`);
 		try {
 			this.logger.debug("Loading DB if not loaded...");
-			if (!this.registry) {
-				await this.initDB();
-			}
+			await this.initDB();
 			const docs = await this.queryDBForPackage(packageName);
 			this.logger.debug("Raw DB output retrieved.");
 			this.logger.debug(`Converting ${docs.length} documents...`);
@@ -628,9 +622,7 @@ export default class AddOnsRegistry {
 	private async queryDBForPackage(packageName: string): Promise<PackageInDB[]> {
 		this.logger.debug(`Query DB for package ${packageName}...`);
 		this.logger.debug("Loading DB if not loaded...");
-		if (!this.registry) {
-			await this.initDB();
-		}
+		await this.initDB();
 		return this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
 	}
 

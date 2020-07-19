@@ -59,8 +59,8 @@ export default class SoftwareRegistryQueryProvider {
 	/** Root directory of registry with software in */
 	public directory: string;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-	// @ts-ignore: DB initalised automatically.
-	public db: Database;
+	// NOTE: DB initalised automatically.
+	public db!: Database;
 	protected dbFilePath: string;
 	protected logger: Logger;
 	constructor(options: SoftwareRegistryDBProviderOptions) {
@@ -69,17 +69,18 @@ export default class SoftwareRegistryQueryProvider {
 		this.logger = options.logger || new Logger({ name: "software" });
 	}
 	/**
-	 * Initalises the DB so we can use it
+	 * Initalises the DB so we can use it (if the DB is yet to be opened)
 	 * @param entry
 	 */
 	public async initDB(): Promise<void> {
-		this.logger.debug("Opening DB...");
-		this.logger.debug("Checking for dir...");
-		this.db = await openDB({
-			filename: this.dbFilePath,
-			driver: sqlite3.Database,
-		});
-		this.logger.debug("DB Open.");
+		if (!this.db || typeof this.db === "undefined") {
+			this.logger.debug("Opening DB...");
+			this.db = await openDB({
+				filename: this.dbFilePath,
+				driver: sqlite3.Database,
+			});
+			this.logger.debug("DB Open.");
+		}
 	}
 
 	public async uninstallSoftware(name: string, ownerName: string): Promise<ISqlite.RunResult> {
@@ -131,9 +132,7 @@ export default class SoftwareRegistryQueryProvider {
 	 */
 	public async getSoftwares(name: string | undefined | null = "*", ownerName = "*"): Promise<SoftwareInDB[]> {
 		this.logger.debug(`Retrieving software of name ${name} for add-on ${ownerName || "*"} in full...`);
-		if (!this.db || typeof this.db === "undefined") {
-			await this.initDB();
-		}
+		await this.initDB();
 		this.logger.debug("Getting software...");
 		let softwaresFromDB: SoftwareDirectlyFromDB[];
 		if (name === "*" && ownerName === "*") {
@@ -195,9 +194,7 @@ export default class SoftwareRegistryQueryProvider {
 		Promise<ExecutableInDB[]> {
 		this.logger.debug(`Retrieving executable of name ${name ?? "*"} from software ${software} for add-on ${ownerName} in full...`);
 		// Auto load
-		if (!this.db || typeof this.db === "undefined") {
-			await this.initDB();
-		}
+		await this.initDB();
 		// 
 		// Query
 		this.logger.debug("Querying...");
