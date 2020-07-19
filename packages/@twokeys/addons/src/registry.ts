@@ -213,15 +213,20 @@ export default class AddOnsRegistry {
 		}
 	}
 
-	// TODO: refactory loadExecutor and the below functions like it to use decorators and generate those functions on the fly.
+	/**
+	 * Util function to create a loadAddonType function, e.g. `loadExecutor`
+	 */
+	public createLoaderForAddonType<AddOnType extends TWOKEYS_ADDON_TYPES & string>(addOnType: AddOnType) {
+		// eslint-disable-next-line @typescript-eslint/no-use-before-define
+		return async (packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<AddOnType>> => {
+			return (await this.load<AddOnType>(packageName, addOnType, propertiesForAddOn));
+		};
+	}
 	/** Loads an executor */
-	public async loadExecutor(packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_EXECUTOR>> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, TWOKEYS_ADDON_TYPE_EXECUTOR, propertiesForAddOn));
-	}
-	/** Loads a detector */
-	public async loadDetector(packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_DETECTOR>> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, TWOKEYS_ADDON_TYPE_DETECTOR, propertiesForAddOn));
-	}
+	public loadExecutor = this.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_EXECUTOR);
+	/** Loads an detector */
+	public loadDetector = this.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_EXECUTOR);
+
 	/**
 	 * Loads all add-ons of a given type
 	 * @param typeOfAddOn Add-on type to load
