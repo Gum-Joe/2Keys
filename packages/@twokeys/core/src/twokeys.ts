@@ -33,7 +33,7 @@ import Logger from "./logger";
  * @param logName Name to use as log prefix, see {@link Logger.args.name}
  */
 export abstract class TwoKeys {
-	public logger: Logger;
+	public readonly logger: Logger;
 	constructor(logger: typeof Logger, logName: string) {
 		this.logger = new logger({
 			name: logName,

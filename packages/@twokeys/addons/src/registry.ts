@@ -33,6 +33,7 @@ import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
 import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
 import TwoKeys, { TwoKeysProperties } from "./module-interfaces/twokeys";
+import { LoggerArgs } from "@twokeys/core/lib/interfaces";
 
 /**
  * Options for add-on registry constructor
@@ -119,8 +120,8 @@ export default class AddOnsRegistry {
 	protected logger = new Logger({
 		name: "add-ons:registry",
 	});
-	/** Constrcutor for the logger */
-	protected LoggerConstructor: typeof Logger = Logger;
+	/** Constrcutor for the logger (has to be private) */
+	private LoggerConstructor: typeof Logger = Logger;
 
 	/**
 	 * Initalises a new registry class for the registry at `dir`
@@ -143,6 +144,24 @@ export default class AddOnsRegistry {
 	}
 
 	// Load functions
+	/**
+	 * Generates a logger for an add-on.
+	 * 
+	 * It does this by creating an child class of {@link AddOnsRegistry.LoggerConstructor} that appends `add-on:addonName:` to the beginning of the prefix for the logger.
+	 * 
+	 * This means:
+	 * - When an add-on function logs, it has the prefix `add-on:addonName::` (colon there because `::` looks better than `:`; the extra colon is provided by {@link TwoKeys})
+	 * - When an add-on use software or registry or other 2Keys function, the prefix is `add-on:addonName:software`, etc
+	 */
+	protected getLoggerForAddon(thePackage: Package): typeof Logger {
+		return class extends this.LoggerConstructor {
+			constructor(args: LoggerArgs) {
+				super(args);
+				this.args.name = `add-on:${thePackage.name}:${this.args.name}`;
+			}
+		};
+	}
+	
 	/**
 	 * Loads the entry points for an add-on type from a {@link Package} (so a package that has already been retrieved from DB).
 	 * Also adds information about the add-on to the loaded module, in the `package` key (see {@link LoadedAddOn}).
@@ -167,7 +186,9 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.LoggerConstructor, propertiesForAddOn);
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), propertiesForAddOn);
+				// Custom Logger to use
+
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
 					return fn(loaded.twokeys, config);
 				};

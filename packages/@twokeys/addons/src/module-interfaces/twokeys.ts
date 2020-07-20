@@ -59,8 +59,7 @@ export type TwoKeysForAProject<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_
 /**
  * Class provided to add-on function that allows them to interact with 2Keys
  */
-export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> implements TwoKeysI<AddOnsType> {
-	public readonly logger: Logger;
+export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> extends BaseTwoKeys implements TwoKeysI<AddOnsType> {
 	public readonly package: Package<AddOnsType>;
 	public readonly software: SoftwareRegistry<AddOnsType>;
 
@@ -71,9 +70,7 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_AD
 	 * @param properties Properties related to execution - **please see {@link TwoKeysProperties}**
 	 */
 	constructor(packageObject: Package<AddOnsType>, registryDB: string, CustomLogger: typeof Logger = Logger, public readonly properties?: TwoKeysProperties) {
-		this.logger = new CustomLogger({
-			name: `add-on:${packageObject.name}`,
-		});
+		super(CustomLogger, ":");
 		this.package = packageObject;
 		this.software = new SoftwareRegistry<AddOnsType>({
 			package: packageObject,

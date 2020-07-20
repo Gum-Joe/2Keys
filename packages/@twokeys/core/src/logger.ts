@@ -22,9 +22,10 @@
  * @packageDocumentation
  */
 import { Chalk } from "chalk";
-import { LoggerArgs, LoggingMethods, defaultLoggingMethods } from "./interfaces";
 import ProgressBar from "progress";
+import { LoggerArgs, LoggingMethods, defaultLoggingMethods } from "./interfaces";
 import Prompts from "./prompts";
+import { implementsStaticProperties } from "./util";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Instance } = require("chalk");
