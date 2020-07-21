@@ -28,11 +28,11 @@ import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
 import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
-import { Logger } from "@twokeys/core";
+import { Logger, TwoKeysProperties } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
 import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
-import TwoKeys, { TwoKeysProperties } from "./module-interfaces/twokeys";
+import TwoKeys from "./module-interfaces/twokeys";
 import { LoggerArgs } from "@twokeys/core/lib/interfaces";
 
 /**
@@ -186,7 +186,7 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), propertiesForAddOn);
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), propertiesForAddOn || {});
 				// Custom Logger to use
 
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {

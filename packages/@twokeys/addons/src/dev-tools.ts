@@ -24,7 +24,7 @@
  */
 import assert from "assert";
 import { TwokeysPackageInfo, TWOKEYS_ADDON_TYPES_ARRAY } from "./util/interfaces";
-import TwoKeys, { TwoKeysProperties, TwoKeysForAProject } from "./module-interfaces/twokeys";
+import TwoKeys, { TwoKeysForAProject, TwoKeysPropertiesForAddons } from "./module-interfaces/twokeys";
 import AddOnsRegistry from "./registry";
 
 /**
@@ -64,7 +64,7 @@ function assertTwoKeysKeyIsCorrect(packageJSON: { [key: string]: any; twokeys: U
  * @param registryLocation Mock registry location
  * @param properties Properties for {@link TwoKeys.properties}
  */
-export function createMockTwoKeys(packageJSON: AddOnsPackageJSON, registryLocation: string, properties?: TwoKeysProperties): TwoKeys {
+export function createMockTwoKeys(packageJSON: AddOnsPackageJSON, registryLocation: string, properties: TwoKeysPropertiesForAddons = {}): TwoKeys {
 	assertTwoKeysKeyIsCorrect(packageJSON);
 	return new TwoKeys(AddOnsRegistry.convertPackageJSONToDBDocument(packageJSON), registryLocation, undefined, properties);
 }

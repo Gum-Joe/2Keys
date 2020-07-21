@@ -22,20 +22,44 @@
  */
 import Logger from "./logger";
 
+/**
+ * Propreties related to exection of an add-on
+ * NOTE: treat all these as optional, i.e. use {@link TwoKeysProperties} from below
+ */
+export interface AllTwoKeysProperties {
+	/**
+	 * Root of the project the TwoKeys object is being used for
+	 * Use {@link assertIsForProject} to validate it is there, and thus stop TS complaning it is undefined
+	 */
+	projectDir: string;
+}
+
+/**
+ * Make all proerties optional as they may not have been set.
+ * 
+ * Use type assertions to ensure the properties are there (and then TS won't complain the property is undefined)
+ */
+export type TwoKeysProperties = Partial<AllTwoKeysProperties>;
+
+/**
+ * Type to use to say that a function wants a twokeys with {@link AllTwoKeysProperties} -> i.e. all properties present
+ */
+export type TwoKeysWithAllProperties = TwoKeys & { properties: AllTwoKeysProperties };
 
 /**
  * Base TwoKeys class, used for commands, logic and add-ons.
  * This is an abstract class as we don't know what to call the logger.
  * 
  * The TwoKeys class provides essential methods for commands and add-ons.
- * This base class provides a logger, and should be extended to add additonal functions, e.g. software registery access
+ * This base class provides a logger, and should be extended to add additonal functions, e.g. software registery access.
+ * It also provides properties for what is being ran, namely properties
  * @param logger Constrcutor for the logger to use
  * @param logName Name to use as log prefix, see {@link Logger.args.name}
  */
 export abstract class TwoKeys {
 	public readonly logger: Logger;
-	constructor(logger: typeof Logger, logName: string) {
-		this.logger = new logger({
+	constructor(LoggerConstructor: typeof Logger, logName: string, public readonly properties: TwoKeysProperties) {
+		this.logger = new LoggerConstructor({
 			name: logName,
 		});
 	}

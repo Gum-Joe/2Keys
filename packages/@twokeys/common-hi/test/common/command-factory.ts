@@ -22,11 +22,12 @@ import { expect } from "chai";
 import BaseTwoKeysForCommands, { ensureIsValidTwoKeysClass } from "@twokeys/common-hi/src/common/twokeys";
 import { CommandInfo, BaseStatefulCommand } from "@twokeys/common-hi/src/common/base-commands";
 import { Logger } from "@twokeys/core";
+import { TwoKeysProperties } from "@twokeys/core/lib/twokeys";
 
 @ensureIsValidTwoKeysClass
 class TwoKeys extends BaseTwoKeysForCommands {
-	constructor(commandInfo: CommandInfo) {
-		super(Logger, commandInfo);
+	constructor(commandInfo: CommandInfo, properties: TwoKeysProperties) {
+		super(Logger, commandInfo, properties);
 	}
 }
 

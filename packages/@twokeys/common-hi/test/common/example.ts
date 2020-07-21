@@ -24,15 +24,16 @@ import BaseTwoKeysForCommands, { ensureIsValidTwoKeysClass } from "../../src/com
 import { Logger } from "@twokeys/core";
 import CommandFactory from "../../src/common/command-factory";
 import { CommandInfo, Command, BaseStatefulCommand } from "../../src/common/base-commands";
+import { TwoKeysProperties } from "@twokeys/core/src";
 
 // First create a TwoKeys class to use:
 @ensureIsValidTwoKeysClass // It's reccomended you add this line, it ensures you have the right constructor
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 class TwoKeys extends BaseTwoKeysForCommands {
-	constructor(commandInfo: CommandInfo) {
+	constructor(commandInfo: CommandInfo, properties: TwoKeysProperties = {}) {
 		// Simple TwoKeys class, just used to set a default logger
-		super(Logger, commandInfo);
+		super(Logger, commandInfo, properties);
 	}
 }
 

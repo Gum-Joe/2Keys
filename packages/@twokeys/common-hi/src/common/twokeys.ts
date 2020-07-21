@@ -32,7 +32,7 @@
  * ```
  * @packageDocumentation
  */
-import { TwoKeys, Logger } from "@twokeys/core";
+import { TwoKeys, Logger, TwoKeysProperties } from "@twokeys/core";
 import { CommandInfo } from "./base-commands";
 
 /**
@@ -42,8 +42,8 @@ import { CommandInfo } from "./base-commands";
  * @see TwoKeys
  */
 export default class BaseTwoKeysForCommands extends TwoKeys {
-	constructor(logger: typeof Logger, commandInfo: CommandInfo) {
-		super(logger, "command:" + commandInfo.commandName);
+	constructor(logger: typeof Logger, commandInfo: CommandInfo, properties: TwoKeysProperties) {
+		super(logger, "command:" + commandInfo.commandName, properties);
 	}
 }
 
@@ -63,7 +63,7 @@ export default class BaseTwoKeysForCommands extends TwoKeys {
  * ```
  */
 export interface FinalTwoKeysConstructor {
-	new(commandInfo: CommandInfo): BaseTwoKeysForCommands;
+	new(commandInfo: CommandInfo, properties: TwoKeysProperties): BaseTwoKeysForCommands;
 }
 
 /**

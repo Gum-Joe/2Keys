@@ -24,6 +24,7 @@
 
 import { FinalTwoKeysConstructor } from "./twokeys";
 import { Command, CommandInfo, BaseStatefulCommand, StatefulCommandConstructor } from "./base-commands";
+import { TwoKeysProperties } from "@twokeys/core/src";
 
 /**
  * Provides the needed methods to call commands,
@@ -78,14 +79,14 @@ export default class CommandFactory {
 	 * @param func Function to call
 	 * @param config Config to pass to it (type inferred from function)
 	 */
-	public callCommand<T, U>(func: Command<T, U>, config: T): U {
+	public callCommand<T, U>(func: Command<T, U>, config: T, properties: TwoKeysProperties = {}): U {
 		if (typeof func.commandInfo === "undefined") {
 			throw new Error("Attempted to call a non-command!");
 		}
 		if (typeof func.commandInfo.commandName !== "string") {
 			throw new TypeError("Property commandName was either undefined or not of type string!");
 		}
-		return func(new this.TwokeysConstructor(func.commandInfo as CommandInfo), config);
+		return func(new this.TwokeysConstructor(func.commandInfo as CommandInfo, properties), config);
 	}
 
 	/**
@@ -94,14 +95,14 @@ export default class CommandFactory {
 	 * **Note: Make sure all properties in {@link CommandInfo} are checked for.  This is because we can't guarentee {@link CommandFactory.wrapStatefulCommand} has been called**
 	 * @param command Command to create instance of
 	 */
-	public createStatefulCommand<CommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<CommandClass>): CommandClass {
+	public createStatefulCommand<CommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<CommandClass>, properties: TwoKeysProperties = {}): CommandClass {
 		if (typeof command.commandInfo === "undefined") {
 			throw new Error("Attempted to call a non-command!");
 		}
 		if (typeof command.commandInfo.commandName !== "string") {
 			throw new TypeError("Property commandName was either undefined or not of type string!");
 		}
-		return new command(new this.TwokeysConstructor(command.commandInfo));
+		return new command(new this.TwokeysConstructor(command.commandInfo, properties));
 	}
 
 	/**

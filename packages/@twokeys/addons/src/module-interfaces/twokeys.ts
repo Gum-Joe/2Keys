@@ -21,7 +21,7 @@
  * Contains the 2Keys class that is provided to {@link TaskFunction}s
  */
 import path from "path";
-import { Logger, TwoKeys as BaseTwoKeys } from "@twokeys/core";
+import { Logger, TwoKeys as BaseTwoKeys, AllTwoKeysProperties } from "@twokeys/core";
 import { Package, TWOKEYS_ADDON_TYPES } from "../util/interfaces";
 import SoftwareRegistry from "../software";
 
@@ -36,25 +36,19 @@ interface TwoKeysI<AddOnsType extends TWOKEYS_ADDON_TYPES> {
  * Propreties related to exection of an add-on
  * NOTE: treat all these as optional
  */
-export interface AllTwoKeysProperties {
-	/**
-	 * Root of the project the add-on is being run for.
-	 * Use {@link assertIsForProject} to validate it is there, and thus stop TS complaning it is undefined
-	 */
-	projectDir: string;
-}
+export type AllTwoKeysPropertiesForAddons = AllTwoKeysProperties
 
 /**
  * Make all proerties optional as they may not have been set.
  * 
  * Use the assertion tools in {@link dev-tools} to ensure the properties are there (and then TS won't complain the property is undefined)
  */
-export type TwoKeysProperties = Partial<AllTwoKeysProperties>;
+export type TwoKeysPropertiesForAddons = Partial<AllTwoKeysPropertiesForAddons>;
 
 /**
  * Type to use to say that a function wants a twokeys with {@link AllTwoKeysProperties} -> i.e. all properties present
  */
-export type TwoKeysForAProject<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = TwoKeys<AddOnsType> & { properties: AllTwoKeysProperties };
+export type TwoKeysForAProject<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = TwoKeys<AddOnsType> & { properties: AllTwoKeysPropertiesForAddons };
 
 /**
  * Class provided to add-on function that allows them to interact with 2Keys
@@ -69,8 +63,8 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_AD
 	 * @param registryDB Path to add-ons registry DB, where software table is stored (see {@link SoftwareRegistry})
 	 * @param properties Properties related to execution - **please see {@link TwoKeysProperties}**
 	 */
-	constructor(packageObject: Package<AddOnsType>, registryDB: string, CustomLogger: typeof Logger = Logger, public readonly properties?: TwoKeysProperties) {
-		super(CustomLogger, ":");
+	constructor(packageObject: Package<AddOnsType>, registryDB: string, CustomLogger: typeof Logger = Logger, properties: TwoKeysPropertiesForAddons) {
+		super(CustomLogger, ":", properties);
 		this.package = packageObject;
 		this.software = new SoftwareRegistry<AddOnsType>({
 			package: packageObject,
