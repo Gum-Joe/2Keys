@@ -1,0 +1,26 @@
+# Automates adding of TODOs
+name: "Workflow"
+on: ["push"]
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@master"
+      - name: "TODO to Issue"
+        uses: "alstr/todo-to-issue-action@v1.2-beta"
+        with:
+          LABEL: "// TODO"
+          COMMENT_MARKER: "//"
+        id: "todo"
+      - name: "FIXME to Issue"
+        uses: "alstr/todo-to-issue-action@v1.2-beta"
+        with:
+          LABEL: "// FIXME"
+          COMMENT_MARKER: "//"
+        id: "fixme"
+      - name: "HACK to Issue"
+        uses: "alstr/todo-to-issue-action@v1.2-beta"
+        with:
+          LABEL: "// HACK"
+          COMMENT_MARKER: "//"
+        id: "hack"
