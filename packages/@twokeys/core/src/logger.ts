@@ -43,7 +43,7 @@ export default class Logger {
 
 	constructor(args: LoggerArgs) {
 		this.args = args;
-		this.argv = args?.argv || process?.argv;
+		this.argv = args.argv || process.argv;
 		this.isDebug = // Are any of these true????
 			this.argv.includes("--debug") ||
 			this.argv.includes("--verbose") ||

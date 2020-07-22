@@ -26,6 +26,6 @@ describe("Util tests", () => {
 				static aProperty = true;
 			}
 			new B(); // So TS does not complain
-		})
+		});
 	});
 });

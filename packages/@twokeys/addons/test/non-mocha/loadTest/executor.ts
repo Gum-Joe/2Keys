@@ -9,7 +9,7 @@ export const execute = async function (twokeys: TwoKeys<"executor">, config): Pr
 	config.expect(twokeys).to.have.property("logger");
 	config.expect(twokeys.logger.args.name).to.include("loading-test");
 
-	if (config?.hasProperties) {
+	if (config.hasProperties) {
 		expect(twokeys.properties.projectDir).to.equal(__dirname);
 	}
 };
