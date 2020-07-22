@@ -61,7 +61,7 @@ function assertTwoKeysKeyIsCorrect(packageJSON: { [key: string]: any; twokeys: U
 /**
  * Creates a mock TwoKeys object for testing purposes
  * @param packageJSON Package.json of the add-on
- * @param registryLocation Mock registry location
+ * @param registryLocation Mock registry location, including filename
  * @param properties Properties for {@link TwoKeys.properties}
  */
 export function createMockTwoKeys(packageJSON: AddOnsPackageJSON, registryLocation: string, properties: TwoKeysPropertiesForAddons = {}): TwoKeys {
@@ -74,7 +74,7 @@ export function createMockTwoKeys(packageJSON: AddOnsPackageJSON, registryLocati
  * Will throw AssertionError: please use try catch to handle it yourself (and throw an error due to it if you want)
  */
 export function assertIsForProject(twokeys: TwoKeys): asserts twokeys is TwoKeysForAProject {
-	assert(typeof twokeys.properties !== "undefined", "No `properties` key present on twokeys! The function may not been called for a project");
+	// assert(typeof twokeys.properties !== "undefined", "No `properties` key present on twokeys! The function may not been called for a project");
 	assert(
 		typeof twokeys.properties !== "undefined"
 		&& typeof twokeys.properties.projectDir !== "undefined",
