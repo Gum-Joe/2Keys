@@ -318,7 +318,7 @@ export default class AddOnsRegistry {
 			// throw new Error(packageInfo.message || "Unknown error adding package to DB, or results entry was missing!");
 		}
 		// Length check
-	/* istanbul ignore if */
+		/* istanbul ignore if */
 		if (packageInfo.results.length < 1) {
 			this.logger.err("Got back no packages when quering for the package we just installed.");
 			this.logger.err("Something unexpected, perhaps impossible, has happened.");

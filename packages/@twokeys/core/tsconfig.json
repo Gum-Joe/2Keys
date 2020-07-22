@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"rootDir": "./src",
 		"outDir": "./lib",
-		"tsBuildInfoFile": "../../../.build-cache/core.tsbuildinfo"
+		"tsBuildInfoFile": "../../../.build-cache/core.tsbuildinfo",
+		"experimentalDecorators": true,
 	},
 	"references": [],
 	"include": [
