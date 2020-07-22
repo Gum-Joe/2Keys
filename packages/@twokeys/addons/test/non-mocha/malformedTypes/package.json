@@ -1,0 +1,15 @@
+{
+	"name": "malformedTypes",
+	"private": true,
+	"version": "1.0.0",
+	"description": "MEAP",
+	"author": "Kishan",
+	"entry": "app.js",
+	"twokeys": {
+		"types": ["executor", "badType"],
+		"entry": {
+			"executor": "./main.js"
+		},
+		"displayName": "NOT_E"
+	}
+}

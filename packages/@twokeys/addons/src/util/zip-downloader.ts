@@ -62,6 +62,7 @@ export default class ZipDownloader extends Downloader {
 		await unzip(this.savePath, {
 			dir: this.extractToPath,
 			onEntry: (entry: Entry, zipfile: ZipFile) => {
+				/* istanbul ignore if */
 				if (!this.logger.isSilent) {
 					if (totalEntries === -1) {
 						totalEntries = zipfile.entryCount;

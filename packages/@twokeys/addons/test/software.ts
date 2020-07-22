@@ -25,6 +25,7 @@ import {
 } from "../src";
 import { SOFTWARE_REG_ROOT, testPackage, testSoftware, testSoftwareUninstalled, testSoftwareToUpdate, testSoftwareUpdated, testSoftwareExecutablesTest } from "./constants";
 import SoftwareRegistryQueryProvider from "../src/software-query-provider";
+import { Logger } from "@twokeys/core";
 
 chai.use(require("chai-fs"));
 chai.use(require("chai-as-promised"));
@@ -57,6 +58,23 @@ describe("Software Registry tests", () => {
 		});
 		it("should get the software folder for one piece of software", () => {
 			expect(softwareRegistry.getOneSoftwareFolder(testSoftware.name)).to.equal(join(SOFTWARE_REG_ROOT, SOFTWARE_ROOT_FOLDER, testPackage.name, testSoftware.name));
+		});
+		it("should use our custom logger", () => {
+			class NewLogger2 extends Logger {
+				public someProp = true;
+			}
+			const softwareReg = new SoftwareRegistryQueryProvider({
+				Logger: NewLogger2,
+				directory: SOFTWARE_REG_ROOT,
+			});
+			// @ts-expect-error
+			expect(new softwareReg.LoggerConstructor({})).to.haveOwnProperty("someProp");
+			// @ts-expect-error
+			expect(new softwareReg.LoggerConstructor({}).someProp).to.be.true;
+			// @ts-expect-error
+			expect(softwareReg.logger).to.haveOwnProperty("someProp");
+			// @ts-expect-error
+			expect(softwareReg.logger.someProp).to.be.true;
 		});
 	});
 
@@ -214,6 +232,28 @@ describe("Software Registry tests", () => {
 			});
 		});
 
+		it("should successfully update a piece of software in the DB, when the newData does not have a name", async () => {
+			const newUpdate = cloneDeep(testSoftwareUpdated);
+			delete newUpdate.name;
+			await softwareRegistry.updateSoftware(testSoftwareToUpdate.name, newUpdate);
+			const results = await softwareRegistry.getSoftware(testSoftwareUpdated.name);
+			const testSoftwareUpdatedWithoutExecutable = cloneDeep(newUpdate);
+			delete testSoftwareUpdatedWithoutExecutable.executables;
+			// check everything
+			expect(results).to.deep.include(testSoftwareUpdatedWithoutExecutable);
+			// Now check executables
+			// Delete paths because thje DB has absolute paths, not relative
+			newUpdate.executables.forEach(value => delete value.path);
+			// Now check
+			expect(results.executables.length).to.equal(newUpdate.executables.length);
+			// Chack executables
+			results.executables.forEach((value) => {
+				const valueToTestAgainst = newUpdate.executables.find(value2 => value2.name === value.name);
+				expect(valueToTestAgainst).to.not.be.undefined;
+				expect(value).to.deep.include(valueToTestAgainst);
+			});
+		});
+
 		it("should set the right bool when using noAutoInstall", async () => {
 			await softwareRegistry.updateSoftware(testSoftwareUpdated.name, { noAutoInstall: true });
 			await expect(softwareRegistry.db.get(`SELECT noAutoInstall FROM ${SOFTWARE_TABLE_NAME} WHERE name = ?`, testSoftwareUpdated.name))
@@ -337,6 +377,20 @@ describe("Software Registry tests", () => {
 			const testSoftware2: Software = Object.assign({}, testSoftware);
 			testSoftware2.executables[0].path = join(softwareRegistry.getOneSoftwareFolder(testSoftware.name), testSoftware2.executables[0].path);
 			expect(result).to.deep.include({ ...testSoftware2, executables: result.executables.map((value, index) => { return { ...value, ...testSoftware2.executables[index] }; })});
+		});
+
+		it("should retrieve all software when no args given", async () => {
+			const softwareRegistryQueryProvider = new SoftwareRegistryQueryProvider({
+				directory: SOFTWARE_REG_ROOT,
+			});
+			await softwareRegistryQueryProvider.initDB();
+			// Assumes testSoftware has been instaleed
+			const results = await softwareRegistryQueryProvider.getSoftwares();
+			// Data check
+			// Check for non DB keys
+			expect(results).to.be.of.length(
+				(await softwareRegistryQueryProvider.db.all(`SELECT * FROM ${SOFTWARE_TABLE_NAME}`)).length
+			);
 		});
 
 		it("should throw an error getting a piece of software not in the DB", async () => {

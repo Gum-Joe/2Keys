@@ -61,6 +61,7 @@ export const testSoftwareToUpdate: Software = {
 			name: "AHK_DLL_ARM_64",
 			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
 			arch: "arm64",
+			userInstalled: true,
 		}
 	]
 };
@@ -91,6 +92,7 @@ export const testSoftwareUpdated: Software = {
 			name: "AHK_DLL_ARM_64",
 			path: "ahkdll-v2-release-master/arm/AutoHotkey.dll",
 			arch: "arm64",
+			userInstalled: false,
 		},
 		// This is inserted
 		{

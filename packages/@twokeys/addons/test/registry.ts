@@ -135,7 +135,7 @@ describe("Registry tests", () => {
 				expect(docs).to.be.of.length(0);
 			}).timeout(50000);
 
-			it("should sucessfully install an executor and add it to the registry", async () => {
+			it("should sucessfully install an executor add-on and add it to the registry", async () => {
 				const pkgJSON = require(join(EXECUTOR_TEST, "package.json"));
 				const status = await registry.install(EXECUTOR_TEST, { local: true });
 				// tslint:disable-next-line: no-unused-expression
@@ -205,13 +205,6 @@ describe("Registry tests", () => {
 				// tslint:disable-next-line: no-unused-expression
 				expect(status.status).to.be.false;
 				expect(status.message).to.include("No valid type");
-			}).timeout(50000);
-
-			it("should reject a package with missing entry points", async () => {
-				const status = await registry.install(join(__dirname, "non-mocha/noEntry"), { local: true });
-				// tslint:disable-next-line: no-unused-expression
-				expect(status.status).to.be.false;
-				expect(status.message).to.include("Entry point was not found");
 			}).timeout(50000);
 
 			it("should include optional properties in the registry and ignore invalid types in the entries list", async () => {
@@ -289,6 +282,17 @@ describe("Registry tests", () => {
 				const pkgJSON = require(join(REGISTRY_DIR, "node_modules", "debug", "package.json"));
 				expect(pkgJSON.version).to.be.equal("4.0.1");
 			}).timeout(50000);
+
+			it("should default to latest when updating a package", async () => {
+				// TODO: Update paclage from npm that is with 2Keys, we can't test this as no such package exists
+				await registry.install("debug", {
+					version: "2.0.0",
+				});
+				await registry.update("debug");
+				expect(join(REGISTRY_DIR, "node_modules", "debug")).to.be.a.directory();
+				const pkgJSON = require(join(REGISTRY_DIR, "node_modules", "debug", "package.json"));
+				expect(pkgJSON.version).to.not.be.equal("2.0.0");
+			}).timeout(50000);
 		});
 
 		describe("Package reindexing", () => {
@@ -333,6 +337,21 @@ describe("Registry tests", () => {
 				const executor = await registry.load(pkgJson.name, "executor");
 				const config = {
 					testValue: false,
+					hasProperties: false,
+					expect,
+				};
+				// @ts-ignore: We don't have a proper config to test with yet
+				await executor.call(executor.execute, config);
+				expect(config.testValue).to.be.true;
+			});
+
+			it("should load a add-on and allow us to execute it with properties", async () => {
+				const executor = await registry.load(pkgJson.name, "executor", {
+					projectDir: LOAD_TEST,
+				});
+				const config = {
+					testValue: false,
+					hasProperties: true,
 					expect,
 				};
 				// @ts-ignore: We don't have a proper config to test with yet
@@ -390,6 +409,14 @@ describe("Registry tests", () => {
 				expect(testOBJ.testValue2).to.be.true;
 
 			}).timeout(50000);
+
+			it("createLoaderForAddonType(): should return a loader for a specific add-on type only", async () => {
+				// Install stuff
+				await registry.install(join(__dirname, "non-mocha", "loadTestMultiType"), { local: true });
+				const theLoader = registry.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_EXECUTOR);
+				// @ts-expect-error
+				(await theLoader("load-test-multi-type")).execute();
+			});
 		});
 	});
 });

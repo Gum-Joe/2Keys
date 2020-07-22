@@ -93,6 +93,8 @@ type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModul
 	call: <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T) => Promise<U>;
 	/** twokeys class */
 	twokeys: TwoKeys<AddOnsType>;
+	/** Properties for {@link TwoKeys.properties} */
+	properties: TwoKeysProperties;
 };
 
 // TODO: Before and after hooks
@@ -186,7 +188,8 @@ export default class AddOnsRegistry {
 				loaded.package = packageToLoad;
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), propertiesForAddOn || {});
+				loaded.properties = propertiesForAddOn || {};
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), loaded.properties);
 				// Custom Logger to use
 
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
@@ -315,6 +318,7 @@ export default class AddOnsRegistry {
 			// throw new Error(packageInfo.message || "Unknown error adding package to DB, or results entry was missing!");
 		}
 		// Length check
+	/* istanbul ignore if */
 		if (packageInfo.results.length < 1) {
 			this.logger.err("Got back no packages when quering for the package we just installed.");
 			this.logger.err("Something unexpected, perhaps impossible, has happened.");
@@ -528,7 +532,7 @@ export default class AddOnsRegistry {
 			this.logger.debug("Reading package.json");
 			const packageJSON: { twokeys: TwokeysPackageInfo; [key: string]: any } = JSON.parse((await fs.readFile(join(packageLocation, "package.json"))).toString("utf8"));
 			// Validate
-			const validation = AddOnsRegistry.validatePackageJSON(packageJSON, this.logger);
+			const validation = AddOnsRegistry.validatePackageJSON(packageJSON, this.LoggerConstructor);
 			if (!validation.status) {
 				this.logger.err("Error validating package.json.");
 				this.logger.warn("Package not added.");
@@ -750,9 +754,10 @@ export default class AddOnsRegistry {
 	 * @param packageJSON Parsed package.json to validate
 	 * @returns flag of if package was added (true) or not (false) and err message if not added
 	 */
-	public static validatePackageJSON(packageJSON: any, loggerOpt?: Logger): ValidatorReturn {
-		const logger = typeof loggerOpt !== "undefined" && loggerOpt ? loggerOpt : new Logger({ name: "add-ons:registry" });
-		logger.args.name = "add-ons:registry";
+	public static validatePackageJSON(packageJSON: any, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
+		const logger = new LoggerConstructor({
+			name: "add-ons:registry"
+		});
 		logger.info("Validating a package.json...");
 		logger.debug(JSON.stringify(packageJSON));
 		// Check if has twokeys metadata
