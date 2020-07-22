@@ -22,8 +22,8 @@
  * @packageDocumentation
  */
 import { Chalk } from "chalk";
-import { LoggerArgs, LoggingMethods, defaultLoggingMethods } from "./interfaces";
 import ProgressBar from "progress";
+import { LoggerArgs, LoggingMethods, defaultLoggingMethods } from "./interfaces";
 import Prompts from "./prompts";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -92,7 +92,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	constructor(options: SoftwareRegistryOptions<PackageType>) {
 		super(options);
 		this.package = options.package;
-		this.logger.args.name = this.package.name;
+		this.logger.args.name = this.package.name + ":software";
 	}
 
 	/**
@@ -106,9 +106,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 */
 	public async installSoftware(software: Software): Promise<void> {
 		this.logger.info(`Installing software ${software.name}...`);
-		if (!this.db || typeof this.db === "undefined") {
-			await this.initDB();
-		}
+		await this.initDB();
 		this.logger.info("Adding software to registry...");
 		try {
 			// Ok, add it to the DB
@@ -204,12 +202,12 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 		this.logger.debug(`Save dir: ${savePathDir}`);
 		switch (software.downloadType) {
 			case SOFTWARE_DOWNLOAD_TYPE_STANDALONE: {
-				const downloader = new Downloader(software, join(savePathDir, software.filename || basename(software.url)), { logger: this.logger });
+				const downloader = new Downloader(software, join(savePathDir, software.filename || basename(software.url)), { Logger: this.LoggerConstructor });
 				await downloader.download();
 				break;
 			}
 			case SOFTWARE_DOWNLOAD_TYPE_ZIP: {
-				const downloader = new ZipDownloader(software, join(savePathDir, software.filename || "tmp.zip"), savePathDir, { logger: this.logger });
+				const downloader = new ZipDownloader(software, join(savePathDir, software.filename || "tmp.zip"), savePathDir, { Logger: this.LoggerConstructor });
 				await downloader.download();
 				await downloader.extract();
 				break;
@@ -253,7 +251,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			const source = this.getOneSoftwareFolder(name);
 			const dest = this.getOneSoftwareFolder(newData.name);
 			this.logger.info(`Copying software from old folder of ${source} to ${dest}...`);
-			const copier = new ContentCopier(source, dest, { logger: this.logger });
+			const copier = new ContentCopier(source, dest, { Logger: this.LoggerConstructor });
 			await copier.copyContents();
 			// Now delete the old
 			this.logger.info(`Deleting old folder (${source})...`);
@@ -316,6 +314,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 			}
 			return stmt;
 		};
+		await this.initDB();
 		// ID is required so we can locate software in DB, this is easier than an originalName field
 		const softwareIdQueryResults = await this.db.get<{ id: string }>(`SELECT id FROM ${SOFTWARE_TABLE_NAME} WHERE name = ? AND ownerName = ?`, [name, this.package.name]);
 		if (typeof softwareIdQueryResults === "undefined") {

@@ -13,9 +13,11 @@ import { createMockTwoKeys } from "@twokeys/addons/lib/dev-tools";
 import packageJSON from "../package.json";
 import { MOCK_REGISTRY_LOCATION, MOCK_CONFIG_LOCATION, MOCK_KEYBAORD_NAME, MOCK_ROOT } from "./constants";
 
-import run_hotkey, { ThisExecutorConfig } from "../src/exec";
+import { ThisExecutorConfig } from "../src/exec";
 import install from "../src/install";
 import { promisify } from "util";
+
+import { execute as run_hotkey } from "../src"; // Implictly test imports
 
 const rimraf = promisify(rimrafCB);
 

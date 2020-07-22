@@ -36,7 +36,7 @@ const pipeline = promisify(stream.pipeline);
  * Defines the options for the downloader
  */
 export interface DownloaderOptions {
-	logger?: Logger;
+	Logger?: typeof Logger;
 	noForce?: boolean;
 }
 
@@ -62,8 +62,7 @@ export default class Downloader {
 	 */
 	constructor(software: Software, savePath: string, options: DownloaderOptions = {}) {
 		this.software = software;
-		this.logger = Object.prototype.hasOwnProperty.call(options, "logger") ?
-			Object.assign(Object.create(Object.getPrototypeOf(options.logger)), options.logger) : new Logger({ name: this.downloaderName });
+		this.logger = new (options.Logger || Logger)({ name: this.downloaderName });
 		this.logger.args.name = this.logger.args.name + ":" + this.downloaderName;
 		this.savePath = savePath; // Save full path
 		this.options = options;
@@ -91,6 +90,7 @@ export default class Downloader {
 		});
 		const totalLength = headers["content-length"];
 		//const req = got.stream(this.software.url);
+		/* istanbul ignore if */
 		if (!this.logger.isSilent) {
 			this.logger.debug("Creating progress bar...");
 			const progressBar = this.logger.createProgressBar(":bar :percent ETA: :etas", {
@@ -118,6 +118,7 @@ export default class Downloader {
 			this.logger.info("Download complete.");
 			return;
 		} catch (err) {
+			/* istanbul ignore else */
 			if (err.code === "EEXIST") {
 				this.logger.err(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
 				throw new Error(`${this.software.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);

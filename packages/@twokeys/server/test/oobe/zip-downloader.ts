@@ -13,7 +13,9 @@ const ZIP_FILENAME = "ahk_v2.zip";
 const ROOT = join(MOCK_ROOT, "oobe_test");
 const FILE_PATH = join(ROOT, ZIP_FILENAME);
 
-describe("Zip downloader test (can take a while to run)", () => {
+// We don't use the zip downloader here due to race conditions and random failure
+// Thus, this is disabled
+describe.skip("Zip downloader test (can take a while to run)", () => {
 
 	before(async () => {
 		await mkdirp(ROOT);
@@ -32,7 +34,7 @@ describe("Zip downloader test (can take a while to run)", () => {
 		await zipDownloader.extract();
 		expect(join(ROOT, "ahkdll-v2-release-master")).to.be.a.directory().and.include.files(["README.md", "LICENSE", "HASH"]);
 		expect(join(ROOT, "ahkdll-v2-release-master", "x64w")).to.be.a.directory().and.include.files(["AutoHotkey.exe", "AutoHotkey.dll"]);
-	}).timeout(50000);
+	}).timeout(120000);
 
 	after((done) => {
 		rimraf(ROOT, done);

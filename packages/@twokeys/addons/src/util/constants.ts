@@ -38,7 +38,7 @@ export const DEFAULT_REGISTRY_ROOT_PACKAGE_JSON = {
 /** Name of table in the sqlite3 regstry DB to insert add-ons to */
 export const REGISTRY_TABLE_NAME = "packages";
 /** SQL Query to create packages table */
-export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE ${REGISTRY_TABLE_NAME} (
+export const CREATE_REGISTRY_DB_QUERY = `CREATE TABLE IF NOT EXISTS ${REGISTRY_TABLE_NAME} (
 	id TEXT,
 	name TEXT,
 	types TEXT,
@@ -58,7 +58,7 @@ export const SOFTWARE_TABLE_NAME = "software";
 /** Name of table to store executables for software in */
 export const EXECUTABLES_TABLE_NAME = "executables";
 /** SQL Query to create software table. Owner field is the add-on that is repsonsible for that software */
-export const CREATE_SOFTWARE_DB_QUERY = `CREATE TABLE ${SOFTWARE_TABLE_NAME} (
+export const CREATE_SOFTWARE_DB_QUERY = `CREATE TABLE IF NOT EXISTS ${SOFTWARE_TABLE_NAME} (
 	id TEXT NOT NULL,
 	name TEXT NOT NULL,
 	url TEXT NOT NULL,
@@ -73,7 +73,7 @@ export const CREATE_SOFTWARE_DB_QUERY = `CREATE TABLE ${SOFTWARE_TABLE_NAME} (
        REFERENCES ${REGISTRY_TABLE_NAME} (name)
 )`;
 /** SQL Query to create software table. Owner field is the add-on that is repsonsible for that software */
-export const CREATE_EXECUTABLES_DB_QUERY = `CREATE TABLE ${EXECUTABLES_TABLE_NAME} (
+export const CREATE_EXECUTABLES_DB_QUERY = `CREATE TABLE IF NOT EXISTS ${EXECUTABLES_TABLE_NAME} (
 	id TEXT,
 	name TEXT,
 	path TEXT,

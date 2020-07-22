@@ -3,9 +3,9 @@
 module.exports = {
 	require: ["ts-node/register", "source-map-support/register"],
 	recursive: true,
-	spec: ["test/**"],
+	spec: ["test/**.ts"],
 	extension: ["ts", "js"],
-	exclude: ["test/non-mocha/*", "test/non-mocha/**/*"],
+	exclude: ["test/non-mocha"],
 	"unhandled-rejections": "strict",
 	timeout: 50000,
 }

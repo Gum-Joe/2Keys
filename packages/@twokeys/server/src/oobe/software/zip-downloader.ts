@@ -32,7 +32,11 @@ import AdmZip from "adm-zip";
 
 const { open, access } = promises;
 
-
+/* istanbul ignore next */
+/**
+ * Downloads a ZipFile
+ * @deprecated Use the zip downloader in @twokeys/addons
+ */
 export default class ZipDownloader {
 	private logger: Logger;
 	private fullPath: string; // thus.saveTo + fetch_file().this.saveAs

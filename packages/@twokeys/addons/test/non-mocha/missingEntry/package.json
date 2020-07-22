@@ -1,5 +1,5 @@
 {
-	"name": "loading-test-3-malformed-db",
+	"name": "missingEntry",
 	"private": true,
 	"version": "1.0.0",
 	"description": "MEAP",
@@ -8,8 +8,8 @@
 	"twokeys": {
 		"types": ["executor", "detector"],
 		"entry": {
-			"executor": "./executor.js",
-			"detector": "./detector.js"
-		}
+			"executor": "./main.js"
+		},
+		"displayName": "NOT_E"
 	}
 }

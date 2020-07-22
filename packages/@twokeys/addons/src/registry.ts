@@ -26,13 +26,14 @@ import npm from "npm";
 import { open as openDB, Database, Statement } from "sqlite";
 import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
-import { promises as fs } from "fs";
+import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
-import { Logger } from "@twokeys/core";
+import { Logger, TwoKeysProperties } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
 import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
-import TwoKeys, { TwoKeysProperties } from "./module-interfaces/twokeys";
+import TwoKeys from "./module-interfaces/twokeys";
+import { LoggerArgs } from "@twokeys/core/lib/interfaces";
 
 /**
  * Options for add-on registry constructor
@@ -40,10 +41,10 @@ import TwoKeys, { TwoKeysProperties } from "./module-interfaces/twokeys";
 interface AddOnsRegistryOptions {
 	/** Absolute path of registry database (a sqlite3 .db file) */
 	dbFilePath?: string;
-	/** Custom twokeys class to use when loading modules */
-	twokeys?: typeof TwoKeys;
-	/** Custom logger to use */
-	logger?: Logger;
+	/** Custom twokeys class to use when loading modules - please provide the contructor! */
+	TwoKeys?: typeof TwoKeys;
+	/** Custom logger to use - please provide the contructor! */
+	Logger?: typeof Logger;
 }
 
 /**
@@ -92,6 +93,8 @@ type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModul
 	call: <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T) => Promise<U>;
 	/** twokeys class */
 	twokeys: TwoKeys<AddOnsType>;
+	/** Properties for {@link TwoKeys.properties} */
+	properties: TwoKeysProperties;
 };
 
 // TODO: Before and after hooks
@@ -108,8 +111,8 @@ export default class AddOnsRegistry {
 
 	protected directory: string;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-	// @ts-ignore: Is initalised by this.initDB()
-	protected registry: Database;
+	// Is initalised by this.initDB()
+	protected registry!: Database;
 	public readonly registryDBFilePath: string;
 	/** Path to root of registry */
 	protected registryModulesPath: string;
@@ -119,6 +122,8 @@ export default class AddOnsRegistry {
 	protected logger = new Logger({
 		name: "add-ons:registry",
 	});
+	/** Constrcutor for the logger (has to be private) */
+	private LoggerConstructor: typeof Logger = Logger;
 
 	/**
 	 * Initalises a new registry class for the registry at `dir`
@@ -128,17 +133,37 @@ export default class AddOnsRegistry {
 		this.directory = dir;
 		this.registryDBFilePath = options?.dbFilePath || join(this.directory, REGISTRY_FILE_NAME);
 		this.registryModulesPath = join(this.directory, REGISTRY_MODULE_FOLDER);
-		if (typeof options?.twokeys !== "undefined" && options.twokeys) {
-			this.TwoKeys = options.twokeys;
+		if (typeof options?.TwoKeys !== "undefined" && options.TwoKeys) {
+			this.TwoKeys = options.TwoKeys;
 		}
-		if (typeof options?.logger !== "undefined" && options.logger) {
-			this.logger = Object.assign(Object.create(Object.getPrototypeOf(options.logger)), options.logger);
-			this.logger.args.name = "add-ons:registry";
+		if (typeof options?.Logger !== "undefined" && options.Logger) {
+			this.logger = new options.Logger({
+				name: "add-ons:registry",
+			});
+			this.LoggerConstructor = options.Logger;
 		}
 		this.logger.debug(`New registry class created for ${dir}`);
 	}
 
 	// Load functions
+	/**
+	 * Generates a logger for an add-on.
+	 * 
+	 * It does this by creating an child class of {@link AddOnsRegistry.LoggerConstructor} that appends `add-on:addonName:` to the beginning of the prefix for the logger.
+	 * 
+	 * This means:
+	 * - When an add-on function logs, it has the prefix `add-on:addonName::` (colon there because `::` looks better than `:`; the extra colon is provided by {@link TwoKeys})
+	 * - When an add-on use software or registry or other 2Keys function, the prefix is `add-on:addonName:software`, etc
+	 */
+	protected getLoggerForAddon(thePackage: Package): typeof Logger {
+		return class extends this.LoggerConstructor {
+			constructor(args: LoggerArgs) {
+				super(args);
+				this.args.name = `add-on:${thePackage.name}:${this.args.name}`;
+			}
+		};
+	}
+	
 	/**
 	 * Loads the entry points for an add-on type from a {@link Package} (so a package that has already been retrieved from DB).
 	 * Also adds information about the add-on to the loaded module, in the `package` key (see {@link LoadedAddOn}).
@@ -157,13 +182,16 @@ export default class AddOnsRegistry {
 				const file: string = join(this.registryModulesPath, packageToLoad.name, (packageToLoad.entry[typeOfAddOn] as string));
 				this.logger.debug(`Loading type ${typeOfAddOn} from file ${file}...`);
 				// load
-				const loaded: LoadedAddOn<AddOnsType> = require(file);
+				const loaded: LoadedAddOn<AddOnsType> = await import(file);
 				this.logger.debug("Type of add-on loaded.");
 				// Add package object
 				loaded.package = packageToLoad;
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.logger, propertiesForAddOn);
+				loaded.properties = propertiesForAddOn || {};
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), loaded.properties);
+				// Custom Logger to use
+
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
 					return fn(loaded.twokeys, config);
 				};
@@ -213,15 +241,20 @@ export default class AddOnsRegistry {
 		}
 	}
 
-	// TODO: refactory loadExecutor and the below functions like it to use decorators and generate those functions on the fly.
+	/**
+	 * Util function to create a loadAddonType function, e.g. `loadExecutor`
+	 */
+	public createLoaderForAddonType<AddOnType extends TWOKEYS_ADDON_TYPES & string>(addOnType: AddOnType) {
+		// eslint-disable-next-line @typescript-eslint/no-use-before-define
+		return async (packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<AddOnType>> => {
+			return (await this.load<AddOnType>(packageName, addOnType, propertiesForAddOn));
+		};
+	}
 	/** Loads an executor */
-	public async loadExecutor(packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_EXECUTOR>> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_EXECUTOR>(packageName, TWOKEYS_ADDON_TYPE_EXECUTOR, propertiesForAddOn));
-	}
-	/** Loads a detector */
-	public async loadDetector(packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<TWOKEYS_ADDON_TYPE_DETECTOR>> {
-		return (await this.load<TWOKEYS_ADDON_TYPE_DETECTOR>(packageName, TWOKEYS_ADDON_TYPE_DETECTOR, propertiesForAddOn));
-	}
+	public loadExecutor = this.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_EXECUTOR);
+	/** Loads an detector */
+	public loadDetector = this.createLoaderForAddonType(TWOKEYS_ADDON_TYPE_DETECTOR);
+
 	/**
 	 * Loads all add-ons of a given type
 	 * @param typeOfAddOn Add-on type to load
@@ -237,9 +270,8 @@ export default class AddOnsRegistry {
 		});
 		this.logger.debug(JSON.stringify(addOnsList));
 		const loadedAddOns: { [name: string]: LoadedAddOn<AddOnsType> } = {};
-		for (const addOn of addOnsList) {
-			loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(addOn, typeOfAddOn);
-		}
+		const promiseLoaders = addOnsList.map(async addOn => loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(addOn, typeOfAddOn));
+		await Promise.all(promiseLoaders);
 		return loadedAddOns;
 
 	}
@@ -286,6 +318,7 @@ export default class AddOnsRegistry {
 			// throw new Error(packageInfo.message || "Unknown error adding package to DB, or results entry was missing!");
 		}
 		// Length check
+		/* istanbul ignore if */
 		if (packageInfo.results.length < 1) {
 			this.logger.err("Got back no packages when quering for the package we just installed.");
 			this.logger.err("Something unexpected, perhaps impossible, has happened.");
@@ -297,14 +330,15 @@ export default class AddOnsRegistry {
 		}
 
 		for (const addOn of packageInfo.results || []) {
-			this.logger.debug(`Running install()s from ${addOn.name}.`);
-			for (const addOnType of addOn.types) {
-				this.logger.info(`Running install() for add-on type ${addOnType}...`);
-				const loaded = await this.load(addOn.name, addOnType);
-				if (Object.prototype.hasOwnProperty.call(loaded, "install") && typeof loaded.install == "function") {
-					await loaded.call(loaded.install, {});
+			this.logger.debug(`Running install()s for ${addOn.name}.`);
+			this.logger.debug("Loading scripts for each included add-on type ready for execution...");
+			const loadedScript = await Promise.all(addOn.types.map(async addOnType => { return { loadedScript: await this.load(addOn.name, addOnType), addOnType }; }));
+			for (const script of loadedScript) {
+				this.logger.info(`Running install() for add-on type ${script.addOnType}...`);
+				if ("install" in script.loadedScript && typeof script.loadedScript.install == "function") {
+					await script.loadedScript.call(script.loadedScript.install, {});
 				} else {
-					this.logger.warn(`Skipping over add-on ${addOn.name} add-on type ${addOnType}, as no install() function found or was not a function.`);
+					this.logger.warn(`Skipping over add-on ${addOn.name} add-on type ${script.addOnType}, as no install() function found or was not a function.`);
 				}
 			}
 		}
@@ -399,7 +433,7 @@ export default class AddOnsRegistry {
 		try {
 			await this.runNpm(packageName + "@" + version, "install", options);
 			this.logger.info("Reindexing package in registry...");
-			return await this.addPackageToDB(packageName, {
+			return this.addPackageToDB(packageName, {
 				...options,
 				force: true,
 				update: true,
@@ -415,10 +449,12 @@ export default class AddOnsRegistry {
 	 * Initalises the DB so we can use it
 	 */
 	public async initDB(): Promise<void> {
-		this.registry = await openDB({
-			filename: this.registryDBFilePath,
-			driver: sqlite3.Database,
-		});
+		if (typeof this.registry === "undefined" || !this.registry) {
+			this.registry = await openDB({
+				filename: this.registryDBFilePath,
+				driver: sqlite3.Database,
+			});
+		}
 	}
 
 	/**
@@ -429,9 +465,7 @@ export default class AddOnsRegistry {
 		this.logger.warn("Wiping registry..."); // Wipe DB
 		try {
 			this.logger.debug("Loading DB if not loaded...");
-			if (!this.registry) {
-				await this.initDB();
-			}
+			await this.initDB();
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME};`);
 			this.logger.info("DB wiped. Will now readd packages from package.json");
 			const pkgJSON = JSON.parse((await fs.readFile(join(this.directory, "package.json"))).toString("utf8"));
@@ -461,9 +495,7 @@ export default class AddOnsRegistry {
 	public async addPackageToDB(name: string, options?: AddPackageOptions): Promise<ValidatorReturn> {
 		this.logger.info(`Adding package (add-on) ${name} to DB...`);
 		this.logger.debug("Loading DB if not loaded...");
-		if (!this.registry) {
-			await this.initDB();
-		}
+		await this.initDB();
 		const packageLocation = join(this.registryModulesPath, name);
 		this.logger.debug(`Package location: ${packageLocation}`);
 		this.logger.debug("Checking if package already in registry...");
@@ -500,7 +532,7 @@ export default class AddOnsRegistry {
 			this.logger.debug("Reading package.json");
 			const packageJSON: { twokeys: TwokeysPackageInfo; [key: string]: any } = JSON.parse((await fs.readFile(join(packageLocation, "package.json"))).toString("utf8"));
 			// Validate
-			const validation = AddOnsRegistry.validatePackageJSON(packageJSON, this.logger);
+			const validation = AddOnsRegistry.validatePackageJSON(packageJSON, this.LoggerConstructor);
 			if (!validation.status) {
 				this.logger.err("Error validating package.json.");
 				this.logger.warn("Package not added.");
@@ -556,9 +588,7 @@ export default class AddOnsRegistry {
 		this.logger.info(`Removing any packages by name ${packageName} in registry DB.`);
 		try {
 			this.logger.debug("Loading DB if not loaded...");
-			if (!this.registry) {
-				await this.initDB();
-			}
+			await this.initDB();
 			await this.registry.all(`DELETE FROM ${REGISTRY_TABLE_NAME} WHERE name=?`, packageName);
 			this.logger.debug("Documents removed.");
 		} catch (err) {
@@ -593,9 +623,7 @@ export default class AddOnsRegistry {
 		this.logger.info(`Getting info for package ${packageName} from DB...`);
 		try {
 			this.logger.debug("Loading DB if not loaded...");
-			if (!this.registry) {
-				await this.initDB();
-			}
+			await this.initDB();
 			const docs = await this.queryDBForPackage(packageName);
 			this.logger.debug("Raw DB output retrieved.");
 			this.logger.debug(`Converting ${docs.length} documents...`);
@@ -628,10 +656,8 @@ export default class AddOnsRegistry {
 	private async queryDBForPackage(packageName: string): Promise<PackageInDB[]> {
 		this.logger.debug(`Query DB for package ${packageName}...`);
 		this.logger.debug("Loading DB if not loaded...");
-		if (!this.registry) {
-			await this.initDB();
-		}
-		return await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
+		await this.initDB();
+		return this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE name = ?`, packageName);
 	}
 
 	/**
@@ -685,8 +711,7 @@ export default class AddOnsRegistry {
 	 * @param dir Directory to create registry in
 	 */
 	public static async createNewRegistry(dir: string, options?: AddOnsRegistryOptions): Promise<ValidatorReturn> {
-		const logger = Object.prototype.hasOwnProperty.call(options || {}, "logger") && typeof options?.logger !== "undefined" ? options.logger : new Logger({ name: "add-ons:registry" });
-		logger.args.name = "add-ons:registry";
+		const logger = new Logger({ name: "add-ons:registry" });
 		logger.info(`Creating new registry in ${dir}...`);
 		try {
 			await mkdirp(dir);
@@ -694,6 +719,18 @@ export default class AddOnsRegistry {
 			logger.info("Writing default package.json...");
 			await fs.writeFile(join(dir, "package.json"), JSON.stringify(DEFAULT_REGISTRY_ROOT_PACKAGE_JSON));
 			logger.info("Creating registry DB...");
+			logger.debug("Checking if registry DB file already exists...");
+			try {
+				await fs.access(options?.dbFilePath || join(dir, REGISTRY_FILE_NAME), fsconstants.F_OK);
+				return { status: false, message: "DB already exists." }; // If we get here, ENOENT not thrown
+			} catch (err) {
+				if (err.code === "ENOENT") {
+					logger.debug("DB did not exist, so creating it...");
+				} else {
+					logger.err("Other error encountered checking if DB file already existed!");
+					throw err;
+				}
+			}
 			const db = await openDB({
 				filename: options?.dbFilePath || join(dir, REGISTRY_FILE_NAME),
 				driver: sqlite3.Database,
@@ -703,15 +740,9 @@ export default class AddOnsRegistry {
 			logger.debug("Closing...");
 			await db.close();
 			logger.info("SQLite registry DB & tables created.");
-			// await fd.close(); // CLose immediately
 		} catch (err) {
 			logger.err("An error was encountered!");
-			if (err.stack.includes(`table ${REGISTRY_TABLE_NAME} already exists`)) {
-				logger.warn("Table (registry) already exists.");
-				return { status: false, message: "Table (registry) already exists." };
-			} else {
-				throw err;
-			}
+			throw err;
 		}
 		logger.info("Registry created.");
 		return { status: true };
@@ -723,9 +754,10 @@ export default class AddOnsRegistry {
 	 * @param packageJSON Parsed package.json to validate
 	 * @returns flag of if package was added (true) or not (false) and err message if not added
 	 */
-	public static validatePackageJSON(packageJSON: any, loggerOpt?: Logger): ValidatorReturn {
-		const logger = typeof loggerOpt !== "undefined" && loggerOpt ? loggerOpt : new Logger({ name: "add-ons:registry" });
-		logger.args.name = "add-ons:registry";
+	public static validatePackageJSON(packageJSON: any, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
+		const logger = new LoggerConstructor({
+			name: "add-ons:registry"
+		});
 		logger.info("Validating a package.json...");
 		logger.debug(JSON.stringify(packageJSON));
 		// Check if has twokeys metadata
