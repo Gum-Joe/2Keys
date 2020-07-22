@@ -6,7 +6,7 @@ import { createMockTwoKeys, assertIsForProject } from "../src/dev-tools";
 import { REGISTRY_DIR } from "./constants";
 import { REGISTRY_FILE_NAME } from "../src/util/constants";
 import { join } from "path";
-import { expect, AssertionError } from "chai";
+import { expect } from "chai";
 import { TwoKeys } from "../src/module-interfaces";
 import { TwoKeys as TwoKeysFromCore } from "@twokeys/core";
 

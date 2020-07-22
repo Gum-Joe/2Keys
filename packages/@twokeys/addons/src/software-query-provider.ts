@@ -75,7 +75,7 @@ export default class SoftwareRegistryQueryProvider {
 	 * @param entry
 	 */
 	public async initDB(): Promise<void> {
-		if (!this.db || typeof this.db === "undefined") {
+		if (typeof this.db === "undefined") {
 			this.logger.debug("Opening DB...");
 			this.db = await openDB({
 				filename: this.dbFilePath,
