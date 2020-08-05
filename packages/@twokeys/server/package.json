@@ -43,7 +43,7 @@
     "inquirer": "^7.0.0",
     "mkdirp": "^1.0.4",
     "mustache": "^4.0.1",
-    "node-addon-api": "^2.0.1",
+    "node-addon-api": "^3.0.0",
     "progress": "^2.0.1",
     "request": "^2.88.0",
     "request-progress": "^3.0.0",
