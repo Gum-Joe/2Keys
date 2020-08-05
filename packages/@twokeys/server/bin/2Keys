@@ -27,10 +27,14 @@ const { config_loader } = require("../lib/util/config");
 const { fetch_hotkey, run_hotkey } = require("../lib/util/ahk");
 const Logger = require("../lib/util/logger").default;
 const { regenerateDaemons } = require("../lib/init/daemon");
+const packageJSON = require("../package.json")
 
 const logger = new Logger({
   name: "cli",
 })
+
+logger.info("2Keys");
+logger.info(`Version: ${packageJSON.version}`);
 
 // const argv = yargs.argv;
 
