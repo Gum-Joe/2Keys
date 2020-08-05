@@ -8,6 +8,7 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "compile": "tsc -b",
+    "watch": "tsc -b -w",
     "lint": "eslint --ext .ts .",
     "test": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
     "coverage": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",

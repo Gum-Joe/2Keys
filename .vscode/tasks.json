@@ -2,26 +2,26 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "npm",
-			"script": "build",
-			"path": "packages/twokeys-core/",
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
 			"problemMatcher": [
 				"$tsc"
 			],
-			"group": "build",
-			"label": "npm: build - packages/twokeys-core",
-			"detail": "tsc -p tsconfig.build.json"
-		},
-		{
-			"type": "npm",
-			"script": "build",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
-			"problemMatcher": [],
-			"label": "npm: build",
-			"detail": "tsc -b"
+			"label": "tsc: build - tsconfig.json"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "tsc: watch - tsconfig.json"
 		}
 	]
 }
