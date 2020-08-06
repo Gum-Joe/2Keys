@@ -23,7 +23,7 @@
  */
 import { Chalk } from "chalk";
 import ProgressBar from "progress";
-import { LoggerArgs, LoggingMethods, defaultLoggingMethods } from "./interfaces";
+import { LoggerArgs, LoggingMethods, defaultLoggingMethods, LoggerTypes } from "./interfaces";
 import Prompts from "./prompts";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -91,7 +91,7 @@ export default class Logger {
 	 * @param args {LoggerArgs} Logger args
 	 * @param logger Custom logger to print with
 	 */
-	protected _log(level: string, colour: string, text: string, logger = this.loggingMethods.log, args: LoggerArgs = this.args): void {
+	protected _log(level: LoggerTypes["level"], colour: string, text: string, logger = this.loggingMethods.log, args: LoggerArgs = this.args): void {
 		if (!this.isSilent) {
 			logger(`${this._getPrefix(level, colour, args)} ${text}`);
 		}
