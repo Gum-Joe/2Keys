@@ -25,6 +25,7 @@
 import { FinalTwoKeysConstructor } from "./twokeys";
 import { Command, CommandInfo, BaseStatefulCommand, StatefulCommandConstructor } from "./base-commands";
 import { TwoKeysProperties } from "@twokeys/core/src";
+import { checkCommandInfo } from "./is-command";
 
 /**
  * Provides the needed methods to call commands,
@@ -80,12 +81,7 @@ export default class CommandFactory {
 	 * @param config Config to pass to it (type inferred from function)
 	 */
 	public callCommand<T, U>(func: Command<T, U>, config: T, properties: TwoKeysProperties = {}): U {
-		if (typeof func.commandInfo === "undefined") {
-			throw new Error("Attempted to call a non-command!");
-		}
-		if (typeof func.commandInfo.commandName !== "string") {
-			throw new TypeError("Property commandName was either undefined or not of type string!");
-		}
+		checkCommandInfo(func);
 		return func(new this.TwokeysConstructor(func.commandInfo as CommandInfo, properties), config);
 	}
 
@@ -96,12 +92,7 @@ export default class CommandFactory {
 	 * @param command Command to create instance of
 	 */
 	public createStatefulCommand<CommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<CommandClass>, properties: TwoKeysProperties = {}): CommandClass {
-		if (typeof command.commandInfo === "undefined") {
-			throw new Error("Attempted to call a non-command!");
-		}
-		if (typeof command.commandInfo.commandName !== "string") {
-			throw new TypeError("Property commandName was either undefined or not of type string!");
-		}
+		checkCommandInfo(command);
 		return new command(new this.TwokeysConstructor(command.commandInfo, properties));
 	}
 
