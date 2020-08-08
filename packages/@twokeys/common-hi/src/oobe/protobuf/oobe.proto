@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+message OOBEConfig {
+	bool didAcceptLicenseAgreement = 1;
+	string serverName = 2;
+
+	enum ThemeOptions {
+		LIGHT = 0;
+		DARK = 1;
+	}
+	ThemeOptions theme = 3;
+	string configLocation = 4;
+	string registryLocation = 5;
+	string networkAdapter = 6;
+	// repated = array of
+	repeated string moduleInstallList = 7;
+}
