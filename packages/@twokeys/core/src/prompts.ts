@@ -108,8 +108,11 @@ export default class Prompts implements PromptsInterfaces {
 	 * should be overriden by GUI to Yes and No.
 	 */
 	public YES_NO = ["y", "n"];
+	protected logger: Logger;
 
-	constructor(protected logger: Logger) {}
+	constructor(logger: Logger) {
+		this.logger = logger;
+	}
 
 	/**
 	 * Base function used to prompt for a simple, mutli-choice response from the user.
@@ -203,7 +206,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * @see Prompts.basePrompt (for more (important) info & example)
 	 * @see PromptFunctionType
 	 */
-	question(message: string, config: PromptConfig = {}) {
+	public question(message: string, config: PromptConfig = {}) {
 		return this.basePrompt(message, { ...config, logger: (message: string) => this.logger.info(message) });
 	}
 
@@ -213,7 +216,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * @see Prompts.basePrompt (for more (important) info & example)
 	 * @see PromptFunctionType
 	 */
-	warning(message: string, config: PromptConfig = {}) {
+	public warning(message: string, config: PromptConfig = {}) {
 		return this.basePrompt(message, { ...config, logger: (message: string) => this.logger.warn(message) });
 	}
 
@@ -229,7 +232,7 @@ export default class Prompts implements PromptsInterfaces {
 	 */
 	// NOTE: Not tested as it just calls logger.printError, which is already tested
 	/* istanbul ignore next */
-	error(err: Error) {
+	public error(err: Error) {
 		this.logger.printError(err);
 	}
 
