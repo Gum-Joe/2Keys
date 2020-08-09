@@ -23,12 +23,10 @@
  */
 
 import { Command, BaseTwoKeysForCommands, CommandFactory } from "../../common";
+import type { OOBEConfig } from "../protobuf/oobe_pb";
 
-export interface OOBEConfig {
-	a: string;
-}
 
-const command: Command<OOBEConfig> = (twokeys: BaseTwoKeysForCommands, config: OOBEConfig) => {
+const command: Command<OOBEConfig.AsObject> = (twokeys: BaseTwoKeysForCommands, config: OOBEConfig.AsObject) => {
 	twokeys.logger.info("HI");
 }
 

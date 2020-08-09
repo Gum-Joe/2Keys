@@ -7,17 +7,25 @@
   "author": "Kishan <kishansambhi@hotmail.co.uk>",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "compile": "tsc -b",
+    "compile:protobuf": "gulp protoc",
+    "compile": "yarn run compile:protobuf && tsc -b",
     "lint": "eslint --ext .ts .",
     "watch": "tsc -b --watch",
+    "watch:protobuf": "gulp protoc:watch",
     "docs": "typedoc",
     "test": "cross-env NODE_ENV=test mocha",
     "coverage": "cross-env NODE_ENV=test nyc mocha"
   },
   "dependencies": {
-    "@twokeys/core": "^1.0.0"
+    "@twokeys/core": "^1.0.0",
+    "google-protobuf": "^3.12.4"
   },
   "devDependencies": {
-    "globby": "^11.0.1"
+    "@types/gulp": "^4.0.6",
+    "globby": "^11.0.1",
+    "gulp": "^4.0.2",
+    "gulp-cli": "^2.3.0",
+    "gulp-exec": "^5.0.0",
+    "ts-protoc-gen": "^0.12.0"
   }
 }
