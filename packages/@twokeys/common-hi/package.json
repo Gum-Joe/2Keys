@@ -7,6 +7,7 @@
   "author": "Kishan <kishansambhi@hotmail.co.uk>",
   "license": "GPL-3.0-or-later",
   "scripts": {
+    "precompile": "gulp protoc",
     "compile:protobuf": "gulp protoc",
     "compile": "yarn run compile:protobuf && tsc -b",
     "lint": "eslint --ext .ts .",

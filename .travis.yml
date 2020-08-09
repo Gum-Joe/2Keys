@@ -19,6 +19,7 @@ before_install:
 install:
   - "\"/c/Program Files (x86)/Yarn/bin/yarn\" --frozen-lockfile"
 before_script:
+  - yarn wsrun -mtc precompile # precompile e.g. protobufs
   - yarn build -v
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
 # NB: server tests ran separately as they assume the CWD is the server package
