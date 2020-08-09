@@ -14,8 +14,8 @@ cache:
   yarn: true
 # Default is fine here
 before_install:
-  # Convery lock file
-  - choco install yarn
+  # Convert lock file & install protoc
+  - choco install yarn protoc
 install:
   - "\"/c/Program Files (x86)/Yarn/bin/yarn\" --frozen-lockfile"
 before_script:
