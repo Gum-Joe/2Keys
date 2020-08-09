@@ -195,7 +195,7 @@ export default class Logger {
 	/**
 	 * Used to log the main status of the task in progress, for example, the overarching task currently in progress.
 	 * Here it just log to info, but will be overriden with a proper implementation for CLI and GUI
-	 * @param message Us
+	 * @param message Message to send
 	 */
 	public status(message: string): void {
 		this.info(message);
@@ -204,7 +204,7 @@ export default class Logger {
 	/**
 	 * Used to log the status of a subtask in progress (i.e. part of the task that was logged with {@link Logger.statis})
 	 * Here it just log to info, but will be overriden with a proper implementation for CLI and GUI
-	 * @param message Us
+	 * @param message Message to send
 	 */
 	public substatus(message: string): void {
 		this.info(message);
