@@ -25,7 +25,9 @@
       "**/node-addon-api",
       "**/node-addon-api/**",
       "**/chalk",
-      "**/chalk/**"
+      "**/chalk/**",
+      "**/ts-protoc-gen",
+      "**/ts-protoc-gen/**"
     ]
   },
   "devDependencies": {

@@ -5,7 +5,7 @@ import exec from "gulp-exec";
 import gulp, { watch } from "gulp";
 import path from "path";
 
-const PROTOC_GEN_TS_PATH = "..\\..\\..\\node_modules\\.bin\\protoc-gen-ts.cmd";
+const PROTOC_GEN_TS_PATH = ".\\node_modules\\.bin\\protoc-gen-ts.cmd";
 const OUT_DIR = "src";
 const SOURCE_DIR_RELATIVE = "src";
 const SOURCE_DIR = path.join(__dirname, SOURCE_DIR_RELATIVE);
