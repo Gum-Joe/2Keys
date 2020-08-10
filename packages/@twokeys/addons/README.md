@@ -1,6 +1,7 @@
 # @twokeys/addons
-Contains code for the management of add0ons in 2Keys.
+Contains code for the management of add-ons in 2Keys.
 
-Two directories:
-- `src/registry`: Contains code for the add-on registry, which caches a list of add-ons and what they can do for quick loading
-- `src/manager`: Contains the code for add-on manageent, that is the installing and uninstalling of them.
+The way this works is by having a central registry that indexes installed add-ons (which are installed via `npm`) and the software that goes with them (such as AHK; this is set by add-ons themselves).
+The code for managing the registry is stored in `src/registry.ts` and `src/software.ts` and `src/software-query-provider.ts`.
+
+Also this package contains the definitons of what function should be exported per add-on type; see `src/module-interfaces`.

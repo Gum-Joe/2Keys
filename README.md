@@ -18,11 +18,31 @@ Windows is supported only as the server (where the hotkeys will run) and a raspb
 This will download a copy of [AutoHotkey_H](https://hotkeyit.github.io/v2/), a DLL version of [AutoHotkey](http://autohotkey.com/)
 
 ## Building
-To build & install the server, where hotkeys are run (for development purposes):
+~~To build & install the server, where hotkeys are run (for development purposes):~~
 ```
+# IGNORE
 $ yarn
 $ yarn build
 $ yarn link
+```
+
+To build all packages:
+```shell
+$ yarn
+$ yarn wsrun -mtc precompile # compiles protobuf definiton files
+$ yarn build # use yarn build -v to display more detailed output -> this builds the TS files
+```
+
+To test everything:
+```shell
+$ yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug # Downloads AHK for testing
+$ yarn test:all # use yarn coverage:all for coverage
+```
+
+To test packages one by one:
+```shell
+$ yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug # Downloads AHK for testing
+$ yarn workspaces run test
 ```
 
 To build the detector (after installing [Pipenv](https://github.com/pypa/pipenv)) (for development purposes):
@@ -54,7 +74,7 @@ Inspired by LTT editor Taran's second keyboard project: [https://github.com/Tara
 2Keys uses AutoHotkey_H (a DLL version of AutoHotkey): [https://hotkeyit.github.io/v2/](https://hotkeyit.github.io/v2/)
 
 ## License
-Copyright 2018 Kishan Sambhi
+Copyright 2020 Kishan Sambhi
 
 2Keys is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
