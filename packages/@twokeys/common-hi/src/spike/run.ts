@@ -19,12 +19,13 @@ const logger = new Logger({
 	name: "spike",
 })
 
+// WARNING! Computer specific!
 factory.callCommand(commands.oobe, {
 	pcName: "server",
 	didAcceptLicense: true,
 	registryRoot: TWOKEYS_DEFAULT_REGISTRY_ROOT,
 	networkAdapter: "Network Bridge",
-	ipv4Address: "192.168.0.40",
+	ipv4Address: "192.168.0.50",
 	// TODO: Create test module
 	addonInstallListList: []
 }).catch(err => {

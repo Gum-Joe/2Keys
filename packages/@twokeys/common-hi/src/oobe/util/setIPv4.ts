@@ -36,6 +36,34 @@ export const IPV4_REGEXP = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?
 // NOTE: May need changing for internationlisation
 export const IFACE_REGEXP = /^[\w\-\s]+$/;
 
+function checkIP(twokeys: BaseTwoKeysForCommands, config: SetStaticIPv4): Promise<void> {
+	return new Promise((resolve, reject) => {
+		twokeys.logger.info("Checking IP was set....");
+		let isSet = false;
+		const timer = setInterval(function () {
+			const newIfaces = networkInterfaces();
+			const newIface = newIfaces[config.networkAdapter];
+			const newFilteredIFace = newIface.filter(value => value.family === "IPv4");
+			if (newFilteredIFace[0].address !== config.ipv4) {
+				twokeys.logger.debug(`Not yet set. Got ${newFilteredIFace[0].address}.`);
+			} else {
+				isSet = true;
+				clearInterval(timer);
+				resolve();
+			}
+		}, 1500);
+
+		// after 10 seconds stop
+		// If isSet is false promise is yet to resolve and interval not cleared
+		setTimeout(() => {
+			if (!isSet) {
+				clearInterval(timer);
+				reject(new CodedError("IPv4 address was not set (within 10 secs)!", errorCodes.NET_IPV4_NOT_SET));
+			}
+		}, 7000);
+	});
+}
+
 /**
  * Sets a static IPv4 address for the server
  * @param twokeys TwoKeys object to use for logging
@@ -68,25 +96,20 @@ export default async function setStaticIPv4Address(twokeys: BaseTwoKeysForComman
 	const theIFace = filteredIFace[0];
 	twokeys.logger.info(`Current IP: ${theIFace.address}`);
 	twokeys.logger.info("Changing your IP.  Please wait, this may take a moment...");
+	await twokeys.logger.prompts.info("About to set your IPv4 address to a static IP.  Please accept the UAC prompt when prompted.");
 	// NOTE: BE CAREFUL HERE!
 	// Easy to do command injection
 	// Ensure the IP address is valid (checked above)
 	// And the network interface is a real one (also checked above)
-	const command = `start powershell -Command "Start-Process netsh -Verb runAs -ArgumentList 'interface ipv4 set address name="${config.networkAdapter}" static ${config.ipv4}'"`;
+	// start powershell -noexit -command "Start-Process netsh -Verb runAs -ArgumentList \"interface ipv4 set address name=`\"Network Bridge`\" static 192.168.0.40\""
+	const command = `start powershell -Command "Start-Process netsh -Verb runAs -ArgumentList \\"interface ipv4 set address name=\`\\"${config.networkAdapter}\`\\" static ${config.ipv4}\\""`;
 	twokeys.logger.debug(`Command: ${command}`);
 	const res = await exec(command);
 	twokeys.logger.debug(res.stdout);
 	twokeys.logger.err(res.stderr);
-	twokeys.logger.info("IP address set.");
+	twokeys.logger.info("IP address set command ran.");
 
-	twokeys.logger.debug("Checking....");
-	const newIfaces = networkInterfaces();
-	const newIface = newIfaces[config.networkAdapter];
-	const newFilteredIFace = newIface.filter(value => value.family === "IPv4");
-
-	if (newFilteredIFace[0].address !== config.ipv4) {
-		throw new CodedError(`Could not set IPv4 address! Got back ${newFilteredIFace[0].address}`, errorCodes.NET_IPV4_NOT_SET);
-	}
+	await checkIP(twokeys, config);
 
 	twokeys.logger.info("Done.");
 
