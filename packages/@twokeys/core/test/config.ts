@@ -25,8 +25,8 @@ import mkdirp from "mkdirp";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { promises as fs, constants as fsconstants } from  "fs";
-import { loadConfig, loadServerConfig } from "../src/config";
-import { CONFIG_DEFAULT_FILE_SERVER } from "../src/constants";
+import { loadConfig, loadMainConfig } from "../src/config";
+import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "../src/constants";
 
 // Setup
 chai.use(chaiAsPromised);
@@ -54,19 +54,19 @@ describe("Config tests", () => {
 		before(async () => {
 			// Create file if it does not exist
 			try {
-				await fs.access(CONFIG_DEFAULT_FILE_SERVER, fsconstants.F_OK);
+				await fs.access(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, fsconstants.F_OK);
 			} catch (err) {
 				if (err.code === "ENOENT") {
 					// Create
-					await mkdirp(path.dirname(CONFIG_DEFAULT_FILE_SERVER));
-					await fs.writeFile(CONFIG_DEFAULT_FILE_SERVER, "name: test\nversion: 1.0.0\n");
+					await mkdirp(path.dirname(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH));
+					await fs.writeFile(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, "name: test\nversion: 1.0.0\n");
 				} else {
 					throw err;
 				}
 			}
 		});
-		it("should sucessfully load the server config", async () => {
-			await expect(loadServerConfig()).to.eventually.be.a("object");
+		it("should sucessfully load the main config", async () => {
+			await expect(loadMainConfig()).to.eventually.be.a("object");
 		});
 	});
 });
