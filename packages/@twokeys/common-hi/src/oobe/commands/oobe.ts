@@ -27,14 +27,13 @@ import type { OOBEConfig } from "../protobuf/oobe_pb";
 import { loadMainConfig, stringifyMainConfig } from "@twokeys/core/lib/config";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
 import { CodedError } from "@twokeys/core";
-import * as errorCodes from "./errors";
+import * as errorCodes from "../util/errors";
 import { MainConfig } from "@twokeys/core/lib/interfaces";
-// @ts-ignore
 import packageJSON from "../../../package.json";
 import path from "path";
 import { promises as fs } from "fs";
 import mkdirp from "mkdirp";
-import setStaticIPv4Address from "./setIPv4";
+import setStaticIPv4Address from "../util/setIPv4";
 import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
 
 // TODO: Set IP address
@@ -70,6 +69,8 @@ const command: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: Bas
 		logger.debug(err.message);
 		if (err.code === "ENOENT") {
 			twokeys.logger.info("No config found, assuming oobe has not been ran.");
+		} else if (err instanceof CodedError) {
+			throw err;
 		} else {
 			twokeys.logger.err(`Some other error was encountered accessing main config at ${TWOKEYS_MAIN_CONFIG_DEFAULT_PATH}`);
 			throw new Error(`Eror getting main config at ${TWOKEYS_MAIN_CONFIG_DEFAULT_PATH}: ${err.message}`);
@@ -94,7 +95,7 @@ const command: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: Bas
 	logger.info("Config written.");
 
 	// Set IP address
-	setStaticIPv4Address(twokeys, {
+	await setStaticIPv4Address(twokeys, {
 		networkAdapter: config.networkAdapter,
 		ipv4: config.ipv4Address,
 	});

@@ -23,9 +23,10 @@ factory.callCommand(commands.oobe, {
 	pcName: "server",
 	didAcceptLicense: true,
 	registryRoot: TWOKEYS_DEFAULT_REGISTRY_ROOT,
-	networkAdapter: "TODO",
-	ipv4Address: "192.168.0.50",
-	addonInstallListList: ["@twokeys/executor-ahk"]
+	networkAdapter: "Network Bridge",
+	ipv4Address: "192.168.0.40",
+	// TODO: Create test module
+	addonInstallListList: []
 }).catch(err => {
 	logger.printError(err);
 	process.exit(1);
