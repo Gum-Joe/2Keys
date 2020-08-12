@@ -36,8 +36,12 @@ import mkdirp from "mkdirp";
 import setStaticIPv4Address from "../util/setIPv4";
 import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
 
-// TODO: Set IP address
-const command: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: BaseTwoKeysForCommands, config: OOBEConfig.AsObject): Promise<void> => {
+/**
+ * Runs OOBE, setting up the main config needed for 2Keys.
+ * @see TWOKEYS_MAIN_CONFIG_DEFAULT_PATH for the path to config
+ * @see MainConfig for config schema
+ */
+const oobe: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: BaseTwoKeysForCommands, config: OOBEConfig.AsObject): Promise<void> => {
 	twokeys.logger.info("Starting OOBE....");
 	twokeys.logger.status("Setting up 2Keys");
 	if (!config.didAcceptLicense) {
@@ -118,4 +122,4 @@ const command: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: Bas
 	// TODO: Update config with oobe: true
 }
 
-export default CommandFactory.wrapCommand(command, "oobe");
+export default CommandFactory.wrapCommand(oobe, "oobe");
