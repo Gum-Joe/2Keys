@@ -1,17 +1,19 @@
 syntax = "proto3";
 
+// NB: snake_case is mapped to camelCase in generated code
 message OOBEConfig {
-	bool didAcceptLicenseAgreement = 1;
-	string serverName = 2;
+	bool did_accept_license = 1;
+	// Default to hostname
+	string pc_name = 2;
 
-	enum ThemeOptions {
+	/**enum ThemeOptions {
 		LIGHT = 0;
 		DARK = 1;
 	}
-	ThemeOptions theme = 3;
-	string configLocation = 4;
-	string registryLocation = 5;
-	string networkAdapter = 6;
+	ThemeOptions theme = 3;*/ // GUI only
+	string registry_root = 3;
+	string network_adapter = 4;
+	string ipv4_address = 5;
 	// repated = array of
-	repeated string moduleInstallList = 7;
+	repeated string addon_install_list = 6;
 }

@@ -29,6 +29,7 @@ import type { ISqlite } from "sqlite";
 import { Logger } from "@twokeys/core";
 import { REGISTRY_FILE_NAME, SOFTWARE_TABLE_NAME, CREATE_SOFTWARE_DB_QUERY, EXECUTABLES_TABLE_NAME, CREATE_EXECUTABLES_DB_QUERY, SOFTWARE_ROOT_FOLDER } from "./util/constants";
 import { SoftwareInDB, ExecutableInDB, SoftwareDirectlyFromDB, ExecutableDirectlyFromDB, SQLBool, } from "./util/interfaces";
+import mkdirp from "mkdirp";
 
 /** Options for a new Software registry DB Provider */
 export interface SoftwareRegistryDBProviderOptions {
@@ -259,6 +260,8 @@ export default class SoftwareRegistryQueryProvider {
 			logger.debug("Closing...");
 			await db.close();
 			logger.info("SQLite registry DB & tables created.");
+			await mkdirp(join(directory, SOFTWARE_ROOT_FOLDER));
+			logger.info("Software install dir created.");
 		} catch (err) {
 			logger.err("An error was encountered!");
 			if (err.code === "ENOENT") {

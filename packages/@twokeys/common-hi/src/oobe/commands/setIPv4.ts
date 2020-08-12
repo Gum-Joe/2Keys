@@ -17,16 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import { BaseTwoKeysForCommands } from "../../common";
+
+export interface SetStaticIPv4 {
+	networkAdapter: string;
+	ipv4: string;
+}
+
 /**
- * Exports stuff for registry
- * @packageDocumentation
+ * Sets a static IPv4 address for the server
+ * @param twokeys TwoKeys object to use for logging
+ * @param config Config
  */
-
-export * from "./registry";
-export * from "./util/interfaces";
-export * from "./util/constants";
-export * from "./module-interfaces";
-export * from "./dev-tools";
-
-export { default as AddOnsRegistry } from "./registry";
-export { default as SoftwareRegistry } from "./software";
+export default async function setStaticIPv4Address(twokeys: BaseTwoKeysForCommands, config: SetStaticIPv4): Promise<void> {
+	twokeys.logger.substatus("Setting an ipv4 address...")
+	twokeys.logger.info(`Address: ${config.ipv4}`);
+	twokeys.logger.warn("NOT YET IMPLEMENTED!");
+}

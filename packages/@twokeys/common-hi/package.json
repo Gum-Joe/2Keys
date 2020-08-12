@@ -9,7 +9,7 @@
   "scripts": {
     "precompile": "gulp protoc",
     "compile:protobuf": "gulp protoc",
-    "compile": "yarn run compile:protobuf && tsc -b",
+    "compile": "tsc -b",
     "lint": "eslint --ext .ts .",
     "watch": "tsc -b --watch",
     "watch:protobuf": "gulp protoc:watch",
@@ -19,10 +19,13 @@
   },
   "dependencies": {
     "@twokeys/core": "^1.0.0",
-    "google-protobuf": "^3.12.4"
+    "@twokeys/addons": "^1.0.0",
+    "google-protobuf": "^3.12.4",
+    "mkdirp": "^1.0.4"
   },
   "devDependencies": {
     "@types/gulp": "^4.0.6",
+    "@types/mkdirp": "^1.0.1",
     "globby": "^11.0.1",
     "gulp": "^4.0.2",
     "gulp-cli": "^2.3.0",

@@ -24,5 +24,14 @@
 import { join } from "path";
 import { homedir } from "os";
 
-/** Default location of 2Keys project config (see interface {@link ServerConfig}) */
-export const CONFIG_DEFAULT_FILE_SERVER = join(process.env.APPDATA || join(homedir(), "AppData", "Roaming"), "2Keys", "2Keys.yml");
+/**
+ * Root Home where all 2Keys stuff is stored
+ */
+export const TWOKEYS_HOME = join(homedir(), ".2Keys");
+/** Root where all config related items are stored */
+export const TWOKEYS_CONFIG_HOME = join(TWOKEYS_HOME, "config");
+/** Default location of 2Keys main config (see interface {@link ServerConfig}).  Is the only fixed config location. */
+export const TWOKEYS_MAIN_CONFIG_DEFAULT_PATH = join(TWOKEYS_CONFIG_HOME,  "config.yml");
+/** root dir for the storage of detector configs */
+export const TWOKEYS_DETECTOR_CONFIG_ROOT = join(TWOKEYS_HOME, "detectors");
+// NOTE: Check @twokeys/addons for default registry root

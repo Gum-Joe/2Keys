@@ -230,15 +230,36 @@ export interface DetectorConfig {
 
 /**
  * Interface to define the 'root' config.
- * This is the config the configures a 2Keys server.
- * It is default stored in AppData.
- * @interface ServerConfig
+ * This is the config the configures 2Keys for a specific device.
+ * **It is different to the config for one server**
+ * It is default stored in {@link TWOKEYS_MAIN_CONFIG_DEFAULT_PATH}
+ * @interface MainConfig
  */
-export interface ServerConfig {
+export interface MainConfig {
 	/** Name of server */
 	name: string;
 	/** SemVer version of 2Keys used as server */
 	version: string;
+	/**
+	 * Root for registry.
+	 * Uses the defaults in @twokeys/addons for files, such as the DB
+	 */
+	registry_root: string;
+	/** 
+	 * Has OOBE been ran?
+	 */
+	oobe: boolean;
+	/** Network info */
+	network: {
+		/** Name of adapter in use */
+		adapter: string;
+		/** IPv4 address of this server */
+		ipv4: string;
+	}
+}
+
+/** Config for the UI */
+export interface UIConfig {
 	/**
 	 * Theme to use.
 	 * This is disabled as there are no themes
@@ -250,13 +271,9 @@ export interface ServerConfig {
 	 * Defaults to system accent
 	 */
 	accent: string;
-	/**
-	 * Location of installed add-ons
-	 */
-	add_ons_location: string;
 }
 
 /**
  * Type to represent one of the above configs (that is loaded from a file)
  */
-export type CombinedConfigs = ServerConfig | DetectorConfig | ClientConfig | ProjectConfig;
+export type CombinedConfigs = MainConfig | DetectorConfig | ClientConfig | ProjectConfig;

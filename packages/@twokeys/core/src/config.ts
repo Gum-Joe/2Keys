@@ -24,9 +24,9 @@
  */
 import { promises as fs } from "fs";
 import YAML from "yaml";
-import { ServerConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs } from "./interfaces";
+import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs } from "./interfaces";
 import Logger from "./logger";
-import { CONFIG_DEFAULT_FILE_SERVER } from "./constants";
+import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "./constants";
 
 const logger = new Logger({
 	name: "config",
@@ -42,21 +42,24 @@ const logger = new Logger({
  * @param configFile File to load config from
  */
 export async function loadConfig<ConfigType extends CombinedConfigs>(configFile: string): Promise<ConfigType> {
-	try {
-		logger.debug("Reading config from file " + configFile);
-		const config: Buffer = await fs.readFile(configFile);
-		const parsedConfig: ConfigType = YAML.parse(config.toString());
-		return parsedConfig;
-	} catch (err) {
-		logger.err("ERROR READING CONFIG FILE " + configFile);
-		throw err; // Handled by callback
-	} 
+	logger.debug("Reading config from file " + configFile);
+	const config: Buffer = await fs.readFile(configFile);
+	const parsedConfig: ConfigType = YAML.parse(config.toString());
+	return parsedConfig;
+	// NOTE: We let whatever is calling it handle the error
 }
 
 /**
- * Loads the main server config from the default dir ({@link CONFIG_DEFAULT_FILE_SERVER})
+ * Loads the main config from the default dir ({@link CONFIG_DEFAULT_FILE_SERVER})
  */
-export async function loadServerConfig(file = CONFIG_DEFAULT_FILE_SERVER): Promise<ServerConfig> {
+export async function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<MainConfig> {
 	logger.debug(`Loading server config from file ${file}...`);
-	return loadConfig<ServerConfig>(file);
+	return loadConfig<MainConfig>(file);
+}
+
+/**
+ * Stringifies to YAML the main config
+ */
+export function stringifyMainConfig(config: MainConfig): string {
+	return YAML.stringify(config);
 }

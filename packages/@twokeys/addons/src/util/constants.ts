@@ -22,8 +22,12 @@
  * @packageDocumentation
  */
 
+import { join } from "path";
+import { TWOKEYS_HOME } from "@twokeys/core/lib/constants";
+
 export const PACKAGE_VERSION = require("../../package.json").version;
 
+export const TWOKEYS_DEFAULT_REGISTRY_ROOT = join(TWOKEYS_HOME, "registry");
 export const REGISTRY_FILE_NAME = "twokeys-registry.db";
 
 /** The default package.json file created that represents what's installed in the registry */
