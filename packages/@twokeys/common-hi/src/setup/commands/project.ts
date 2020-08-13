@@ -50,6 +50,7 @@ export const TWOKEYS_CONFIG_PRELUDE = `# 2Keys Project Config
 const createProject: Command<Required<CreateProject.AsObject>, Promise<void>> = async (twokeys, config) => {
 	const { logger } = twokeys;
 	logger.status("Creating new project");
+	logger.substatus("Creating config");
 	logger.info("Validating info...");
 	if (typeof config.serverInfo === "undefined") {
 		throw new CodedError("Did not get any server info!", errorCodes.MISSING_PROPS);
@@ -85,6 +86,8 @@ const createProject: Command<Required<CreateProject.AsObject>, Promise<void>> = 
 	logger.info("Done");
 
 	// TODO: Add project to startup
+	
+	// TODO: Index project
 
 };
 

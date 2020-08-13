@@ -26,7 +26,9 @@ import { promises as fs } from "fs";
 import YAML from "yaml";
 import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs } from "./interfaces";
 import Logger from "./logger";
-import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "./constants";
+import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, TWOKEYS_PROJECT_CONFIG_FILENAME } from "./constants";
+import { join } from "path";
+import { CodedError } from "./error";
 
 const logger = new Logger({
 	name: "config",
@@ -55,6 +57,24 @@ export async function loadConfig<ConfigType extends CombinedConfigs>(configFile:
 export async function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<MainConfig> {
 	logger.debug(`Loading server config from file ${file}...`);
 	return loadConfig<MainConfig>(file);
+}
+
+/**
+ * Loads the project config from a dir
+ * @param projectPath absolute path to project to load
+ */
+export async function loadProjectConfig(projectPath: string): Promise<ProjectConfig> {
+	const file = join(projectPath, TWOKEYS_PROJECT_CONFIG_FILENAME);
+	logger.debug(`Loading project config from file ${file}...`);
+	try {
+		return await loadConfig<ProjectConfig>(file);
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			throw new CodedError("Attempted to load a config that was not a project", "INVALID_PROJECT");
+		} else {
+			throw err;
+		}
+	}
 }
 
 /**
