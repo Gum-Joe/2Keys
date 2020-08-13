@@ -37,11 +37,20 @@ import setStaticIPv4Address from "../util/setIPv4";
 import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
 
 /**
+ * Additonal options
+ */
+export interface AdditonalOOBEOptions {
+	/** Proceed regarless of if oobe has already been done */
+	// TODO: Implement better
+	force: boolean;
+}
+
+/**
  * Runs OOBE, setting up the main config needed for 2Keys.
  * @see TWOKEYS_MAIN_CONFIG_DEFAULT_PATH for the path to config
  * @see MainConfig for config schema
  */
-const oobe: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: BaseTwoKeysForCommands, config: OOBEConfig.AsObject): Promise<void> => {
+const oobe: Command<OOBEConfig.AsObject & Partial<AdditonalOOBEOptions>, Promise<void>> = async (twokeys: BaseTwoKeysForCommands, config: OOBEConfig.AsObject & Partial<AdditonalOOBEOptions>): Promise<void> => {
 	twokeys.logger.info("Starting OOBE....");
 	twokeys.logger.status("Setting up 2Keys");
 	if (!config.didAcceptLicense) {
@@ -53,14 +62,14 @@ const oobe: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: BaseTw
 	const logger = twokeys.logger;
 	try {
 		const serverConfig = await loadMainConfig(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH);
-		if (serverConfig.oobe) {
+		if (serverConfig.oobe && !config.force) {
 			logger.prompts.warning("Not running OOBE as main config already exists and says oobe has been ran.", {
 				buttons: ["Ok"],
 				defaultButton: 0,
 			});
 			return;
 		} else {
-			const { response } = await logger.prompts.warning("Found existing main config that says OOBE was not completed. It will be overwritten. Continue?", {
+			const { response } = await logger.prompts.warning("Found existing main config. It will be overwritten. Continue?", {
 				defaultButton: 0,
 			});
 			if (response !== 0) {
@@ -106,20 +115,27 @@ const oobe: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys: BaseTw
 
 	// Create registry
 	logger.substatus("Creating add-ons registry");
-	await AddOnsRegistry.createNewRegistry(configToWrite.registry_root);
+	await AddOnsRegistry.createNewRegistry(configToWrite.registry_root, {
+		Logger: twokeys.LoggerConstructor,
+	});
 	logger.substatus("Creating software registry");
-	await SoftwareRegistry.createSoftwareRegistry(configToWrite.registry_root);
+	await SoftwareRegistry.createSoftwareRegistry(configToWrite.registry_root, undefined, twokeys.LoggerConstructor);
 
 	// Install stuff
 	logger.status("Installing add-ons");
 	logger.debug("Loading registry...");
-	const registry = new AddOnsRegistry(configToWrite.registry_root);
+	const registry = new AddOnsRegistry(configToWrite.registry_root, {
+		Logger: twokeys.LoggerConstructor,
+	});
 	for (const addOn of config.addonInstallListList) {
 		logger.substatus(`Installing add-on ${addOn}...`);
 		await registry.install(addOn);
 	}
 
-	// TODO: Update config with oobe: true
+	logger.status("Finishing up");
+	configToWrite.oobe = true;
+	await fs.writeFile(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, stringifyMainConfig(configToWrite));
+	logger.info("Done.");
 }
 
 export default CommandFactory.wrapCommand(oobe, "oobe");

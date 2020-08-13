@@ -242,9 +242,9 @@ export default class SoftwareRegistryQueryProvider {
 	 * @param directory Directory to create registry in
 	 * @param fileName Filename of registry, defaulting to {@link REGISTRY_FILE_NAME} (it is recomended you leave it as the default)
 	 */
-	public static async createSoftwareRegistry(directory: string, fileName: string = REGISTRY_FILE_NAME): Promise<void> {
+	public static async createSoftwareRegistry(directory: string, fileName: string = REGISTRY_FILE_NAME, LoggerConstructor = Logger): Promise<void> {
 		// Create DB
-		const logger = new Logger({ name: "add-ons:software" });
+		const logger = new LoggerConstructor({ name: "add-ons:software" });
 		try {
 			const fullFilePath = join(directory, fileName);
 			logger.info("Creating a software DB...");

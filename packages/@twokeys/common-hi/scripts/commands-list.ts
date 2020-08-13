@@ -85,13 +85,13 @@ type CommandsMap = Map<string, string>;
 		const relativeFilePath = relative(dirname(OUT_FILE), command.file);
 		const filePathWithoutExt = join(path.parse(relativeFilePath).dir, path.parse(relativeFilePath).name);
 		return `import command${index} from "./${filePathWithoutExt.split(path.sep).join("/")}"`;
-	})}
+	}).join("\n")}
 
 	// Map
 	export = {
 	${mappedCommands.map((command, index) => {
-		return `"${command.commandName}": command${index}`;
-	})}
+		return `"${command.commandName}": command${index},`;
+	}).join("\n")}
 	}
 	`;
 	await fs.writeFile(OUT_FILE, finalFile);

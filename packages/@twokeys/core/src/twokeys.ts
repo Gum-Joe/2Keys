@@ -58,8 +58,8 @@ export type TwoKeysWithAllProperties = TwoKeys & { properties: AllTwoKeysPropert
  */
 export abstract class TwoKeys {
 	public readonly logger: Logger;
-	constructor(LoggerConstructor: typeof Logger, logName: string, public readonly properties: TwoKeysProperties) {
-		this.logger = new LoggerConstructor({
+	constructor(public readonly LoggerConstructor: typeof Logger, logName: string, public readonly properties: TwoKeysProperties) {
+		this.logger = new this.LoggerConstructor({
 			name: logName,
 		});
 	}

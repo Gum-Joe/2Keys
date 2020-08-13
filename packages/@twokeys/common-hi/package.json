@@ -15,7 +15,8 @@
     "watch:protobuf": "gulp protoc:watch",
     "docs": "typedoc",
     "test": "cross-env NODE_ENV=test mocha",
-    "coverage": "cross-env NODE_ENV=test nyc mocha"
+    "coverage": "cross-env NODE_ENV=test nyc mocha",
+    "commandlist": "ts-node -T scripts/commands-list.ts"
   },
   "dependencies": {
     "@twokeys/core": "^1.0.0",

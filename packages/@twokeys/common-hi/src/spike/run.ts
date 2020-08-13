@@ -27,7 +27,8 @@ factory.callCommand(commands.oobe, {
 	networkAdapter: "Network Bridge",
 	ipv4Address: "192.168.0.50",
 	// TODO: Create test module
-	addonInstallListList: []
+	addonInstallListList: [],
+	force: true,
 }).catch(err => {
 	logger.printError(err);
 	process.exit(1);
