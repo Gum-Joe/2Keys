@@ -35,3 +35,9 @@ export const TWOKEYS_MAIN_CONFIG_DEFAULT_PATH = join(TWOKEYS_CONFIG_HOME,  "conf
 /** root dir for the storage of detector configs */
 export const TWOKEYS_DETECTOR_CONFIG_ROOT = join(TWOKEYS_HOME, "detectors");
 // NOTE: Check @twokeys/addons for default registry root
+/**
+ * Name of config file for projects
+ * NOTE: BE CAREFUL BEFORE CHANGING AS IT WILL BREAK THINGS!!!!!!!
+ */
+export const TWOKEYS_PROJECT_CONFIG_FILENAME = "config.yml";
+

@@ -63,3 +63,10 @@ export async function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): P
 export function stringifyMainConfig(config: MainConfig): string {
 	return YAML.stringify(config);
 }
+
+/**
+ * Stringifies to YAML project config
+ */
+export function stringifyProjectConfig(config: ProjectConfig): string {
+	return YAML.stringify(config);
+}

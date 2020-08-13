@@ -91,7 +91,7 @@ export default async function setStaticIPv4Address(twokeys: BaseTwoKeysForComman
 	const filteredIFace = iface.filter(value => value.family === "IPv4");
 	if (filteredIFace.length > 1) {
 		twokeys.logger.debug(JSON.stringify(filteredIFace));
-		throw new CodedError(`Found more than 1 IPv4 address for network interface ${config.networkAdapter}!  2Keys doesn't yet know how to handle this.`);
+		throw new CodedError(`Found more than 1 IPv4 address for network interface ${config.networkAdapter}!  2Keys doesn't yet know how to handle this.`, errorCodes.NET_TOO_MANY_ENTRIES);
 	}
 	const theIFace = filteredIFace[0];
 	twokeys.logger.info(`Current IP: ${theIFace.address}`);

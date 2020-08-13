@@ -91,6 +91,14 @@ export interface ProjectConfig {
 	 * This is different from the client config files, as these are stored in the project dir
 	 */
 	detectors: string[];
+	/** Project permissions */
+	perms: {
+		/**
+		 * Sync with 2Keys cloud.
+		 * 
+		 * **RESERVED FOR FUTURE USE, NOT YET IMPLEMENTED** */
+		sync: false;
+	};
 }
 
 /**
@@ -255,7 +263,7 @@ export interface MainConfig {
 		adapter: string;
 		/** IPv4 address of this server */
 		ipv4: string;
-	}
+	};
 }
 
 /** Config for the UI */

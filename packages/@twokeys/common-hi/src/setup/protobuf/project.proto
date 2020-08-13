@@ -5,11 +5,12 @@ message CreateProject {
 	string project_name = 1;
 	/** Abolsute path to project */
 	string project_location = 2;
+	string project_uuid = 3;
 	message Permissions {
 		/** RESERVED FOR FURURE USE - defaults to false */
 		bool allow_sync = 2;
 	}
-	Permissions permissions = 3;
+	Permissions permissions = 4;
 	message ServerInfo {
 		message ServerPermissions {
 			bool allow_startup = 1;
@@ -17,5 +18,5 @@ message CreateProject {
 		uint32 server_port = 1;
 		ServerPermissions permissions = 2;
 	}
-	ServerInfo server_info = 4;
+	ServerInfo server_info = 5;
 }

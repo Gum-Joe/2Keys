@@ -17,3 +17,6 @@ export const NET_INVALID_IPV4 = "INET_INVALID_IPV4";
 export const NET_INVALID_INTERFACE_NAME = "INET_INVALID_OR_UNSAFE_NAME";
 /** When IPV4 address was not set and is wrong */
 export const NET_IPV4_NOT_SET = "INET_IPV4_NOT_SET";
+
+/** Missing properties */
+export const MISSING_PROPS = "MISSING_PROPS";

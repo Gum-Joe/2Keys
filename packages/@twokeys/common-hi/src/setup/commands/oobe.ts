@@ -21,20 +21,19 @@
  * Runs OOBE
  * @packageDocumentation
  */
-
-import { Command, BaseTwoKeysForCommands, CommandFactory } from "../../common";
-import type { OOBEConfig } from "../protobuf/oobe_pb";
-import { loadMainConfig, stringifyMainConfig } from "@twokeys/core/lib/config";
-import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
-import { CodedError } from "@twokeys/core";
-import * as errorCodes from "../util/errors";
-import { MainConfig } from "@twokeys/core/lib/interfaces";
-import packageJSON from "../../../package.json";
 import path from "path";
 import { promises as fs } from "fs";
 import mkdirp from "mkdirp";
-import setStaticIPv4Address from "../util/setIPv4";
+import { loadMainConfig, stringifyMainConfig } from "@twokeys/core/lib/config";
+import { CodedError } from "@twokeys/core";
+import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
+import { MainConfig } from "@twokeys/core/lib/interfaces";
 import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
+import { Command, BaseTwoKeysForCommands, CommandFactory } from "../../common";
+import type { OOBEConfig } from "../protobuf/oobe_pb";
+import * as errorCodes from "../util/errors";
+import packageJSON from "../../../package.json";
+import setStaticIPv4Address from "../util/setIPv4";
 
 /**
  * Additonal options
