@@ -29,8 +29,8 @@ import {
 	DEFAULT_LOCAL_2KEYS,
 	WINDOWS_DAEMON_FILE,
 	WINDOWS_DAEMON_PID_FILE,
-	//WINDOWS_DAEMON_FILE_JS_TEMPLATE,
-	//WINDOWS_DAEMON_FILE_VBS_TEMPLATE,
+	WINDOWS_DAEMON_FILE_JS_TEMPLATE,
+	WINDOWS_DAEMON_FILE_VBS_TEMPLATE,
 	WINDOWS_DAEMON_FILE_VBS,
 	WINDOWS_SERVER_PID_FILE } from "../util/constants";
 import { writeFileSync, readFile, symlinkSync, readFileSync, promises as fs } from "fs";
@@ -45,6 +45,8 @@ import { loadProjectConfig } from "@twokeys/core/lib/config";
 
 
 const Mustache = require("mustache");
+
+// TODO: Figure out how templates are handled
 
 /**
  * Hacky way to generate daemon startup JS

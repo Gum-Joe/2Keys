@@ -4,8 +4,8 @@ import { join } from "path";
 export const WINDOWS_DAEMON_PREFIX = "2Keys-";
 export const WINDOWS_DAEMON_FILE = "daemon.js";
 export const WINDOWS_DAEMON_FILE_VBS = "daemon.vbs";
-//export const WINDOWS_DAEMON_FILE_JS_TEMPLATE = join(__dirname, `../../assets/${WINDOWS_DAEMON_FILE}`);
-//export const WINDOWS_DAEMON_FILE_VBS_TEMPLATE = join(__dirname, `../../assets/${WINDOWS_DAEMON_FILE_VBS}`);
+export const WINDOWS_DAEMON_FILE_JS_TEMPLATE = join(__dirname, `../../assets/${WINDOWS_DAEMON_FILE}`);
+export const WINDOWS_DAEMON_FILE_VBS_TEMPLATE = join(__dirname, `../../assets/${WINDOWS_DAEMON_FILE_VBS}`);
 export const WINDOWS_DAEMON_PID_FILE = "daemon.pid";
 export const WINDOWS_SERVER_PID_FILE = "server.pid";
 
