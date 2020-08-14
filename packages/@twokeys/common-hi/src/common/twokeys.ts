@@ -62,8 +62,8 @@ export default class BaseTwoKeysForCommands extends TwoKeys {
  * }
  * ```
  */
-export interface FinalTwoKeysConstructor {
-	new(commandInfo: CommandInfo, properties: TwoKeysProperties): BaseTwoKeysForCommands;
+export interface FinalTwoKeysConstructor<TwokeysClass extends BaseTwoKeysForCommands = BaseTwoKeysForCommands> {
+	new(commandInfo: CommandInfo, properties: TwoKeysProperties): TwokeysClass;
 }
 
 /**
