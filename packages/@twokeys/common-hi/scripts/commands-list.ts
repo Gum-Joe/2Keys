@@ -88,11 +88,11 @@ ${mappedCommands.map((command, index) => {
 }).join("\n")}
 
 // Map
-export = new Map([
-${mappedCommands.map((command, index) => {
-	return `	["${command.commandName}", command${index}],`;
-}).join("\n")}
-]);
+export = {
+	${mappedCommands.map((command, index) => {
+		return `"${command.commandName}": command${index},`;
+	}).join("\n")}
+}
 `;
 	await fs.writeFile(OUT_FILE, finalFile);
 	logger.info("File written.");
