@@ -6,7 +6,7 @@
 		"tsBuildInfoFile": "../../../.build-cache/common-hi.tsbuildinfo",
 		"experimentalDecorators": true,
 		// See src/types.d.ts
-		"resolveJsonModule": false,
+		"resolveJsonModule": true,
 	},
 	"include": [
 		"src"
