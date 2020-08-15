@@ -22,7 +22,6 @@
  * @packageDocumentation
  */
 import { join } from "path";
-import { Arguments } from "yargs";
 import mkdirp from "mkdirp";
 import {
 	WINDOWS_DAEMON_PREFIX,
@@ -33,13 +32,11 @@ import {
 	WINDOWS_DAEMON_FILE_VBS_TEMPLATE,
 	WINDOWS_DAEMON_FILE_VBS,
 	WINDOWS_SERVER_PID_FILE } from "../util/constants";
-import { writeFileSync, readFile, symlinkSync, readFileSync, promises as fs } from "fs";
-//import { exec } from "child_process";
+import { promises as fs } from "fs";
 import { homedir } from "os";
 import { Command, CommandFactory } from "../../common";
 import { GenerateProjectDaemon } from "../protobuf/daemon_pb";
 import { CodedError } from "@twokeys/core";
-//import { config_loader } from "../util/config";
 import * as errorCodes from "../../util/errors";
 import { loadProjectConfig } from "@twokeys/core/lib/config";
 
@@ -131,7 +128,7 @@ const generateDaemon: Command<GenerateProjectDaemon.AsObject, Promise<void>> = a
 			throw err;
 		}
 	}
-}
+};
 
 export default CommandFactory.wrapCommand(generateDaemon, "generateProjectDaemon");
 

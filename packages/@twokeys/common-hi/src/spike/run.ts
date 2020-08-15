@@ -18,7 +18,7 @@ const factory = new CommandFactory(Twokeys);
 
 const logger = new Logger({
 	name: "spike",
-})
+});
 
 // WARNING! Computer specific!
 /*factory.callCommand(commands.oobe, {
@@ -51,4 +51,4 @@ factory.callCommand(commands.createProject, {
 }).catch(err => {
 	logger.printError(err);
 	process.exit(1);
-})
+});

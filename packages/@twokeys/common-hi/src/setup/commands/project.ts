@@ -21,11 +21,11 @@
  * Create Project config
  * @packageDocumentation
  */
-import path, { join } from "path";
+import { join } from "path";
 import mkdirp from "mkdirp";
 import { promises as fs } from "fs";
 import { CreateProject } from "../protobuf/project_pb";
-import { Command, BaseTwoKeysForCommands, CommandFactory } from "../../common";
+import { Command, CommandFactory } from "../../common";
 import * as errorCodes from "../util/errors";
 import packageJSON from "../../../package.json";
 import generateDaemon from "./daemon";

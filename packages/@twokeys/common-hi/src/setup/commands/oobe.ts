@@ -135,6 +135,6 @@ const oobe: Command<OOBEConfig.AsObject & Partial<AdditonalOOBEOptions>, Promise
 	configToWrite.oobe = true;
 	await fs.writeFile(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, stringifyMainConfig(configToWrite));
 	logger.info("Done.");
-}
+};
 
 export default CommandFactory.wrapCommand(oobe, "oobe");
