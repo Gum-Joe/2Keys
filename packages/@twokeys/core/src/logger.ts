@@ -182,7 +182,10 @@ export default class Logger {
 		}
 	}
 
-	/** Create a progress bar */
+	/**
+	 * Create a progress bar
+	 * NOTE: On the GUI custom tokens do not matter.
+	 */
 	public createProgressBar(format: string, options: ProgressBar.ProgressBarOptions): ProgressBar {
 		return new ProgressBar(`${this._getPrefix("info", "green")} ${format}`, options);
 	}
