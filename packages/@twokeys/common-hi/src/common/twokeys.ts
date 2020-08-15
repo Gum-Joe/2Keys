@@ -43,7 +43,7 @@ import { CommandInfo } from "./base-commands";
  */
 export default class BaseTwoKeysForCommands extends TwoKeys {
 	constructor(logger: typeof Logger, commandInfo: CommandInfo, properties: TwoKeysProperties) {
-		super(logger, "command:" + commandInfo.commandName, properties);
+		super(logger, commandInfo.commandName, properties);
 	}
 }
 
