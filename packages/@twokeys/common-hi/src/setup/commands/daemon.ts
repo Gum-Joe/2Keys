@@ -52,10 +52,12 @@ const Mustache = require("mustache");
  * Hacky way to generate daemon startup JS
  * @param name Name of 2Keys project, from config
  * @param relativeDir relative .2Keys dir where stuff is
+ * @param projectRoot Aboslute path to project root
+ * TODO: Only supports windows at the moment
  */
-function gen_startup_js(name: string, relativeDir: string = DEFAULT_LOCAL_2KEYS): string {
-	const output = Mustache.render(readFileSync(WINDOWS_DAEMON_FILE_JS_TEMPLATE).toString("utf8"), {
-		root: process.cwd().split("\\").join("\\\\"),
+async function gen_startup_js(name: string, relativeDir: string = DEFAULT_LOCAL_2KEYS, projectRoot: string): Promise<string> {
+	const output = Mustache.render((await fs.readFile(WINDOWS_DAEMON_FILE_JS_TEMPLATE)).toString("utf8"), {
+		root: projectRoot.split("\\").join("\\\\"),
 		name,
 		default_local_twokeys: relativeDir,
 		daemon_pid_file: WINDOWS_DAEMON_PID_FILE,
@@ -68,8 +70,8 @@ function gen_startup_js(name: string, relativeDir: string = DEFAULT_LOCAL_2KEYS)
  * Generates .vbs startup script for shell:startup
  * @param filesDir absolute path to .2Keys dir where stuff is
  */
-function gen_startup_vbs(name: string, filesDir: string) {
-	const output = Mustache.render(readFileSync(WINDOWS_DAEMON_FILE_VBS_TEMPLATE).toString("utf8"), {
+async function gen_startup_vbs(name: string, filesDir: string): Promise<string> {
+	const output = Mustache.render((await fs.readFile(WINDOWS_DAEMON_FILE_VBS_TEMPLATE)).toString("utf8"), {
 		daemon: join(filesDir, WINDOWS_DAEMON_FILE),
 		name,
 	});
@@ -103,14 +105,20 @@ const generateDaemon: Command<GenerateProjectDaemon.AsObject, Promise<void>> = a
 	// Create service file
 	try {
 		logger.info(`Creating daemon startup js file to start the server as file ${WINDOWS_DAEMON_PREFIX}${projectName}...`);
-		await fs.writeFile(join(config.projectLocation, config.relativeFilesLocationDir, WINDOWS_DAEMON_FILE), gen_startup_js(projectName, config.relativeFilesLocationDir));
+		await fs.writeFile(
+			join(config.projectLocation, config.relativeFilesLocationDir, WINDOWS_DAEMON_FILE),
+			await gen_startup_js(projectName, config.relativeFilesLocationDir, config.projectLocation)
+		);
 
-		logger.debug("Adding a .vbs script to .2Keys to start daemon in the background...");
+		logger.info("Adding a .vbs script to .2Keys to start daemon in the background...");
 		// writeFileSync(join(process.env.APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${projectName}.vbs`), gen_startup_vbs());
-		await fs.writeFile(join(config.projectLocation, config.relativeFilesLocationDir, WINDOWS_DAEMON_FILE_VBS), gen_startup_vbs(projectName, join(config.projectLocation, config.relativeFilesLocationDir)));
+		await fs.writeFile(
+			join(config.projectLocation, config.relativeFilesLocationDir, WINDOWS_DAEMON_FILE_VBS),
+			await gen_startup_vbs(projectName, join(config.projectLocation, config.relativeFilesLocationDir))
+		);
 
 		if (config.addToStartup) { // If --no-startup given, startup set to false.  Is undefined if not
-			logger.debug("Symlinking this .vbs script into user startup folder...");
+			logger.info("Symlinking this .vbs script into user startup folder...");
 			await fs.symlink(join(config.projectLocation, config.relativeFilesLocationDir, WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT_SYMBLINK);
 		}
 	} catch (err) {
