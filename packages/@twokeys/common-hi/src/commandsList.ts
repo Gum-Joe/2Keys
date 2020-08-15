@@ -9,8 +9,8 @@ import command1 from "./setup/commands/oobe"
 import command2 from "./setup/commands/project"
 
 // Map
-export = new Map<string, Command<unknown>>([
-	["generateProjectDaemon", command0],
-	["oobe", command1],
-	["createProject", command2],
-]);
+export = {
+	"generateProjectDaemon": command0,
+"oobe": command1,
+"createProject": command2,
+}
