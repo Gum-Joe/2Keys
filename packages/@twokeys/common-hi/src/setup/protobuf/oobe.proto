@@ -16,4 +16,13 @@ message OOBEConfig {
 	string ipv4_address = 5;
 	// repated = array of
 	repeated string addon_install_list = 6;
+	/** (CLI) options */
+	message OOBEOptions {
+		/** Proceed regarless of if oobe has already been done */
+		// TODO: Implement better
+		bool force = 1;
+		/** When true, don't set a static IPv4 address */
+		bool no_IPv4_set = 2;
+	}
+	OOBEOptions options = 7;
 }

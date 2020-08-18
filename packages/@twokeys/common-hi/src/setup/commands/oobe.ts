@@ -36,20 +36,11 @@ import packageJSON from "../../../package.json";
 import setStaticIPv4Address from "../util/setIPv4";
 
 /**
- * Additonal options
- */
-export interface AdditonalOOBEOptions {
-	/** Proceed regarless of if oobe has already been done */
-	// TODO: Implement better
-	force: boolean;
-}
-
-/**
  * Runs OOBE, setting up the main config needed for 2Keys.
  * @see TWOKEYS_MAIN_CONFIG_DEFAULT_PATH for the path to config
  * @see MainConfig for config schema
  */
-const oobe: Command<OOBEConfig.AsObject & Partial<AdditonalOOBEOptions>, Promise<void>> = async (twokeys: BaseTwoKeysForCommands, config: OOBEConfig.AsObject & Partial<AdditonalOOBEOptions>): Promise<void> => {
+const oobe: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys, config): Promise<void> => {
 	twokeys.logger.info("Starting OOBE....");
 	twokeys.logger.status("Setting up 2Keys");
 	if (!config.didAcceptLicense) {
@@ -61,7 +52,7 @@ const oobe: Command<OOBEConfig.AsObject & Partial<AdditonalOOBEOptions>, Promise
 	const logger = twokeys.logger;
 	try {
 		const serverConfig = await loadMainConfig(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH);
-		if (serverConfig.oobe && !config.force) {
+		if (serverConfig.oobe && !config.options?.force) { // If force is false, and OOBE in the config is true, OOBE has already been done and we can't redo it
 			logger.prompts.warning("Not running OOBE as main config already exists and says oobe has been ran.", {
 				buttons: ["Ok"],
 				defaultButton: 0,
@@ -107,10 +98,15 @@ const oobe: Command<OOBEConfig.AsObject & Partial<AdditonalOOBEOptions>, Promise
 	logger.info("Config written.");
 
 	// Set IP address
-	await setStaticIPv4Address(twokeys, {
-		networkAdapter: config.networkAdapter,
-		ipv4: config.ipv4Address,
-	});
+	// Provided noIpv4set is false
+	if (!(config.options?.noIpv4Set)) {
+		await setStaticIPv4Address(twokeys, {
+			networkAdapter: config.networkAdapter,
+			ipv4: config.ipv4Address,
+		});
+	} else {
+		logger.warn("Not setting a static IPv4 address because --no-ipv4-set was passed");
+	}
 
 	// Create registry
 	logger.substatus("Creating add-ons registry");
