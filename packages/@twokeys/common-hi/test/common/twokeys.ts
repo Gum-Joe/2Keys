@@ -26,6 +26,6 @@ describe("TwoKeys object tests", () => {
 		const twokeys = new BaseTwoKeysForCommands(Logger, {
 			commandName: "test",
 		}, {});
-		expect(twokeys.logger.args.name).to.equal("command:test");
+		expect(twokeys.logger.args.name).to.equal("test");
 	});
 });

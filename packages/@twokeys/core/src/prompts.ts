@@ -144,7 +144,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * ```
 	 */
 	protected async basePrompt(message: string, config: BasePromptFunctionConfig): Promise<PromptResponse> {
-		const originalState = this.logger.isSilent ? true : false;
+		const originalSilenceState = this.logger.isSilent ? true : false;
 		this.logger.isSilent = false; // Allow logging
 		config.logger("");
 		if (typeof config.buttons === "undefined") {
@@ -164,6 +164,20 @@ export default class Prompts implements PromptsInterfaces {
 		config.logger(`${message} [${options}]`);
 
 		// Get response index
+		// HACK: Test shortcut to return default or 0 when TWOKEYS_NONINTERACTIVE is true.
+		// TODO: Allow a --no-interactive options eventually
+		// TODO: Better docs for TWOKEYS_NONINTERACTIVE - currently undocumented
+		/* istanbul ignore next */
+		if (process.env.TWOKEYS_NONINTERACTIVE === "true") {
+			this.logger.warn(`Returning value of ${config.buttons[config.defaultButton ?? 0]} as TWOKEYS_NONINTERACTIVE is set.`);
+			this.logger.warn("This may lead to undetermined behaviour when no default (Titlecase) option is specified by the code!");
+			if (originalSilenceState) { // I.e. was silent
+				this.logger.isSilent = true; // Reset back to true
+			}
+			return {
+				response: config.defaultButton ?? 0,
+			};
+		}
 		const responseLiteral = await Prompts.getInputPromise();
 		const responseIndex = normalisedOptions.indexOf(responseLiteral.toLowerCase());
 		if (responseIndex < 0) {
@@ -175,7 +189,7 @@ export default class Prompts implements PromptsInterfaces {
 				return this.basePrompt(message, config);
 			}
 		}
-		if (originalState) { // I.e. was silent
+		if (originalSilenceState) { // I.e. was silent
 			this.logger.isSilent = true; // Reset back to true
 		}
 		return { response: responseIndex };
