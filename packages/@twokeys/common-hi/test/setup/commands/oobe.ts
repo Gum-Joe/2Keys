@@ -106,9 +106,5 @@ describe("Setup Tests", () => {
 		after(function () {
 			sinon.restore();
 		});
-
-		/*after((done) => {
-			rimraf(MOCK_TWOKEYS_HOME_ROOT, done);
-		});*/
 	});
 });

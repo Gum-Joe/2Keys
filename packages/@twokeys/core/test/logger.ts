@@ -76,18 +76,24 @@ describe("Logger tests", () => {
 				expect(logger.isDebug).to.be.true;
 			});
 			it("should do isDebug if NODE_ENV is development and TWOKEYS_DEBUG is not false", () => {
+				const oldEnv = process.env.NODE_ENV;
 				process.env.TWOKEYS_DEBUG = "NOT_FALSE";
 				process.env.NODE_ENV = "development";
 				const logger = new Logger({ name: "TEST" });
 				// @ts-ignore
 				expect(logger.isDebug).to.be.true;
+				// Reset
+				process.env.NODE_ENV = oldEnv;
 			});
 			it("should not do isDebug if NODE_ENV is development but TWOKEYS_DEBUG is false", () => {
+				const oldEnv = process.env.NODE_ENV;
 				process.env.TWOKEYS_DEBUG = "false";
 				process.env.NODE_ENV = "development";
 				const logger = new Logger({ name: "TEST" });
 				// @ts-ignore
 				expect(logger.isDebug).to.be.false;
+				// Reset
+				process.env.NODE_ENV = oldEnv;
 			});
 		});
 
