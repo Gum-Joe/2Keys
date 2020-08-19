@@ -1,7 +1,0 @@
-name: should_be_this
-version: 1.0.0
-registry_root: D:\Users\Kishan\Documents\Projects\CONFIDENTIAL\2Keys\2Keys-UI\twokeys\packages\@twokeys\common-hi\test\non-mocha\2Keys-Home\registry
-oobe: false
-network:
-  adapter: Network Bridge
-  ipv4: 192.168.0.50
