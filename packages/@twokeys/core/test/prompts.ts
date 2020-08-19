@@ -1,6 +1,6 @@
 import Logger from "../src/logger";
 import chai, { expect } from "chai";
-import Prompts, { PromptOptions } from "../src/prompts";
+import Prompts from "../src/prompts";
 import stream from "stream";
 import chaiAsPromised from "chai-as-promised";
 import { spawn } from "child_process";

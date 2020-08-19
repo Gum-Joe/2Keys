@@ -1,10 +1,8 @@
 import factory from "../../test-util/command-factory";
 import { join } from "path";
-import { promisify } from "util";
 import chai, { expect } from "chai";
 import chaiFs from "chai-fs";
 import chaiAsPromised from "chai-as-promised";
-import rimrafCB from "rimraf";
 import { TWOKEYS_PROJECT_CONFIG_FILENAME } from "@twokeys/core/lib/constants";
 
 import setupProject from "../../../src/setup/commands/project";
@@ -15,7 +13,6 @@ import { homedir } from "os";
 import { unlink } from "fs";
 import daemon from "../../../src/setup/commands/daemon";
 
-const rimraf = promisify(rimrafCB);
 const MOCK_TWOKEYS_PROJECT_ROOT = join(__dirname, "../../non-mocha/mock-project");
 
 chai.use(chaiFs);
@@ -110,7 +107,7 @@ describe("Project setup tests", () => {
 			expect(join(MOCK_TWOKEYS_PROJECT_ROOT, DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE)).to.be.a.file();
 			expect(join(MOCK_TWOKEYS_PROJECT_ROOT, DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS)).to.be.a.file();
 		});
-		
+
 		it("should not throw an error when symbolic link in startup already exists", async () => {
 			await expect(factory.callCommand(daemon, {
 				projectLocation: MOCK_TWOKEYS_PROJECT_ROOT,

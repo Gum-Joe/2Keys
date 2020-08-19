@@ -29,7 +29,7 @@ const TEST_OOBE_CONFIG = {
 		force: false,
 		noIpv4Set: true,
 	}
-}
+};
 
 chai.use(chaiFs);
 chai.use(chaiAsPromised);
