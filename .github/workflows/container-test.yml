@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    container:
-      image: stefanscherer/node-windows:12-build-tools
 
     strategy:
       matrix:
@@ -19,7 +17,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install protoc
-      run: choco install yarn protoc
+      run: choco install protoc
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Setup native modules
+      run: yarn global add windows-build-tools
     - name: Install packages
       run: yarn
     - name: Compile
