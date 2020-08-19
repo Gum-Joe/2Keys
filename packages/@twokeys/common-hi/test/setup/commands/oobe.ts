@@ -31,8 +31,6 @@ const TEST_OOBE_CONFIG = {
 	}
 }
 
-
-
 chai.use(chaiFs);
 chai.use(chaiAsPromised);
 
@@ -101,6 +99,14 @@ describe("Setup Tests", () => {
 			const returned = await loadMainConfig(constants.TWOKEYS_MAIN_CONFIG_DEFAULT_PATH);
 			expect(returned.name).to.equal("should_be_this");
 			expect(returned.oobe).to.be.true;
+		});
+
+		// PENDING - VM needed
+		describe("IPv4 setting tests", () => {
+			it("should successfully set an IPv4 address");
+			it("should throw an error when IPv4 address is wrong format");
+			it("should throw an error when the network interface to set the IPv4 on is non-existant");
+			it("should throw an error when more than 1 IPv4 address is set for an interface");
 		});
 
 		after(function () {

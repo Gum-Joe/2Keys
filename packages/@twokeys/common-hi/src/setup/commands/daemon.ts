@@ -90,12 +90,8 @@ const generateDaemon: Command<GenerateProjectDaemon.AsObject, Promise<void>> = a
 	const projectName = projectConf.name;
 	logger.info(`Using dir ${config.relativeFilesLocationDir} in project for daemon files.`);
 	// Create required dirs
-	try {
-		await mkdirp(join(config.projectLocation, config.relativeFilesLocationDir));
-		logger.debug(`Made dir ${join(config.projectLocation, config.relativeFilesLocationDir)}...`);
-	} catch (err) {
-		logger.throw(err);
-	}
+	await mkdirp(join(config.projectLocation, config.relativeFilesLocationDir));
+	logger.debug(`Made dir ${join(config.projectLocation, config.relativeFilesLocationDir)}...`);
 	// NOTE: Even though there may not be a "Startup" folder, windows explorer may show a "Start-Up" folder
 	// 2Keys will still see "Startup"
 	const VBS_SCRIPT_SYMBLINK = join(homedir(), "AppData", "Roaming", "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${projectName}.vbs`);

@@ -76,7 +76,7 @@ export default class CommandFactory {
 	/**
 	 * Calls a stateless command (that has been wrapped with {@link CommandFactory.wrapCommand})
 	 * 
-	 * **Note: Make sure all properties in {@link CommandInfo} are checked for.  This is because we can't guarentee {@link CommandFactory.wrapCommand} has been called**
+	 * **Development Note: Make sure all properties in {@link CommandInfo} are checked for.  This is because we can't guarentee {@link CommandFactory.wrapCommand} has been called**
 	 * @param func Function to call
 	 * @param config Config to pass to it (type inferred from function)
 	 */
