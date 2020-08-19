@@ -22,8 +22,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Setup native modules
-      run: yarn global add windows-build-tools
+    # - name: Setup native modules
+    #   run: yarn global add windows-build-tools
     - name: Install packages
       run: yarn
     - name: Compile
