@@ -1,0 +1,31 @@
+name: Tests in a container
+
+on:
+  push:
+    branches: [ master, v1 ]
+  pull_request:
+    branches: [ master, v1 ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    container:
+      image: stefanscherer/node-windows:12-build-tools
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install protoc
+      run: choco install yarn protoc
+    - name: Install packages
+      run: yarn
+    - name: Compile
+      run: |
+        yarn wsrun -mtc precompile
+        yarn build -v
+    - name: Run stuff
+      run: yarn wsrun -msc test:container
+

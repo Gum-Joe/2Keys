@@ -53,3 +53,6 @@ Command should be:
 	- And extension of this is that commands should be atomic, that is, isolated from other operations.  However, for e.g. writing to a DB, this may not be possible
 
 For a complete example, see `test/common/example.ts` (NOTE: If this file does not compile, the code is broken (think of this file as a test)).
+
+### Testing notes
+Some commands make changes to the system.  These should be ran in containers, and you can find them in `./vm-test`
