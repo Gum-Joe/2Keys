@@ -1,10 +1,6 @@
-name: Tests in a container
+name: Isolated tests
 
-on:
-  push:
-    branches: [ master, v1 ]
-  pull_request:
-    branches: [ master, v1 ]
+on: push
 
 jobs:
   build:
@@ -34,5 +30,6 @@ jobs:
         yarn wsrun -mtc precompile
         yarn build -v
     - name: Run stuff
-      run: yarn wsrun -msc test:container
+      run: yarn wsrun -msc coverage:isolated
+    - uses: codecov/codecov-action@v1
 
