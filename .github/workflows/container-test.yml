@@ -1,11 +1,5 @@
 name: Tests in a container
 
-#on:
-#  push:
-#    branches: [ master, v1 ]
-#  pull_request:
-#    branches: [ master, v1 ]
-
 on: push
 
 jobs:
