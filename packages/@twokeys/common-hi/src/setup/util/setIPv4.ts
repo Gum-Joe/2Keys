@@ -79,7 +79,7 @@ export default async function setStaticIPv4Address(twokeys: BaseTwoKeysForComman
 	}
 	twokeys.logger.debug("Checking interface name...");
 	if (!IFACE_REGEXP.test(config.networkAdapter)) {
-		throw new CodedError("Network interface was not alphanumeric (with _, - and spaces also allowed)!  This check is here to prevent command injection.", errorCodes.NET_INVALID_INTERFACE_NAME);
+		throw new CodedError("Network interface was not alphanumeric (with brackets and spaces also allowed)!  This check is here to prevent command injection.", errorCodes.NET_INVALID_INTERFACE_NAME);
 	}
 
 	const ifaces = networkInterfaces();

@@ -1,4 +1,4 @@
-name: Tests in a container
+name: Isolated tests
 
 on: push
 
@@ -30,5 +30,6 @@ jobs:
         yarn wsrun -mtc precompile
         yarn build -v
     - name: Run stuff
-      run: yarn wsrun -msc test:container
+      run: yarn wsrun -msc coverage:isolated
+    - uses: codecov/codecov-action@v1
 

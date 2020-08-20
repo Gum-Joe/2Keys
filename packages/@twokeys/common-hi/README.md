@@ -55,4 +55,5 @@ Command should be:
 For a complete example, see `test/common/example.ts` (NOTE: If this file does not compile, the code is broken (think of this file as a test)).
 
 ### Testing notes
-Some commands make changes to the system.  These should be ran in containers, and you can find them in `./vm-test`
+Some commands make changes to the system.  These should be ran in containers, and you can run them by using the `test:isolated` script.
+- For IPv4 setting tests, also set the env var `TWOKEYS_OOBE_NET_TEST_INTERFACE` to the network interface to change the IP address of.

@@ -15,9 +15,10 @@
     "watch:protobuf": "gulp protoc:watch",
     "docs": "typedoc",
     "test": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha",
-    "test:container": "cross-env TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha vm-test/*.ts --exclude test/**/*.ts",
+    "test:isolated": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha test-isolated/**/*.ts --exclude test/**/*.ts",
     "test:log": "cross-env TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha",
     "coverage": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true nyc mocha",
+    "coverage:isolated": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true nyc mocha test-isolated/**/*.ts --exclude test/**/*.ts",
     "commandlist": "ts-node -T scripts/commands-list.ts"
   },
   "dependencies": {
