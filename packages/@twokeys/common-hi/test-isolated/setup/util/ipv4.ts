@@ -1,10 +1,10 @@
 import { networkInterfaces, platform } from "os";
-import setStaticIPv4Address, { IPV4_REGEXP, IFACE_REGEXP } from "../../../src/setup/util/setIPv4";
+import setStaticIPv4Address from "../../../src/setup/util/setIPv4";
 import { TwoKeys } from "../../../test/test-util/command-factory";
 import chai, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 
-chai.use(chaiAsPromised)
+chai.use(chaiAsPromised);
 
 /** Change IPv4 for interface from an env var or default one for GitHub Actions */
 export const NETWORK_INTERFACE = process.env.TWOKEYS_OOBE_NET_TEST_INTERFACE || "vEthernet (nat)";
@@ -107,5 +107,14 @@ function addOneToIPv4(ip: string): string {
 			ipv4: "192.168.0.50", // Too long
 			networkAdapter: "Has some ` ` in it",
 		})).to.eventually.rejectedWith("not alphanumeric");
-	})
+	});
+
+	it("should fail on a non-existant network interface", async () => {
+		await expect(setStaticIPv4Address(new TwoKeys({
+			commandName: "ipv4"
+		}, {}), {
+			ipv4: "192.168.0.50", // Too long
+			networkAdapter: "Valid Name",
+		})).to.eventually.rejectedWith("find network interface");
+	});
 });
