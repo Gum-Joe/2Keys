@@ -32,9 +32,10 @@ export interface SetStaticIPv4 {
 	ipv4: string;
 }
 export const IPV4_REGEXP = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-/** Only allow alphanumerica chars, -, _s and spaces to prevent command injection */
+/** Only allow alphanumerica chars,(_)s and spaces to prevent command injection */
 // NOTE: May need changing for internationlisation
-export const IFACE_REGEXP = /^[\w\-\s]+$/;
+export const IFACE_REGEXP = /^[a-zA-Z][\sa-zA-Z0-9\[\]\(\)]+$/m;
+// export const IFACE_REGEXP = /^[\w\-\s]+$/; // Dahses, underscore and alphanumeric and spaces
 
 function checkIP(twokeys: BaseTwoKeysForCommands, config: SetStaticIPv4): Promise<void> {
 	return new Promise((resolve, reject) => {
