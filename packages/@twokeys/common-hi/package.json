@@ -14,7 +14,7 @@
     "watch": "tsc -b --watch",
     "watch:protobuf": "gulp protoc:watch",
     "docs": "typedoc",
-    "test": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha",
+    "test": "cross-env TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha",
     "test:isolated": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha test-isolated/**/*.ts --exclude test/**/*.ts",
     "test:log": "cross-env TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha",
     "coverage": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true nyc mocha",

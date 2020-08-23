@@ -34,13 +34,17 @@ namespace twokeys {
       // ...
       // You might want to throw an exception, or just return an
       // empty string here.
-			DWORD err = GetLastError();
-			// cerr << "Error opening AHK library: " << err;
-			error_handler->code = err;
-			error_handler->is_error = true;
-			error_handler->message =
-				"The SHGetKnownFolderPath() function failed.  Error Code: " + err;
-			return (std::u16string) u"ERROR";
-    }
+      if (hr == E_FAIL) {
+        error_handler->code = err;
+        error_handler->is_error = true;
+        error_handler->message =
+          "E_FAIL: The SHGetKnownFolderPath() function failed because the startup folder may not present on this system.";
+          err;
+      } else {
+				error_handler->code = err;
+				error_handler->is_error = true;
+				error_handler->message =
+					"E_INVALIDARG: The SHGetKnownFolderPath() function failed because the startup folder identifier could not be found"
+    	}
   }
 }
