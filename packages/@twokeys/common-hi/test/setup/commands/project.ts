@@ -35,7 +35,14 @@ const mockConfig: ProjectConfig = {
 	detectors: [],
 };
 
-const STARTUP_VBS_FILE = join(native.get_startup_folder(), `${WINDOWS_DAEMON_PREFIX}${mockConfig.name}.vbs`);
+let STARTUP_VBS_FILE: string | undefined;
+try {
+	const startupfolder = native.get_startup_folder();
+	STARTUP_VBS_FILE = join(startupfolder, `${WINDOWS_DAEMON_PREFIX}${mockConfig.name}.vbs`);
+} catch (err) {
+	console.warn("Skipping startup folder linking tests as the folder is not present.");
+}
+
 
 describe("Project setup tests", () => {
 	it("should succesffuly setup a project (and not add to startup, but still create startup files)", async () => {
@@ -72,7 +79,11 @@ describe("Project setup tests", () => {
 		await expect(factory.callCommand(setupProject, { serverInfo: {}, permissions: {} })).to.be.rejectedWith("permissions info for server!");
 	});
 
-	it("should create startup files AND add to startup", async () => {
+	it("should create startup files AND add to startup", async function () {
+		if (typeof STARTUP_VBS_FILE === "undefined") {
+			this.skip();
+		}
+
 		await factory.callCommand(setupProject, {
 			projectName: mockConfig.name,
 			projectLocation: MOCK_TWOKEYS_PROJECT_ROOT,
@@ -109,7 +120,11 @@ describe("Project setup tests", () => {
 			expect(join(MOCK_TWOKEYS_PROJECT_ROOT, DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS)).to.be.a.file();
 		});
 
-		it("should not throw an error when symbolic link in startup already exists", async () => {
+		it("should not throw an error when symbolic link in startup already exists", async function () {
+			if (typeof STARTUP_VBS_FILE === "undefined") {
+				this.skip();
+			}
+
 			await expect(factory.callCommand(daemon, {
 				projectLocation: MOCK_TWOKEYS_PROJECT_ROOT,
 				relativeFilesLocationDir: DEFAULT_LOCAL_2KEYS,
@@ -124,9 +139,12 @@ describe("Project setup tests", () => {
 			expect(STARTUP_VBS_FILE).to.be.a.file();
 		});
 	});
-
 	after((done) => {
 		// Delete stuff
-		unlink(STARTUP_VBS_FILE, done);
+		if (typeof STARTUP_VBS_FILE === "string") {
+			unlink(STARTUP_VBS_FILE, done);
+		} else {
+			done();
+		}
 	});
 });
