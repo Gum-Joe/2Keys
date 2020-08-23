@@ -25,7 +25,7 @@ namespace twokeys {
   }
 
   Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    exports.Set(Napi::String::New(env, "run_ahk_text"),
+    exports.Set(Napi::String::New(env, "get_startup_folder"),
                 Napi::Function::New(env, get_startup_folder_node));
     return exports;
   }
