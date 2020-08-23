@@ -39,7 +39,6 @@ import { GenerateProjectDaemon } from "../protobuf/daemon_pb";
 import { CodedError } from "@twokeys/core";
 import * as errorCodes from "../../util/errors";
 import { loadProjectConfig } from "@twokeys/core/lib/config";
-
 import native from "../util/native";
 
 
@@ -96,7 +95,7 @@ const generateDaemon: Command<GenerateProjectDaemon.AsObject, Promise<void>> = a
 	logger.debug(`Made dir ${join(config.projectLocation, config.relativeFilesLocationDir)}...`);
 	// NOTE: Even though there may not be a "Startup" folder, windows explorer may show a "Start-Up" folder
 	// 2Keys will still see "Startup"
-	const VBS_SCRIPT_SYMBLINK = join(homedir(), "AppData", "Roaming", "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${projectName}.vbs`);
+	const VBS_SCRIPT_SYMBLINK = join(native.get_startup_folder(), `${WINDOWS_DAEMON_PREFIX}${projectName}.vbs`);
 	// Create service file
 	try {
 		logger.info(`Creating daemon startup js file to start the server as file ${WINDOWS_DAEMON_PREFIX}${projectName}...`);
@@ -114,8 +113,8 @@ const generateDaemon: Command<GenerateProjectDaemon.AsObject, Promise<void>> = a
 
 		if (config.addToStartup) { // If --no-startup given, startup set to false.  Is undefined if not
 			logger.info("Symlinking this .vbs script into user startup folder...");
-			logger.debug(`Linking into ${join(native.get_startup_folder(), WINDOWS_DAEMON_FILE_VBS)}...`);
-			await fs.symlink(join(native.get_startup_folder(), WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT_SYMBLINK);
+			logger.debug(`Linking into ${VBS_SCRIPT_SYMBLINK}`);
+			await fs.symlink(join(config.projectLocation, config.relativeFilesLocationDir, WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT_SYMBLINK);
 		}
 	} catch (err) {
 		if (err.code === "EEXIST") {
