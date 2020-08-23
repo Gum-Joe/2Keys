@@ -9,7 +9,6 @@ import setupProject from "../../../src/setup/commands/project";
 import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { loadProjectConfig } from "@twokeys/core/lib/config";
 import { DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE, WINDOWS_DAEMON_FILE_VBS, WINDOWS_DAEMON_PREFIX } from "../../../src/setup/util/constants";
-import { homedir } from "os";
 import { unlink } from "fs";
 import daemon from "../../../src/setup/commands/daemon";
 import native from "../../../src/setup/util/native";

@@ -33,7 +33,6 @@ import {
 	WINDOWS_DAEMON_FILE_VBS,
 	WINDOWS_SERVER_PID_FILE } from "../util/constants";
 import { promises as fs } from "fs";
-import { homedir } from "os";
 import { Command, CommandFactory } from "../../common";
 import { GenerateProjectDaemon } from "../protobuf/daemon_pb";
 import { CodedError } from "@twokeys/core";
