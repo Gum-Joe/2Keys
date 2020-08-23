@@ -35,16 +35,18 @@ namespace twokeys {
       // You might want to throw an exception, or just return an
       // empty string here.
       if (hr == E_FAIL) {
-        error_handler->code = err;
+        error_handler->code = 0;
         error_handler->is_error = true;
         error_handler->message =
           "E_FAIL: The SHGetKnownFolderPath() function failed because the startup folder may not present on this system.";
-          err;
+				return (std::u16string) u"";
       } else {
-				error_handler->code = err;
+				error_handler->code = 0;
 				error_handler->is_error = true;
 				error_handler->message =
-					"E_INVALIDARG: The SHGetKnownFolderPath() function failed because the startup folder identifier could not be found"
+					"E_INVALIDARG: The SHGetKnownFolderPath() function failed because the startup folder identifier could not be found";
+				return (std::u16string) u"";
     	}
-  }
+  	}
+	}
 }
