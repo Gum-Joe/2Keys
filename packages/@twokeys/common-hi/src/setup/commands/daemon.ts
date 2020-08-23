@@ -40,6 +40,8 @@ import { CodedError } from "@twokeys/core";
 import * as errorCodes from "../../util/errors";
 import { loadProjectConfig } from "@twokeys/core/lib/config";
 
+import native from "../util/native";
+
 
 const Mustache = require("mustache");
 
@@ -112,7 +114,8 @@ const generateDaemon: Command<GenerateProjectDaemon.AsObject, Promise<void>> = a
 
 		if (config.addToStartup) { // If --no-startup given, startup set to false.  Is undefined if not
 			logger.info("Symlinking this .vbs script into user startup folder...");
-			await fs.symlink(join(config.projectLocation, config.relativeFilesLocationDir, WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT_SYMBLINK);
+			logger.debug(`Linking into ${join(native.get_startup_folder(), WINDOWS_DAEMON_FILE_VBS)}...`);
+			await fs.symlink(join(native.get_startup_folder(), WINDOWS_DAEMON_FILE_VBS), VBS_SCRIPT_SYMBLINK);
 		}
 	} catch (err) {
 		if (err.code === "EEXIST") {

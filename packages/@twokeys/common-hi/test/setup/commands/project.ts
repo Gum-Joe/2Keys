@@ -12,6 +12,7 @@ import { DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE, WINDOWS_DAEMON_FILE_VBS, WIND
 import { homedir } from "os";
 import { unlink } from "fs";
 import daemon from "../../../src/setup/commands/daemon";
+import native from "../../../src/setup/util/native";
 
 const MOCK_TWOKEYS_PROJECT_ROOT = join(__dirname, "../../non-mocha/mock-project");
 
@@ -34,7 +35,7 @@ const mockConfig: ProjectConfig = {
 	detectors: [],
 };
 
-const STARTUP_VBS_FILE = join(homedir(), "AppData", "Roaming", "Microsoft", "Windows", "Start Menu", "Programs", "Startup", `${WINDOWS_DAEMON_PREFIX}${mockConfig.name}.vbs`);
+const STARTUP_VBS_FILE = join(native.get_startup_folder(), `${WINDOWS_DAEMON_PREFIX}${mockConfig.name}.vbs`);
 
 describe("Project setup tests", () => {
 	it("should succesffuly setup a project (and not add to startup, but still create startup files)", async () => {

@@ -34,7 +34,13 @@ namespace twokeys {
       // ...
       // You might want to throw an exception, or just return an
       // empty string here.
-      throw std::runtime_error("The SHGetKnownFolderPath function failed");
+			DWORD err = GetLastError();
+			// cerr << "Error opening AHK library: " << err;
+			error_handler->code = err;
+			error_handler->is_error = true;
+			error_handler->message =
+				"The SHGetKnownFolderPath() function failed.  Error Code: " + err;
+			return (std::u16string) u"ERROR";
     }
   }
 }
