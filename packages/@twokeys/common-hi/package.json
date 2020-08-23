@@ -38,6 +38,7 @@
     "gulp": "^4.0.2",
     "gulp-cli": "^2.3.0",
     "gulp-exec": "^5.0.0",
+    "node-addon-api": "^3.0.0",
     "sinon": "^9.0.3",
     "ts-protoc-gen": "^0.12.0"
   }

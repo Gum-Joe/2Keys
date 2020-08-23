@@ -1,0 +1,9 @@
+{
+	"files.associations": {
+		"*.jsx": "javascriptreact",
+		"xstring": "cpp",
+		"iostream": "cpp",
+		"stdexcept": "cpp",
+		"string": "cpp"
+	}
+}
