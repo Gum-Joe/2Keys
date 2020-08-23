@@ -94,6 +94,11 @@ export interface PromptResponse {
 	checkboxChecked?: boolean;
 }
 
+/** Options */
+export interface PromptOptions {
+	nonInteractive: boolean;
+}
+
 
 /**
  * Handles prompts for the logger, so that commands using a twokeys object can have interactivity with users on both CLI and GUI,
@@ -109,9 +114,20 @@ export default class Prompts implements PromptsInterfaces {
 	 */
 	public YES_NO = ["y", "n"];
 	protected logger: Logger;
+	/**
+	 * Turn off interactivity
+	 * Useful when testing
+	 */
+	// HACK: Used as a test shortcut to return default or 0 when TWOKEYS_NONINTERACTIVE is true.
+	// TODO: Allow a --no-interactive options eventually
+	// TODO: Better docs for TWOKEYS_NONINTERACTIVE - currently undocumented
+	public nonInterative = process.env.TWOKEYS_NONINTERACTIVE === "true";
 
-	constructor(logger: Logger) {
+	constructor(logger: Logger, options?: Partial<PromptOptions>) {
 		this.logger = logger;
+		if (options?.nonInteractive) {
+			this.nonInterative = options.nonInteractive;
+		}
 	}
 
 	/**
@@ -144,7 +160,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * ```
 	 */
 	protected async basePrompt(message: string, config: BasePromptFunctionConfig): Promise<PromptResponse> {
-		const originalState = this.logger.isSilent ? true : false;
+		const originalSilenceState = this.logger.isSilent ? true : false;
 		this.logger.isSilent = false; // Allow logging
 		config.logger("");
 		if (typeof config.buttons === "undefined") {
@@ -164,6 +180,20 @@ export default class Prompts implements PromptsInterfaces {
 		config.logger(`${message} [${options}]`);
 
 		// Get response index
+		// HACK: Test shortcut to return default or 0 when TWOKEYS_NONINTERACTIVE is true.
+		// TODO: Allow a --no-interactive options eventually
+		// TODO: Better docs for TWOKEYS_NONINTERACTIVE - currently undocumented
+		/* istanbul ignore next */
+		if (this.nonInterative) {
+			this.logger.warn(`Returning value of ${config.buttons[config.defaultButton ?? 0]} as TWOKEYS_NONINTERACTIVE is set.`);
+			this.logger.warn("This may lead to undetermined behaviour when no default (Titlecase) option is specified by the code!");
+			if (originalSilenceState) { // I.e. was silent
+				this.logger.isSilent = true; // Reset back to true
+			}
+			return {
+				response: config.defaultButton ?? 0,
+			};
+		}
 		const responseLiteral = await Prompts.getInputPromise();
 		const responseIndex = normalisedOptions.indexOf(responseLiteral.toLowerCase());
 		if (responseIndex < 0) {
@@ -175,7 +205,7 @@ export default class Prompts implements PromptsInterfaces {
 				return this.basePrompt(message, config);
 			}
 		}
-		if (originalState) { // I.e. was silent
+		if (originalSilenceState) { // I.e. was silent
 			this.logger.isSilent = true; // Reset back to true
 		}
 		return { response: responseIndex };
@@ -190,7 +220,7 @@ export default class Prompts implements PromptsInterfaces {
 	 * @returns On CLI this means nothing, on GUI it indicates if OK was pressed.
 	 */
 	public async info(message: string) {
-		if (!this.logger.isSilent) {
+		if (!this.logger.isSilent && !this.nonInterative) {
 			this.logger.info("");
 			this.logger.info(message);
 			//this.logger.info("");

@@ -14,23 +14,32 @@
     "watch": "tsc -b --watch",
     "watch:protobuf": "gulp protoc:watch",
     "docs": "typedoc",
-    "test": "cross-env NODE_ENV=test mocha",
-    "coverage": "cross-env NODE_ENV=test nyc mocha",
+    "test": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha",
+    "test:isolated": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha test-isolated/**/*.ts --exclude test/**/*.ts",
+    "test:log": "cross-env TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true mocha",
+    "coverage": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true nyc mocha",
+    "coverage:isolated": "cross-env NODE_ENV=test TS_NODE_PROJECT=\"./tsconfig.test.json\" TWOKEYS_NONINTERACTIVE=true nyc mocha test-isolated/**/*.ts --exclude test/**/*.ts",
     "commandlist": "ts-node -T scripts/commands-list.ts"
   },
   "dependencies": {
-    "@twokeys/core": "^1.0.0",
     "@twokeys/addons": "^1.0.0",
+    "@twokeys/core": "^1.0.0",
     "google-protobuf": "^3.12.4",
-    "mkdirp": "^1.0.4"
+    "mkdirp": "^1.0.4",
+    "rimraf": "^3.0.2"
   },
   "devDependencies": {
     "@types/gulp": "^4.0.6",
     "@types/mkdirp": "^1.0.1",
+    "@types/rimraf": "^3.0.0",
+    "@types/sinon": "^9.0.4",
+    "chai-fs": "^2.0.0",
     "globby": "^11.0.1",
     "gulp": "^4.0.2",
     "gulp-cli": "^2.3.0",
     "gulp-exec": "^5.0.0",
+    "node-addon-api": "^3.0.0",
+    "sinon": "^9.0.3",
     "ts-protoc-gen": "^0.12.0"
   }
 }

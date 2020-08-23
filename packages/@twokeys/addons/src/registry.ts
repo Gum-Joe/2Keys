@@ -364,7 +364,9 @@ export default class AddOnsRegistry {
 			this.logger.info(`Running command npm ${command} ${packageName}...`);
 			this.logger.debug("Running command...");
 			const oldCWD = this.directory;
+			// HACK: This causes issues, since other stuff can be ran that assumee the DIR is x 
 			process.chdir(this.directory); // So lock files are made etc
+			this.logger.debug(`Current CWD (before run): ${process.cwd()}`);
 			this.logger.debug(`Changed dir to ${this.directory}.`);
 			// Functions
 			npm.load({
@@ -386,6 +388,7 @@ export default class AddOnsRegistry {
 					npmLogger.info(data);
 					process.chdir(oldCWD);
 					this.logger.debug("Gone back to old CWD.");
+					this.logger.debug(`Current CWD: ${process.cwd()}`);
 					this.logger.info("Command should have been ran successfully.");
 					resolve();
 				});

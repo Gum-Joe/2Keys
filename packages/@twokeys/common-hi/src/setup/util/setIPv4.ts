@@ -32,9 +32,10 @@ export interface SetStaticIPv4 {
 	ipv4: string;
 }
 export const IPV4_REGEXP = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-/** Only allow alphanumerica chars, -, _s and spaces to prevent command injection */
+/** Only allow alphanumerica chars,(_)s and spaces to prevent command injection */
 // NOTE: May need changing for internationlisation
-export const IFACE_REGEXP = /^[\w\-\s]+$/;
+export const IFACE_REGEXP = /^[a-zA-Z][\sa-zA-Z0-9[\]()]+$/i;
+// export const IFACE_REGEXP = /^[\w\-\s]+$/; // Dahses, underscore and alphanumeric and spaces
 
 function checkIP(twokeys: BaseTwoKeysForCommands, config: SetStaticIPv4): Promise<void> {
 	return new Promise((resolve, reject) => {
@@ -78,7 +79,7 @@ export default async function setStaticIPv4Address(twokeys: BaseTwoKeysForComman
 	}
 	twokeys.logger.debug("Checking interface name...");
 	if (!IFACE_REGEXP.test(config.networkAdapter)) {
-		throw new CodedError("Network interface was not alphanumeric (with _, - and spaces also allowed)!  This check is here to prevent command injection.", errorCodes.NET_INVALID_INTERFACE_NAME);
+		throw new CodedError("Network interface was not alphanumeric (with brackets and spaces also allowed)!  This check is here to prevent command injection.", errorCodes.NET_INVALID_INTERFACE_NAME);
 	}
 
 	const ifaces = networkInterfaces();

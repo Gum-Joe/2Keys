@@ -62,6 +62,7 @@ const oobe: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys, config
 			const { response } = await logger.prompts.warning("Found existing main config. It will be overwritten. Continue?", {
 				defaultButton: 0,
 			});
+			// Untestable code
 			if (response !== 0) {
 				throw new CodedError("Main config already existed. Unable to proceed.", errorCodes.CONFIG_ALREADY_EXISTS);
 			}

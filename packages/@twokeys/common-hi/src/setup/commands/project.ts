@@ -48,6 +48,8 @@ export const TWOKEYS_CONFIG_PRELUDE = `# 2Keys Project Config
 
 /**
  * Create a new project, creating the folder and the config file for it
+ * 
+ * NOTE: {@link CreateProject.AsObject.serverInfo.permissions} needs to be provided
  */
 const createProject: Command<Required<CreateProject.AsObject>, Promise<void>> = async (twokeys, config) => {
 	const { logger } = twokeys;

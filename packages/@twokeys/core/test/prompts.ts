@@ -63,7 +63,10 @@ describe("Prompts test (prompts.ts)", () => {
 					}
 				}
 			});
+			logger.isSilent = false; // Or stuff won't work
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
 			let isPending = true; // HACK: Hack to get promise state
 
 			const promptPromise = prompts.info("IMPORTANT! Read this.")
@@ -99,6 +102,8 @@ describe("Prompts test (prompts.ts)", () => {
 			});
 			logger.isSilent = true;
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
 
 			expect(prompts.info("IMPORTANT! Read this.")).to.be.eventually.fulfilled.notify(done);
 		}).timeout(5000);
@@ -124,6 +129,9 @@ describe("Prompts test (prompts.ts)", () => {
 				}
 			});
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
+
 			const promptPromise = prompts.question("Do you wish to continue?", {
 				buttons: ["yes", "no", "maybe"],
 				defaultButton: 1
@@ -155,6 +163,8 @@ describe("Prompts test (prompts.ts)", () => {
 				}
 			});
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
 			const promptPromise = prompts.question("Do you wish to continue?", {
 				buttons: ["Option A", "Option B", "Option C"],
 				defaultButton: 1
@@ -191,6 +201,8 @@ describe("Prompts test (prompts.ts)", () => {
 			// check regular logger works
 			logger.info("should not be logged");
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
 			const promptPromise = prompts.question("Do you wish to continue?", {
 				buttons: ["Option A", "Option B", "Option C"],
 				defaultButton: 1
@@ -224,6 +236,8 @@ describe("Prompts test (prompts.ts)", () => {
 				}
 			});
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
 			const promptPromise = prompts.question("Please select a mode.", {
 				buttons: ["o", "m", "c"], // Overwrite, merge, cancel
 				defaultButton: 2
@@ -280,6 +294,8 @@ describe("Prompts test (prompts.ts)", () => {
 					}
 				});
 				const prompts = new MockedPrompts(logger);
+				// HACK: To get prompts to show
+				prompts.nonInterative = false;
 				let isPending = true; // HACK: Hack to get promise state
 
 				const promptPromise = prompts.question("Do you wish to continue?")
@@ -325,6 +341,8 @@ describe("Prompts test (prompts.ts)", () => {
 				}
 			});
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
 			const promptPromise = prompts.warning("Do you wish to continue?", { buttons: ["proceed", "halt"] });
 			expect(messagePrinted).to.be.true;
 			mockedStdinStream.write("proceed");
@@ -348,6 +366,8 @@ describe("Prompts test (prompts.ts)", () => {
 				}
 			});
 			const prompts = new MockedPrompts(logger);
+			// HACK: To get prompts to show
+			prompts.nonInterative = false;
 			const promptPromise = prompts.warning("Do you wish to continue?");
 			expect(messagePrinted).to.be.true;
 			mockedStdinStream.write("y");

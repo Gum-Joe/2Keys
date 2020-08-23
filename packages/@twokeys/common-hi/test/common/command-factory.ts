@@ -72,7 +72,7 @@ describe("Command factory tests", () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			const someCommand = (twokeys: TwoKeys, config: any): void => {
 				expect(twokeys).to.be.instanceOf(TwoKeys);
-				expect(twokeys.logger.args.name).to.equal("command:commandName");
+				expect(twokeys.logger.args.name).to.equal("commandName");
 				expect(config).to.haveOwnProperty("isHere");
 				expect(config.isHere).to.be.true;
 				done();
@@ -106,7 +106,7 @@ describe("Command factory tests", () => {
 			class SomeProperCommand extends BaseStatefulCommand {
 				public run(): void {
 					expect(this.twokeys).to.be.instanceOf(TwoKeys);
-					expect(this.twokeys.logger.args.name).to.equal("command:someStatefulCommand");
+					expect(this.twokeys.logger.args.name).to.equal("someStatefulCommand");
 					done();
 				}
 			}
