@@ -64,7 +64,12 @@ export interface CommandInfo {
  * @template ReturnU Return type of command
  * @param twokeys TwoKeys object to use in the command, see {@link BaseTwoKeysForCommands} and {@link TwoKeys}
  */
-export type Command<ConfigT, ReturnU = void> = ((twokeys: TwoKeysForCommands, config: ConfigT) => ReturnU) & { commandInfo?: Partial<CommandInfo> };
+export type Command<ConfigT, ReturnU = void> = ((twokeys: TwoKeysForCommands, config: ConfigT) => (ReturnU)) & { commandInfo?: Partial<CommandInfo> };
+/**
+ * {@link Command} that returns a promise
+ * @see Command
+ */
+export type PromiseCommand<ConfigT, ReturnU = void> = Command<ConfigT, Promise<ReturnU>>;
 
 /**
  * Static props for a stateful command

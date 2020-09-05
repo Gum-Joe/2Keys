@@ -29,7 +29,7 @@ import { CodedError } from "@twokeys/core";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
 import { MainConfig } from "@twokeys/core/lib/interfaces";
 import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
-import { Command, BaseTwoKeysForCommands, CommandFactory } from "../../common";
+import { Command, BaseTwoKeysForCommands, CommandFactory, PromiseCommand } from "../../common";
 import type { OOBEConfig } from "../protobuf/oobe_pb";
 import * as errorCodes from "../util/errors";
 import packageJSON from "../../../package.json";
@@ -40,7 +40,7 @@ import setStaticIPv4Address from "../util/setIPv4";
  * @see TWOKEYS_MAIN_CONFIG_DEFAULT_PATH for the path to config
  * @see MainConfig for config schema
  */
-const oobe: Command<OOBEConfig.AsObject, Promise<void>> = async (twokeys, config): Promise<void> => {
+const oobe: PromiseCommand<OOBEConfig.AsObject> = async (twokeys, config): Promise<void> => {
 	twokeys.logger.info("Starting OOBE....");
 	twokeys.logger.status("Setting up 2Keys");
 	if (!config.didAcceptLicense) {

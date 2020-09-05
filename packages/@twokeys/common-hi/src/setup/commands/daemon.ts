@@ -33,7 +33,7 @@ import {
 	WINDOWS_DAEMON_FILE_VBS,
 	WINDOWS_SERVER_PID_FILE } from "../util/constants";
 import { promises as fs } from "fs";
-import { Command, CommandFactory } from "../../common";
+import { Command, CommandFactory, PromiseCommand } from "../../common";
 import { GenerateProjectDaemon } from "../protobuf/daemon_pb";
 import { CodedError } from "@twokeys/core";
 import * as errorCodes from "../../util/errors";
@@ -75,7 +75,7 @@ async function gen_startup_vbs(name: string, filesDir: string): Promise<string> 
 	return output;
 }
 
-const generateDaemon: Command<GenerateProjectDaemon.AsObject, Promise<void>> = async function (twokeys, config) {
+const generateDaemon: PromiseCommand<GenerateProjectDaemon.AsObject, void> = async function (twokeys, config) {
 	const { logger } = twokeys;
 	logger.status("Generating files for startup");
 	logger.substatus("Validating project");

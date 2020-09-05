@@ -25,7 +25,7 @@ import { join } from "path";
 import mkdirp from "mkdirp";
 import { promises as fs } from "fs";
 import { CreateProject } from "../protobuf/project_pb";
-import { Command, CommandFactory } from "../../common";
+import { Command, CommandFactory, PromiseCommand } from "../../common";
 import * as errorCodes from "../util/errors";
 import packageJSON from "../../../package.json";
 import generateDaemon from "./daemon";
@@ -51,7 +51,7 @@ export const TWOKEYS_CONFIG_PRELUDE = `# 2Keys Project Config
  * 
  * NOTE: {@link CreateProject.AsObject.serverInfo.permissions} needs to be provided
  */
-const createProject: Command<Required<CreateProject.AsObject>, Promise<void>> = async (twokeys, config) => {
+const createProject: PromiseCommand<Required<CreateProject.AsObject>> = async (twokeys, config) => {
 	const { logger } = twokeys;
 	logger.status("Creating new project");
 	logger.substatus("Creating config");

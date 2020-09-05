@@ -28,12 +28,13 @@ import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
 import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
-import { Logger, TwoKeysProperties } from "@twokeys/core";
+import { Logger, TwoKeysProperties, CodedError } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
 import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
 import TwoKeys from "./module-interfaces/twokeys";
 import { LoggerArgs } from "@twokeys/core/lib/interfaces";
+import * as errorCodes from "./util/error-codes";
 
 /**
  * Options for add-on registry constructor
@@ -203,8 +204,12 @@ export default class AddOnsRegistry {
 				throw new Error(`Add-on of type ${typeOfAddOn} not in package (add-on) ${packageToLoad.name} entries!`);
 			}
 		} catch (err) {
-			this.logger.err("Error loading package!");
-			throw err;
+			this.logger.err("Error loading add-on!");
+			if (err?.code === "MODULE_NOT_FOUND") {
+				throw new CodedError(`Entry point for type ${typeOfAddOn} from add-on ${packageToLoad.name} not found!`, errorCodes.ADDON_LOAD_FAILURE + ":NOT_FOUND");
+			} else {
+				throw new CodedError(`Error loading entry point for for type ${typeOfAddOn} from add-on ${packageToLoad.name}: ${err.message}`, `${errorCodes.ADDON_LOAD_FAILURE}${err.code ? ":" + err.code : ""}`);
+			}
 		}
 	}
 	/**
@@ -219,18 +224,17 @@ export default class AddOnsRegistry {
 			// Query DB for package
 			const packagesResults = await this.getPackagesFromDB(packageName);
 			if (!packagesResults.status) {
-				this.logger.err("Error loading package from DB!");
-				throw new Error(`Error loading package from DB: ${packagesResults.message || "See logs above"}`);
+				this.logger.err("Error loading add-on from DB!");
+				throw new Error(`Error loading add-on from DB: ${packagesResults.message || "See logs above"}`);
 			} else if (typeof packagesResults.results === "undefined" || packagesResults.results.length < 1) {
-				this.logger.err(`No packages were found by name ${packageName}!`);
-				const err: any = new Error(`No packages were found by name ${packageName}!`);
-				err.code = "ENOENT";
+				this.logger.err(`No add-ons were found by name ${packageName}!`);
+				const err: any = new CodedError(`No add-ons were found by name ${packageName}!`, errorCodes.ADDON_NOT_IN_REGISTRY);
 				throw err;
 			} else if (packagesResults.results.length > 1) {
-				this.logger.err("Error! Got back multiple packages!");
+				this.logger.err("Error! Got back multiple add-ons!");
 				this.logger.err("This means the registry DB may be corrupt.");
-				this.logger.err("Please reindex the packages DB in full.");
-				throw new Error("Got back multiple packages! Registry DB may be corrupt!");
+				this.logger.err("Please reindex the add-on DB in full.");
+				throw new Error("Got back multiple add-ons! Registry DB may be corrupt!");
 			} else {
 				// Everything OK, so we can load
 				return this.loadPackage<AddOnsType>(packagesResults.results[0], typeOfAddOn, propertiesForAddOn);
