@@ -77,24 +77,23 @@ type CommandsMap = Map<string, string>;
 
 	// Now, loop
 	const finalFile = `/* eslint-disable */
-// FILE COMPILED BY scripts/commands-list.ts
-// DO NOT MODIFY
+	// FILE COMPILED BY scripts/commands-list.ts
+	// DO NOT MODIFY
 
-// Imports
-import { Command } from "./common/base-commands";
-${mappedCommands.map((command, index) => {
-	const relativeFilePath = relative(dirname(OUT_FILE), command.file);
-	const filePathWithoutExt = join(path.parse(relativeFilePath).dir, path.parse(relativeFilePath).name);
-	return `import command${index} from "./${filePathWithoutExt.split(path.sep).join("/")}"`;
-}).join("\n")}
+	// Imports
+	${mappedCommands.map((command, index) => {
+		const relativeFilePath = relative(dirname(OUT_FILE), command.file);
+		const filePathWithoutExt = join(path.parse(relativeFilePath).dir, path.parse(relativeFilePath).name);
+		return `import command${index} from "./${filePathWithoutExt.split(path.sep).join("/")}"`;
+	}).join("\n")}
 
-// Map
-export = new Map<string, Command<unknown>>([
-${mappedCommands.map((command, index) => {
-	return `	["${command.commandName}", command${index}],`;
-}).join("\n")}
-]);
-`;
+	// Map
+	export = {
+	${mappedCommands.map((command, index) => {
+		return `"${command.commandName}": command${index},`;
+	}).join("\n")}
+	}
+	`;
 	await fs.writeFile(OUT_FILE, finalFile);
 	logger.info("File written.");
 })().catch(err => logger.printError(err));
