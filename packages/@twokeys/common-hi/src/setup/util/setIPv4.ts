@@ -44,6 +44,9 @@ function checkIP(twokeys: BaseTwoKeysForCommands, config: SetStaticIPv4): Promis
 		const timer = setInterval(function () {
 			const newIfaces = networkInterfaces();
 			const newIface = newIfaces[config.networkAdapter];
+			if (typeof newIface === "undefined") {
+				return reject(new CodedError(`Network Interface ${config.networkAdapter} has suddenly disappeared! This should be impossible. NOTE: IPv4 may have still been set`, errorCodes.NET_INTERFACE_NOT_FOUND));
+			}
 			const newFilteredIFace = newIface.filter(value => value.family === "IPv4");
 			if (newFilteredIFace[0].address !== config.ipv4) {
 				twokeys.logger.debug(`Not yet set. Got ${newFilteredIFace[0].address}.`);
@@ -87,6 +90,9 @@ export default async function setStaticIPv4Address(twokeys: BaseTwoKeysForComman
 		throw new CodedError(`Could not find network interface ${config.networkAdapter}!`, errorCodes.NET_INTERFACE_NOT_FOUND);
 	}
 	const iface = ifaces[config.networkAdapter];
+	if (typeof iface === "undefined") {
+		throw new CodedError(`Could not find network interface ${config.networkAdapter}!`, errorCodes.NET_INTERFACE_NOT_FOUND);
+	}
 	twokeys.logger.debug(`Found info for network interface ${config.networkAdapter}.`);
 	twokeys.logger.debug("Looking for IPv4...");
 	const filteredIFace = iface.filter(value => value.family === "IPv4");

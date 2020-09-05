@@ -225,7 +225,7 @@ export default class AddOnsRegistry {
 			const packagesResults = await this.getPackagesFromDB(packageName);
 			if (!packagesResults.status) {
 				this.logger.err("Error loading add-on from DB!");
-				throw new Error(`Error loading add-on from DB: ${packagesResults.message || "See logs above"}`);
+				throw new CodedError(`Error loading add-on from DB: ${packagesResults.message || "See logs above"}`, errorCodes.ADDON_DB_LOAD_FAIL);
 			} else if (typeof packagesResults.results === "undefined" || packagesResults.results.length < 1) {
 				this.logger.err(`No add-ons were found by name ${packageName}!`);
 				const err: any = new CodedError(`No add-ons were found by name ${packageName}!`, errorCodes.ADDON_NOT_IN_REGISTRY);

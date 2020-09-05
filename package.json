@@ -35,24 +35,24 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.11",
     "@types/chai-as-promised": "^7.1.3",
-    "@types/mocha": "^7.0.2",
+    "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.6.5",
     "cross-env": "^7.0.2",
-    "eslint": "^6.8.0",
-    "lerna": "3.20.2",
-    "mocha": "^7.2.0",
+    "eslint": "^7.8.1",
+    "lerna": "3.22.1",
+    "mocha": "^8.1.3",
     "mochawesome": "^6.1.1",
-    "node-gyp": "^6.1.0",
+    "node-gyp": "^7.1.0",
     "nyc": "^15.1.0",
     "source-map-support": "^0.5.19",
-    "ts-node": "^8.10.2",
-    "typedoc": "^0.17.4",
+    "ts-node": "^9.0.0",
+    "typedoc": "^0.19.1",
     "typescript": "^4.0.2",
     "wsrun": "^5.2.1"
   },
   "dependencies": {
-    "chalk": "4.0.0"
+    "chalk": "4.1.0"
   }
 }

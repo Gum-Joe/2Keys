@@ -36,6 +36,7 @@ import { REGISTRY_DIR, EXECUTOR_TEST } from "./constants";
 import { Logger } from "@twokeys/core";
 import { TwoKeys } from "../src/module-interfaces";
 import { LoggerArgs } from "@twokeys/core/src/interfaces";
+import * as errorCodes from "../src/util/error-codes";
 
 chai.use(require("chai-fs"));
 chai.use(require("chai-as-promised"));
@@ -360,7 +361,7 @@ describe("Registry tests", () => {
 			});
 
 			it("should throw an error if we ask for an add-on that is not installed", async () => {
-				await expect(registry.load("DEFO_NOT_IN_REG_" + Math.random(), "detector")).to.be.rejectedWith(/No packages were found (.*)/);
+				await expect(registry.load("DEFO_NOT_IN_REG_" + Math.random(), "detector")).to.be.rejectedWith(errorCodes.ADDON_NOT_IN_REGISTRY);
 			});
 
 			it("should throw an error if we load a type not in the package", async () => {
@@ -381,7 +382,7 @@ describe("Registry tests", () => {
 					driver: sqlite3.Database,
 				});
 				await db.exec(`UPDATE ${REGISTRY_TABLE_NAME} SET info = "{}" WHERE name = "${pkgJSON.name}"`);
-				await expect(registry.load(pkgJSON.name, "executor")).to.be.rejectedWith(/Error loading package from DB:(.*)/);
+				await expect(registry.load(pkgJSON.name, "executor")).to.be.rejectedWith(errorCodes.ADDON_DB_LOAD_FAIL);
 				await registry.uninstall(pkgJSON.name);
 			});
 

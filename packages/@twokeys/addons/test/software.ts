@@ -216,11 +216,15 @@ describe("Software Registry tests", () => {
 			await softwareRegistry.updateSoftware(testSoftwareToUpdate.name, testSoftwareUpdated);
 			const results = await softwareRegistry.getSoftware(testSoftwareUpdated.name);
 			const testSoftwareUpdatedWithoutExecutable = cloneDeep(testSoftwareUpdated);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
 			delete testSoftwareUpdatedWithoutExecutable.executables;
 			// check everything
 			expect(results).to.deep.include(testSoftwareUpdatedWithoutExecutable);
 			// Now check executables
 			// Delete paths because thje DB has absolute paths, not relative
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
 			testSoftwareUpdated.executables.forEach(value => delete value.path);
 			// Now check
 			expect(results.executables.length).to.equal(testSoftwareUpdated.executables.length);
@@ -234,15 +238,21 @@ describe("Software Registry tests", () => {
 
 		it("should successfully update a piece of software in the DB, when the newData does not have a name", async () => {
 			const newUpdate = cloneDeep(testSoftwareUpdated);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
 			delete newUpdate.name;
 			await softwareRegistry.updateSoftware(testSoftwareToUpdate.name, newUpdate);
 			const results = await softwareRegistry.getSoftware(testSoftwareUpdated.name);
 			const testSoftwareUpdatedWithoutExecutable = cloneDeep(newUpdate);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
 			delete testSoftwareUpdatedWithoutExecutable.executables;
 			// check everything
 			expect(results).to.deep.include(testSoftwareUpdatedWithoutExecutable);
 			// Now check executables
 			// Delete paths because thje DB has absolute paths, not relative
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
 			newUpdate.executables.forEach(value => delete value.path);
 			// Now check
 			expect(results.executables.length).to.equal(newUpdate.executables.length);
