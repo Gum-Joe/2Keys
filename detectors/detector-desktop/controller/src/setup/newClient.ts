@@ -18,9 +18,9 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PromisedTaskFunction } from "@twokeys/addons/src"
-import { ClientConfig } from "@twokeys/core/lib/interfaces"
-import { ClientConfigHere } from "../config"
+import type { PromisedTaskFunction } from "@twokeys/addons/src";
+import { ClientConfig } from "@twokeys/core/lib/interfaces";
+import { ClientConfigHere } from "../config";
 
 /**
  * Function to setup a new client
