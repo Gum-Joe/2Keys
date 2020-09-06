@@ -25,7 +25,7 @@ import type { Executor } from "@twokeys/addons";
 import execute, { AHKExecutorConfig } from "./exec";
 import install from "./install";
 
-// @ts-ignore
+// @ts-expect-error
 const executor: Executor<AHKExecutorConfig> = {
 	install: install, // causes compile errors
 	execute: execute,

@@ -104,8 +104,9 @@ export interface ProjectConfig {
 /**
  * Configures a client that is used as a detector.
  * This config is project-agnostic and is stored with the 2Keys Root Config (see interface {@link ServerConfig}).
+ * @template ClientConfigType type of config for client that controller provides
  */
-export interface ClientConfig {
+export interface ClientConfig<ClientConfigType = any> {
 	/** UUID of client, used to reference it in project config so it can be used in projects */
 	id: string;
 	/** Name of detector */
@@ -113,7 +114,7 @@ export interface ClientConfig {
 	/** Controller to use with detector, that is the add-on that holds the server side code for interfacing with the detector */
 	controller: string;
 	/** Config options to pass to the controller, defined by the controller itself */
-	controllerConfig: unknown;
+	controllerConfig: ClientConfigType;
 }
 
 /**

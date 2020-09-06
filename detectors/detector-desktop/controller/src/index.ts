@@ -18,18 +18,21 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Runs the install function
+ * Main detector type entry point
  * @packageDocumentation
  */
+import type { DetectorController } from "@twokeys/addons";
+import type { ClientConfigHere } from "./config";
+import newClient from "./setup/newClient";
 
-import type { PromisedTaskFunction, TwoKeys, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
-import { AHK_SOFTWARE_DEF } from "./constants";
-
-const install: PromisedTaskFunction<any, void, TWOKEYS_ADDON_TYPE_EXECUTOR> = async (twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>, config: any): Promise<void> => {
-	twokeys.logger.info("Installing AutoHotkey_H v2 alpha, to execute macro scripts...");
-	await twokeys.software.installSoftware(AHK_SOFTWARE_DEF);
-	twokeys.logger.info("AutoHotkey_H installed");
-	return;
+const detector: DetectorController = {
+	setup: {
+		// @ts-expect-error
+		setupNewClient: {
+			generateConfig: (twokeys, config): ClientConfigHere => config,
+			setup: newClient,
+		}
+	}
 };
 
-export default install;
+export = detector;

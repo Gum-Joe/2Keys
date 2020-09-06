@@ -17,19 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import type { PromisedTaskFunction } from "@twokeys/addons/src"
+import { ClientConfig } from "@twokeys/core/lib/interfaces"
+import { ClientConfigHere } from "../config"
+
 /**
- * Runs the install function
- * @packageDocumentation
+ * Function to setup a new client
  */
+const newClient: PromisedTaskFunction<ClientConfig<ClientConfigHere>> = async (twokeys, config) => {
+	twokeys.logger.status("Setting up a new VM");
+}
 
-import type { PromisedTaskFunction, TwoKeys, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
-import { AHK_SOFTWARE_DEF } from "./constants";
-
-const install: PromisedTaskFunction<any, void, TWOKEYS_ADDON_TYPE_EXECUTOR> = async (twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>, config: any): Promise<void> => {
-	twokeys.logger.info("Installing AutoHotkey_H v2 alpha, to execute macro scripts...");
-	await twokeys.software.installSoftware(AHK_SOFTWARE_DEF);
-	twokeys.logger.info("AutoHotkey_H installed");
-	return;
-};
-
-export default install;
+export default newClient;

@@ -2,5 +2,5 @@
 
 module.exports = {
 	extends: "../../../config/.mocharc.js",
-	timeout: 5000,
+	timeout: 50000,
 }

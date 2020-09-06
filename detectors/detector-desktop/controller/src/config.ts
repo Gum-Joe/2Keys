@@ -18,18 +18,36 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Runs the install function
+ * Types for config
  * @packageDocumentation
  */
 
-import type { PromisedTaskFunction, TwoKeys, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
-import { AHK_SOFTWARE_DEF } from "./constants";
+/**
+ * Keyboard identifyers
+ */
+export interface KeyboardIdentifyer {
+	/** Name of USB device */
+	name: string;
+	vendorID: string;
+	productID: string;
+	/** Optional serial number (not present on some devices) */
+	serialNumber?: string;
+	uuid: string;
+	/** Path to USB device */
+	address: string;
+}
 
-const install: PromisedTaskFunction<any, void, TWOKEYS_ADDON_TYPE_EXECUTOR> = async (twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>, config: any): Promise<void> => {
-	twokeys.logger.info("Installing AutoHotkey_H v2 alpha, to execute macro scripts...");
-	await twokeys.software.installSoftware(AHK_SOFTWARE_DEF);
-	twokeys.logger.info("AutoHotkey_H installed");
-	return;
-};
+/**
+ * Config for this controller, stored under the client configs inside a {@link ClientConfig}
+ */
+export interface ClientConfigHere {
+	perms: {
+		/** Add client to startup? */
+		addToStartup: boolean;
+		/** Automatically apply updates to client? RESERVED FOR FUTURE USE */
+		allowAutoUpdate: boolean;
+	};
 
-export default install;
+	/** Keyboard to capture (passthrough) */
+	keyboards: KeyboardIdentifyer[];
+}
