@@ -35,7 +35,7 @@ const logger = new Logger({
 	process.exit(1);
 })*/
 
-factory.callCommand(commands.createProject, {
+/*factory.callCommand(commands.createProject, {
 	projectName: "test_project",
 	projectLocation: join(__dirname, "../../testing"),
 	projectUuid: "1",
@@ -48,6 +48,23 @@ factory.callCommand(commands.createProject, {
 			allowStartup: false,
 		}
 	}
+}).catch(err => {
+	logger.printError(err);
+	process.exit(1);
+});*/
+
+
+factory.callCommand(commands.newClient, {
+	id: "101011",
+	name: "Test",
+	controller: "@twokeys/detector-desktop",
+	config: JSON.stringify({
+		perms: {
+			addToStartup: false,
+			allowAutoUpdate: true,
+		},
+		keyboards: []
+	})
 }).catch(err => {
 	logger.printError(err);
 	process.exit(1);

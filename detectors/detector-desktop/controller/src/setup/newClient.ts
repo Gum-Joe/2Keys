@@ -27,6 +27,12 @@ import { ClientConfigHere } from "../config";
  */
 const newClient: PromisedTaskFunction<ClientConfig<ClientConfigHere>> = async (twokeys, config) => {
 	twokeys.logger.status("Setting up a new VM");
-}
+	// TODO: Action List
+	// 0: Check vagrant and VBox is installed
+	// 1: Create base files (from templates)
+	// 2: Adjust Ansible config
+	// 3: Run `vagrant up` & handle errors
+	// 4: SSH in and validate 2Keys is installed; copy client config & configure shares (run 2Keys client init)
+};
 
 export default newClient;
