@@ -4,14 +4,14 @@
 
 // Imports
 import command0 from "./setup/commands/daemon"
-import command1 from "./setup/commands/new-detector"
+import command1 from "./setup/commands/new-client"
 import command2 from "./setup/commands/project"
 import command3 from "./setup/commands/oobe"
 
 // Map
 export = {
 	"generateProjectDaemon": command0,
-	"newDetector": command1,
+	"newClient": command1,
 	"createProject": command2,
 	"oobe": command3,
 }

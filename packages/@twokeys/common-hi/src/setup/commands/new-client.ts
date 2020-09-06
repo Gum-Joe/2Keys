@@ -78,4 +78,4 @@ export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys,
 	await controller.call(controller.setup.setupNewClient.setup, fullConfig);
 };
 
-export default CommandFactory.wrapCommand(newDetector, "newDetector");
+export default CommandFactory.wrapCommand(newDetector, "newClient");
