@@ -60,7 +60,7 @@ export interface StepsExplainer {
 }
 
 /**
- * Defines a generic task function used to execute addon tasks, such as:
+ * Defines a generic task function used to execute addon tasks **that does __NOT__ returns a promose**, such as:
  * - Setup of a detector
  * - Execution of a hotkey
  * @param twokeys An object provided to the task function that allow it to interact with 2Keys and access function for, for example, logging
@@ -68,12 +68,22 @@ export interface StepsExplainer {
  * @template GenericConfigT Generic where the config the add-on wants is defined
  * @template ReturnG An optional return type for the Promise, auto wrapped into a promise because all add-on functions are async/await promise returning ones
  */
-export type TaskFunction<GenericConfigT, ReturnG = void, AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = BaseTaskFunction<TwoKeys<AddOnsType>, GenericConfigT, Promise<ReturnG>>
+export type TaskFunction<GenericConfigT, ReturnG = void, AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = BaseTaskFunction<TwoKeys<AddOnsType>, GenericConfigT, ReturnG>
+/**
+ * Defines a generic task function used to execute addon tasks **that returns a promise**, such as:
+ * - Setup of a detector
+ * - Execution of a hotkey
+ * @param twokeys An object provided to the task function that allow it to interact with 2Keys and access function for, for example, logging
+ * @param config Config object to pass to function
+ * @template GenericConfigT Generic where the config the add-on wants is defined
+ * @template ReturnG An optional return type for the Promise, auto wrapped into a promise because all add-on functions are async/await promise returning ones
+ */
+export type PromisedTaskFunction<GenericConfigT, ReturnG = void, AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = TaskFunction<GenericConfigT, Promise<ReturnG>, AddOnsType>
 
 /** Defines the base properties for ALL add-ons */
 export interface BaseAddon<AddonType extends TWOKEYS_ADDON_TYPES> {
 	/** Options to present to user when running install func */
 	installOptions?: ConfigDescriptors;
 	/** Function that runs when installing the add-on, doing, for example, downloading (executor) software */
-	install?: TaskFunction<any, void, AddonType>;
+	install?: PromisedTaskFunction<any, void, AddonType>;
 }

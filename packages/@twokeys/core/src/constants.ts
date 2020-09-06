@@ -32,8 +32,8 @@ export const TWOKEYS_HOME = join(homedir(), ".2Keys");
 export const TWOKEYS_CONFIG_HOME = join(TWOKEYS_HOME, "config");
 /** Default location of 2Keys main config (see interface {@link ServerConfig}).  Is the only fixed config location. */
 export const TWOKEYS_MAIN_CONFIG_DEFAULT_PATH = join(TWOKEYS_CONFIG_HOME,  "config.yml");
-/** root dir for the storage of detector configs */
-export const TWOKEYS_DETECTOR_CONFIG_ROOT = join(TWOKEYS_HOME, "detectors");
+/** root dir for the storage of client configs */
+export const TWOKEYS_CLIENTS_CONFIG_ROOT = join(TWOKEYS_HOME, "clients");
 // NOTE: Check @twokeys/addons for default registry root
 /**
  * Name of config file for projects

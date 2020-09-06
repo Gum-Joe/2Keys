@@ -1,8 +1,6 @@
 /** Config for creating a new detector, and adding it to a project */
 syntax = "proto3";
 
-import "google/protobuf/any.proto";
-
 message NewDetector {
 	/** UUID of detector */
 	string id = 1;
@@ -10,6 +8,6 @@ message NewDetector {
 	string name = 2;
 	/** Controller to use with this detector */
 	string controller = 3;
-	/** Protobuf serialised config for controller */
-	google.protobuf.Any config = 4;
+	/** JSON serialised config for detector controller */
+	string config = 4;
 }

@@ -23,7 +23,7 @@
  */
 
 import type { HotkeyTypeSingle, Keyboard } from "@twokeys/core/src/interfaces";
-import type { ConfigDescriptors, TaskFunction, ConfigDescriptor, BaseAddon } from "./";
+import type { ConfigDescriptor, BaseAddon, PromisedTaskFunction } from "./";
 import type { TWOKEYS_ADDON_TYPE_EXECUTOR } from "../util/interfaces";
 
 /**
@@ -91,7 +91,7 @@ export interface ExecutorScanMultiFileOne {
  */
 export type ExecutorScan = ExecutorScanMultiFileOne[] | ExecutorScanIndividual[];
 
-export type ExecutorTaskFunction<ConfigT, ReturnG = void> = TaskFunction<ConfigT, ReturnG, TWOKEYS_ADDON_TYPE_EXECUTOR>
+export type ExecutorTaskFunction<ConfigT, ReturnG = void> = PromisedTaskFunction<ConfigT, ReturnG, TWOKEYS_ADDON_TYPE_EXECUTOR>
 
 /**
  * Defines the exports for an executor

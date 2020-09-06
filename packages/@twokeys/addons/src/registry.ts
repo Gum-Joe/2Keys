@@ -91,7 +91,7 @@ type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModul
 	 * @template U Return type (excluding promise wrapper) of the function
 	 * @returns The Promise from the function
 	 */
-	call: <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T) => Promise<U>;
+	call: <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T) => U;
 	/** twokeys class */
 	twokeys: TwoKeys<AddOnsType>;
 	/** Properties for {@link TwoKeys.properties} */
@@ -193,7 +193,7 @@ export default class AddOnsRegistry {
 				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), loaded.properties);
 				// Custom Logger to use
 
-				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): Promise<U> => {
+				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): U => {
 					return fn(loaded.twokeys, config);
 				};
 				this.logger.info("Add-on loaded.");

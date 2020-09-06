@@ -21,15 +21,31 @@
  * Creates a new detector
  * @packageDocumentation
  */
-
+import { promises as fs } from "fs";
 import { PromiseCommand, CommandFactory } from "../../common";
 import { NewDetector } from "../protobuf/detector_pb";
 import { AddOnsRegistry } from "@twokeys/addons/src";
-import { loadMainConfig } from "@twokeys/core/lib/config";
+import { loadMainConfig, stringifyClientConfig } from "@twokeys/core/lib/config";
+import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
+import TwoKeysForCommands from "../../common/twokeys";
+import { join } from "path";
+import { ClientConfig } from "@twokeys/core/lib/interfaces";
+
+/**
+ * Writes a client config to {@link TWOKEYS_CLIENTS_CONFIG_ROOT} as name `client-${config.id}.yml`
+ * @param twokeys TwoKeys object
+ * @param uuid UUID of client
+ * @param configYAML YAML stringfied config
+ */
+export function writeClientConfig(twokeys: TwoKeysForCommands, uuid: string, configYAML: string): Promise<void> {
+	const filename = join(TWOKEYS_CLIENTS_CONFIG_ROOT, `client-${uuid}.yml`);
+	twokeys.logger.debug(`Writing config to ${filename}...`);
+	return fs.writeFile(filename, configYAML);
+}
 
 export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys, config) => {
 	const { logger } = twokeys;
-	logger.status("Creating new detector")
+	logger.status("Creating new detector");
 	logger.info(`Creating new detector of name ${config.name}`);
 	logger.substatus("Loading main config");
 	const mainConfig = await loadMainConfig();
@@ -40,10 +56,26 @@ export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys,
 	await registry.initDB();
 	logger.substatus("Loading controller");
 	const controller = await registry.loadDetector(config.controller);
+	logger.debug("Controller loaded");
+
+	logger.substatus("Generating config");
+	logger.debug("Parsing config...");
 	// Decode config
 	const detectorConfigDecoded = JSON.parse(config.config) as unknown;
-	logger.substatus("Handing over to controller add-on");
-	await controller.call(controller.setup.setupNewClient.setup, detectorConfigDecoded);
-}
+	logger.debug("Running controller function to generate config...");
+	const controllerConfig = controller.call(controller.setup.setupNewClient.generateConfig, detectorConfigDecoded);
+	const fullConfig: ClientConfig = {
+		id: config.id,
+		name: config.name,
+		controller: config.controller,
+		controllerConfig,
+	};
+	logger.info("Writing config...");
+	logger.debug("Stringifying...");
+	await writeClientConfig(twokeys, config.id, stringifyClientConfig(fullConfig));
+
+	logger.substatus("Handing over to controller add-on for setup");
+	await controller.call(controller.setup.setupNewClient.setup, fullConfig);
+};
 
 export default CommandFactory.wrapCommand(newDetector, "newDetector");

@@ -54,8 +54,8 @@ export async function loadConfig<ConfigType extends CombinedConfigs>(configFile:
 /**
  * Loads the main config from the default dir ({@link CONFIG_DEFAULT_FILE_SERVER})
  */
-export async function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<MainConfig> {
-	logger.debug(`Loading server config from file ${file}...`);
+export function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<MainConfig> {
+	logger.debug(`Loading main config from file ${file}...`);
 	return loadConfig<MainConfig>(file);
 }
 
@@ -70,11 +70,20 @@ export async function loadProjectConfig(projectPath: string): Promise<ProjectCon
 		return await loadConfig<ProjectConfig>(file);
 	} catch (err) {
 		if (err.code === "ENOENT") {
-			throw new CodedError("Attempted to load a config that was not a project", "INVALID_PROJECT");
+			throw new CodedError("Attempted to load a project config in a directory that was not a project", "INVALID_PROJECT");
 		} else {
 			throw err;
 		}
 	}
+}
+
+/**
+ * Loads a client config based on a file name
+ * @param file ABsolute path to detector config
+ */
+export function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<ClientConfig> {
+	logger.debug(`Loading detector config from file ${file}...`);
+	return loadConfig<ClientConfig>(file);
 }
 
 /**
@@ -88,5 +97,12 @@ export function stringifyMainConfig(config: MainConfig): string {
  * Stringifies to YAML project config
  */
 export function stringifyProjectConfig(config: ProjectConfig): string {
+	return YAML.stringify(config);
+}
+
+/**
+ * Stringifies to YAML client config
+ */
+export function stringifyClientConfig(config: ClientConfig): string {
 	return YAML.stringify(config);
 }
