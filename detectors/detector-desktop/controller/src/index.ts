@@ -22,14 +22,14 @@
  * @packageDocumentation
  */
 import type { DetectorController } from "@twokeys/addons";
-import type { ClientConfigHere } from "./config";
-import newClient from "./setup/newClient";
+import generateConfig from "./setup/client/generateConfig";
+import newClient from "./setup/client/newClient";
 
 const detector: DetectorController = {
 	setup: {
 		// @ts-expect-error
 		setupNewClient: {
-			generateConfig: (twokeys, config): ClientConfigHere => config,
+			generateConfig,
 			setup: newClient,
 		}
 	}

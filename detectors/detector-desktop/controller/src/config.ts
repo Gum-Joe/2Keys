@@ -50,4 +50,9 @@ export interface ClientConfigHere {
 
 	/** Keyboard to capture (passthrough) */
 	keyboards: KeyboardIdentifyer[];
+
+	/** Executables, optional for the config from generateConfig.  Only set this if the user has specifically set a vagrant path */
+	executables: Partial<{
+		vagrant: string;
+	}>;
 }

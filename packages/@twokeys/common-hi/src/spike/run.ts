@@ -4,8 +4,6 @@ import BaseTwoKeysForCommands, { ensureIsValidTwoKeysClass } from "../common/two
 import { Logger, TwoKeysProperties } from "@twokeys/core";
 import { CommandInfo } from "../common/base-commands";
 import commands from "../commandsList";
-import { TWOKEYS_DEFAULT_REGISTRY_ROOT } from "@twokeys/addons";
-import { join } from "path";
 
 @ensureIsValidTwoKeysClass
 class Twokeys extends BaseTwoKeysForCommands {

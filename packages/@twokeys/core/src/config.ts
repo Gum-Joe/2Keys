@@ -24,7 +24,7 @@
  */
 import { promises as fs } from "fs";
 import YAML from "yaml";
-import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs } from "./interfaces";
+import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs, DeepWriteable, ConfigWithoutUtils, ConfigUtils, MakeKeysOptional } from "./interfaces";
 import Logger from "./logger";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, TWOKEYS_PROJECT_CONFIG_FILENAME } from "./constants";
 import { join } from "path";
@@ -33,6 +33,8 @@ import { CodedError } from "./error";
 const logger = new Logger({
 	name: "config",
 });
+
+type ConfigLoaderReturn<T> = Promise<T>;
 
 /**
  * Loads and parses a YAML config from a file
@@ -43,7 +45,7 @@ const logger = new Logger({
  * - Config for a detector that is used in a project (see interface {@link DetectorConfig})
  * @param configFile File to load config from
  */
-export async function loadConfig<ConfigType extends CombinedConfigs>(configFile: string): Promise<ConfigType> {
+export async function loadConfig<ConfigType extends CombinedConfigs>(configFile: string): ConfigLoaderReturn<ConfigType> {
 	logger.debug("Reading config from file " + configFile);
 	const config: Buffer = await fs.readFile(configFile);
 	const parsedConfig: ConfigType = YAML.parse(config.toString());
@@ -54,7 +56,7 @@ export async function loadConfig<ConfigType extends CombinedConfigs>(configFile:
 /**
  * Loads the main config from the default dir ({@link CONFIG_DEFAULT_FILE_SERVER})
  */
-export function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<MainConfig> {
+export function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): ConfigLoaderReturn<MainConfig> {
 	logger.debug(`Loading main config from file ${file}...`);
 	return loadConfig<MainConfig>(file);
 }
@@ -63,7 +65,7 @@ export function loadMainConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise
  * Loads the project config from a dir
  * @param projectPath absolute path to project to load
  */
-export async function loadProjectConfig(projectPath: string): Promise<ProjectConfig> {
+export async function loadProjectConfig(projectPath: string): ConfigLoaderReturn<ProjectConfig> {
 	const file = join(projectPath, TWOKEYS_PROJECT_CONFIG_FILENAME);
 	logger.debug(`Loading project config from file ${file}...`);
 	try {
@@ -81,9 +83,31 @@ export async function loadProjectConfig(projectPath: string): Promise<ProjectCon
  * Loads a client config based on a file name
  * @param file ABsolute path to detector config
  */
-export function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<ClientConfig> {
-	logger.debug(`Loading detector config from file ${file}...`);
-	return loadConfig<ClientConfig>(file);
+export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): ConfigLoaderReturn<ClientConfig> {
+	logger.debug(`Loading client config from file ${file}...`);
+	const config = await loadConfig<ClientConfig>(file);
+	// Add methods
+	/**
+	 * How this works:
+	 * - Creatre shallow opy of config
+	 * - Remove the write options etc 
+	 * - Write config
+	 */
+	config.write = (): Promise<void> => {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+		// @ts-ignore: Bad keys are deleted
+		const newConfig: MakeKeysOptional<ClientConfig, keyof ConfigUtils> = { ...config } as MakeKeysOptional<ClientConfig, keyof ConfigUtils>;
+		// HACK: Would prefer type checking here, to check all deletes are manually done, but couldn't get that to work
+		const keys: Array<keyof ConfigUtils> = ["write"];
+		// Delete everything related to utils
+		for (const key of keys) {
+			delete newConfig[key]; // Thankfully this does not affect `config` 
+		}
+		// eslint-disable-next-line @typescript-eslint/no-use-before-define
+		return fs.writeFile(file, stringifyClientConfig(newConfig));
+	};
+
+	return config;
 }
 
 /**
@@ -103,6 +127,6 @@ export function stringifyProjectConfig(config: ProjectConfig): string {
 /**
  * Stringifies to YAML client config
  */
-export function stringifyClientConfig(config: ClientConfig): string {
+export function stringifyClientConfig(config: ConfigWithoutUtils<ClientConfig>): string {
 	return YAML.stringify(config);
 }

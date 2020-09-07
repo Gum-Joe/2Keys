@@ -25,11 +25,16 @@ import { promises as fs } from "fs";
 import { PromiseCommand, CommandFactory } from "../../common";
 import { NewDetector } from "../protobuf/detector_pb";
 import { AddOnsRegistry } from "@twokeys/addons/src";
-import { loadMainConfig, stringifyClientConfig } from "@twokeys/core/lib/config";
+import { loadClientConfig, loadMainConfig, stringifyClientConfig } from "@twokeys/core/lib/config";
 import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
 import TwoKeysForCommands from "../../common/twokeys";
 import { join } from "path";
-import { ClientConfig } from "@twokeys/core/lib/interfaces";
+import { ClientConfig, ConfigUtils, MakeKeysOptional } from "@twokeys/core/lib/interfaces";
+
+/** Gets path to client config */
+export function getClientConfigPath(root: string, uuid: string) {
+	return join(root, `client-${uuid}.yml`);
+}
 
 /**
  * Writes a client config to {@link TWOKEYS_CLIENTS_CONFIG_ROOT} as name `client-${config.id}.yml`
@@ -38,7 +43,7 @@ import { ClientConfig } from "@twokeys/core/lib/interfaces";
  * @param configYAML YAML stringfied config
  */
 export function writeClientConfig(twokeys: TwoKeysForCommands, uuid: string, configYAML: string): Promise<void> {
-	const filename = join(TWOKEYS_CLIENTS_CONFIG_ROOT, `client-${uuid}.yml`);
+	const filename = getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, uuid);
 	twokeys.logger.debug(`Writing config to ${filename}...`);
 	return fs.writeFile(filename, configYAML);
 }
@@ -64,18 +69,25 @@ export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys,
 	const detectorConfigDecoded = JSON.parse(config.config) as unknown;
 	logger.debug("Running controller function to generate config...");
 	const controllerConfig = controller.call(controller.setup.setupNewClient.generateConfig, detectorConfigDecoded);
-	const fullConfig: ClientConfig = {
+	const fullConfig: MakeKeysOptional<ClientConfig, "write"> = {
 		id: config.id,
 		name: config.name,
 		controller: config.controller,
 		controllerConfig,
+		write: undefined,
 	};
+	// HACK: Would prefer type checking here, to check all deletes are manually done, but couldn't get that to work
+	const keys: Array<keyof ConfigUtils> = ["write"];
+	// Delete everything related to utils
+	for (const key of keys) {
+		delete fullConfig[key]; // Thankfully this does not affect `config` 
+	}
 	logger.info("Writing config...");
 	logger.debug("Stringifying...");
 	await writeClientConfig(twokeys, config.id, stringifyClientConfig(fullConfig));
 
 	logger.substatus("Handing over to controller add-on for setup");
-	await controller.call(controller.setup.setupNewClient.setup, fullConfig);
+	await controller.call(controller.setup.setupNewClient.setup, await loadClientConfig(getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, fullConfig.id)));
 };
 
 export default CommandFactory.wrapCommand(newDetector, "newClient");

@@ -18,6 +18,18 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** Recursivly make a type writable */
+export type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> };
+
+/** Makes some keys from an interface optional */
+export type MakeKeysNever<T, K extends keyof T> ={
+	[P in keyof T]: P extends K ? undefined : T[P];
+}
+
+export type MakeKeysOptional<T, K extends keyof T> = {
+	[P in keyof T]: P extends K ? undefined : T[P];
+}
+
 /**
  * Defines options for the Logger class
  * @packageDocumentation
@@ -65,6 +77,14 @@ export interface LoggerTypes {
  * Config types
  * See `example` for examples of each
  */
+/** Util methods for config for add-ons to allow the modification of config */
+export interface ConfigUtils {
+	/** Adjust the properties of adjustable options, then call `write()` to write the new config. */
+	write: () => Promise<void>;
+}
+
+export type ConfigWithoutUtils<T extends ConfigUtils> = MakeKeysOptional<T, keyof ConfigUtils>;
+
 /**
  * Defines the config for a project file.
  * This is the root `config.yml` and is first loaded when 2Keys loads a project
@@ -106,7 +126,7 @@ export interface ProjectConfig {
  * This config is project-agnostic and is stored with the 2Keys Root Config (see interface {@link ServerConfig}).
  * @template ClientConfigType type of config for client that controller provides
  */
-export interface ClientConfig<ClientConfigType = any> {
+export interface ClientConfig<ClientConfigType = any> extends ConfigUtils {
 	/** UUID of client, used to reference it in project config so it can be used in projects */
 	id: string;
 	/** Name of detector */
