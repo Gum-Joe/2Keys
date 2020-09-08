@@ -156,8 +156,8 @@ export default class AddOnsRegistry {
 	 * - When an add-on function logs, it has the prefix `add-on:addonName::` (colon there because `::` looks better than `:`; the extra colon is provided by {@link TwoKeys})
 	 * - When an add-on use software or registry or other 2Keys function, the prefix is `add-on:addonName:software`, etc
 	 */
-	protected getLoggerForAddon(thePackage: Package): typeof Logger {
-		return class extends this.LoggerConstructor {
+	public static getLoggerForAddon(thePackage: Package, LoggerConstructor: typeof Logger): typeof Logger {
+		return class extends LoggerConstructor {
 			constructor(args: LoggerArgs) {
 				super(args);
 				this.args.name = `add-on:${thePackage.name}:${this.args.name}`;
@@ -190,7 +190,12 @@ export default class AddOnsRegistry {
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
 				loaded.properties = propertiesForAddOn || {};
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), loaded.properties);
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(
+					Object.assign(packageToLoad),
+					this.registryDBFilePath,
+					AddOnsRegistry.getLoggerForAddon(loaded.package, this.LoggerConstructor),
+					loaded.properties
+				);
 				// Custom Logger to use
 
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): U => {

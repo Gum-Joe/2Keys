@@ -70,7 +70,7 @@ async function getVBoxManagePath(twokeys: TwoKeys): Promise<string> {
 /**
  * Install stuff
  */
-const install: PromisedTaskFunction<void> = async (twokeys) => {
+const install: PromisedTaskFunction<void, void> = async (twokeys) => {
 	twokeys.logger.info("Configuring 2Keys to use VirtualBox and Vagrant...");
 	// 0: Check vagrant and VBox is installed
 	const vagrantPath = await getVagrantPath(twokeys);
