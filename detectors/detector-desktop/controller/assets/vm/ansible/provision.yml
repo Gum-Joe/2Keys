@@ -1,0 +1,70 @@
+# Ansible provisioning for alpine
+---
+- hosts: all
+  tasks:
+    - name: Update package index and upgrade system
+      become: true
+      apk:
+        update_cache: yes
+        upgrade: yes
+    - name: Check for Python 3
+      raw: test -e /usr/bin/python3
+      changed_when: false
+      failed_when: false
+      register: check_python3
+    - name: Install Python 3
+      become: true
+      apk:
+        name: python3
+        state: present
+      when: check_python3.rc != 0
+    - name: Check for pip3
+      raw: test -e /usr/bin/pip3
+      changed_when: false
+      failed_when: false
+      register: check_pip3
+    - name: Install pip3
+      become: true
+      apk:
+        name: py3-pip
+        state: present
+      when: check_pip3.rc != 0
+    # Install APK packages
+    - name: Instal udev
+      become: true
+      apk:
+        name: udev
+        state: present 
+    - name: Start udev service
+      become: true
+      service:
+        name: udev
+        state: started
+    - name: Add udev to sysinit
+      become: true
+      command: rc-update add udev sysinit
+    - name: Start udev-trigger service
+      become: true
+      service:
+        name: udev-trigger
+        state: started
+    - name: Add udev-trigger to sysinit
+      become: true
+      command: rc-update add udev-trigger sysinit
+    - name: Start udev-settle service
+      become: true
+      service:
+        name: udev-settle
+        state: started
+    - name: Add udev-settle to sysinit
+      become: true
+      command: rc-update add udev-settle sysinit
+    - name: Add Python native add-on build deps
+      become: true
+      apk:
+        name: linux-headers,build-base,python3-dev
+        state: present
+    - name: Install 2Keys
+      become: true
+      pip:
+        name: 2Keys
