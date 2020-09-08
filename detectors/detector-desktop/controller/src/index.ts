@@ -24,6 +24,7 @@
 import type { DetectorController } from "@twokeys/addons";
 import generateConfig from "./setup/client/generateConfig";
 import newClient from "./setup/client/newClient";
+import install from "./install";
 
 const detector: DetectorController = {
 	setup: {
@@ -32,7 +33,8 @@ const detector: DetectorController = {
 			generateConfig,
 			setup: newClient,
 		}
-	}
+	},
+	install,
 };
 
 export = detector;

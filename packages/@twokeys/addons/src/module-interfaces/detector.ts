@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 
-import { Keyboard, DetectorConfig, ClientConfig } from "@twokeys/core/src/interfaces";
+import { Keyboard, DetectorConfig, ClientConfig, AddConfigUtils } from "@twokeys/core/src/interfaces";
 import { ConfigDescriptors, StepsExplainer, TaskFunction, BaseAddon, PromisedTaskFunction } from "./common";
 
 /**
@@ -62,7 +62,7 @@ export interface DetectorController extends BaseAddon<"detector"> {
 			/** Function to run to generate config that is written, and then passed to any function needing the config */
 			generateConfig: TaskFunction<any, any>;
 			/** Function to run, with the config created using {@link DetectorController.setup.setupNewClient.configDescriptor} */
-			setup: PromisedTaskFunction<ClientConfig>;
+			setup: PromisedTaskFunction<AddConfigUtils<ClientConfig>>;
 		};
 		/** Export of the code to do with adding a detector */
 		addDetectorToProject: {

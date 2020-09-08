@@ -19,18 +19,18 @@
  */
 
 import { PromisedTaskFunction } from "@twokeys/addons/lib";
-import type { ClientConfig } from "@twokeys/core/lib/interfaces";
+import type { AddConfigUtils, ClientConfig } from "@twokeys/core/lib/interfaces";
 import type { ClientConfigHere } from "../../config";
 
 /**
  * Function to setup a new client
  */
-const newClient: PromisedTaskFunction<ClientConfig<ClientConfigHere>> = async (twokeys, config) => {
+const newClient: PromisedTaskFunction<AddConfigUtils<ClientConfig<ClientConfigHere>>> = async (twokeys, config) => {
 	twokeys.logger.status("Setting up a new VM");
 	// TODO: Action Lis
 	// NOTE: The install of this module means vagrant etc was installed, so it's fine to just assume they are installed
 	// 1: Create base files (from templates)
-	// 2: Adjust Ansible config
+	// 2: Adjust Ansible configx
 	// 3: Run `vagrant up` & handle errors
 	// 4: SSH in and validate 2Keys is installed; copy client config & configure shares (run 2Keys client init)
 };

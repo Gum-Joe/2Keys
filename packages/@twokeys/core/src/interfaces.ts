@@ -73,17 +73,21 @@ export interface LoggerTypes {
 	args?: LoggerArgs;
 }
 
-/**
- * Config types
- * See `example` for examples of each
- */
 /** Util methods for config for add-ons to allow the modification of config */
 export interface ConfigUtils {
 	/** Adjust the properties of adjustable options, then call `write()` to write the new config. */
 	write: () => Promise<void>;
 }
 
-export type ConfigWithoutUtils<T extends ConfigUtils> = MakeKeysOptional<T, keyof ConfigUtils>;
+/**
+ * Config types
+ * See `example` for examples of each
+ */
+
+/** Add {@link ConfigUtils} to config types so you can safely use them. */
+export type AddConfigUtils<T extends { [key: string]: any }> = T & ConfigUtils
+
+// export type ConfigWithoutUtils<T extends AddConfigUtils<U>, U> = MakeKeysOptional<T, keyof ConfigUtils>;
 
 /**
  * Defines the config for a project file.
@@ -126,7 +130,7 @@ export interface ProjectConfig {
  * This config is project-agnostic and is stored with the 2Keys Root Config (see interface {@link ServerConfig}).
  * @template ClientConfigType type of config for client that controller provides
  */
-export interface ClientConfig<ClientConfigType = any> extends ConfigUtils {
+export interface ClientConfig<ClientConfigType = any> {
 	/** UUID of client, used to reference it in project config so it can be used in projects */
 	id: string;
 	/** Name of detector */

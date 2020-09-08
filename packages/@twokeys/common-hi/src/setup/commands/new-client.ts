@@ -29,10 +29,10 @@ import { loadClientConfig, loadMainConfig, stringifyClientConfig } from "@twokey
 import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
 import TwoKeysForCommands from "../../common/twokeys";
 import { join } from "path";
-import { ClientConfig, ConfigUtils, MakeKeysOptional } from "@twokeys/core/lib/interfaces";
+import { ClientConfig } from "@twokeys/core/lib/interfaces";
 
 /** Gets path to client config */
-export function getClientConfigPath(root: string, uuid: string) {
+export function getClientConfigPath(root: string, uuid: string): string {
 	return join(root, `client-${uuid}.yml`);
 }
 
@@ -69,19 +69,12 @@ export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys,
 	const detectorConfigDecoded = JSON.parse(config.config) as unknown;
 	logger.debug("Running controller function to generate config...");
 	const controllerConfig = controller.call(controller.setup.setupNewClient.generateConfig, detectorConfigDecoded);
-	const fullConfig: MakeKeysOptional<ClientConfig, "write"> = {
+	const fullConfig: ClientConfig = {
 		id: config.id,
 		name: config.name,
 		controller: config.controller,
 		controllerConfig,
-		write: undefined,
 	};
-	// HACK: Would prefer type checking here, to check all deletes are manually done, but couldn't get that to work
-	const keys: Array<keyof ConfigUtils> = ["write"];
-	// Delete everything related to utils
-	for (const key of keys) {
-		delete fullConfig[key]; // Thankfully this does not affect `config` 
-	}
 	logger.info("Writing config...");
 	logger.debug("Stringifying...");
 	await writeClientConfig(twokeys, config.id, stringifyClientConfig(fullConfig));

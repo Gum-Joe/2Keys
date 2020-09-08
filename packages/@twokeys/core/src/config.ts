@@ -24,7 +24,7 @@
  */
 import { promises as fs } from "fs";
 import YAML from "yaml";
-import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs, DeepWriteable, ConfigWithoutUtils, ConfigUtils, MakeKeysOptional } from "./interfaces";
+import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs, AddConfigUtils, MakeKeysOptional, ConfigUtils } from "./interfaces";
 import Logger from "./logger";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, TWOKEYS_PROJECT_CONFIG_FILENAME } from "./constants";
 import { join } from "path";
@@ -83,9 +83,9 @@ export async function loadProjectConfig(projectPath: string): ConfigLoaderReturn
  * Loads a client config based on a file name
  * @param file ABsolute path to detector config
  */
-export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): ConfigLoaderReturn<ClientConfig> {
+export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<AddConfigUtils<ClientConfig>> {
 	logger.debug(`Loading client config from file ${file}...`);
-	const config = await loadConfig<ClientConfig>(file);
+	const config = await loadConfig<ClientConfig & Partial<ConfigUtils>>(file);
 	// Add methods
 	/**
 	 * How this works:
@@ -96,7 +96,7 @@ export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH):
 	config.write = (): Promise<void> => {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 		// @ts-ignore: Bad keys are deleted
-		const newConfig: MakeKeysOptional<ClientConfig, keyof ConfigUtils> = { ...config } as MakeKeysOptional<ClientConfig, keyof ConfigUtils>;
+		const newConfig: MakeKeysOptional<ClientConfig, keyof ConfigUtils> = { ...config };
 		// HACK: Would prefer type checking here, to check all deletes are manually done, but couldn't get that to work
 		const keys: Array<keyof ConfigUtils> = ["write"];
 		// Delete everything related to utils
@@ -107,7 +107,7 @@ export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH):
 		return fs.writeFile(file, stringifyClientConfig(newConfig));
 	};
 
-	return config;
+	return config as AddConfigUtils<ClientConfig>;
 }
 
 /**
@@ -127,6 +127,6 @@ export function stringifyProjectConfig(config: ProjectConfig): string {
 /**
  * Stringifies to YAML client config
  */
-export function stringifyClientConfig(config: ConfigWithoutUtils<ClientConfig>): string {
+export function stringifyClientConfig(config: ClientConfig): string {
 	return YAML.stringify(config);
 }
