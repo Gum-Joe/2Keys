@@ -26,8 +26,8 @@
  * Keyboard identifyers
  */
 export interface KeyboardIdentifyer {
-	/** Name of USB device */
-	name: string;
+	/** VBox identifyer for this passthrough */
+	filterName: string;
 	vendorID: string;
 	productID: string;
 	/** Optional serial number (not present on some devices) */
@@ -35,6 +35,15 @@ export interface KeyboardIdentifyer {
 	uuid: string;
 	/** Path to USB device */
 	address: string;
+}
+
+/**
+ * Defines a project we want to refer to because it use a client
+ */
+export interface ProjectReference {
+	path: string;
+	/** RELATIVE Path to script to use that will be in `/vagrant` (usually `projects/project-name-uuid.yml`) */
+	ansibleProvisioner: string;
 }
 
 /**
@@ -48,8 +57,10 @@ export interface ClientConfigHere {
 		allowAutoUpdate: boolean;
 	};
 
-	/** Keyboard to capture (passthrough) */
+	/** Keyboard to capture (passthrough).  Added as we go along. */
 	keyboards: KeyboardIdentifyer[];
+
+	projects: ProjectReference[];
 
 	/** Executables, optional for the config from generateConfig.  Only set this if the user has specifically set a vagrant path */
 	executables: Partial<{

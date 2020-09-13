@@ -18,13 +18,13 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PromisedTaskFunction } from "@twokeys/addons";
+import type { DetectorPromisedTaskFunction } from "@twokeys/addons";
 import type { ClientConfigHere } from "../../config";
 
 /**
  * Reserved for future use, just returns config
  */
-const generateConfig: PromisedTaskFunction<any, ClientConfigHere> = async (twokeys, config) => {
+const generateConfig: DetectorPromisedTaskFunction<any, ClientConfigHere> = async (twokeys, config) => {
 	return config;
 };
 

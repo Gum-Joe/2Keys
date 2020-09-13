@@ -19,7 +19,7 @@
  */
 import mkdirp from "mkdirp";
 import path from "path";
-import ProgressBar from "progress";
+import type ProgressBar from "progress";
 import { pipeline as pipelineWithCB } from "stream";
 import fs from "fs";
 import { promisify } from "util";
@@ -103,7 +103,7 @@ export default class ContentCopier {
 				// Progress bar
 				// Where action is "mkdir" or the file being copied
 				// And :dest is the file being copied to or dir being made
-				progress_bar = new ProgressBar(":bar :percent .\\:action :symbol :dest", {
+				progress_bar = this.logger.createProgressBar(":bar :percent .\\:action :symbol :dest", {
 					complete: "▓",
 					incomplete: "░",
 					width: 50,

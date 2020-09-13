@@ -1,0 +1,7 @@
+# Provisions a new client on the VM, i.e. sets it up for 2Keys to use for projects
+---
+- hosts: all
+  tasks:
+    - name: Provision 2Keys client
+      become: true
+      command: 2Keys provision -f /vagrant/config/client.yml

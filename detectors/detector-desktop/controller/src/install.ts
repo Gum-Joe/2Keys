@@ -1,6 +1,6 @@
 import which from "which";
 import { promises as fs, constants as fsconstants } from "fs";
-import { PromisedTaskFunction, SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD, TwoKeys } from "@twokeys/addons/lib";
+import { DetectorPromisedTaskFunction, SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD, TwoKeys } from "@twokeys/addons/lib";
 import { CodedError } from "@twokeys/core";
 import * as errorCodes from "./errorCodes";
 import { VAGRANT_DEFAULT_INSTALL_PATH, VBOX_DEFAULT_INSTALL_PATH, VIRTUALBOX_NAME, VIRTUALBOX_EXECUTABLE_NAME, VAGRANT_NAME, VAGRANT_EXECUTABLE_NAME } from "./constants";
@@ -70,7 +70,7 @@ async function getVBoxManagePath(twokeys: TwoKeys): Promise<string> {
 /**
  * Install stuff
  */
-const install: PromisedTaskFunction<void, void> = async (twokeys) => {
+const install: DetectorPromisedTaskFunction<void, void> = async (twokeys) => {
 	twokeys.logger.info("Configuring 2Keys to use VirtualBox and Vagrant...");
 	// 0: Check vagrant and VBox is installed
 	const vagrantPath = await getVagrantPath(twokeys);

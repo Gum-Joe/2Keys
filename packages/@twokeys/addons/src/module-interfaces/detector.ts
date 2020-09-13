@@ -22,7 +22,8 @@
  * @packageDocumentation
  */
 
-import { Keyboard, DetectorConfig, ClientConfig, AddConfigUtils } from "@twokeys/core/src/interfaces";
+import type { Keyboard, DetectorConfig, ClientConfig, AddConfigUtils } from "@twokeys/core/lib/interfaces";
+import { TWOKEYS_ADDON_TYPE_DETECTOR } from "../util/interfaces";
 import { ConfigDescriptors, StepsExplainer, TaskFunction, BaseAddon, PromisedTaskFunction } from "./common";
 
 /**
@@ -35,6 +36,11 @@ export interface DetectorRegisterKDBConfig {
 	/** Name of keyboard being registered */
 	keyboardName: string;
 }
+
+/** Task function where type is detector and promised is wanted */
+export type DetectorPromisedTaskFunction<ConfigT, ReturnG = void> = PromisedTaskFunction<ConfigT, ReturnG, TWOKEYS_ADDON_TYPE_DETECTOR>;
+/** Task function where type is detector */
+export type DetectorTaskFunction<ConfigT, ReturnG = void> = TaskFunction<ConfigT, ReturnG, TWOKEYS_ADDON_TYPE_DETECTOR>;
 
 /**
  * Defines the exports of a detector controller add-on.
@@ -60,9 +66,9 @@ export interface DetectorController extends BaseAddon<"detector"> {
 			/** Steps to explain to user that will occur to setup a new client as a detector */
 			steps: StepsExplainer;
 			/** Function to run to generate config that is written, and then passed to any function needing the config */
-			generateConfig: TaskFunction<any, any>;
+			generateConfig: DetectorTaskFunction<any, any>;
 			/** Function to run, with the config created using {@link DetectorController.setup.setupNewClient.configDescriptor} */
-			setup: PromisedTaskFunction<AddConfigUtils<ClientConfig>>;
+			setup: DetectorPromisedTaskFunction<AddConfigUtils<ClientConfig>>;
 		};
 		/** Export of the code to do with adding a detector */
 		addDetectorToProject: {
@@ -72,11 +78,11 @@ export interface DetectorController extends BaseAddon<"detector"> {
 			 * Generates a config object to save as the detector config for this project ({@link DetectorConfig.detector_config}).
 			 * Should return a default config if no arguments given
 			 */
-			createConfig: TaskFunction<undefined | { [key: string]: any }, DetectorConfig["detector_config"]>;
+			createConfig: DetectorTaskFunction<undefined | { [key: string]: any }, DetectorConfig["detector_config"]>;
 			/** Function to run to add the detector to the project */
-			setup?: PromisedTaskFunction<any>;
+			setup?: DetectorPromisedTaskFunction<any>;
 			/** Function to run to register a new keyboard.  This will usually be actions such as matching the keybaord in config to a physical device. Should return config */
-			registerKeyboard: PromisedTaskFunction<DetectorRegisterKDBConfig>;
+			registerKeyboard: DetectorPromisedTaskFunction<DetectorRegisterKDBConfig>;
 		};
 	};
 	/** Options to add to the properties panel so that detector specific things can be configured */
@@ -87,19 +93,19 @@ export interface DetectorController extends BaseAddon<"detector"> {
 	 * the idea is that you log all keypreses (or just a live log from the detector) to screen
 	 * so the user can see e.g. scancodes of keys that don't have a 2Keys hotkey code.
 	 */
-	logKeys: PromisedTaskFunction<any>;
+	logKeys: DetectorPromisedTaskFunction<any>;
 	/**
 	 * Context menu functions, that is used to display actions that can be undergone on a detector.
 	 * Is diplayed in the project window in the GUI
 	 */
-	contextMenu: Array<{ name: string; func: PromisedTaskFunction<any> }>;
+	contextMenu: Array<{ name: string; func: DetectorPromisedTaskFunction<any> }>;
 	/**
 	 * Used to retrieve logs from the detector.
 	 * This is different to {@link DetectorController.logKeys}, as instead of being live
 	 * it is more a retrival operation that would most likely return the content of the detector's log file.
 	 * @returns Detector logs
 	 */
-	getLogs: PromisedTaskFunction<any, {
+	getLogs: DetectorPromisedTaskFunction<any, {
 		/** The log itself */
 		log: string;
 		/** Time of log */
