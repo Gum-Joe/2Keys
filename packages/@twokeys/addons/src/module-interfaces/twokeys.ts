@@ -40,7 +40,7 @@ export type BaseTwoKeysPropertiesForAddons = AllTwoKeysProperties;
 
 export interface DetectorTwoKeysProperties extends Partial<BaseTwoKeysPropertiesForAddons> {
 	/**
-	 * Directory where clients should store all their related files (outside of projects).
+	 * Absolute path to directory where clients should store all their related files (outside of projects).
 	 * 
 	 * __Not__ the same as the directory where the client config is stored.
 	 */

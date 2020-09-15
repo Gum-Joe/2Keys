@@ -1,2 +1,2 @@
 cd "{{ vm_host_root_dir }}"
-vagrant up
+{{ vagrant_path }} up

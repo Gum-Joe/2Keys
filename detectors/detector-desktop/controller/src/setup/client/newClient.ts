@@ -23,7 +23,7 @@ import ContentCopier from "@twokeys/addons/lib/util/copy-contents";
 import type { AddConfigUtils, ClientConfig } from "@twokeys/core/lib/interfaces";
 import type { ClientConfigHere } from "../../config";
 import { VM_ASSETS_ROOT } from "../../constants";
-import { updateVagrantFile } from "./updateTemplates";
+import { updateVagrantFile, updateVMLaunchFiles } from "./template-updates";
 
 /**
  * Function to setup a new client
@@ -40,7 +40,8 @@ const newClient: DetectorPromisedTaskFunction<AddConfigUtils<ClientConfig<Client
 	});
 	await copier.copyContents();
 	twokeys.logger.substatus("Filling out templates");
-	updateVagrantFile(twokeys, config.controllerConfig);
+	await updateVagrantFile(twokeys, config.controllerConfig);
+	await updateVMLaunchFiles(twokeys, config.controllerConfig);
 	// DONE!
 	// 2: Adjust Ansible config
 	// 3: Run `vagrant up` & handle errors

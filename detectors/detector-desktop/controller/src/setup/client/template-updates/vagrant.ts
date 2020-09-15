@@ -25,8 +25,8 @@
 import { TwoKeys, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
 import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
-import { ClientConfigHere } from "../../config";
-import { VAGRANT_FILE_TEMPLATE } from "../../constants";
+import { ClientConfigHere } from "../../../config";
+import { VAGRANT_FILE_TEMPLATE, VAGRANT_FILE_DEST } from "../../../constants";
 import Handlebars from "handlebars";
 
 /** Parameters for the Vagrantfile template */
@@ -62,13 +62,13 @@ export const ANSIBLE_SCRIPT_TEMPLATE =
     ansible.playbook = "/vagrant/{{ script }}"
   end`;
 
-/** @see USB_PASSTHROUGH_TEMPLATE */
+/** @see ANSIBLE_SCRIPT_TEMPLATE */
 export interface AnsibleScriptParams {
 	script: string;
 }
 
 /** Generates a Vagrantfile from the template (see assets/vm/Vagrantfile.template) */
-export async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: ClientConfigHere): Promise<void> {
+export default async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: ClientConfigHere): Promise<void> {
 	twokeys.logger.substatus("Updating Vagrantfile");
 	const template = await readFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_TEMPLATE));
 
@@ -91,6 +91,6 @@ export async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETE
 	});
 
 	twokeys.logger.debug("Writing Vagrantfile");
-	await writeFile(join(twokeys.properties.clientRoot, "VagrantFile"), vagrantFile);
+	await writeFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_DEST), vagrantFile);
 	// DONE!
 }
