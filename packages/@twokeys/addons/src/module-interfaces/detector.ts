@@ -66,7 +66,7 @@ export interface DetectorController extends BaseAddon<"detector"> {
 			/** Steps to explain to user that will occur to setup a new client as a detector */
 			steps: StepsExplainer;
 			/** Function to run to generate config that is written, and then passed to any function needing the config */
-			generateConfig: DetectorTaskFunction<any, any>;
+			generateConfig: TaskFunction<any, any>;
 			/** Function to run, with the config created using {@link DetectorController.setup.setupNewClient.configDescriptor} */
 			setup: DetectorPromisedTaskFunction<AddConfigUtils<ClientConfig>>;
 		};

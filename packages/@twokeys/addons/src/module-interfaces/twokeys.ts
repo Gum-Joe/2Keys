@@ -53,7 +53,7 @@ export interface DetectorTwoKeysProperties extends Partial<BaseTwoKeysProperties
  * Use the assertion tools in {@link dev-tools} to ensure the properties are there (and then TS won't complain the property is undefined)
  */
 export type TwoKeysPropertiesForAddons<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> =
-	AddOnsType extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorTwoKeysProperties : Partial<BaseTwoKeysPropertiesForAddons>;
+	AddOnsType extends TWOKEYS_ADDON_TYPE_DETECTOR & string ? DetectorTwoKeysProperties : Partial<BaseTwoKeysPropertiesForAddons>;
 
 /**
  * Type to use to say that a function wants a twokeys with {@link AllTwoKeysProperties} -> i.e. all properties present

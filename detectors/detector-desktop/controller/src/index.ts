@@ -28,8 +28,8 @@ import install from "./install";
 
 const detector: DetectorController = {
 	setup: {
-		// @ts-expect-error
 		setupNewClient: {
+			// @ts-expect-error
 			generateConfig,
 			setup: newClient,
 		}

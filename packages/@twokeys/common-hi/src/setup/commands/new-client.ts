@@ -26,7 +26,7 @@ import { PromiseCommand, CommandFactory } from "../../common";
 import { NewDetector } from "../protobuf/detector_pb";
 import { AddOnsRegistry } from "@twokeys/addons/src";
 import { loadClientConfig, loadMainConfig, stringifyClientConfig } from "@twokeys/core/lib/config";
-import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
+import { TWOKEYS_CLIENTS_CONFIG_ROOT, TWOKEYS_CLIENT_STORAGE_ROOT } from "@twokeys/core/lib/constants";
 import TwoKeysForCommands from "../../common/twokeys";
 import { join } from "path";
 import { ClientConfig } from "@twokeys/core/lib/interfaces";
@@ -60,7 +60,9 @@ export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys,
 	});
 	await registry.initDB();
 	logger.substatus("Loading controller");
-	const controller = await registry.loadDetector(config.controller);
+	const controller = await registry.loadDetector(config.controller, {
+		clientRoot: join(TWOKEYS_CLIENT_STORAGE_ROOT, config.id),
+	});
 	logger.debug("Controller loaded");
 
 	logger.substatus("Generating config");

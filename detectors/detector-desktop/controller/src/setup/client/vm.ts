@@ -43,6 +43,7 @@ export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: C
 					));
 				} else {
 					twokeys.logger.substatus("VM is now running and provisioned!");
+					return resolve();
 				}
 			});
 		}).catch(reject);

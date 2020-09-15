@@ -2,6 +2,10 @@
 ---
 - hosts: all
   tasks:
-    - name: Provision 2Keys client
+    # TODO: Reenable when it works
+    # - name: Provision 2Keys client
+    #   become: true
+    #   command: 2Keys provision -f /vagrant/config/client.yml
+    - name: Is 2Keys there?
       become: true
-      command: 2Keys provision -f /vagrant/config/client.yml
+      command: 2Keys --help
