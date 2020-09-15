@@ -335,7 +335,7 @@ describe("Registry tests", () => {
 			});
 
 			it("should load a add-on and allow us to execute it", async () => {
-				const executor = await registry.load(pkgJson.name, "executor");
+				const executor = await registry.load(pkgJson.name, "executor", {});
 				const config = {
 					testValue: false,
 					hasProperties: false,
@@ -361,12 +361,12 @@ describe("Registry tests", () => {
 			});
 
 			it("should throw an error if we ask for an add-on that is not installed", async () => {
-				await expect(registry.load("DEFO_NOT_IN_REG_" + Math.random(), "detector")).to.be.rejectedWith(errorCodes.ADDON_NOT_IN_REGISTRY);
+				await expect(registry.load("DEFO_NOT_IN_REG_" + Math.random(), "detector", { clientRoot: "UNIMPORTANT" })).to.be.rejectedWith(errorCodes.ADDON_NOT_IN_REGISTRY);
 			});
 
 			it("should throw an error if we load a type not in the package", async () => {
 				try {
-					await registry.load(pkgJson.name, "pack");
+					await registry.load(pkgJson.name, "pack", {});
 				} catch (err) {
 					expect(err.message).to.include("Add-on of type");
 					return;
@@ -382,7 +382,7 @@ describe("Registry tests", () => {
 					driver: sqlite3.Database,
 				});
 				await db.exec(`UPDATE ${REGISTRY_TABLE_NAME} SET info = "{}" WHERE name = "${pkgJSON.name}"`);
-				await expect(registry.load(pkgJSON.name, "executor")).to.be.rejectedWith(errorCodes.ADDON_DB_LOAD_FAIL);
+				await expect(registry.load(pkgJSON.name, "executor", {})).to.be.rejectedWith(errorCodes.ADDON_DB_LOAD_FAIL);
 				await registry.uninstall(pkgJSON.name);
 			});
 

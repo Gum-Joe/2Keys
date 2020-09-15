@@ -286,7 +286,8 @@ export default class AddOnsRegistry {
 		const promiseLoaders = addOnsList.map(async addOn => loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(
 			addOn,
 			typeOfAddOn,
-			//@ts-expect-error
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
 			defaultProps
 		));
 		await Promise.all(promiseLoaders);
