@@ -68,6 +68,7 @@ export interface AnsibleScriptParams {
 }
 
 /** Generates a Vagrantfile from the template (see assets/vm/Vagrantfile.template) */
+// TODO: Might need to copy in projects (sync) here
 export default async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: ClientConfigHere): Promise<void> {
 	twokeys.logger.substatus("Updating Vagrantfile");
 	const template = await readFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_TEMPLATE));

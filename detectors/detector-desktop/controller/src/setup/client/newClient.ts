@@ -24,6 +24,7 @@ import type { AddConfigUtils, ClientConfig } from "@twokeys/core/lib/interfaces"
 import type { ClientConfigHere } from "../../config";
 import { VM_ASSETS_ROOT } from "../../constants";
 import { updateVagrantFile, updateVMLaunchFiles } from "./template-updates";
+import { startVM } from "./vm";
 
 /**
  * Function to setup a new client
@@ -42,9 +43,14 @@ const newClient: DetectorPromisedTaskFunction<AddConfigUtils<ClientConfig<Client
 	twokeys.logger.substatus("Filling out templates");
 	await updateVagrantFile(twokeys, config.controllerConfig);
 	await updateVMLaunchFiles(twokeys, config.controllerConfig);
+	// TODO: Add to startup
+	// TODO: Handle auto update setup
+	twokeys.logger.warn("Adding to startup is currently disabled in this release due to VBox preventing host shut down if VM is not stopped.");
 	// DONE!
 	// 2: Adjust Ansible config
 	// 3: Run `vagrant up` & handle errors
+	await startVM(twokeys, config.controllerConfig);
+
 	// 4: SSH in and validate 2Keys is installed; copy client config & configure shares (run 2Keys client init)
 };
 
