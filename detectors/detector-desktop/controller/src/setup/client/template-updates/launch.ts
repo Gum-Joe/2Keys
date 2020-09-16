@@ -1,5 +1,5 @@
 import { TwoKeys, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
-import { readFile, writeFile } from "fs/promises";
+import { promises as fs } from "fs";
 import { join } from "path";
 import { ClientConfigHere } from "../../../config";
 import { VAGRANT_EXECUTABLE_NAME, VAGRANT_NAME, VM_LAUNCH_BAT_FILE_DEST, VM_LAUNCH_BAT_FILE_TEMPLATE, VM_LAUNCH_VBS_FILE_DEST, VM_LAUNCH_VBS_FILE_TEMPLATE } from "../../../constants";
@@ -31,23 +31,25 @@ export default async function updateVMLaunchFiles(twokeys: TwoKeys<TWOKEYS_ADDON
 	twokeys.logger.info("Note: If starting on startup has been disallowed, startup files are still generated but not setup to be ran on boot");
 
 	twokeys.logger.debug("Updating .bat launch script");
-	const batTemplate = await readFile(join(twokeys.properties.clientRoot, VM_LAUNCH_BAT_FILE_TEMPLATE));
+	const batTemplate = (await fs.readFile(join(twokeys.properties.clientRoot, VM_LAUNCH_BAT_FILE_TEMPLATE))).toString("utf8");
 	const batCompiledTemplate = Handlebars.compile<VMLaunchBATParams>(batTemplate);
+	const vagrantPath = (await twokeys.software.getExecutable(VAGRANT_NAME, VAGRANT_EXECUTABLE_NAME)).path;
+	twokeys.logger.debug(`Using vagrant at ${vagrantPath}`);
 	const batFile = batCompiledTemplate({
 		vm_host_root_dir: twokeys.properties.clientRoot,
-		vagrant_path: config.executables.vagrant || (await twokeys.software.getExecutable(VAGRANT_NAME, VAGRANT_EXECUTABLE_NAME)).path,
+		vagrant_path: config.executables.vagrant || vagrantPath,
 	});
 	twokeys.logger.debug("Writing .bat file that launches VM...");
-	await writeFile(join(twokeys.properties.clientRoot, VM_LAUNCH_BAT_FILE_DEST), batFile);
+	await fs.writeFile(join(twokeys.properties.clientRoot, VM_LAUNCH_BAT_FILE_DEST), batFile);
 
 	twokeys.logger.debug("Updating .vbs launch script");
-	const template = await readFile(join(twokeys.properties.clientRoot, VM_LAUNCH_VBS_FILE_TEMPLATE));
+	const template = (await fs.readFile(join(twokeys.properties.clientRoot, VM_LAUNCH_VBS_FILE_TEMPLATE))).toString("utf8");
 	const vbsCompiledTemplate = Handlebars.compile<VMLaunchVBSParams>(template);
 	const vbsFile = vbsCompiledTemplate({
 		vm_launch_script: join(twokeys.properties.clientRoot, VM_LAUNCH_BAT_FILE_DEST)
 	});
 	twokeys.logger.debug("Writing VBS file that start .bat file in background...");
-	await writeFile(join(twokeys.properties.clientRoot, VM_LAUNCH_VBS_FILE_DEST), vbsFile);
+	await fs.writeFile(join(twokeys.properties.clientRoot, VM_LAUNCH_VBS_FILE_DEST), vbsFile);
 
 	twokeys.logger.info("Startup file generated, but not linked so windows knows to run them on boot.");
 }

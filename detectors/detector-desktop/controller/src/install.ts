@@ -85,6 +85,7 @@ const install: DetectorPromisedTaskFunction<void, void> = async (twokeys) => {
 				name: VIRTUALBOX_EXECUTABLE_NAME,
 				path: vBoxPath,
 				arch: "x64",
+				userInstalled: true,
 			}
 		],
 		noAutoInstall: false,
@@ -101,6 +102,7 @@ const install: DetectorPromisedTaskFunction<void, void> = async (twokeys) => {
 				name: VAGRANT_EXECUTABLE_NAME,
 				path: vagrantPath,
 				arch: "x64",
+				userInstalled: true,
 			}
 		],
 		noAutoInstall: false,

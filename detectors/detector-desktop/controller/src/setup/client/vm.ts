@@ -9,9 +9,9 @@ import { BAD_VAGRANT_EXIT_CODE } from "../../errorCodes";
 export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: ClientConfigHere): Promise<void> {
 	return new Promise((resolve, reject) => {
 		twokeys.logger.status("Starting VM.");
-		twokeys.logger.substatus("Generating VM.  Please Wait.");
 		twokeys.software.getExecutable(VAGRANT_NAME, VAGRANT_EXECUTABLE_NAME).then((executable) => {
 			const vagrantPath = executable.path;
+			twokeys.logger.debug("Spawning.");
 			const vagrantUp = spawn(config.executables.vagrant || vagrantPath, ["up"], {
 				cwd: twokeys.properties.clientRoot
 			});
@@ -23,7 +23,7 @@ export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: C
 				name: "vagrant",
 			});
 			vagrantUp.stdout.on("data", (data) => {
-				const dataStr: string = data.toString("utf8");
+				const dataStr: string = data.toString("utf8").trim();
 				vagrantLogger.info(dataStr);
 				if (dataStr.includes("Booting") && dataStr.includes("VM")) {
 					twokeys.logger.status("Booting VM. Please wait");
@@ -32,7 +32,7 @@ export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: C
 				}
 			});
 			vagrantUp.stderr.on("data", (data) => {
-				vagrantLogger.err(data.toString("utf8"));
+				vagrantLogger.err(data.toString("utf8").trim());
 			});
 			vagrantUp.on("close", (code) => {
 				if (code !== 0) {

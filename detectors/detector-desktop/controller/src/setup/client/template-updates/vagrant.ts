@@ -23,7 +23,7 @@
  */
 
 import { TwoKeys, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
-import { readFile, writeFile } from "fs/promises";
+import { promises as fs } from "fs";
 import { join } from "path";
 import { ClientConfigHere } from "../../../config";
 import { VAGRANT_FILE_TEMPLATE, VAGRANT_FILE_DEST } from "../../../constants";
@@ -71,7 +71,7 @@ export interface AnsibleScriptParams {
 // TODO: Might need to copy in projects (sync) here
 export default async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: ClientConfigHere): Promise<void> {
 	twokeys.logger.substatus("Updating Vagrantfile");
-	const template = await readFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_TEMPLATE));
+	const template = (await fs.readFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_TEMPLATE))).toString("utf8");
 
 	twokeys.logger.debug("Generating USB passthrough");
 	const usbPassthrough = config.keyboards.map(keyboardFilter => Handlebars.compile<UsbPassthroughParams>(USB_PASSTHROUGH_TEMPLATE)({
@@ -92,6 +92,6 @@ export default async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_T
 	});
 
 	twokeys.logger.debug("Writing Vagrantfile");
-	await writeFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_DEST), vagrantFile);
+	await fs.writeFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_DEST), vagrantFile);
 	// DONE!
 }
