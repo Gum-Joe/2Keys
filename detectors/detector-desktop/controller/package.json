@@ -25,7 +25,8 @@
   "dependencies": {
     "@twokeys/addons": "^1.0.0",
     "@twokeys/core": "^1.0.0",
-    "handlebars": "^4.7.6"
+    "handlebars": "^4.7.6",
+    "rimraf": "^3.0.2"
   },
   "devDependencies": {}
 }

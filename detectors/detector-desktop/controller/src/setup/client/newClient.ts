@@ -21,9 +21,8 @@
 import { DetectorPromisedTaskFunction } from "@twokeys/addons";
 import ContentCopier from "@twokeys/addons/lib/util/copy-contents";
 import { AddConfigUtils, ClientConfig } from "@twokeys/core/lib/interfaces";
-import { join } from "path";
 import { ClientConfigHere } from "../../config";
-import { VM_ASSETS_ROOT, VM_LAUNCH_VBS_FILE_DEST } from "../../constants";
+import { VM_ASSETS_ROOT } from "../../constants";
 import { updateVagrantFile, updateVMLaunchFiles } from "./template-updates";
 import { startVM } from "./vm";
 

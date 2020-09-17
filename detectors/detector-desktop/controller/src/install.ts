@@ -1,6 +1,6 @@
 import which from "which";
 import { promises as fs, constants as fsconstants } from "fs";
-import { DetectorPromisedTaskFunction, SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD, TwoKeys } from "@twokeys/addons/lib";
+import { DetectorPromisedTaskFunction, SOFTWARE_DOWNLOAD_TYPE_NO_DOWNLOAD, TwoKeys } from "@twokeys/addons";
 import { CodedError } from "@twokeys/core";
 import * as errorCodes from "./errorCodes";
 import { VAGRANT_DEFAULT_INSTALL_PATH, VBOX_DEFAULT_INSTALL_PATH, VIRTUALBOX_NAME, VIRTUALBOX_EXECUTABLE_NAME, VAGRANT_NAME, VAGRANT_EXECUTABLE_NAME } from "./constants";
