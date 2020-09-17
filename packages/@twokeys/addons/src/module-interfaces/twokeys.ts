@@ -24,12 +24,14 @@ import path from "path";
 import { Logger, TwoKeys as BaseTwoKeys, AllTwoKeysProperties } from "@twokeys/core";
 import { Package, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_DETECTOR } from "../util/interfaces";
 import SoftwareRegistry from "../software";
+import TwoKeysUtilites from "./twokeys-utils";
 
 /** Interface twokeys must implement */
 interface TwoKeysI<AddOnsType extends TWOKEYS_ADDON_TYPES> {
 	logger: Logger;
 	package: Package<AddOnsType>;
 	software: SoftwareRegistry<AddOnsType>;
+	utils: TwoKeysUtilites;
 }
 
 /**
@@ -66,6 +68,12 @@ export type TwoKeysForAProject<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_
 export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> extends BaseTwoKeys implements TwoKeysI<AddOnsType> {
 	public readonly package: Package<AddOnsType>;
 	public readonly software: SoftwareRegistry<AddOnsType>;
+	/**
+	 * Utils.
+	 * These allow the autmoation of tasks such as adding stuff to startup
+	 * // TODO: More docs here
+	 */
+	public readonly utils: TwoKeysUtilites<AddOnsType>;
 
 	/**
 	 * Class provided to add-on function that allows them to interact with 2Keys
@@ -75,7 +83,6 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_AD
 	 */
 	constructor(packageObject: Package<AddOnsType>, registryDB: string, CustomLogger: typeof Logger = Logger, public readonly properties: TwoKeysPropertiesForAddons<AddOnsType>) {
 		super(CustomLogger, ":", properties);
-		(properties as TwoKeysPropertiesForAddons<TWOKEYS_ADDON_TYPES>).projectDir;
 		this.package = packageObject;
 		this.software = new SoftwareRegistry<AddOnsType>({
 			package: packageObject,
@@ -83,8 +90,8 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_AD
 			dbFileName: path.basename(registryDB),
 			Logger: CustomLogger,
 		});
+		this.utils = new TwoKeysUtilites(this.package, this.LoggerConstructor);
 	}
-	
 }
 
 /**

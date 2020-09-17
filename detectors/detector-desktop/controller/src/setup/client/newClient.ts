@@ -21,8 +21,9 @@
 import { DetectorPromisedTaskFunction } from "@twokeys/addons";
 import ContentCopier from "@twokeys/addons/lib/util/copy-contents";
 import { AddConfigUtils, ClientConfig } from "@twokeys/core/lib/interfaces";
+import { join } from "path";
 import { ClientConfigHere } from "../../config";
-import { VM_ASSETS_ROOT } from "../../constants";
+import { VM_ASSETS_ROOT, VM_LAUNCH_VBS_FILE_DEST } from "../../constants";
 import { updateVagrantFile, updateVMLaunchFiles } from "./template-updates";
 import { startVM } from "./vm";
 
@@ -43,7 +44,11 @@ export const newClient: DetectorPromisedTaskFunction<AddConfigUtils<ClientConfig
 	twokeys.logger.substatus("Filling out templates");
 	await updateVagrantFile(twokeys, config.controllerConfig);
 	await updateVMLaunchFiles(twokeys, config.controllerConfig);
-	// TODO: Add to startup
+	// TODO: Add to startup (SEE LOGGER MESSAGE BELOW FOR WHY NOT YET)
+	// if (config.controllerConfig.perms.addToStartup) {
+	// 	twokeys.logger.substatus("Adding startup script launch.vbs to startup");
+	// 	await twokeys.utils.symbolLinkToStartup(join(twokeys.properties.clientRoot, VM_LAUNCH_VBS_FILE_DEST));
+	// }
 	// TODO: Handle auto update setup
 	twokeys.logger.warn("Adding to startup is currently disabled in this release due to VBox preventing host shut down if VM is not stopped.");
 	// DONE!

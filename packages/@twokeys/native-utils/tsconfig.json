@@ -3,18 +3,16 @@
 	"compilerOptions": {
 		"rootDir": "./src",
 		"outDir": "./lib",
-		"tsBuildInfoFile": "../../../.build-cache/addons.tsbuildinfo"
+		// Change "package" for actual package name
+		"tsBuildInfoFile": "../../../.build-cache/package.tsbuildinfo"
 	},
 	"include": [
 		"src"
 	],
 	"references": [
+		// Add deps here, so they are compiled
 		{
 			"path": "../core",
-			"prepend": false
-		},
-		{
-			"path": "../native-utils",
 			"prepend": false
 		}
 	]

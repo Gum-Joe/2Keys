@@ -1,0 +1,23 @@
+{
+  "name": "@twokeys/native-utils",
+  "version": "1.0.0",
+  "description": "Native dependency utils so we only build once",
+  "main": "lib/index.js",
+  "repository": "https://github.com/Gum-Joe/2Keys",
+  "author": "Kishan <kishansambhi@hotmail.co.uk>",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "compile": "tsc -b",
+    "lint": "eslint --ext .ts .",
+    "watch": "tsc -b --watch",
+    "docs": "typedoc",
+    "test": "cross-env NODE_ENV=test mocha",
+    "coverage": "cross-env NODE_ENV=test nyc mocha"
+  },
+  "dependencies": {
+    "@twokeys/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "node-addon-api": "^3.0.0"
+  }
+}
