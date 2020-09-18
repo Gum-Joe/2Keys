@@ -87,8 +87,21 @@ describe("Install function tests", () => {
 			mockFS.restore();
 		});
 
-		it.skip("should use environment variables when set", () => {
+		it("should use environment variables when set for VBox", async () => {
+			process.env.VBOX_INSTALL_PATH  = process.cwd();
+			await twokeys.software.uninstallSoftware(VIRTUALBOX_NAME);
+			await twokeys.software.uninstallSoftware(VAGRANT_NAME);
+			await install(twokeys);
+			expect((await twokeys.software.getExecutable(VIRTUALBOX_NAME, VIRTUALBOX_EXECUTABLE_NAME)).path).to.equal(process.cwd());
+		});
 
+		it("should use default install path for VBox when no env vars", async () => {
+			delete process.env.VBOX_INSTALL_PATH;
+			delete process.env.VBOX_MSI_INSTALL_PATH;
+			await twokeys.software.uninstallSoftware(VIRTUALBOX_NAME);
+			await twokeys.software.uninstallSoftware(VAGRANT_NAME);
+			await install(twokeys);
+			expect((await twokeys.software.getExecutable(VIRTUALBOX_NAME, VIRTUALBOX_EXECUTABLE_NAME)).path).to.equal(VBOX_DEFAULT_INSTALL_PATH);
 		});
 	});
 });
