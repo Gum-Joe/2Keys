@@ -9,10 +9,12 @@ import install from "../src/install";
 import { VAGRANT_DEFAULT_INSTALL_PATH, VAGRANT_EXECUTABLE_NAME, VAGRANT_NAME, VBOX_DEFAULT_INSTALL_PATH, VIRTUALBOX_EXECUTABLE_NAME, VIRTUALBOX_NAME } from "../src/constants";
 import chai, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
-import fs from "fs";
+import fs, { PathLike } from "fs";
 import { CodedError } from "@twokeys/core";
 import sinon from "sinon";
 import * as errorCodes from "../src/errorCodes";
+import which from "which";
+import mockFS from "mock-fs";
 
 const rimraf = promisify(rimrafCB);
 
@@ -31,25 +33,62 @@ describe("Install function tests", () => {
 	});
 
 	it("should run install", async () => {
+		const mockFS_here = {};
+		mockFS_here[VAGRANT_DEFAULT_INSTALL_PATH] = VAGRANT_DEFAULT_INSTALL_PATH;
+		mockFS_here[VBOX_DEFAULT_INSTALL_PATH] = VBOX_DEFAULT_INSTALL_PATH;
+		mockFS(mockFS_here);
 		await install(twokeys);
 		await expect(twokeys.software.getSoftware(VAGRANT_NAME)).to.eventually.be.fulfilled;
 		await expect(twokeys.software.getSoftware(VIRTUALBOX_NAME)).to.eventually.be.fulfilled;
+		mockFS.restore();
 	});
 
 	it("should use the correct paths for vagrant", async () => {
+		const mockFS_here = {};
+		mockFS_here[VAGRANT_DEFAULT_INSTALL_PATH] = VAGRANT_DEFAULT_INSTALL_PATH;
+		mockFS_here[VBOX_DEFAULT_INSTALL_PATH] = VBOX_DEFAULT_INSTALL_PATH;
+		mockFS(mockFS_here);
 		expect((await twokeys.software.getSoftware(VAGRANT_NAME)).executables.filter(exe => exe.name === VAGRANT_EXECUTABLE_NAME)[0].path).to.equal(VAGRANT_DEFAULT_INSTALL_PATH);
+		mockFS.restore();
 	});
 
 	it("should use the correct paths for vbox", async () => {
+		const mockFS_here = {};
+		mockFS_here[VAGRANT_DEFAULT_INSTALL_PATH] = VAGRANT_DEFAULT_INSTALL_PATH;
+		mockFS_here[VBOX_DEFAULT_INSTALL_PATH] = VBOX_DEFAULT_INSTALL_PATH;
+		mockFS(mockFS_here);
 		expect((await twokeys.software.getSoftware(VIRTUALBOX_NAME)).executables.filter(exe => exe.name === VIRTUALBOX_EXECUTABLE_NAME)[0].path).to.equal(VBOX_DEFAULT_INSTALL_PATH + "\\");
+		mockFS.restore();
 	});
 
 	describe("Getting Paths", () => {
 		it("should throw an error when vagrant is not found", async () => {
-			sinon.replace(fs.promises, "access", async () => {
-				throw new CodedError("", "ENOENT");
-			});
-			await expect(install(twokeys)).to.be.rejectedWith(errorCodes.APPLICATION_NOT_FOUND);
+			const mockFS_here = {};
+			mockFS(mockFS_here);
+			await expect(install(twokeys)).to.be.rejectedWith("Vagrant not found");
+			mockFS.restore();
+		});
+
+		it("should throw an error when VBox is not found", async () => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
+			/*sinon.replaceGetter(fs, "promises", () => { return {
+				access: async (path: PathLike) => {
+					if (path === await which("vagrant") || path === VAGRANT_DEFAULT_INSTALL_PATH) {
+						return;
+					}
+					throw new CodedError("", "ENOENT");
+				},
+			};});*/
+			const mockFS_here = {};
+			mockFS_here[VAGRANT_DEFAULT_INSTALL_PATH] = "content";
+			mockFS(mockFS_here);
+			await expect(install(twokeys)).to.be.rejectedWith("VirtualBox not found");
+			mockFS.restore();
+		});
+
+		it.skip("should use environment variables when set", () => {
+
 		});
 	});
 });

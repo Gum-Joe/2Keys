@@ -28,5 +28,8 @@
     "handlebars": "^4.7.6",
     "rimraf": "^3.0.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/mock-fs": "^4.10.0",
+    "mock-fs": "^4.13.0"
+  }
 }
