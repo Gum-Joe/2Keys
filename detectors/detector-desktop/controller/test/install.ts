@@ -1,29 +1,17 @@
-import { MOCK_REGISTRY_LOCATION, MOCK_ROOT } from "./constants";
+import { MOCK_REGISTRY_LOCATION } from "./constants";
 import rimrafCB from "rimraf";
 import { promisify } from "util";
-import { createMockTwoKeys, AddOnsRegistry, TWOKEYS_ADDON_TYPE_DETECTOR, SoftwareRegistry } from "@twokeys/addons";
-import { TwoKeys } from "@twokeys/addons";
-import { MOCK_CLIENT_LOCATION } from "./constants";
-import packageJSON from "../package.json";
+import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
+import { twokeys } from "./constants";
 import install from "../src/install";
 import { VAGRANT_DEFAULT_INSTALL_PATH, VAGRANT_EXECUTABLE_NAME, VAGRANT_NAME, VBOX_DEFAULT_INSTALL_PATH, VIRTUALBOX_EXECUTABLE_NAME, VIRTUALBOX_NAME } from "../src/constants";
 import chai, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
-import fs, { PathLike } from "fs";
-import { CodedError } from "@twokeys/core";
-import sinon from "sinon";
-import * as errorCodes from "../src/errorCodes";
-import which from "which";
 import mockFS from "mock-fs";
 
 const rimraf = promisify(rimrafCB);
 
 chai.use(chaiAsPromised);
-
-const twokeys = createMockTwoKeys(packageJSON, new AddOnsRegistry(MOCK_REGISTRY_LOCATION).registryDBFilePath, {
-	projectDir: MOCK_ROOT,
-	clientRoot: MOCK_CLIENT_LOCATION
-}) as unknown as TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>;
 
 describe("Install function tests", () => {
 	before(async () => {

@@ -20,7 +20,7 @@
 
 import { DetectorPromisedTaskFunction } from "@twokeys/addons";
 import ContentCopier from "@twokeys/addons/lib/util/copy-contents";
-import { AddConfigUtils, ClientConfig } from "@twokeys/core/lib/interfaces";
+import { ClientConfig } from "@twokeys/core/lib/interfaces";
 import { ClientConfigHere } from "../../config";
 import { VM_ASSETS_ROOT } from "../../constants";
 import { updateVagrantFile, updateVMLaunchFiles } from "./template-updates";
@@ -29,7 +29,7 @@ import { startVM } from "./vm";
 /**
  * Function to setup a new client
  */
-export const newClient: DetectorPromisedTaskFunction<AddConfigUtils<ClientConfig<ClientConfigHere>>> = async (twokeys, config) => {
+export const newClient: DetectorPromisedTaskFunction<ClientConfig<ClientConfigHere>> = async (twokeys, config) => {
 	twokeys.logger.status("Setting up a new VM");
 	// TODO: Action List
 	// NOTE: The install of this module means vagrant etc was installed, so it's fine to just assume they are installed

@@ -58,7 +58,7 @@ export interface UsbPassthroughParams {
 
 // TODO: Adjust script param to be relative
 export const ANSIBLE_SCRIPT_TEMPLATE = 
-	`config.vm.provision "ansible_local" do |ansible|
+`	config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "/vagrant/{{ script }}"
   end`;
 
@@ -82,7 +82,7 @@ export default async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_T
 
 	twokeys.logger.debug("Generating Ansible Provising scripts");
 	const ansibleScripts = config.projects.map(project => Handlebars.compile<AnsibleScriptParams>(ANSIBLE_SCRIPT_TEMPLATE)({
-		script: project.ansibleProvisioner,
+		script: project.ansibleProvisioner.split("\\").join("/"),
 	})).join("\n");
 
 	const compiledTemplate = Handlebars.compile<VagrantFileTemplateParams>(template);
