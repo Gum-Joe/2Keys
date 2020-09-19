@@ -1,6 +1,7 @@
 import { TwoKeys, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
 import { CodedError } from "@twokeys/core";
 import { spawn } from "child_process";
+import { EOL } from "os";
 import { ClientConfigHere } from "../../config";
 import { VAGRANT_EXECUTABLE_NAME, VAGRANT_NAME } from "../../constants";
 import { BAD_VAGRANT_EXIT_CODE } from "../../errorCodes";
@@ -22,13 +23,19 @@ export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: C
 			const vagrantLogger = new twokeys.LoggerConstructor({
 				name: "vagrant",
 			});
+			let provisioning = false; // Ensure we only print the message once
 			vagrantUp.stdout.on("data", (data) => {
-				const dataStr: string = data.toString("utf8").trim();
-				vagrantLogger.info(dataStr);
+				const dataStr: string = data.toString("utf8");
+				dataStr.split(EOL).forEach((line) => {
+					if (line !== "") {
+						vagrantLogger.info(dataStr);
+					}
+				});
 				if (dataStr.includes("Booting") && dataStr.includes("VM")) {
 					twokeys.logger.status("Booting VM. Please wait");
-				} else if (dataStr.includes("provision")) {
+				} else if (dataStr.includes("provision") && !provisioning) {
 					twokeys.logger.substatus("Provisioning VM. Please wait.");
+					provisioning = true;
 				}
 			});
 			vagrantUp.stderr.on("data", (data) => {

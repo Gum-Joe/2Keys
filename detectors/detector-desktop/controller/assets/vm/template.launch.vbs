@@ -21,5 +21,5 @@
 ' DO NOT MODIFY
 Set oShell = CreateObject("Wscript.Shell") 
 Dim strArgs
-strArgs = "cmd /c {{ vm_launch_script }}"
+strArgs = "cmd /c '{{ vm_launch_script }}'"
 oShell.Run strArgs, 0, false
