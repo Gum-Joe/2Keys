@@ -12,7 +12,7 @@ export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: C
 		twokeys.logger.status("Starting VM.");
 		twokeys.software.getExecutable(VAGRANT_NAME, VAGRANT_EXECUTABLE_NAME).then((executable) => {
 			const vagrantPath = executable.path;
-			twokeys.logger.debug("Spawning.");
+			twokeys.logger.debug(`Spawning in ${twokeys.properties.clientRoot}.`);
 			const vagrantUp = spawn(config.executables.vagrant || vagrantPath, ["up"], {
 				cwd: twokeys.properties.clientRoot
 			});
@@ -25,12 +25,9 @@ export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: C
 			});
 			let provisioning = false; // Ensure we only print the message once
 			vagrantUp.stdout.on("data", (data) => {
-				const dataStr: string = data.toString("utf8");
-				dataStr.split(EOL).forEach((line) => {
-					if (line !== "") {
-						vagrantLogger.info(dataStr);
-					}
-				});
+				// TODO: Better logging
+				const dataStr: string = data.toString("utf8").trim();
+				vagrantLogger.info(dataStr);
 				if (dataStr.includes("Booting") && dataStr.includes("VM")) {
 					twokeys.logger.status("Booting VM. Please wait");
 				} else if (dataStr.includes("provision") && !provisioning) {

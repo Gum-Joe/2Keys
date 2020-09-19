@@ -46,7 +46,7 @@ describe("VM Startup tests", () => {
 	it("should throw an error if vagrant has a non zero exit code", async () => {
 		const twokeysHere = createMockTwoKeys(packageJSON, new AddOnsRegistry(MOCK_REGISTRY_LOCATION).registryDBFilePath, {
 			projectDir: MOCK_ROOT,
-			clientRoot: join(MOCK_CLIENT_ROOT_HERE, "config") // No vagrantfile will force vagrant to exit with non-zero exit code
+			clientRoot: MOCK_ROOT // No vagrantfile will force vagrant to exit with non-zero exit code
 		}) as unknown as TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>;
 		await expect(startVM(twokeysHere, clientConfig.controllerConfig)).to.eventually.be.rejectedWith(BAD_VAGRANT_EXIT_CODE);
 	}).timeout(30000);
