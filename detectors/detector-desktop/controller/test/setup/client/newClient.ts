@@ -51,7 +51,14 @@ describe("Client creation tests", () => {
 	});
 
 	it("should successfully generate a client", async () => {
-		await expect(newClient(twokeys, clientConfig)).to.eventually.be.fulfilled;
+		//await expect(newClient(twokeys, clientConfig)).to.eventually.be.fulfilled;
+		try {
+			await newClient(twokeys, clientConfig);
+		} catch (err) {
+			console.log(err.message);
+			console.log(err.stack);
+			return;
+		}
 
 		expect((await fs.readFile(join(MOCK_CLIENT_LOCATION, VAGRANT_FILE_DEST))).toString()).to.include(checkForUSB);
 		expect((await fs.readFile(join(MOCK_CLIENT_LOCATION, VAGRANT_FILE_DEST))).toString()).to.include(checkForAnsible);
