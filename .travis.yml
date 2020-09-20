@@ -15,8 +15,7 @@ cache:
 # Default is fine here
 before_install:
   # Convert lock file & install protoc
-  # - choco install yarn protoc
-  - choco install yarn protoc virtualbox vagrant
+  - choco install yarn protoc
 install:
   - "\"/c/Program Files (x86)/Yarn/bin/yarn\" --frozen-lockfile"
 before_script:
@@ -25,6 +24,5 @@ before_script:
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
-  # - yarn workspaces run coverage
-  - yarn workspace @twokeys/detector-desktop coverage:isolated
+  - yarn workspaces run coverage
   - bash <(curl -s https://codecov.io/bash)

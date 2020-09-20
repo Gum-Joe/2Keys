@@ -1,10 +1,11 @@
-name: "@twokeys/common-hi: isolated tests"
+name: "@twokeys/detector-desktop: isolated tests"
 
 on: push
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: macos-latest
+    continue-on-error: true
 
     strategy:
       matrix:
@@ -12,6 +13,7 @@ jobs:
     
     env:
      TWOKEYS_OOBE_NET_TEST_INTERFACE: vEthernet (nat)
+     working-dir: detectors/detector-desktop/controller
 
     steps:
     - uses: actions/checkout@v2
@@ -24,12 +26,15 @@ jobs:
     # - name: Setup native modules
     #   run: yarn global add windows-build-tools
     - name: Install packages
-      run: yarn
+      run: |
+        yarn
+      working-directory: ${{ env.working-dir }}
     - name: Compile
       run: |
-        yarn wsrun -mtc precompile
         yarn build -v
+      working-directory: ${{ env.working-dir }}
     - name: Run tests
-      run: yarn workspace @twokeys/common-hi coverage:isolated
+      run: yarn coverage:isolated
+      working-directory: ${{ env.working-dir }}
     - uses: codecov/codecov-action@v1
 
