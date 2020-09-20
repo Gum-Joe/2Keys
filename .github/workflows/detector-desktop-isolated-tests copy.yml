@@ -30,11 +30,14 @@ jobs:
         yarn
       working-directory: ${{ env.working-dir }}
     - name: Compile
+      if: ${{ always() }}
       run: |
         yarn build -v
       working-directory: ${{ env.working-dir }}
     - name: Run tests
+      if: ${{ always() }}
       run: yarn coverage:isolated
       working-directory: ${{ env.working-dir }}
     - uses: codecov/codecov-action@v1
+      if: ${{ always() }}
 
