@@ -17,14 +17,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install protoc
-      run: brew install protobuf
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
     # - name: Setup native modules
     #   run: yarn global add windows-build-tools
+    - name: Delete binding.gyps # So that builds work and we don't have to bother with native modules that are windows only
+      run: rm -v packages/@twokeys/*/binding.gyp executors/@twokeys/*/binding.gyp detectors/*/controller/binding.gyp
     - name: Install packages
       run: |
         yarn
