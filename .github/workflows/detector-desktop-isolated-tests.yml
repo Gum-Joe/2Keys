@@ -14,6 +14,7 @@ jobs:
     env:
      TWOKEYS_OOBE_NET_TEST_INTERFACE: vEthernet (nat)
      working-dir: detectors/detector-desktop/controller
+     TWOKEYS_DEBUG: true
 
     steps:
     - uses: actions/checkout@v2
@@ -27,6 +28,8 @@ jobs:
       run: rm -fv packages/@twokeys/*/binding.gyp executors/@twokeys/*/binding.gyp detectors/*/controller/binding.gyp
     - name: WHERE IS VAGRANT?
       run: which vagrant
+    - name: IS VAGRANT THERE?
+      run: vagrant --help
     - name: Install packages
       run: |
         yarn

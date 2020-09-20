@@ -10,6 +10,7 @@ async function getVagrantPath(twokeys: TwoKeys): Promise<string> {
 	let vagrantPath: string;
 	try {
 		vagrantPath = await which("vagrant");
+		twokeys.logger.debug("Using vagrant from PATH");
 	} catch (err) {
 		twokeys.logger.warn("Vagrant not found on PATH.  Using default install location.");
 		twokeys.logger.debug(`Using ${VAGRANT_DEFAULT_INSTALL_PATH}`);
@@ -21,6 +22,7 @@ async function getVagrantPath(twokeys: TwoKeys): Promise<string> {
 		await fs.access(vagrantPath, fsconstants.F_OK);
 	} catch (err) {
 		if (err.code === "ENOENT") {
+			twokeys.logger.debug(`Error: ${(err as Error).message}`);
 			throw new CodedError("Vagrant not found! Please check it is installed and if so specify the path manually in the configuration options.", errorCodes.APPLICATION_NOT_FOUND);
 		} else {
 			throw new CodedError(
@@ -51,6 +53,7 @@ async function getVBoxManagePath(twokeys: TwoKeys): Promise<string> {
 		await fs.access(vboxInstallPath, fsconstants.F_OK);
 	} catch (err) {
 		if (err.code === "ENOENT") {
+			twokeys.logger.debug(`Error: ${(err as Error).message}`);
 			throw new CodedError("VirtualBox not found! Please check it is installed and if so specify the path manually in the configuration options.", errorCodes.APPLICATION_NOT_FOUND);
 		} else {
 			throw new CodedError(
