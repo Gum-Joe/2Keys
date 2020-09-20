@@ -12,6 +12,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import { BAD_VAGRANT_EXIT_CODE } from "../src/errorCodes";
 import { startVM } from "../src/setup/client/vm";
+import install from "../src/install";
 
 chai.use(chaiAsPromised);
 
@@ -45,6 +46,9 @@ describe("VM Startup tests", () => {
 		try { await rimraf(MOCK_REGISTRY_LOCATION); } catch (err) { if (err.code !== "ENOENT") throw err; }
 		await AddOnsRegistry.createNewRegistry(MOCK_REGISTRY_LOCATION);
 		await SoftwareRegistry.createSoftwareRegistry(MOCK_REGISTRY_LOCATION);
+
+		// Install
+		await install(twokeys);
 	});
 
 	it("should start a VM and provision it correctly", async () => {
