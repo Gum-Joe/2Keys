@@ -49,6 +49,14 @@ async function getVBoxManagePath(twokeys: TwoKeys): Promise<string> {
 		twokeys.logger.warn(`Using ${VBOX_DEFAULT_INSTALL_PATH}`);
 		vboxInstallPath = VBOX_DEFAULT_INSTALL_PATH;
 	}
+
+	// HACK: Get tests working on macOs for VM deployment tests. This is because GitHub only support virtualisation on macOS.
+	if (process.platform === "darwin") {
+		twokeys.logger.warn("Detected macOS.  This is probably for testing purposes in CI, since macOS is not officialy suported.");
+		const VBOX_INSTALL_LOCATION_DARWIN = "/Applications/VirtualBox.app/Contents/MacOS/";
+		twokeys.logger.warn(`Using ${VBOX_INSTALL_LOCATION_DARWIN}`);
+		return VBOX_INSTALL_LOCATION_DARWIN;
+	}
 	// Check access
 	try {
 		await fs.access(vboxInstallPath, fsconstants.F_OK);
