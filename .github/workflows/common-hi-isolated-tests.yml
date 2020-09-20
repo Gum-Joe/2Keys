@@ -1,4 +1,4 @@
-name: Isolated tests
+name: "@twokeys/common-hi: isolated tests"
 
 on: push
 
@@ -30,6 +30,6 @@ jobs:
         yarn wsrun -mtc precompile
         yarn build -v
     - name: Run stuff
-      run: yarn wsrun -msc coverage:isolated
+      run: yarn workspace @twokeys/common-hi coverage:isolated
     - uses: codecov/codecov-action@v1
 
