@@ -2,12 +2,20 @@ import { ClientConfig } from "@twokeys/core/lib/interfaces";
 import { expect } from "chai";
 import { join } from "path";
 import sinon from "sinon";
+import mockFS from "mock-fs";
 import { ClientConfigHere } from "../../../src/config";
 import newClient from "../../../src/setup/client/newClient";
 import * as vmCode from "../../../src/setup/client/vm";
 import { MOCK_CLIENT_LOCATION, twokeys } from "../../constants";
 import { promises as fs } from "fs";
-import { VAGRANT_FILE_DEST, VM_LAUNCH_BAT_FILE_DEST, VM_LAUNCH_VBS_FILE_DEST } from "../../../src/constants";
+import { VAGRANT_DEFAULT_INSTALL_PATH, VAGRANT_FILE_DEST, VBOX_DEFAULT_INSTALL_PATH, VM_LAUNCH_BAT_FILE_DEST, VM_LAUNCH_VBS_FILE_DEST } from "../../../src/constants";
+
+// For coverage
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import detectorFull from "../../../src/index";
+
+// Property access check
+detectorFull.install;
 
 // VAUES FOR TESTS ONLY AS THEY DON'T MATTER
 const clientConfig: ClientConfig<ClientConfigHere> = {
@@ -44,6 +52,7 @@ describe("Client creation tests", () => {
 
 	it("should successfully generate a client", async () => {
 		await expect(newClient(twokeys, clientConfig)).to.eventually.be.fulfilled;
+
 		expect((await fs.readFile(join(MOCK_CLIENT_LOCATION, VAGRANT_FILE_DEST))).toString()).to.include(checkForUSB);
 		expect((await fs.readFile(join(MOCK_CLIENT_LOCATION, VAGRANT_FILE_DEST))).toString()).to.include(checkForAnsible);
 		

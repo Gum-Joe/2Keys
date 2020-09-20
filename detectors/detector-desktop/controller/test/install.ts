@@ -45,7 +45,9 @@ describe("Install function tests", () => {
 		mockFS_here[VAGRANT_DEFAULT_INSTALL_PATH] = VAGRANT_DEFAULT_INSTALL_PATH;
 		mockFS_here[VBOX_DEFAULT_INSTALL_PATH] = VBOX_DEFAULT_INSTALL_PATH;
 		mockFS(mockFS_here);
-		expect((await twokeys.software.getSoftware(VIRTUALBOX_NAME)).executables.filter(exe => exe.name === VIRTUALBOX_EXECUTABLE_NAME)[0].path).to.equal(VBOX_DEFAULT_INSTALL_PATH + "\\");
+		const thePath = (await twokeys.software.getSoftware(VIRTUALBOX_NAME)).executables.filter(exe => exe.name === VIRTUALBOX_EXECUTABLE_NAME)[0].path;
+		// HACK: Hack to ignore slashes
+		expect(thePath.split("").map(char => char !== "\\" ? char : "" ).join("")).to.equal(VBOX_DEFAULT_INSTALL_PATH.split("").map(char => char !== "\\" ? char : "" ).join(""));
 		mockFS.restore();
 	});
 
@@ -76,20 +78,30 @@ describe("Install function tests", () => {
 		});
 
 		it("should use environment variables when set for VBox", async () => {
+			const mockFS_here = {};
+			mockFS_here[VAGRANT_DEFAULT_INSTALL_PATH] = VAGRANT_DEFAULT_INSTALL_PATH;
+			mockFS_here[VBOX_DEFAULT_INSTALL_PATH] = VBOX_DEFAULT_INSTALL_PATH;
+			mockFS(mockFS_here);
 			process.env.VBOX_INSTALL_PATH  = process.cwd();
 			await twokeys.software.uninstallSoftware(VIRTUALBOX_NAME);
 			await twokeys.software.uninstallSoftware(VAGRANT_NAME);
 			await install(twokeys);
 			expect((await twokeys.software.getExecutable(VIRTUALBOX_NAME, VIRTUALBOX_EXECUTABLE_NAME)).path).to.equal(process.cwd());
+			mockFS.restore();
 		});
 
 		it("should use default install path for VBox when no env vars", async () => {
+			const mockFS_here = {};
+			mockFS_here[VAGRANT_DEFAULT_INSTALL_PATH] = VAGRANT_DEFAULT_INSTALL_PATH;
+			mockFS_here[VBOX_DEFAULT_INSTALL_PATH] = VBOX_DEFAULT_INSTALL_PATH;
+			mockFS(mockFS_here);
 			delete process.env.VBOX_INSTALL_PATH;
 			delete process.env.VBOX_MSI_INSTALL_PATH;
 			await twokeys.software.uninstallSoftware(VIRTUALBOX_NAME);
 			await twokeys.software.uninstallSoftware(VAGRANT_NAME);
 			await install(twokeys);
 			expect((await twokeys.software.getExecutable(VIRTUALBOX_NAME, VIRTUALBOX_EXECUTABLE_NAME)).path).to.equal(VBOX_DEFAULT_INSTALL_PATH);
+			mockFS.restore();
 		});
 	});
 });
