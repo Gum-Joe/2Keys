@@ -24,6 +24,6 @@ before_script:
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
-  - yarn workspace @twokeys/detector-desktop run cross-env TWOKEYS_DEBUG=true nyc mocha --grep "Client creation tests"
+  - yarn workspace @twokeys/detector-desktop run cross-env TWOKEYS_DEBUG=true nyc mocha
   # - yarn workspaces run coverage
   # - bash <(curl -s https://codecov.io/bash)

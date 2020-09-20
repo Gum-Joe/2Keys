@@ -90,10 +90,10 @@ export default class ContentCopier {
 		try {
 			const tree = await ContentCopier.generateFileTree(this.root);
 			this.logger.debug("Creating dirs list...");
-			const dirs = await ContentCopier.getDirsFromTree(tree);
+			const dirs = ContentCopier.getDirsFromTree(tree);
 			// Do copy action
 			this.logger.debug("Creating file list....");
-			const files = await ContentCopier.getFilesFromTree(tree);
+			const files = ContentCopier.getFilesFromTree(tree);
 
 			// DO IT
 			this.logger.debug("Copying...");
@@ -118,6 +118,7 @@ export default class ContentCopier {
 
 			// COPY
 			for (const file of files) {
+				this.logger.debug(`Copying to ${path.relative(this.root, path.join(this.destination, path.relative(this.root, file)))}`);
 				const relativePath = path.join(this.destination, path.relative(this.root, file));
 				const reader = fs.createReadStream(file);
 				const writer = fs.createWriteStream(relativePath);
@@ -153,28 +154,20 @@ export default class ContentCopier {
 	 * @param progress_bar 
 	 * @param dirs Absolute path to dirctories, which we make relative to destination
 	 */
-	public mkdirs(dirs: string[], progress_bar?: ProgressBar): Promise<{}> {
-		return new Promise((resolve, reject) => {
-			// MKDIR
-			for (const dir of dirs) {
-				// Make relative to root, then attach dest to start i.e.
-				// C:\AHK\ahk-v2 => .\ahk-v2 -> D:\software\.\ahk-v2
-				const relativeDir = path.join(this.destination, path.relative(this.root, dir));
-				mkdirp(relativeDir)
-					.then(() => {
-						progress_bar?.tick({
-							action: "mkdir",
-							symbol: ">>",
-							dest: relativeDir,
-						});
-						// At end?
-						if (dir === dirs[dirs.length - 1]) {
-							resolve();
-						}
-					})
-					.catch(reject);
-			}
-		});
+	public mkdirs(dirs: string[], progress_bar?: ProgressBar): Promise<void[]> {
+		return Promise.all(dirs.map(async (dir) => {
+			const relativeDir = path.join(this.destination, path.relative(this.root, dir));
+			return mkdirp(relativeDir)
+				.then(() => {
+					// TODO: REMOVE
+					this.logger.debug(`mkdir ${relativeDir}`);
+					progress_bar?.tick({
+						action: "mkdir",
+						symbol: ">>",
+						dest: relativeDir,
+					});
+				});
+		})); 
 	}
 
 	/**
@@ -182,9 +175,28 @@ export default class ContentCopier {
    * @param root Root dir to start at
    */
 	private static async generateFileTree(root: string): Promise<FileTreeNodes<FileTreeNode>[]> {
-		const files: FileTreeNode[] = [];
 		const contents = await readdir(root);
-		for (const file of contents) {
+		return Promise.all(contents.map(async (file) => {
+			const absolutePath = path.join(root, file);
+			// Dir or file?
+			const status = await stat(absolutePath);
+			if (status.isDirectory()) {
+				// Is dir, run this func on it
+				const dirNode: FileTreeDir = {
+					type: "dir",
+					path: absolutePath,
+					contents: await ContentCopier.generateFileTree(absolutePath),
+				};
+				return dirNode;
+			} else {
+				// It's a file!
+				return {
+					type: "file",
+					path: absolutePath
+				} as FileTreeFile;
+			}
+		}));
+		/*for (const file of contents) {
 			const absolutePath = path.join(root, file);
 			// Dir or file?
 			const status = await stat(absolutePath);
@@ -204,14 +216,14 @@ export default class ContentCopier {
 				});
 			}
 		}
-		return files;
+		return files;*/
 	}
 
 	/**
 	 * Gets a list of dirs in a tree
 	 * @param tree Tree generated
 	 */
-	private static async getDirsFromTree(tree: FileTreeNodes<FileTreeNode>[]): Promise<string[]> {
+	private static getDirsFromTree(tree: FileTreeNodes<FileTreeNode>[]): string[] {
 		const dirs: string[] = [];
 		for (const node of tree) {
 			// 1: check type
@@ -220,7 +232,7 @@ export default class ContentCopier {
 			} else if (node.type === "dir") {
 				// Add to list, rerun function on it
 				dirs.push(node.path);
-				const nextDirs = await ContentCopier.getDirsFromTree(node.contents); // Dirs in this current dir
+				const nextDirs = ContentCopier.getDirsFromTree(node.contents); // Dirs in this current dir
 				nextDirs.forEach(dir => dirs.push(dir));
 			} else {
 				throw new Error("Invalid file type! Only dir and file are allowed."); // TS complains if path is here
@@ -234,13 +246,13 @@ export default class ContentCopier {
 	 * Gets a list of files in a tree
 	 * @param tree Tree generated
 	 */
-	private static async getFilesFromTree(tree: FileTreeNode[]): Promise<string[]> {
+	private static getFilesFromTree(tree: FileTreeNode[]): string[] {
 		const files: string[] = [];
 		for (const node of tree) {
 			// 1: check type
 			if (node.type === "dir") {
 				// Run function on dir to get files from it
-				const nextFiles = await ContentCopier.getFilesFromTree(node.contents); // Dirs in this current dir
+				const nextFiles = ContentCopier.getFilesFromTree(node.contents); // Dirs in this current dir
 				nextFiles.forEach(file => files.push(file));
 			} else if (node.type === "file") {
 				// It's a file, add it
