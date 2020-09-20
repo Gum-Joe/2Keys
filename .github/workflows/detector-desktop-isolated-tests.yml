@@ -15,7 +15,7 @@ jobs:
     env:
      TWOKEYS_OOBE_NET_TEST_INTERFACE: vEthernet (nat)
      working-dir: detectors/detector-desktop/controller
-     TWOKEYS_DEBUG: true
+     TWOKEYS_DEBUG: "true"
 
     steps:
     - uses: actions/checkout@v2

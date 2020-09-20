@@ -8,6 +8,7 @@ os: windows
 # Fix build timeout. See https://travis-ci.community/t/build-timeout-but-actually-succeeded/2763
 env:
   - YARN_GPG=no
+  - TWOKEYS_DEBUG=true
 
 cache:
   npm: true
@@ -24,5 +25,6 @@ before_script:
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
-  - yarn workspaces run coverage
+  - yarn workspaces run nyc mocha
+  # - yarn workspaces run coverage
   # - bash <(curl -s https://codecov.io/bash)
