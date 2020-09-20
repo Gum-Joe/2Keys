@@ -32,7 +32,7 @@ jobs:
     - name: Compile
       if: ${{ always() }}
       run: |
-        yarn build -v
+        yarn compile -v
       working-directory: ${{ env.working-dir }}
     - name: Run tests
       if: ${{ always() }}
