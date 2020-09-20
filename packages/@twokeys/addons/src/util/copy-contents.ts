@@ -118,7 +118,7 @@ export default class ContentCopier {
 
 			// COPY
 			for (const file of files) {
-				this.logger.debug(`Copying to ${path.relative(this.root, path.join(this.destination, path.relative(this.root, file)))}`);
+				// this.logger.debug(`Copying to ${path.relative(this.root, path.join(this.destination, path.relative(this.root, file)))}`);
 				const relativePath = path.join(this.destination, path.relative(this.root, file));
 				const reader = fs.createReadStream(file);
 				const writer = fs.createWriteStream(relativePath);
@@ -159,8 +159,7 @@ export default class ContentCopier {
 			const relativeDir = path.join(this.destination, path.relative(this.root, dir));
 			return mkdirp(relativeDir)
 				.then(() => {
-					// TODO: REMOVE
-					this.logger.debug(`mkdir ${relativeDir}`);
+					// this.logger.debug(`mkdir ${relativeDir}`);
 					progress_bar?.tick({
 						action: "mkdir",
 						symbol: ">>",
