@@ -14,7 +14,8 @@
     "docs": "typedoc --includes src",
     "test": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true mocha",
     "test:log": "cross-env mocha",
-    "coverage": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha"
+    "coverage": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha",
+    "coverage:log": "cross-env TWOKEYS_USE_COLOUR=true nyc mocha"
   },
   "devDependencies": {
     "@types/mkdirp": "^1.0.1",

@@ -14,6 +14,7 @@
     "test": "cross-env NODE_ENV=test mocha",
     "test:isolated": "cross-env mocha test-isolated/**/*.ts --exclude test/**/*.ts --timeout 600000",
     "coverage": "cross-env NODE_ENV=test nyc mocha",
+    "coverage:log": "cross-env nyc mocha",
     "coverage:isolated": "cross-env nyc mocha test-isolated/**/*.ts --exclude test/**/*.ts --timeout 600000"
   },
   "twokeys": {
