@@ -1,7 +1,6 @@
 import { TwoKeys, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
 import { CodedError } from "@twokeys/core";
 import { spawn } from "child_process";
-import { EOL } from "os";
 import { ClientConfigHere } from "../../config";
 import { VAGRANT_EXECUTABLE_NAME, VAGRANT_NAME } from "../../constants";
 import { BAD_VAGRANT_EXIT_CODE } from "../../errorCodes";

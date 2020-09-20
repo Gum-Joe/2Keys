@@ -141,7 +141,7 @@ export default class ZipDownloader {
 		this.logger.info("Extracting...");
 		// Validate existence
 		try {
-			await access(this.fullPath, fs.constants.F_OK)
+			await access(this.fullPath, fs.constants.F_OK);
 			this.logger.debug("Zip file found. Extracting...");
 			// DO IT
 			// From https://github.com/cthackers/adm-zip

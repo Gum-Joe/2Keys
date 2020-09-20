@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { TwoKeys, createMockTwoKeys, AddOnsRegistry, TWOKEYS_ADDON_TYPE_DETECTOR, SoftwareRegistry } from "@twokeys/addons";
 import { ClientConfig } from "@twokeys/core/lib/interfaces";
 import chai, { expect } from "chai";
