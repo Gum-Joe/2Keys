@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install protoc
-      run: choco install protoc
+      run: brew install protobuf
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
