@@ -2,7 +2,7 @@ import { Logger } from "@twokeys/core";
 import path, { join } from "path";
 import { Package, TWOKEYS_ADDON_TYPES } from "../util/interfaces";
 import { promises as fs } from "fs";
-import native from "@twokeys/native-utils";
+import { platform } from "os";
 
 /** Utils for {@link TwoKeys} */
 export default class TwoKeysUtilites<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES>  {
@@ -27,7 +27,13 @@ export default class TwoKeysUtilites<AddOnsType extends TWOKEYS_ADDON_TYPES = TW
 	 * @param source Path to source that is being linked
 	 */
 	public getSymbolLinkPath(source: string): string {
-		return join(native.get_startup_folder(), `2Keys-add-on-${this.package.name}-${path.basename(source)}`);
+		// Prevent OS error when testing on macOS (some tests have to run on macOS because GitHub Actions only allows Virtualbox on macOS)
+		if (platform() === "win32") {
+			const native = require("@twokeys/native-utils");
+			return join(native.get_startup_folder(), `2Keys-add-on-${this.package.name}-${path.basename(source)}`);
+		} else {
+			throw new Error("This method is not supported on your OS platform!");
+		}
 	}
 
 	/**
