@@ -30,6 +30,8 @@ jobs:
       run: which vagrant
     - name: IS VAGRANT THERE?
       run: vagrant --help
+    - name: WHERE IS VBOX
+      run: which VBoxManage
     - name: Install packages
       run: |
         yarn
