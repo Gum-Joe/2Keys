@@ -1,0 +1,46 @@
+name: "@twokeys/detector-desktop: isolated tests"
+
+on: push
+
+jobs:
+  build:
+    runs-on: macos-latest
+    continue-on-error: true
+    name: "@twokeys/detector-desktop: isolated tests"
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+    
+    env:
+     TWOKEYS_OOBE_NET_TEST_INTERFACE: vEthernet (nat)
+     working-dir: detectors/detector-desktop/controller
+     TWOKEYS_DEBUG: "true"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    # - name: Setup native modules
+    #   run: yarn global add windows-build-tools
+    - name: Delete binding.gyps # So that builds work and we don't have to bother with native modules that are windows only
+      run: rm -fv packages/@twokeys/*/binding.gyp executors/@twokeys/*/binding.gyp detectors/*/controller/binding.gyp
+    - name: WHERE IS VAGRANT?
+      run: which vagrant
+    - name: WHERE IS VBOX?
+      run: which VBoxManage
+    - name: Install packages
+      run: |
+        yarn
+      working-directory: ${{ env.working-dir }}
+    - name: Compile
+      run: |
+        yarn compile -v
+      working-directory: ${{ env.working-dir }}
+    - name: Run tests
+      run: yarn coverage:isolated
+      working-directory: ${{ env.working-dir }}
+    - uses: codecov/codecov-action@v1
+

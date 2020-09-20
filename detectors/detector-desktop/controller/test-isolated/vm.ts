@@ -1,8 +1,10 @@
-import { TwoKeys, createMockTwoKeys, AddOnsRegistry, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { TwoKeys, createMockTwoKeys, AddOnsRegistry, TWOKEYS_ADDON_TYPE_DETECTOR, SoftwareRegistry } from "@twokeys/addons";
 import { ClientConfig } from "@twokeys/core/lib/interfaces";
 import chai, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { join } from "path";
+import rimrafCB from "rimraf";
 import { ClientConfigHere } from "../src/config";
 import newClient from "../src/setup/client/newClient";
 import { MOCK_REGISTRY_LOCATION, MOCK_ROOT } from "../test/constants";
@@ -11,6 +13,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import { BAD_VAGRANT_EXIT_CODE } from "../src/errorCodes";
 import { startVM } from "../src/setup/client/vm";
+import install from "../src/install";
 
 chai.use(chaiAsPromised);
 
@@ -37,7 +40,18 @@ const clientConfig: ClientConfig<ClientConfigHere> = {
 	}
 };
 
+const rimraf = promisify(rimrafCB);
+
 describe("VM Startup tests", () => {
+	before(async () => {
+		try { await rimraf(MOCK_REGISTRY_LOCATION); } catch (err) { if (err.code !== "ENOENT") throw err; }
+		await AddOnsRegistry.createNewRegistry(MOCK_REGISTRY_LOCATION);
+		await SoftwareRegistry.createSoftwareRegistry(MOCK_REGISTRY_LOCATION);
+
+		// Install
+		await install(twokeys);
+	});
+
 	it("should start a VM and provision it correctly", async () => {
 		await expect(newClient(twokeys, clientConfig)).to.eventually.be.fulfilled;
 		await expect(promisify(exec)("vagrant ssh -c 2Keys --help")).to.eventually.be.fulfilled;

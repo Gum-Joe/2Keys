@@ -1,0 +1,50 @@
+name: Monorepo Tests
+
+on: push
+
+jobs:
+  tests:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install protoc
+      run: choco install protoc
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    # - name: Setup native modules
+    #   run: yarn global add windows-build-tools
+
+    # Cache
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - uses: actions/cache@v2
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    # Setup
+    - name: Install packages
+      run: yarn
+    - name: Compile
+      run: |
+        yarn wsrun -mtc precompile
+        yarn build -v
+    - name: Bootstrap server
+      run: yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
+    
+    # Test
+    - name: Run tests
+      run: yarn workspaces run coverage
+    - uses: codecov/codecov-action@v1
+

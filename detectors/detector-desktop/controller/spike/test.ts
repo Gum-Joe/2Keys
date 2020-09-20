@@ -4,7 +4,7 @@ import { MOCK_REGISTRY_LOCATION, MOCK_ROOT, MOCK_CLIENT_LOCATION } from "../test
 
 import packageJSON from "../package.json";
 
-import install from "../src/install";
+//import install from "../src/install";
 import newClient from "../src/setup/client/newClient";
 
 
