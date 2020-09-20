@@ -25,6 +25,8 @@ jobs:
     #   run: yarn global add windows-build-tools
     - name: Delete binding.gyps # So that builds work and we don't have to bother with native modules that are windows only
       run: rm -fv packages/@twokeys/*/binding.gyp executors/@twokeys/*/binding.gyp detectors/*/controller/binding.gyp
+    - name: WHERE IS VAGRANT?
+      run: which vagrant
     - name: Install packages
       run: |
         yarn
