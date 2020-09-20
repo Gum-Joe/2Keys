@@ -12,6 +12,7 @@ async function getVagrantPath(twokeys: TwoKeys): Promise<string> {
 		vagrantPath = await which("vagrant");
 		twokeys.logger.debug("Using vagrant from PATH");
 	} catch (err) {
+		twokeys.logger.debug(err.message);
 		twokeys.logger.warn("Vagrant not found on PATH.  Using default install location.");
 		twokeys.logger.debug(`Using ${VAGRANT_DEFAULT_INSTALL_PATH}`);
 		vagrantPath = VAGRANT_DEFAULT_INSTALL_PATH;
