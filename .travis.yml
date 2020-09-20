@@ -24,6 +24,6 @@ before_script:
   - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
-  - yarn workspaces run coverage:log
+  - yarn workspace @twokeys/detector-desktop run coverage:log
   # - yarn workspaces run coverage
   # - bash <(curl -s https://codecov.io/bash)
