@@ -26,6 +26,7 @@ import assert from "assert";
 import { TwokeysPackageInfo, TWOKEYS_ADDON_TYPES_ARRAY } from "./util/interfaces";
 import TwoKeys, { TwoKeysForAProject, TwoKeysPropertiesForAddons } from "./module-interfaces/twokeys";
 import AddOnsRegistry from "./registry";
+import { Logger } from "@twokeys/core";
 
 /**
  * Hack to typecast the types key to any so we can do what we want with it.
@@ -66,7 +67,7 @@ function assertTwoKeysKeyIsCorrect(packageJSON: { [key: string]: any; twokeys: U
  */
 export function createMockTwoKeys(packageJSON: AddOnsPackageJSON, registryLocation: string, properties: TwoKeysPropertiesForAddons = {}): TwoKeys {
 	assertTwoKeysKeyIsCorrect(packageJSON);
-	return new TwoKeys(AddOnsRegistry.convertPackageJSONToDBDocument(packageJSON), registryLocation, undefined, properties);
+	return new TwoKeys(AddOnsRegistry.convertPackageJSONToDBDocument(packageJSON), registryLocation, AddOnsRegistry.getLoggerForAddon(AddOnsRegistry.convertPackageJSONToDBDocument(packageJSON), Logger), properties);
 }
 
 /**

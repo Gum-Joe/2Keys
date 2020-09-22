@@ -13,10 +13,12 @@
     "docs": "typedoc",
     "test": "cross-env NODE_ENV=test mocha",
     "test:log": "cross-env mocha",
-    "coverage": "cross-env NODE_ENV=test nyc mocha"
+    "coverage": "cross-env NODE_ENV=test nyc mocha",
+    "coverage:log": "cross-env nyc mocha"
   },
   "dependencies": {
     "@twokeys/core": "^1.0.0",
+    "@twokeys/native-utils": "^1.0.0",
     "axios": "^0.20.0",
     "extract-zip": "^2.0.0",
     "mkdirp": "^1.0.4",

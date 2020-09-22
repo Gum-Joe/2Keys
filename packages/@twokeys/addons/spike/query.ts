@@ -1,6 +1,6 @@
 import { Database, open as openDB } from "sqlite";
 import sqlite3 from "sqlite3";
-const query = `SELECT *  FROM software JOIN executables ON software.id = executables.softwareId;`;
+const query = "SELECT *  FROM software JOIN executables ON software.id = executables.softwareId;";
 
 (async function () {
 	const db = await openDB({

@@ -48,4 +48,4 @@ export const AHK_SOFTWARE_DEF: Software = {
 			arch: "x32",
 		}
 	]
-}
+};

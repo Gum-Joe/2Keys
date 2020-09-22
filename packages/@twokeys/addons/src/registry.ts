@@ -32,7 +32,7 @@ import { Logger, TwoKeysProperties, CodedError } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
 import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
-import TwoKeys from "./module-interfaces/twokeys";
+import TwoKeys, { TwoKeysPropertiesForAddons } from "./module-interfaces/twokeys";
 import { LoggerArgs } from "@twokeys/core/lib/interfaces";
 import * as errorCodes from "./util/error-codes";
 
@@ -95,7 +95,7 @@ type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModul
 	/** twokeys class */
 	twokeys: TwoKeys<AddOnsType>;
 	/** Properties for {@link TwoKeys.properties} */
-	properties: TwoKeysProperties;
+	properties: TwoKeysPropertiesForAddons<AddOnsType>;
 };
 
 // TODO: Before and after hooks
@@ -156,8 +156,8 @@ export default class AddOnsRegistry {
 	 * - When an add-on function logs, it has the prefix `add-on:addonName::` (colon there because `::` looks better than `:`; the extra colon is provided by {@link TwoKeys})
 	 * - When an add-on use software or registry or other 2Keys function, the prefix is `add-on:addonName:software`, etc
 	 */
-	protected getLoggerForAddon(thePackage: Package): typeof Logger {
-		return class extends this.LoggerConstructor {
+	public static getLoggerForAddon(thePackage: Package, LoggerConstructor: typeof Logger): typeof Logger {
+		return class extends LoggerConstructor {
 			constructor(args: LoggerArgs) {
 				super(args);
 				this.args.name = `add-on:${thePackage.name}:${this.args.name}`;
@@ -175,7 +175,7 @@ export default class AddOnsRegistry {
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
 	 * @returns A loaded add-on.  Use .call(config) to call a {@link TaskFunction}
 	 */
-	private async loadPackage<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageToLoad: Package, typeOfAddOn: AddOnsType, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<AddOnsType>> {
+	private async loadPackage<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageToLoad: Package, typeOfAddOn: AddOnsType, propertiesForAddOn: TwoKeysPropertiesForAddons<AddOnsType>): Promise<LoadedAddOn<AddOnsType>> {
 		try {
 			this.logger.info(`Loading package ${packageToLoad.name}, type ${typeOfAddOn}...`);
 			this.logger.debug(JSON.stringify(packageToLoad));
@@ -190,7 +190,12 @@ export default class AddOnsRegistry {
 				// Add call function
 				this.logger.debug("Adding twokeys class & call function");
 				loaded.properties = propertiesForAddOn || {};
-				loaded.twokeys = new this.TwoKeys<AddOnsType>(Object.assign(packageToLoad), this.registryDBFilePath, this.getLoggerForAddon(loaded.package), loaded.properties);
+				loaded.twokeys = new this.TwoKeys<AddOnsType>(
+					Object.assign(packageToLoad),
+					this.registryDBFilePath,
+					AddOnsRegistry.getLoggerForAddon(loaded.package, this.LoggerConstructor),
+					loaded.properties
+				);
 				// Custom Logger to use
 
 				loaded.call = <T, U>(fn: TaskFunction<T, U, AddOnsType>, config: T): U => {
@@ -218,7 +223,7 @@ export default class AddOnsRegistry {
 	 * @param typeOfAddOn SINGLE type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only.
 	 */
-	public async load<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageName: string, typeOfAddOn: AddOnsType, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<AddOnsType>> {
+	public async load<AddOnsType extends TWOKEYS_ADDON_TYPE_SINGLE>(packageName: string, typeOfAddOn: AddOnsType, propertiesForAddOn: TwoKeysPropertiesForAddons<AddOnsType>): Promise<LoadedAddOn<AddOnsType>> {
 		this.logger.info(`Loading add-on ${packageName}...`);
 		try {
 			// Query DB for package
@@ -250,7 +255,7 @@ export default class AddOnsRegistry {
 	 */
 	public createLoaderForAddonType<AddOnType extends TWOKEYS_ADDON_TYPES & string>(addOnType: AddOnType) {
 		// eslint-disable-next-line @typescript-eslint/no-use-before-define
-		return async (packageName: string, propertiesForAddOn?: TwoKeysProperties): Promise<LoadedAddOn<AddOnType>> => {
+		return async (packageName: string, propertiesForAddOn: TwoKeysPropertiesForAddons<AddOnType>): Promise<LoadedAddOn<AddOnType>> => {
 			return (await this.load<AddOnType>(packageName, addOnType, propertiesForAddOn));
 		};
 	}
@@ -266,6 +271,9 @@ export default class AddOnsRegistry {
 	 */
 	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType): Promise<{ [name: string]: LoadedAddOn<AddOnsType> }> {
 		this.logger.info(`Loading all modules of type ${typeOfAddOn}...`);
+		if (typeOfAddOn === TWOKEYS_ADDON_TYPE_DETECTOR) {
+			throw new Error("Cant do a load all for detectors becasue client location is unknown");
+		}
 		this.logger.debug("Querying...");
 		const addOnsList: Package[] = (await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE types LIKE ?`, `%${typeOfAddOn}%`)).map(value => {
 			const res = this.parsePackageFromDB(value);
@@ -274,7 +282,14 @@ export default class AddOnsRegistry {
 		});
 		this.logger.debug(JSON.stringify(addOnsList));
 		const loadedAddOns: { [name: string]: LoadedAddOn<AddOnsType> } = {};
-		const promiseLoaders = addOnsList.map(async addOn => loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(addOn, typeOfAddOn));
+		const defaultProps: TwoKeysProperties = {};
+		const promiseLoaders = addOnsList.map(async addOn => loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(
+			addOn,
+			typeOfAddOn,
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
+			defaultProps
+		));
 		await Promise.all(promiseLoaders);
 		return loadedAddOns;
 
@@ -336,7 +351,7 @@ export default class AddOnsRegistry {
 		for (const addOn of packageInfo.results || []) {
 			this.logger.debug(`Running install()s for ${addOn.name}.`);
 			this.logger.debug("Loading scripts for each included add-on type ready for execution...");
-			const loadedScript = await Promise.all(addOn.types.map(async addOnType => { return { loadedScript: await this.load(addOn.name, addOnType), addOnType }; }));
+			const loadedScript = await Promise.all(addOn.types.map(async addOnType => { return { loadedScript: await this.load(addOn.name, addOnType, {}), addOnType }; }));
 			for (const script of loadedScript) {
 				this.logger.info(`Running install() for add-on type ${script.addOnType}...`);
 				if ("install" in script.loadedScript && typeof script.loadedScript.install == "function") {

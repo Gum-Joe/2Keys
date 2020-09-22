@@ -92,7 +92,6 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	constructor(options: SoftwareRegistryOptions<PackageType>) {
 		super(options);
 		this.package = options.package;
-		this.logger.args.name = this.package.name + ":software";
 	}
 
 	/**

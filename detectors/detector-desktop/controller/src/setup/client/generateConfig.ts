@@ -18,21 +18,14 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PromisedTaskFunction } from "@twokeys/addons/src";
-import { ClientConfig } from "@twokeys/core/lib/interfaces";
-import { ClientConfigHere } from "../config";
+import type { DetectorPromisedTaskFunction } from "@twokeys/addons";
+import type { ClientConfigHere } from "../../config";
 
 /**
- * Function to setup a new client
+ * Reserved for future use, just returns config
  */
-const newClient: PromisedTaskFunction<ClientConfig<ClientConfigHere>> = async (twokeys, config) => {
-	twokeys.logger.status("Setting up a new VM");
-	// TODO: Action List
-	// 0: Check vagrant and VBox is installed
-	// 1: Create base files (from templates)
-	// 2: Adjust Ansible config
-	// 3: Run `vagrant up` & handle errors
-	// 4: SSH in and validate 2Keys is installed; copy client config & configure shares (run 2Keys client init)
+const generateConfig: DetectorPromisedTaskFunction<any, ClientConfigHere> = async (twokeys, config) => {
+	return config;
 };
 
-export default newClient;
+export default generateConfig;

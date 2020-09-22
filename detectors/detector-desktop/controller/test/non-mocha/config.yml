@@ -1,0 +1,14 @@
+keyboards:
+  keyboard_test:
+    root: ./keyboard_test
+    executors:
+      executor-ahk:
+        root: index.ahk
+        #libs:
+        #  - add-ons/libs/twokeys-ahk-core-libs # Use library twokeys-ahk-core-libs from libs
+      default: executor-ahk # Default executor
+    hotkeys:
+      ^RT:
+        func: RunTestForExecution1
+      +!A:
+        func: Not A Valid Func

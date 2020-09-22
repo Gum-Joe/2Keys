@@ -76,7 +76,7 @@ export default function (argv: Arguments): Promise<Config> {
 		const ifaces = networkInterfaces();
 		const ip_choices: string[] = [];
 		for (const ifname in ifaces) {
-			const iface_root = ifaces[ifname];
+			const iface_root = ifaces[ifname] || [];
 			let aliases = 0; // To check if mutliple IPs
 			for (const iface of iface_root) {
 				if ("IPv4" !== iface.family || iface.internal !== false) {

@@ -1,7 +1,6 @@
 language: node_js
 node_js:
-  - lts/*
-  - node
+  - 12
 
 os: windows
 
@@ -25,4 +24,4 @@ before_script:
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
   - yarn workspaces run coverage
-  - bash <(curl -s https://codecov.io/bash)
+  # - bash <(curl -s https://codecov.io/bash)

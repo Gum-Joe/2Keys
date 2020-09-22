@@ -1,5 +1,5 @@
 # Automates adding of TODOs
-name: "Workflow"
+name: "TODO issue creator"
 on: ["push"]
 jobs:
   build:

@@ -15,6 +15,9 @@
 			"path": "./packages/@twokeys/server"
 		},
 		{
+			"path": "./packages/@twokeys/native-utils"
+		},
+		{
 			"path": "./executors/@twokeys/executor-ahk"
 		},
 		{

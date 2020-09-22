@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { networkInterfaces, platform } from "os";
 import setStaticIPv4Address from "../../../src/setup/util/setIPv4";
 import { TwoKeys } from "../../../test/test-util/command-factory";
@@ -31,6 +32,7 @@ function addOneToIPv4(ip: string): string {
 			return;
 		}
 
+		// @ts-ignore
 		const oldIp = networkInterfaces()[NETWORK_INTERFACE].filter(value => value.family === "IPv4")[0].address;
 		const newIp = addOneToIPv4(oldIp);
 
@@ -42,6 +44,7 @@ function addOneToIPv4(ip: string): string {
 			ipv4: newIp,
 		});
 
+		// @ts-ignore
 		expect(networkInterfaces()[NETWORK_INTERFACE].filter(value => value.family === "IPv4")[0].address).to.equal(newIp);
 
 		// Reset
@@ -52,6 +55,7 @@ function addOneToIPv4(ip: string): string {
 			ipv4: oldIp,
 		});
 
+		// @ts-ignore
 		expect(networkInterfaces()[NETWORK_INTERFACE].filter(value => value.family === "IPv4")[0].address).to.equal(oldIp);
 
 	});

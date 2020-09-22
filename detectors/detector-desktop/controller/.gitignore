@@ -1,1 +1,3 @@
-test/non-mocha
+test/non-mocha/registry
+test/non-mocha/client
+test/non-mocha/client-vm

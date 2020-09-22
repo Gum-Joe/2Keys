@@ -18,6 +18,18 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** Recursivly make a type writable */
+export type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> };
+
+/** Makes some keys from an interface optional */
+export type MakeKeysNever<T, K extends keyof T> ={
+	[P in keyof T]: P extends K ? undefined : T[P];
+}
+
+export type MakeKeysOptional<T, K extends keyof T> = {
+	[P in keyof T]: P extends K ? undefined : T[P];
+}
+
 /**
  * Defines options for the Logger class
  * @packageDocumentation
@@ -61,10 +73,22 @@ export interface LoggerTypes {
 	args?: LoggerArgs;
 }
 
+/** Util methods for config for add-ons to allow the modification of config */
+export interface ConfigUtils {
+	/** Adjust the properties of adjustable options, then call `write()` to write the new config. */
+	write: () => Promise<void>;
+}
+
 /**
  * Config types
  * See `example` for examples of each
  */
+
+/** Add {@link ConfigUtils} to config types so you can safely use them. */
+export type AddConfigUtils<T extends { [key: string]: any }> = T & ConfigUtils
+
+// export type ConfigWithoutUtils<T extends AddConfigUtils<U>, U> = MakeKeysOptional<T, keyof ConfigUtils>;
+
 /**
  * Defines the config for a project file.
  * This is the root `config.yml` and is first loaded when 2Keys loads a project
