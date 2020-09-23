@@ -9,7 +9,7 @@ jobs:
       - name: "TODO to Issue"
         uses: "alstr/todo-to-issue-action@v1.2-beta"
         with:
-          LABEL: "// TODO"
+          LABEL: "TODO"
           COMMENT_MARKER: "//"
         id: "todo"
       - name: "FIXME to Issue"
