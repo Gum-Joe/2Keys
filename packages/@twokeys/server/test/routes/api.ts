@@ -37,7 +37,7 @@ describe("/api test", () => {
 					keyboard: MOCK_KEYBAORD_NAME,
 					path: testPath,
 				})
-				.end((err, res) => {
+				.end((err) => {
 					if (err) { done(err); }
 					// Delay, to account for time to execute
 					setTimeout(() => {
@@ -62,7 +62,7 @@ describe("/api test", () => {
 					hotkey: "+^B",
 					keyboard: MOCK_KEYBAORD_NAME,
 				})
-				.end((err, res) => {
+				.end((err) => {
 					if (err) { done(err); }
 					// Delay, to account for time to execute
 					setTimeout(() => {
@@ -86,7 +86,7 @@ describe("/api test", () => {
 					keyboard: MOCK_KEYBAORD_NAME,
 					value: EvDevValues.Down,
 				})
-				.end((err, res) => {
+				.end((err) => {
 					if (err) { done(err); }
 					// Delay, to account for time to execute
 					setTimeout(() => {
@@ -109,7 +109,7 @@ describe("/api test", () => {
 					keyboard: MOCK_KEYBAORD_NAME,
 					value: EvDevValues.Up,
 				})
-				.end((err, res) => {
+				.end((err) => {
 					if (err) { done(err); }
 					// Delay, to account for time to execute
 					setTimeout(() => {

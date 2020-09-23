@@ -36,7 +36,7 @@ const logger = new Logger({
  * Generates files, such as keyboard root folder and index.ahks
  * @param config Config written to config.yml
  */
-export default function gen_files(config: Config) {
+export default function gen_files(config: Config): Promise<void> {
 	return new Promise((resolve, reject) => {
 		// Get dirs & root
 		const dirs: string[] = [];
@@ -54,7 +54,7 @@ export default function gen_files(config: Config) {
 				mkdirp.sync(dir);
 				logger.debug(`Made dir ${dir}.`);
 			} catch (err) {
-				reject(err);
+				return reject(err);
 			}
 		}
 
@@ -63,7 +63,7 @@ export default function gen_files(config: Config) {
 				writeFileSync(root, DEFAULT_AHK_ROOT_CONTENTS);
 				logger.debug(`Made root ${root}.`);
 			} catch (err) {
-				reject(err);
+				return reject(err);
 			}
 		}
 

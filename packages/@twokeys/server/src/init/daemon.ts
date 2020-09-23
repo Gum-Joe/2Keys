@@ -56,7 +56,7 @@ function gen_startup_js(name: string): string {
 /**
  * Generates .vbs startup script for shell:startup
  */
-function gen_startup_vbs(name: string) {
+function gen_startup_vbs(name: string): string {
 	const output = Mustache.render(readFileSync(WINDOWS_DAEMON_FILE_VBS_TEMPLATE).toString("utf8"), {
 		daemon: join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE),
 		name,
@@ -67,8 +67,8 @@ function gen_startup_vbs(name: string) {
 /**
  * Stop 2Keys daemon
  */
-export function stop_daemon() {
-	return new Promise((resolve, reject) => {
+export function stop_daemon(): Promise<void> {
+	return new Promise((resolve) => {
 		logger.info("Stopping 2Keys startup daemon...");
 		logger.info("NB: You may need to run 2Keys daemon-gen to make sure you have the latest daemon files.");
 		logger.debug("Reading .pid files...");
@@ -91,10 +91,10 @@ export function stop_daemon() {
 /**
  * Starts 2Keys daemon
  */
-export function start_daemon() {
+export function start_daemon(): void {
 	logger.info("Starting 2Keys daemon...");
 	logger.info(`See logs in ${join(process.cwd(), DEFAULT_LOCAL_2KEYS)} for logs.`);
-	exec(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), {}, (error, stdout, stderr) => {
+	exec(join(process.cwd(), DEFAULT_LOCAL_2KEYS, WINDOWS_DAEMON_FILE_VBS), {}, (error) => {
 		if (error) {
 			logger.throw(error);
 		}
@@ -106,7 +106,7 @@ export function start_daemon() {
  * Function to regenerate daemons
  * @param argv CLI args
  */
-export async function regenerateDaemons(argv: Arguments) {
+export async function regenerateDaemons(argv: Arguments): Promise<void> {
 	logger.info("Regenerating daemon files...");
 	logger.warn("Deleting old files...");
 	try {
@@ -117,6 +117,7 @@ export async function regenerateDaemons(argv: Arguments) {
 		const config = await config_loader();
 
 		logger.debug("Running generator...");
+		// eslint-disable-next-line @typescript-eslint/no-use-before-define
 		add_to_startup(config.name, argv);
 	} catch (err) {
 		logger.throw(err);
@@ -130,7 +131,7 @@ export async function regenerateDaemons(argv: Arguments) {
  * And symlinks the .vbs for the start, stop and restart commands
  * @param name Name of 2Keys project, from config
  */
-export default function add_to_startup(name: string, argv: Arguments) {
+export default function add_to_startup(name: string, argv: Arguments): void {
 	logger.debug("Making files...");
 	// Create required dirs
 	try {

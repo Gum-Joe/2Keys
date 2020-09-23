@@ -24,7 +24,6 @@
 import * as fs from "fs";
 import { Hotkey, Config, FetchHotkey } from "./interfaces";
 import { config_loader, userspace_config_loader } from "./config";
-import { AHK_LIB_PATH } from "./constants";
 import Logger from "./logger";
 import { join } from "path";
 
@@ -45,9 +44,9 @@ export async function fetch_hotkey(keyboard: string, hotkey_code: string): Promi
 	// Get hotkey func
 	let func: string;
 	let type: string;
-	if (!config.keyboards.hasOwnProperty(keyboard)) { // Validate
+	if (!Object.prototype.hasOwnProperty.call(config.keyboards, keyboard)) { // Validate
 		throw new ReferenceError(`Keyboard ${keyboard} was not found!`);
-	} else if (!config.keyboards[keyboard].hotkeys.hasOwnProperty(hotkey_code)) {
+	} else if (!Object.prototype.hasOwnProperty.call(config.keyboards[keyboard].hotkeys, hotkey_code)) {
 		throw new ReferenceError(`Hotkey ${hotkey_code} was not found in keyboard ${keyboard}!`);
 	}
 	const hotkey: string | Hotkey = config.keyboards[keyboard].hotkeys[hotkey_code];
@@ -111,7 +110,7 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
 					return; // STOP execution
 				}
 				// Errors handled by the code
-				const ahk_run = ahk.run_ahk_text(join(userspace_config.paths.software, userspace_config.software.ahk.paths.root, userspace_config.software.ahk.paths.dll), exec_test);
+				ahk.run_ahk_text(join(userspace_config.paths.software, userspace_config.software.ahk.paths.root, userspace_config.software.ahk.paths.dll), exec_test);
 				// Change back to old CWD (DLL changes CWD)
 				process.chdir(old_cwd);
 			} catch (err) {

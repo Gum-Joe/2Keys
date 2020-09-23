@@ -17,6 +17,10 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 const run_hotkey = require("../../lib/util/ahk").run_hotkey;
+/**
+ * @returns null
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 async function test() { await run_hotkey("test.ahk", "TestFunc"); }
 
 test();

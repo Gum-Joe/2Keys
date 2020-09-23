@@ -130,3 +130,10 @@ export function stringifyProjectConfig(config: ProjectConfig): string {
 export function stringifyClientConfig(config: ClientConfig): string {
 	return YAML.stringify(config);
 }
+
+/**
+ * Stringifies to YAML detector config
+ */
+export function stringifyDetectorConfig(config: DetectorConfig): string {
+	return YAML.stringify(config);
+}

@@ -38,7 +38,7 @@ const logger: Logger = new Logger({
 app.use(bodyParser.json());
 app.use("/api", api);
 
-const server = (port: number = DEFAULT_PORT, argv: Arguments) => {
+const server = (port: number = DEFAULT_PORT, argv: Arguments): void => {
 	app.listen(port, () => {
 		logger.info("Server now listenning on port " + port);
 		logger.debug("PID: " + process.pid);

@@ -25,10 +25,9 @@ import { writeFile as writeFileRaw } from "fs";
 import { promisify } from "util";
 import YAML from "yaml";
 import { Arguments } from "yargs";
-import { DEFAULT_USERSPACE_ROOT, DEFAULT_USERSPACE_CONFIG, default_userspace_config } from "../util/constants";
+import { DEFAULT_USERSPACE_CONFIG, default_userspace_config } from "../util/constants";
 import Logger from "../util/logger";
 import { userspace_config_loader } from "../util/config";
-import { UserspaceConfig } from "../util/interfaces";
 import fetch_software from "./software";
 
 const writeFile = promisify(writeFileRaw);
@@ -36,7 +35,7 @@ const logger = new Logger({
 	name: "oobe",
 });
 
-export default async function run_oobe(argv: Arguments) {
+export default async function run_oobe(argv: Arguments): Promise<void> {
 	logger.info("Starting OOBE...");
 	logger.debug("Checking if OOBE has already been ran...");
 	let config = default_userspace_config; // So we don't risk config being undefined

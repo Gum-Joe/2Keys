@@ -38,7 +38,7 @@ const logger = new Logger({
  * Downloader
  * @param argv Args from CLI
  */
-export default async function fetch_software(argv: Arguments) {
+export default async function fetch_software(argv: Arguments): Promise<void> {
 	try {
 		const soft: Software = {
 			name: "ahk",

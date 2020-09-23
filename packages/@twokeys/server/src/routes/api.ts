@@ -27,7 +27,7 @@ import { join } from "path";
 import YAML from "yaml";
 import { config_loader } from "../util/config";
 import Logger from "../util/logger";
-import { Config, Hotkey, EvDevValues } from "../util/interfaces";
+import {EvDevValues } from "../util/interfaces";
 import { run_hotkey, fetch_hotkey } from "../util/ahk";
 import { CONFIG_FILE } from "../util/constants";
 
@@ -66,7 +66,7 @@ router.post("/post/trigger", async (req, res, next) => {
 	// Get vars
 	const keyboard = req.body.keyboard;
 	const hotkey_code = req.body.hotkey;
-	const value: EvDevValues = req.body.hasOwnProperty("value") ?  req.body.value : EvDevValues.Down;
+	const value: EvDevValues = Object.prototype.hasOwnProperty.call(req.body, "value") ?  req.body.value : EvDevValues.Down;
 	logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}, with value ${value}`);
 	// Parse config
 	try {

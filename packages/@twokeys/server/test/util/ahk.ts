@@ -1,5 +1,5 @@
 import { fetch_hotkey, run_hotkey } from "../../src/util/ahk";
-import { MOCK_KEYBAORD_NAME, CONFIG_FILE, MOCK_ROOT } from "../global/constants";
+import { MOCK_KEYBAORD_NAME, MOCK_ROOT } from "../global/constants";
 import { Config } from "../../src/util/interfaces";
 import { config_loader } from "../../src/util/config";
 

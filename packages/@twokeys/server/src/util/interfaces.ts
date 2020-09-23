@@ -20,37 +20,37 @@
 export { LoggerArgs, LoggerTypes } from "@twokeys/core/src/interfaces";
 
 export interface Hotkey {
-  type: "down" | "up";
-  func: string;
+	type: "down" | "up";
+	func: string;
 }
 
 export interface Hotkeys {
-  [key: string]: Hotkey | string;
+	[key: string]: Hotkey | string;
 }
 
 export interface Keyboard {
-  path: string; // Path to watch on pi
-  dir: string; // Dir of hotkeys
-  root: string; // Root AHK file with all hotkeys
-  map?: Map<string, number>;
-  hotkeys: Hotkeys;
+	path: string; // Path to watch on pi
+	dir: string; // Dir of hotkeys
+	root: string; // Root AHK file with all hotkeys
+	map?: Map<string, number>;
+	hotkeys: Hotkeys;
 }
 
 export interface Config {
-  name: string; // Used for naming startup services
-  keyboards: {
-    [propName: string]: Keyboard;
-  };
-  addresses: { // IPv4 addresses
-    server: {
-      ipv4: string;
-      port: number;  // Port number
-    };
-    detector: string;
-  };
-  perms?: { // Permissions
-    ssh: boolean; // Allow us to auto run setup and startup and 2Keys command on the pi via SSH
-  };
+	name: string; // Used for naming startup services
+	keyboards: {
+		[propName: string]: Keyboard;
+	};
+	addresses: { // IPv4 addresses
+		server: {
+			ipv4: string;
+			port: number;  // Port number
+		};
+		detector: string;
+	};
+	perms?: { // Permissions
+		ssh: boolean; // Allow us to auto run setup and startup and 2Keys command on the pi via SSH
+	};
 }
 
 /**
@@ -61,56 +61,56 @@ export interface Config {
  * @param exe (Optional) Relative path to a EXE to run
  */
 export interface AppPath {
-  root: string;
-  dll?: string;
-  exe?: string;
+	root: string;
+	dll?: string;
+	exe?: string;
 }
 
 /**
  * Index type of constants.DEFAULT_APP_PATH
  */
 export interface AppPaths {
-  [index: string]: AppPath;
+	[index: string]: AppPath;
 }
 
 export interface UserspaceConfigSoftwareConfig {
-  version: string | number;
-  paths: {
-    root: string; // Root of where software contents are, relative to paths.software
-    dll?: string; // Path to DLL to use from software, relative to this.paths.root
-    exe?: string; // Path to EXE to use from software, relative to this.paths.root
-  };
+	version: string | number;
+	paths: {
+		root: string; // Root of where software contents are, relative to paths.software
+		dll?: string; // Path to DLL to use from software, relative to this.paths.root
+		exe?: string; // Path to EXE to use from software, relative to this.paths.root
+	};
 }
 /**
  * Config for Userspace
  * See /example/config_userspace.yml
  */
 export interface UserspaceConfig {
-  oobe: boolean; // Has OOBE been done?
-  paths: {
-    root: string; // Absolute path to 2Keys usersapce root.  Default: /home/.2Keys (where home is user folder)
-    software: string; // Relative to root, is where downloaded software is
-  };
-  software: {
-    [index: string]: UserspaceConfigSoftwareConfig;
-  };
+	oobe: boolean; // Has OOBE been done?
+	paths: {
+		root: string; // Absolute path to 2Keys usersapce root.  Default: /home/.2Keys (where home is user folder)
+		software: string; // Relative to root, is where downloaded software is
+	};
+	software: {
+		[index: string]: UserspaceConfigSoftwareConfig;
+	};
 }
 
 /**
  * Interface for each section of the file tree
  */
 export interface FileTreeFile {
-  type: "file"; // File or dir?
-  path: string; // Full path to the file
+	type: "file"; // File or dir?
+	path: string; // Full path to the file
 }
 
 /**
  * Interface for files
  */
 export interface FileTreeDir {
-  type: "dir";
-  path: string; // Full path to the file
-  contents: FileTreeNodes<FileTreeNode>[];
+	type: "dir";
+	path: string; // Full path to the file
+	contents: FileTreeNodes<FileTreeNode>[];
 }
 
 export type FileTreeNode = FileTreeDir | FileTreeFile;
@@ -121,22 +121,22 @@ export type FileTreeNodes<T> = T extends FileTreeDir ? FileTreeDir : FileTreeFil
  * Hotkey that can be up or down, specifiying how the required functions should be stored
  */
 export interface HotKeyUpDown {
-  up: string;
-  down: string;
+	up: string;
+	down: string;
 }
 /**
  * Fetch hotkey interface
  */
 export interface FetchHotkey {
-  file: string;
-  func: string | HotKeyUpDown;
-  type: string;
+	file: string;
+	func: string | HotKeyUpDown;
+	type: string;
 }
 
 /**
  * EVDEV value mapping
  */
 export enum EvDevValues {
-  Up = 0,
-  Down, // 1
+	Up = 0,
+	Down, // 1
 }

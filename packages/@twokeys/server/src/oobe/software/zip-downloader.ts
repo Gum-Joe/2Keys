@@ -21,7 +21,7 @@
  * ZIP file downloader, extracter and copier
  * @packageDocumentation
  */
-import fs, { open as openRaw, createWriteStream, write as writer, close as closeFile, appendFile, promises, read } from "fs";
+import fs, { createWriteStream, openSync, promises } from "fs";
 import https from "https";
 import mkdirp from "mkdirp";
 import ProgressBar from "progress";
@@ -30,7 +30,7 @@ import Logger from "../../util/logger";
 import { join } from "path";
 import AdmZip from "adm-zip";
 
-const { open, access } = promises;
+const { access } = promises;
 
 /* istanbul ignore next */
 /**
@@ -71,11 +71,11 @@ export default class ZipDownloader {
 	 * Download the file
 	 */
 	public fetch_file(): Promise<void> {
-		return new Promise(async (resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			this.logger.info(`Downloading package from url ${this.url} to ${this.saveTo} as ${this.saveAs}.zip...`);
 
 			// Make dirs
-			try { await mkdirp(this.saveTo); } catch (err) {
+			try { mkdirp.sync(this.saveTo); } catch (err) {
 				this.logger.err("Error making download dirs!");
 				reject(err);
 				return;
@@ -86,7 +86,7 @@ export default class ZipDownloader {
 			// Only needed if not forcing
 			if (!this.argv?.force) {
 				try {
-					await open(this.fullPath, "wx");
+					openSync(this.fullPath, "wx");
 				} catch (err) {
 					if (err.code === "EEXIST") {
 						this.logger.err(`${this.name} already downloaded.  Please delete the downloaded file if you need to redownload it.`);
@@ -108,7 +108,6 @@ export default class ZipDownloader {
 
 			req.on("response", res => {
 				const len = parseInt(res.headers["content-length"] || "", 10);
-				const downloaded = "";
 				if (!this.logger.isSilent) {
 					const progress_bar = new ProgressBar(":bar :percent ETA: :etas", {
 						complete: "▓",
@@ -137,7 +136,7 @@ export default class ZipDownloader {
 	/**
 	 * Extract the zip folder
 	 */
-	public async extract() {
+	public async extract(): Promise<void> {
 		this.logger.info("Extracting...");
 		// Validate existence
 		try {

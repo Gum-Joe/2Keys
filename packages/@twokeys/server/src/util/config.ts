@@ -30,25 +30,18 @@ import { Config, UserspaceConfig } from "./interfaces";
 import Logger from "./logger";
 
 const readFile = promisify(readFileRaw); // For easier handling with async
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger: Logger = new Logger({ name: "config" });
 
 export async function config_loader(): Promise<Config> {
-	try {
-		const config: Buffer = await readFile(join(process.cwd(), CONFIG_FILE));
-		const parsedConfig: Config = YAML.parse(config.toString());
-		return parsedConfig;
-	} catch (err) {
-		throw err; // Handled by callback
-	}
+	const config: Buffer = await readFile(join(process.cwd(), CONFIG_FILE));
+	const parsedConfig: Config = YAML.parse(config.toString());
+	return parsedConfig;
 }
 
 export async function userspace_config_loader(): Promise<UserspaceConfig> {
-	try {
-		const config: Buffer = await readFile(DEFAULT_USERSPACE_CONFIG);
-		const parsed_config: UserspaceConfig = YAML.parse(config.toString());
-		return parsed_config;
-	} catch (err) {
-		throw err; // Handled by callback
-	}
+	const config: Buffer = await readFile(DEFAULT_USERSPACE_CONFIG);
+	const parsed_config: UserspaceConfig = YAML.parse(config.toString());
+	return parsed_config;
 }
 

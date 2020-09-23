@@ -16,7 +16,7 @@ const MOCK_ROOT_COPY = join(MOCK_ROOT, "../non-mocha-copy");
 describe("Copy contents of folder function test", () => {
 
 	it("should successfully copy contents of a dir to another", async () => {
-		const result = await copy_contents(MOCK_ROOT, MOCK_ROOT_COPY);
+		await copy_contents(MOCK_ROOT, MOCK_ROOT_COPY);
 		expect(MOCK_ROOT_COPY).to.be.a.directory().and.include.files(["config.yml"]);
 		expect(join(MOCK_ROOT_COPY, "keyboard_test")).to.be.a.directory().and.include.files(["index.ahk", "test.ahk"]);
 	});

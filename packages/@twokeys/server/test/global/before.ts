@@ -1,4 +1,3 @@
-import { join } from "path";
 import { MOCK_ROOT } from "./constants";
 
 /**

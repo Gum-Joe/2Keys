@@ -22,7 +22,6 @@
  * @packageDocumentation
  */
 import * as fs from "fs";
-import { promisify } from "util";
 import { Arguments } from "yargs";
 import YAML from "yaml";
 import Logger from "../util/logger";
@@ -31,7 +30,6 @@ import get_config from "./get-config";
 import { Config } from "../util/interfaces";
 import run_oobe from "../oobe";
 import gen_files from "./gen-files";
-import { rejects } from "assert";
 import add_to_startup from "./daemon";
 
 const logger: Logger = new Logger({
@@ -67,7 +65,7 @@ export default async function run_init(argv: Arguments): Promise<void> {
 	});
 
 	try {
-		config = await get_config(argv);
+		config = await get_config();
 		const yaml_config = YAML.stringify(config);
 
 		logger.debug("Config:");
