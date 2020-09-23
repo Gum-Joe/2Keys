@@ -29,7 +29,6 @@ import { TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON
 import TwoKeys from "./twokeys";
 import { BaseAddon } from "./common";
 
-// TODO: Add types for TaskFunction<T, G>
 export * from "./common";
 export * from "./detector";
 export * from "./executor";

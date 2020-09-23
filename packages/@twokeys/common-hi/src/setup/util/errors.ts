@@ -1,8 +1,7 @@
 /**
  * Error codes
  */
-// TODO: More docs & troubleshooting
-
+// TODO: More docs & troubleshooting advice
 /** Config file already exists */
 export const CONFIG_ALREADY_EXISTS = "EEXIST";
 /** License not accepted */

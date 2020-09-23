@@ -16,7 +16,7 @@ export default class TwoKeysUtilites<AddOnsType extends TWOKEYS_ADDON_TYPES = TW
 		this.package = packageObject;
 	}
 
-	// TODO: Come up with a better way of tracking links.
+	// TODO: Come up with a better way of tracking startup links.
 
 	/**
 	 * Gets path for symbolic link to startup.

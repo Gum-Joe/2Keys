@@ -98,7 +98,7 @@ type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModul
 	properties: TwoKeysPropertiesForAddons<AddOnsType>;
 };
 
-// TODO: Before and after hooks
+// TODO: Before and after hooks for registry
 /**
  * Registry class.
  * Handles management of add-ons

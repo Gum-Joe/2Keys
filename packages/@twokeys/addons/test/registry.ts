@@ -233,8 +233,6 @@ describe("Registry tests", () => {
 				expect(info.displayName).to.be.equal(pkgJSON.twokeys.displayName);
 			}).timeout(50000);
 
-			// TODO:
-			// Fix above test
 			// Add error handlers:
 			it("should throw an error if npm has an error installing.", async () => {
 				// tslint:disable-next-line: no-unused-expression
@@ -274,7 +272,7 @@ describe("Registry tests", () => {
 
 		describe("Package update", () => {
 			it("should succesfuly update a package", async () => {
-				// TODO: Update paclage from npm that is with 2Keys, we can't test this as no such package exists
+				// TODO: Update package from npm that is with 2Keys, we can't test this as no such package exists
 				await registry.install("debug", {
 					version: "3.0.0",
 				});
@@ -285,7 +283,7 @@ describe("Registry tests", () => {
 			}).timeout(50000);
 
 			it("should default to latest when updating a package", async () => {
-				// TODO: Update paclage from npm that is with 2Keys, we can't test this as no such package exists
+				// TODO: Update package from npm that is with 2Keys, we can't test this as no such package exists
 				await registry.install("debug", {
 					version: "2.0.0",
 				});

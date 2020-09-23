@@ -62,8 +62,6 @@ export interface AddExecutorToKeyboardConfig {
 	keyboardName: string;
 }
 
-// TODO: Add types for TaskFunction<T, G>
-
 /** Properties for a scanned hotkey from {@link Executor.scan} */
 export interface ExecutorScanIndividual {
 	/** Name of macro function, set as {@link HotkeyTypeSingle.func} */

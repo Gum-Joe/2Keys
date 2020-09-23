@@ -89,14 +89,13 @@ const createProject: PromiseCommand<Required<CreateProject.AsObject>> = async (t
 	await fs.writeFile(join(config.projectLocation, TWOKEYS_PROJECT_CONFIG_FILENAME), TWOKEYS_CONFIG_PRELUDE + "\n" + stringifyProjectConfig(configToWrite));
 	logger.info("Done");
 
-	// TODO: Add project to startup
 	await generateDaemon(twokeys, {
 		projectLocation: config.projectLocation,
 		// TODO: One day, allow this to be customised
 		relativeFilesLocationDir: DEFAULT_LOCAL_2KEYS,
 		addToStartup: config.serverInfo.permissions.allowStartup ? true : false,
 	});
-	// TODO: Index project
+	// TODO: Add project to index
 
 };
 

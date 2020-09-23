@@ -31,7 +31,6 @@ import { startVM } from "./vm";
  */
 export const newClient: DetectorPromisedTaskFunction<ClientConfig<ClientConfigHere>> = async (twokeys, config) => {
 	twokeys.logger.status("Setting up a new VM");
-	// TODO: Action List
 	// NOTE: The install of this module means vagrant etc was installed, so it's fine to just assume they are installed
 	// 1: Create base files (from templates)
 	twokeys.logger.status("Creating files");
@@ -43,12 +42,12 @@ export const newClient: DetectorPromisedTaskFunction<ClientConfig<ClientConfigHe
 	twokeys.logger.substatus("Filling out templates");
 	await updateVagrantFile(twokeys, config.controllerConfig);
 	await updateVMLaunchFiles(twokeys, config.controllerConfig);
-	// TODO: Add to startup (SEE LOGGER MESSAGE BELOW FOR WHY NOT YET)
+	// TODO: Add to startup (once certain issues are fixed)
 	// if (config.controllerConfig.perms.addToStartup) {
 	// 	twokeys.logger.substatus("Adding startup script launch.vbs to startup");
 	// 	await twokeys.utils.symbolLinkToStartup(join(twokeys.properties.clientRoot, VM_LAUNCH_VBS_FILE_DEST));
 	// }
-	// TODO: Handle auto update setup
+	// TODO: Handle auto update of OS setup 
 	twokeys.logger.warn("Adding to startup is currently disabled in this release due to VBox preventing host shut down if VM is not stopped.");
 	// DONE!
 	// 2: Adjust Ansible config
