@@ -383,7 +383,7 @@ export default class AddOnsRegistry {
 			this.logger.info(`Running command npm ${command} ${packageName}...`);
 			this.logger.debug("Running command...");
 			const oldCWD = this.directory;
-			// HACK: This causes issues, since other stuff can be ran that assumee the DIR is x 
+			// FIXME: This causes issues, since other stuff can be ran that assumee the DIR is x 
 			process.chdir(this.directory); // So lock files are made etc
 			this.logger.debug(`Current CWD (before run): ${process.cwd()}`);
 			this.logger.debug(`Changed dir to ${this.directory}.`);
