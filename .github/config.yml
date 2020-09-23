@@ -1,5 +1,5 @@
 todo:
   keyword:
-    - TODO:
-    - HACK:
-    - FIXME:
+    - "TODO:"
+    - "HACK:"
+    - "FIXME:"
