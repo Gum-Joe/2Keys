@@ -289,7 +289,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 */
 	protected async updateSoftwareRecord<SoftwareType extends Software = SoftwareInDB>
 	(name: string, newData: Partial<SoftwareType> & {
-			executables?: SoftwareType extends SoftwareInDB ?
+		executables?: SoftwareType extends SoftwareInDB ?
 			Array<Partial<ExecutableInDB> & { name: string }> : Array<Partial<Executable> & { name: string }>; // Name is required
 	}): Promise<void> {
 		this.logger.debug(`Updating software record of ${name}...`);

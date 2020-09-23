@@ -194,7 +194,7 @@ export default class SoftwareRegistryQueryProvider {
 	 * @param ownerName Name of owner (add-on) of the software in question
 	 */
 	public async getExecutables(software: string, name: string | null, ownerName: string):
-		Promise<ExecutableInDB[]> {
+	Promise<ExecutableInDB[]> {
 		this.logger.debug(`Retrieving executable of name ${name ?? "*"} from software ${software} for add-on ${ownerName} in full...`);
 		// Auto load
 		await this.initDB();

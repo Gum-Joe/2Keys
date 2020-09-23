@@ -46,7 +46,7 @@ export { TwoKeys };
  */
 export type AddOnModulesCollection = {
 	[key in TWOKEYS_ADDON_TYPES]:
-		key extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorController :
+	key extends TWOKEYS_ADDON_TYPE_DETECTOR ? DetectorController :
 		key extends TWOKEYS_ADDON_TYPE_EXECUTOR ? Executor :
-		BaseAddon<TWOKEYS_ADDON_TYPES>;
+			BaseAddon<TWOKEYS_ADDON_TYPES>;
 };
