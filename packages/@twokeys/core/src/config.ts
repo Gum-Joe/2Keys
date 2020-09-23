@@ -80,6 +80,23 @@ export async function loadProjectConfig(projectPath: string): ConfigLoaderReturn
 }
 
 /**
+ * Loads a detector (project-local) config
+ * @param projectPath absolute path to project to load
+ */
+export async function loadDetectorConfig(file: string): ConfigLoaderReturn<DetectorConfig> {
+	logger.debug(`Loading detector config from file ${file}...`);
+	try {
+		return await loadConfig<DetectorConfig>(file);
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			throw new CodedError("Attempted to load a project config in a directory that was not a project", "INVALID_PROJECT");
+		} else {
+			throw err;
+		}
+	}
+}
+
+/**
  * Loads a client config based on a file name
  * @param file ABsolute path to detector config
  */

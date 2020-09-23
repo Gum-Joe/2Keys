@@ -30,6 +30,11 @@ import Logger from "../util/logger";
 import {EvDevValues } from "../util/interfaces";
 import { run_hotkey, fetch_hotkey } from "../util/ahk";
 import { CONFIG_FILE } from "../util/constants";
+import { ProjectConfig } from "@twokeys/core/lib/interfaces";
+import { loadClientConfig, loadDetectorConfig, loadMainConfig } from "@twokeys/core/lib/config";
+import { TWOKEYS_CLIENTS_CONFIG_ROOT, TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
+import { getClientConfigPath, getClientRootFromConfig } from "@twokeys/core";
+import { AddOnsRegistry } from "@twokeys/addons";
 
 const logger: Logger = new Logger({
 	name: "api",
@@ -37,100 +42,131 @@ const logger: Logger = new Logger({
 const router = Router();
 
 /**
- * Returns the config for the 2Keys project
+ * Needed so we can use async/await
  */
-router.get("/get/config", (req, res, next) => {
-	logger.debug("Sending a config copy as JSON...");
-	readFile(join(process.cwd(), "config.yml"), (err, data) => {
-		if (err) {
-			return next(err);
-		}
-		const data_to_send = JSON.stringify(YAML.parse(data.toString()));
-		res.setHeader("Content-Type", "application/json");
-		res.statusCode = 200;
-		res.send(data_to_send);
-	});
-});
+export default async function getAPI(projectConfig: ProjectConfig, projectDir: string) {
+	logger.info("Preparing server...");
+	logger.info("Loading root config...");
+	const mainConfig = await loadMainConfig(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH);
+	logger.info("Loading add-ons...");
+	const registry = new AddOnsRegistry(mainConfig.registry_root);
 
-/**
- * Trigger a hotkey
- * Info to send:
- * - keyboard: The keyboard name that has been pressed
- * - hotkey: set of keys that have been pressed
- */
-router.post("/post/trigger", async (req, res, next) => {
-	/**
-   * 1: Get hotkey function from config
-   * 2: Execute C++ bindings with #Include <root of keyboard>; function()
-   */
-	// Get vars
-	const keyboard = req.body.keyboard;
-	const hotkey_code = req.body.hotkey;
-	const value: EvDevValues = Object.prototype.hasOwnProperty.call(req.body, "value") ?  req.body.value : EvDevValues.Down;
-	logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}, with value ${value}`);
-	// Parse config
-	try {
-		const fetched_hotkey = await fetch_hotkey(keyboard, hotkey_code); // Gets hotkey
-		let func_to_run: string;
-
-		// Use the value arg to select
-		if (typeof fetched_hotkey.func === "object") {
-			// Is an object
-			logger.debug("Got a multi event hotkey.");
-			// Select which function to run
-			if (value === EvDevValues.Down) {
-				func_to_run = fetched_hotkey.func.down;
-			} else if (value === EvDevValues.Up) {
-				func_to_run = fetched_hotkey.func.up;
-			} else {
-				// Stop exec as and error was encountered
-				return next(new TypeError(`The request keyboard event value of ${value} is invalid.  Valid event values are: 0 (Up) & 1 (Down)`));
-			}
-
-			// Validate a function actually exists
-			if (typeof func_to_run === "undefined") {
-				// Ignore
-				logger.warn(`Ignoring hotkey ${hotkey_code} of value ${value}, as no function to run exists`);
-				res.statusCode = 404;
-				res.send("Hotkey function not found");
-				return;
-			}
-		} else {
-			func_to_run = fetched_hotkey.func;
-		}
-
-		// Execute
-		run_hotkey(fetched_hotkey.file, func_to_run);
-
-		res.statusCode = 200;
-		res.send("OK");
-	} catch (err) {
-		next(err); // Hand off to error handler
-	}
-});
-
-/**
- * Handles keyboard path update
- */
-router.post("/post/update-keyboard-path", (req, res, next) => {
-	const { keyboard, path } = req.body;
-	logger.info(`Got update for ${keyboard}, path ${path}`);
-	config_loader()
-		.then((config) => {
-			// Make changes
-			config.keyboards[keyboard].path = path;
-			// Write
-			logger.debug("Writing config...");
-			writeFile(CONFIG_FILE, YAML.stringify(config), (err) => {
-				if (err) {
-					return next(err);
-				} else {
-					res.statusCode = 200;
-					res.send("OK");
-				}
-				res.end();
-			});
+	// Run startup functions for detectors
+	logger.info("Loading detectors...");
+	const loading = projectConfig.detectors.map(async (detectorConfigPath) => {
+		logger.debug("Loading a detector config...");
+		const detector = await loadDetectorConfig(join(projectDir, detectorConfigPath));
+		logger.debug(`Loading client config for client ${detector.client.name}...`);
+		const client = await loadClientConfig(getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, detector.client.id));
+		const controller = await registry.loadDetector(client.controller, {
+			projectDir,
+			clientRoot: getClientRootFromConfig(client)
 		});
-});
+		if (typeof controller.startup === "function") {
+			logger.info(`Running startup actions for client ${client.name}, which has detector ${detector.name}`);
+			await controller.call(controller.startup, {
+				clientConfig: client,
+				projectConfig,
+				detectorConfig: detector
+			});
+		}
+	});
 
-export default router;
+	/**
+ 	 * Returns the config for the 2Keys project
+ 	 */
+	router.get("/get/config", (req, res, next) => {
+		logger.debug("Sending a config copy as JSON...");
+		readFile(join(process.cwd(), "config.yml"), (err, data) => {
+			if (err) {
+				return next(err);
+			}
+			const data_to_send = JSON.stringify(YAML.parse(data.toString()));
+			res.setHeader("Content-Type", "application/json");
+			res.statusCode = 200;
+			res.send(data_to_send);
+		});
+	});
+
+	/**
+	 * Trigger a hotkey
+	 * Info to send:
+	 * - keyboard: The keyboard name that has been pressed
+	 * - hotkey: set of keys that have been pressed
+	 */
+	router.post("/post/trigger", async (req, res, next) => {
+		/**
+		 * 1: Get hotkey function from config
+		 * 2: Execute C++ bindings with #Include <root of keyboard>; function()
+		 */
+		// Get vars
+		const keyboard = req.body.keyboard;
+		const hotkey_code = req.body.hotkey;
+		const value: EvDevValues = Object.prototype.hasOwnProperty.call(req.body, "value") ? req.body.value : EvDevValues.Down;
+		logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}, with value ${value}`);
+		// Parse config
+		try {
+			const fetched_hotkey = await fetch_hotkey(keyboard, hotkey_code); // Gets hotkey
+			let func_to_run: string;
+
+			// Use the value arg to select
+			if (typeof fetched_hotkey.func === "object") {
+				// Is an object
+				logger.debug("Got a multi event hotkey.");
+				// Select which function to run
+				if (value === EvDevValues.Down) {
+					func_to_run = fetched_hotkey.func.down;
+				} else if (value === EvDevValues.Up) {
+					func_to_run = fetched_hotkey.func.up;
+				} else {
+					// Stop exec as and error was encountered
+					return next(new TypeError(`The request keyboard event value of ${value} is invalid.  Valid event values are: 0 (Up) & 1 (Down)`));
+				}
+
+				// Validate a function actually exists
+				if (typeof func_to_run === "undefined") {
+					// Ignore
+					logger.warn(`Ignoring hotkey ${hotkey_code} of value ${value}, as no function to run exists`);
+					res.statusCode = 404;
+					res.send("Hotkey function not found");
+					return;
+				}
+			} else {
+				func_to_run = fetched_hotkey.func;
+			}
+
+			// Execute
+			run_hotkey(fetched_hotkey.file, func_to_run);
+
+			res.statusCode = 200;
+			res.send("OK");
+		} catch (err) {
+			next(err); // Hand off to error handler
+		}
+	});
+
+	/**
+	 * Handles keyboard path update
+	 */
+	router.post("/post/update-keyboard-path", (req, res, next) => {
+		const { keyboard, path } = req.body;
+		logger.info(`Got update for ${keyboard}, path ${path}`);
+		config_loader()
+			.then((config) => {
+				// Make changes
+				config.keyboards[keyboard].path = path;
+				// Write
+				logger.debug("Writing config...");
+				writeFile(CONFIG_FILE, YAML.stringify(config), (err) => {
+					if (err) {
+						return next(err);
+					} else {
+						res.statusCode = 200;
+						res.send("OK");
+					}
+					res.end();
+				});
+			});
+	});
+	return router;
+}

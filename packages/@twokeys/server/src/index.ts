@@ -25,20 +25,39 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { writeFile } from "fs";
-import api from "./routes/api";
 import Logger from "./util/logger";
-import { DEFAULT_PORT } from "./util/constants";
+import { DEFAULT_LOCAL_2KEYS, DEFAULT_PORT, WINDOWS_SERVER_PID_FILE } from "./util/constants";
 import { Arguments } from "yargs";
+import { loadProjectConfig } from "@twokeys/core/lib/config";
+import { join } from "path";
+import getAPI from "./routes/api";
+import { ProjectConfig } from "@twokeys/core/lib/interfaces";
+import helmet from "helmet";
+
+const packageJSON = require("../package.json");
 
 const app = express();
 const logger: Logger = new Logger({
 	name: "server",
 });
 
-app.use(bodyParser.json());
-app.use("/api", api);
+interface ServerArgs {
+	"pid-file"?: string;
+}
 
-const server = (port: number = DEFAULT_PORT, argv: Arguments): void => {
+const server = async (port: number = DEFAULT_PORT, argv: Arguments<ServerArgs>, projectDir: string, projectConfig: ProjectConfig): Promise<void> => {
+
+	app.use(bodyParser.json());
+	app.use(helmet());
+	app.use("/api", await getAPI(projectConfig, projectDir));
+
+	// Error handler
+	app.use((err, req, res, next) => {
+		logger.err(`An error was encountered on router ${req.originalUrl}`);
+		logger.throw_noexit(err);
+		next(err);
+	});
+
 	app.listen(port, () => {
 		logger.info("Server now listenning on port " + port);
 		logger.debug("PID: " + process.pid);
@@ -54,12 +73,19 @@ const server = (port: number = DEFAULT_PORT, argv: Arguments): void => {
 
 };
 
-// Error handler
-app.use((err, req, res, next) => {
-	logger.err(`An error was encountered on router ${req.originalUrl}`);
-	logger.throw_noexit(err);
-	next(err);
-});
+/**
+ * Eventually default starter for server
+ * @param projectDir Absoluter path to project
+ */
+export async function starter(projectDir: string) {
+	logger.info("Starting 2Keys....");
+	logger.info("Loading project...");
+	// TODO: Version checks to check config version matches this version of 2Keys
+	const projectConfig = await loadProjectConfig(projectDir);
+	await server(projectConfig.server.port, {
+		"pid-file": join(projectDir, DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE)
+	} as Arguments<ServerArgs>, projectDir, projectConfig);
+}
 
 export default server;
 export { app };

@@ -33,12 +33,14 @@ const readFile = promisify(readFileRaw); // For easier handling with async
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger: Logger = new Logger({ name: "config" });
 
+/** @deprecated Use @twokeys/core */
 export async function config_loader(): Promise<Config> {
 	const config: Buffer = await readFile(join(process.cwd(), CONFIG_FILE));
 	const parsedConfig: Config = YAML.parse(config.toString());
 	return parsedConfig;
 }
 
+/** @deprecated Use @twokeys/core */
 export async function userspace_config_loader(): Promise<UserspaceConfig> {
 	const config: Buffer = await readFile(DEFAULT_USERSPACE_CONFIG);
 	const parsed_config: UserspaceConfig = YAML.parse(config.toString());
