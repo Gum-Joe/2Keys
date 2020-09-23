@@ -56,7 +56,7 @@ export interface UsbPassthroughParams {
 	kbd_productid: string;
 }
 
-// TNOTAODO Adjust script param to be relative
+// TODO: Adjust script param to be relative
 export const ANSIBLE_SCRIPT_TEMPLATE = 
 `	config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "/vagrant/{{ script }}"
@@ -68,7 +68,7 @@ export interface AnsibleScriptParams {
 }
 
 /** Generates a Vagrantfile from the template (see assets/vm/Vagrantfile.template) */
-// TNOTAODO Might need to copy in projects (sync) here
+// TODO: Might need to copy in projects (sync) here
 export default async function updateVagrantFile(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: ClientConfigHere): Promise<void> {
 	twokeys.logger.substatus("Updating Vagrantfile");
 	const template = (await fs.readFile(join(twokeys.properties.clientRoot, VAGRANT_FILE_TEMPLATE))).toString("utf8");

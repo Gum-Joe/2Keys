@@ -54,7 +54,7 @@ export interface ClientConfigHere {
 		/** Add client to startup? */
 		addToStartup: boolean;
 		/** Automatically apply updates to client? **RESERVED FOR FUTURE USE** */
-		// TNOTAODO Implement allowAutoUpdate (detector-desktop)
+		// TODO: Implement allowAutoUpdate (detector-desktop)
 		allowAutoUpdate: boolean;
 	};
 

@@ -19,7 +19,7 @@ message OOBEConfig {
 	/** (CLI) options */
 	message OOBEOptions {
 		/** Proceed regarless of if oobe has already been done */
-		// TNOTAODO  Implement better
+		// TODO:  Implement better
 		bool force = 1;
 		/** When true, don't set a static IPv4 address */
 		bool no_IPv4_set = 2;

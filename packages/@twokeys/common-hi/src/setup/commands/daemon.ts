@@ -43,7 +43,7 @@ import native from "../util/native";
 
 const Mustache = require("mustache");
 
-// TNOTAODO Figure out how templates are handled (with `webpack` etc)
+// TODO: Figure out how templates are handled (with `webpack` etc)
 
 /**
  * Hacky way to generate daemon startup JS

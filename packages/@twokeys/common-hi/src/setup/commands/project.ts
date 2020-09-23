@@ -77,7 +77,7 @@ const createProject: PromiseCommand<Required<CreateProject.AsObject>> = async (t
 			}
 		},
 		detectors: [],
-		// TNOTAODO Update this to use config once sync is enabled.
+		// TODO: Update this to use config once sync is enabled.
 		perms: {
 			sync: false,
 		}
@@ -91,11 +91,11 @@ const createProject: PromiseCommand<Required<CreateProject.AsObject>> = async (t
 
 	await generateDaemon(twokeys, {
 		projectLocation: config.projectLocation,
-		// TNOTAODO One day, allow this to be customised
+		// TODO: One day, allow this to be customised
 		relativeFilesLocationDir: DEFAULT_LOCAL_2KEYS,
 		addToStartup: config.serverInfo.permissions.allowStartup ? true : false,
 	});
-	// TNOTAODO Add project to index
+	// TODO: Add project to index
 
 };
 

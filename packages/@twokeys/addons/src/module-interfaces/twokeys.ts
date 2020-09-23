@@ -71,7 +71,7 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_AD
 	/**
 	 * Utils.
 	 * These allow the autmoation of tasks such as adding stuff to startup
-	 * // TNOTAODO More docs here
+	 * // TODO: More docs here
 	 */
 	public readonly utils: TwoKeysUtilites<AddOnsType>;
 

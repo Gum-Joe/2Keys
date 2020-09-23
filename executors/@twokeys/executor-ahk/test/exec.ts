@@ -39,7 +39,7 @@ describe("AHK execution tests", () => {
 	});
 
 	it("should successfully execute a hotkey", async () => {
-		// TNOTAODO Map root file to absolute path
+		// TODO: Map root file to absolute path
 		const configHere: ThisExecutorConfig = {
 			hotkey: { ...config.keyboards[MOCK_KEYBAORD_NAME].hotkeys["^RT"], ...config.keyboards[MOCK_KEYBAORD_NAME].executors["executor-ahk"] },
 			executorDefaultConfig: config.keyboards[MOCK_KEYBAORD_NAME].executors["executor-ahk"],

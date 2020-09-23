@@ -1,7 +1,7 @@
 /**
  * Error codes
  */
-// TNOTAODO More docs & troubleshooting advice
+// TODO: More docs & troubleshooting advice
 /** Config file already exists */
 export const CONFIG_ALREADY_EXISTS = "EEXIST";
 /** License not accepted */

@@ -42,12 +42,12 @@ export const newClient: DetectorPromisedTaskFunction<ClientConfig<ClientConfigHe
 	twokeys.logger.substatus("Filling out templates");
 	await updateVagrantFile(twokeys, config.controllerConfig);
 	await updateVMLaunchFiles(twokeys, config.controllerConfig);
-	// TNOTAODO Add to startup (once certain issues are fixed)
+	// TODO: Add to startup (once certain issues are fixed)
 	// if (config.controllerConfig.perms.addToStartup) {
 	// 	twokeys.logger.substatus("Adding startup script launch.vbs to startup");
 	// 	await twokeys.utils.symbolLinkToStartup(join(twokeys.properties.clientRoot, VM_LAUNCH_VBS_FILE_DEST));
 	// }
-	// TNOTAODO Handle auto update of OS setup 
+	// TODO: Handle auto update of OS setup 
 	twokeys.logger.warn("Adding to startup is currently disabled in this release due to VBox preventing host shut down if VM is not stopped.");
 	// DONE!
 	// 2: Adjust Ansible config
