@@ -24,8 +24,7 @@ export function startVM(twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_DETECTOR>, config: C
 			});
 			let provisioning = false; // Ensure we only print the message once
 			vagrantUp.stdout.on("data", (data) => {
-				// TODO: Better logging here
-				// Use vagrant's machine readable ouput
+				// TNOTAODO Better logging here
 				const dataStr: string = data.toString("utf8").trim();
 				vagrantLogger.info(dataStr);
 				if (dataStr.includes("Booting") && dataStr.includes("VM")) {

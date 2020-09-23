@@ -119,8 +119,8 @@ export default class Prompts implements PromptsInterfaces {
 	 * Useful when testing
 	 */
 	// HACK: Used as a test shortcut to return default or 0 when TWOKEYS_NONINTERACTIVE is true.
-	// TODO: Allow a --no-interactive options eventually
-	// TODO: Better docs for TWOKEYS_NONINTERACTIVE - currently undocumented
+	// TNOTAODO Allow a --no-interactive options eventually
+	// TNOTAODO Better docs for TWOKEYS_NONINTERACTIVE - currently undocumented
 	public nonInterative = process.env.TWOKEYS_NONINTERACTIVE === "true";
 
 	constructor(logger: Logger, options?: Partial<PromptOptions>) {
@@ -181,8 +181,8 @@ export default class Prompts implements PromptsInterfaces {
 
 		// Get response index
 		// HACK: Test shortcut to return default or 0 when TWOKEYS_NONINTERACTIVE is true.
-		// TODO: Allow a --no-interactive options eventually
-		// TODO: Better docs for TWOKEYS_NONINTERACTIVE - currently undocumented
+		// TNOTAODO Allow a --no-interactive options eventually
+		// TNOTAODO Better docs for TWOKEYS_NONINTERACTIVE - currently undocumented
 		/* istanbul ignore next */
 		if (this.nonInterative) {
 			this.logger.warn(`Returning value of ${config.buttons[config.defaultButton ?? 0]} as TWOKEYS_NONINTERACTIVE is set.`);

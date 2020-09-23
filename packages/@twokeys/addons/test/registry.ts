@@ -272,7 +272,7 @@ describe("Registry tests", () => {
 
 		describe("Package update", () => {
 			it("should succesfuly update a package", async () => {
-				// TODO: Update package from npm that is with 2Keys, we can't test this as no such package exists
+				// TNOTAODO Update package from npm that is with 2Keys, we can't test this as no such package exists
 				await registry.install("debug", {
 					version: "3.0.0",
 				});
@@ -283,7 +283,7 @@ describe("Registry tests", () => {
 			}).timeout(50000);
 
 			it("should default to latest when updating a package", async () => {
-				// TODO: Update package from npm that is with 2Keys, we can't test this as no such package exists
+				// TNOTAODO Update package from npm that is with 2Keys, we can't test this as no such package exists
 				await registry.install("debug", {
 					version: "2.0.0",
 				});

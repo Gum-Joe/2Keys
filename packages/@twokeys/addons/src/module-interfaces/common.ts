@@ -40,7 +40,7 @@ import { BaseTaskFunction } from "@twokeys/core";
  * ```
  */
 export interface ConfigDescriptor {
-	// TODO: Implement ConfigDescriptors
+	// TNOTAODO Implement ConfigDescriptors
 	[key: string]: string;
 }
 

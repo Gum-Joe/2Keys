@@ -25,7 +25,7 @@ const logger = new Logger({
 	registryRoot: TWOKEYS_DEFAULT_REGISTRY_ROOT,
 	networkAdapter: "Network Bridge",
 	ipv4Address: "192.168.0.50",
-	// TODO: Create test module for OOBE
+	// TNOTAODO Create test module for OOBE
 	addonInstallListList: [],
 	force: true,
 }).catch(err => {

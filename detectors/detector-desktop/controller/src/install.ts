@@ -36,7 +36,7 @@ async function getVagrantPath(twokeys: TwoKeys): Promise<string> {
 	// No errors? Done!
 	return vagrantPath;
 
-	// TODO: Install Vagrant here
+	// TNOTAODO Install Vagrant here
 }
 
 async function getVBoxManagePath(twokeys: TwoKeys): Promise<string> {
@@ -76,7 +76,7 @@ async function getVBoxManagePath(twokeys: TwoKeys): Promise<string> {
 	twokeys.logger.debug("VBox found.");
 	return vboxInstallPath;
 
-	// TODO: Install VBox here
+	// TNOTAODO Install VBox here
 }
 
 /**

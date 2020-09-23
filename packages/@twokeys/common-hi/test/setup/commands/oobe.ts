@@ -23,7 +23,7 @@ const TEST_OOBE_CONFIG = {
 	registryRoot: join(MOCK_TWOKEYS_HOME_ROOT, "registry"),
 	networkAdapter: "Network Bridge",
 	ipv4Address: "192.168.0.50",
-	// TODO: Create test module for OOBE
+	// TNOTAODO Create test module for OOBE
 	addonInstallListList: ["debug"],
 	options: {
 		force: false,
