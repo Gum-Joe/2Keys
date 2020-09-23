@@ -17,8 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
-// TODO: remove this TODO
-// TODO: Also remove this TODO
 export { default as Logger } from "./logger";
 export { default as Prompts } from "./prompts";
 export * as interfaces from "./interfaces";
