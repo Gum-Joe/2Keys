@@ -13,18 +13,26 @@ jobs:
           BEFORE: ${{ github.event.before }}
           SHA: ${{ github.sha }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LABEL: "// TODO"
+          LABEL: "// TODO:"
           COMMENT_MARKER: "//"
         id: "todo"
       - name: "FIXME to Issue"
         uses: "alstr/todo-to-issue-action@v1.2-beta"
         with:
-          LABEL: "// FIXME"
+          REPO: ${{ github.repository }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL: "// FIXME:"
           COMMENT_MARKER: "//"
         id: "fixme"
       - name: "HACK to Issue"
         uses: "alstr/todo-to-issue-action@v1.2-beta"
         with:
-          LABEL: "// HACK"
+          REPO: ${{ github.repository }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL: "// HACK:"
           COMMENT_MARKER: "//"
         id: "hack"
