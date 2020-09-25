@@ -59,8 +59,10 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 		const detector = await loadDetectorConfig(join(projectDir, detectorConfigPath));
 		return detector;
 	}));
+	// TODO: Convert `detectors` array into a `Map` of name to detectorConfig
+	// And then also add watchers to watch for config changes
 
-	logger.debug("Continueing load...");
+	logger.debug("Running startup actions...");
 	await Promise.all(detectors.map(async (detector) => {
 		logger.debug(`Loading client config for client ${detector.client.name}...`);
 		const client = await loadClientConfig(getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, detector.client.id));
