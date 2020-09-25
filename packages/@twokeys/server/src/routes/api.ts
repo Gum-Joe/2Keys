@@ -34,7 +34,7 @@ import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { loadClientConfig, loadDetectorConfig, loadMainConfig } from "@twokeys/core/lib/config";
 import { TWOKEYS_CLIENTS_CONFIG_ROOT, TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
 import { getClientConfigPath, getClientRootFromConfig } from "@twokeys/core";
-import { AddOnsRegistry } from "@twokeys/addons";
+import { AddOnsRegistry, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
 
 const logger: Logger = new Logger({
 	name: "api",
@@ -53,9 +53,15 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 
 	// Run startup functions for detectors
 	logger.info("Loading detectors...");
-	const loading = projectConfig.detectors.map(async (detectorConfigPath) => {
+	logger.info("Listing detectors...");
+	const detectors = await Promise.all(projectConfig.detectors.map(async (detectorConfigPath) => {
 		logger.debug("Loading a detector config...");
 		const detector = await loadDetectorConfig(join(projectDir, detectorConfigPath));
+		return detector;
+	}));
+
+	logger.debug("Continueing load...");
+	await Promise.all(detectors.map(async (detector) => {
 		logger.debug(`Loading client config for client ${detector.client.name}...`);
 		const client = await loadClientConfig(getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, detector.client.id));
 		const controller = await registry.loadDetector(client.controller, {
@@ -70,7 +76,10 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 				detectorConfig: detector
 			});
 		}
-	});
+	}));
+	
+	logger.info("Loading executors for use...");
+	const executors = await registry.loadAllOfType(TWOKEYS_ADDON_TYPE_EXECUTOR);
 
 	/**
  	 * Returns the config for the 2Keys project
