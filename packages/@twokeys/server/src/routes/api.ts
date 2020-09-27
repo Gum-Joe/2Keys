@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 import { Router } from "express";
-import { readFile, watchFile, writeFile } from "fs";
+import { readFile, writeFile } from "fs";
 import { join } from "path";
 import YAML from "yaml";
 import { config_loader } from "../util/config";
@@ -30,13 +30,14 @@ import Logger from "../util/logger";
 import {EvDevValues } from "../util/interfaces";
 import { run_hotkey, fetch_hotkey } from "../util/ahk";
 import { CONFIG_FILE } from "../util/constants";
-import { DetectorConfig, ProjectConfig } from "@twokeys/core/lib/interfaces";
-import { loadClientConfig, loadDetectorConfig, loadMainConfig } from "@twokeys/core/lib/config";
-import { TWOKEYS_CLIENTS_CONFIG_ROOT, TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
-import { getClientConfigPath, getClientRootFromConfig } from "@twokeys/core";
-import { AddOnsRegistry, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
+import { ProjectConfig } from "@twokeys/core/lib/interfaces";
+import { loadMainConfig } from "@twokeys/core/lib/config";
+import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
+import { AddOnsRegistry } from "@twokeys/addons";
+import { loadDetectors } from "./loadDetectors";
+import { loadExecutors } from "./loadExecutors";
 
-const logger: Logger = new Logger({
+export const logger: Logger = new Logger({
 	name: "api",
 });
 const router = Router();
@@ -46,72 +47,17 @@ const router = Router();
  */
 export default async function getAPI(projectConfig: ProjectConfig, projectDir: string): Promise<Router> {
 	logger.info("Preparing server...");
+
+	// 1: Load config
 	// TODO: Watch for changes to project and reload everything
 	logger.info("Loading root config...");
 	const mainConfig = await loadMainConfig(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH);
 	logger.info("Loading add-ons...");
 	const registry = new AddOnsRegistry(mainConfig.registry_root);
 
-	// Run startup functions for detectors
-	logger.info("Loading detectors...");
-	const detectors = new Map<string, DetectorConfig>();
-
-	logger.info("Listing detectors & generating map...");
-	await Promise.all(projectConfig.detectors.map(async (detectorConfigPath) => {
-		logger.debug("Loading a detector config...");
-		const absoluteDetectorConfigPath = join(projectDir, detectorConfigPath);
-		const detector = await loadDetectorConfig(absoluteDetectorConfigPath);
-		detectors.set(detector.name, detector);
-
-		logger.debug("Watching for changes");
-		watchFile(absoluteDetectorConfigPath, () => {
-			logger.info(`Changes detected to detector ${detector.name}! Reloading`);
-			loadDetectorConfig(absoluteDetectorConfigPath)
-				.then((newDetector) => {
-					detectors.set(newDetector.name, newDetector);
-					if (detector && (newDetector.name !== detector.name)) { // Detector may have been deleted from memeory, hence
-						// Detector name change!
-						logger.debug(`Detected a name change of detector ${detector.name} to ${newDetector.name}!`);
-						detectors.delete(detector.name);
-					}
-				})
-				.catch(err => {
-					logger.err(`Error reloading detector ${detector.name}!`);
-					logger.printError(err);
-					// What else to do?
-					throw err;
-				});
-		});
-		return detector;
-	}));
-
-	logger.debug("Running startup actions...");
-	const actionPromises: Array<Promise<void>> = [];
-	for (const [detectorName, detectorConfig] of detectors.entries()) {
-		logger.debug(`Adding startup task for ${detectorName}`);
-		actionPromises.push((async (): Promise<void> => {
-			logger.debug(`Loading client config for client ${detectorConfig.client.name}...`);
-			const client = await loadClientConfig(getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, detectorConfig.client.id));
-			const controller = await registry.loadDetector(client.controller, {
-				projectDir,
-				clientRoot: getClientRootFromConfig(client)
-			});
-			if (typeof controller.startup === "function") {
-				logger.info(`Running startup actions for client ${client.name}, which has detector ${detectorName}`);
-				await controller.call(controller.startup, {
-					clientConfig: client,
-					projectConfig,
-					detectorConfig,
-				});
-			}
-		})()); // Must call it so it is ran
-	}
-	logger.debug("Waiting for startup actions to finish...");
-	logger.debug(JSON.stringify([...detectors]));
-	await Promise.all(actionPromises);
-	
-	logger.info("Loading executors for use...");
-	const executors = await registry.loadAllOfType(TWOKEYS_ADDON_TYPE_EXECUTOR);
+	// Load add-ons & run startup functions for detectors
+	const detectors = await loadDetectors(projectConfig, projectDir, registry);
+	const executors = await loadExecutors(registry);
 
 	/**
  	 * Returns the config for the 2Keys project
