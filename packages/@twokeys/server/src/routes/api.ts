@@ -45,6 +45,8 @@ const router = Router();
 /**
  * Needed so we can use async/await
  */
+// TODO: Rate limiting of routes to prevent excessive FS access
+// TODO: Remove deprecated routes
 export default async function getAPI(projectConfig: ProjectConfig, projectDir: string): Promise<Router> {
 	logger.info("Preparing server...");
 
@@ -60,10 +62,40 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 	const executors = await loadExecutors(registry);
 
 	/**
+	 * Returns to config for the 2Keys project
+	 */
+	router.get("/get/config/project", (req, res) => {
+		logger.info("Sending a config copy as JSON...");
+		// We can rely on hot reload to ensure it is accurate
+		res.statusCode = 200;
+		res.json(mainConfig);
+	});
+
+	/**
+	 * Returns config for a detector
+	 */
+	router.get("/get/config/detectors/:detector", (req, res) => {
+		const detectorToGet = req.params.detector;
+		logger.info(`Requested config for detector ${detectorToGet}`);
+		if (detectors.has(detectorToGet)) {
+			res.statusCode = 200;
+			res.json(detectors.get(detectorToGet));
+		} else {
+			logger.info(`${detectorToGet} not found!`);
+			res.statusCode = 404;
+			res.json({
+				message: "Not Found"
+			});
+		}
+	});
+
+	/**
  	 * Returns the config for the 2Keys project
+		* @deprecated
  	 */
 	router.get("/get/config", (req, res, next) => {
 		logger.debug("Sending a config copy as JSON...");
+		logger.warn("/get/config is deprecated.");
 		readFile(join(process.cwd(), "config.yml"), (err, data) => {
 			if (err) {
 				return next(err);
