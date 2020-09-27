@@ -1,0 +1,4 @@
+{"DO_NOT_MODIFY":true,"name":"twokeys-local-registry","version":"1.0.0","private":true,"dependencies":{
+	"@twokeys/executor-ahk": "@twokeys/executor-ahk",
+	"@twokeys/detector-desktop": "@twokeys/detector-desktop"
+}}

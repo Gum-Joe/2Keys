@@ -58,6 +58,8 @@ interface ManagerOptions {
 	force?: boolean;
 	/** Semver version to install */
 	version?: string;
+	/** HACK: Allow using linked packages.  Please remove in final version */
+	useLink?: boolean;
 }
 
 /**
@@ -305,7 +307,14 @@ export default class AddOnsRegistry {
 		this.logger.info("Installing new package...");
 		const packageString = options?.version ? packageName + "@" + options.version : packageName;
 		this.logger.info(`Package: ${packageString}`);
-		await this.runNpm(packageString, "install", options);
+		let npmCommand: keyof typeof npm["commands"] = "install";
+		// HACK: Allow the use of locally installed npm link modules in a registry. Remove this for final release as it is a hack
+		/* istanbul ignore next */
+		if (options?.useLink) {
+			this.logger.debug("Using link command.");
+			npmCommand = "link";
+		}
+		await this.runNpm(packageString, npmCommand, options);
 		this.logger.info("Adding package to registry...");
 		// If local, get Name and use that
 		let truePackageName = packageName; // packageName can be a string, hence this
@@ -375,7 +384,7 @@ export default class AddOnsRegistry {
 	 * @param command Command to run
 	 * @param options Options
 	 */
-	private runNpm(packageName: string, command: string, options?: ManagerOptions): Promise<void> {
+	private runNpm(packageName: string, command: keyof typeof npm["commands"], options?: ManagerOptions): Promise<void> {
 		return new Promise((resolve, reject) => {
 			const npmLogger = new Logger({ // For npm to log with
 				name: "add-ons:registry:npm",

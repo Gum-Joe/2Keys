@@ -1,6 +1,6 @@
 import { CommandFactory, BaseTwoKeysForCommands, ensureIsValidTwoKeysClass, CommandInfo }  from "@twokeys/common-hi/lib/common";
 import { Logger, TwoKeysProperties } from "@twokeys/core";
-import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
+import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons/src";
 import { join } from "path";
 
 const logger = new Logger({
@@ -19,15 +19,18 @@ export class TwoKeys extends BaseTwoKeysForCommands {
 
 (async (): Promise<void> => {
 	logger.info("Bootstraping test project");
-	logger.warn("Please run `/scripts/link-test-packages.cmd` first.");
+	logger.warn("Please run `/scripts/link-test-packages.sh` first.");
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const factory = new CommandFactory(TwoKeys);
 
-	await AddOnsRegistry.createNewRegistry(MOCK_REGISTRY);
-	await SoftwareRegistry.createSoftwareRegistry(MOCK_REGISTRY);
+	//await AddOnsRegistry.createNewRegistry(MOCK_REGISTRY);
+	//await SoftwareRegistry.createSoftwareRegistry(MOCK_REGISTRY);
 
 	logger.info("Installing packages");
 	const registry = new AddOnsRegistry(MOCK_REGISTRY);
-	await registry.install("@twokeys/executor-ahk");
-	await registry.install("@twokeys/detector-desktop");
+	//await registry.install("@twokeys/executor-ahk", { useLink: true });
+	//await registry.install("@twokeys/detector-desktop", { useLink: true });
+	//await registry.install(join(__dirname, "../../../../executors/@twokeys/executor-ahk"), { local: true });
+	//await registry.install(join(__dirname, "../../../../detectors/detector-desktop/controller"), { local: true });
+	await registry.reindex();
 })();
