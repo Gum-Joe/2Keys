@@ -273,6 +273,7 @@ export default class AddOnsRegistry {
 	 */
 	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType): Promise<{ [name: string]: LoadedAddOn<AddOnsType> }> {
 		this.logger.info(`Loading all modules of type ${typeOfAddOn}...`);
+		await this.initDB();
 		if (typeOfAddOn === TWOKEYS_ADDON_TYPE_DETECTOR) {
 			throw new Error("Cant do a load all for detectors becasue client location is unknown");
 		}

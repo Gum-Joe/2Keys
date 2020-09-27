@@ -44,7 +44,7 @@ const router = Router();
 /**
  * Needed so we can use async/await
  */
-export default async function getAPI(projectConfig: ProjectConfig, projectDir: string) {
+export default async function getAPI(projectConfig: ProjectConfig, projectDir: string): Promise<Router> {
 	logger.info("Preparing server...");
 	// TODO: Watch for changes to project and reload everything
 	logger.info("Loading root config...");
@@ -86,9 +86,10 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 	}));
 
 	logger.debug("Running startup actions...");
-	const actionPromises: Array<() => Promise<void>> = [];
+	const actionPromises: Array<Promise<void>> = [];
 	for (const [detectorName, detectorConfig] of detectors.entries()) {
-		actionPromises.push(async () => {
+		logger.debug(`Adding startup task for ${detectorName}`);
+		actionPromises.push((async (): Promise<void> => {
 			logger.debug(`Loading client config for client ${detectorConfig.client.name}...`);
 			const client = await loadClientConfig(getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, detectorConfig.client.id));
 			const controller = await registry.loadDetector(client.controller, {
@@ -103,8 +104,10 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 					detectorConfig,
 				});
 			}
-		});
+		})()); // Must call it so it is ran
 	}
+	logger.debug("Waiting for startup actions to finish...");
+	logger.debug(JSON.stringify([...detectors]));
 	await Promise.all(actionPromises);
 	
 	logger.info("Loading executors for use...");

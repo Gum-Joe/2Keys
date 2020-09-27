@@ -1,9 +1,9 @@
 # Controls config for a given detector
 name: Test Detector
 client: # Idetifies the device this detector config is for
-  id: device-00000 # See devices/device-00000.yml
-  name: Detector-PI # So the user knows what it is
-detector-config: # Schema specified by detector; this configures the detector
+  id: "00000" # See devices/device-00000.yml
+  name: Detector-VM # So the user knows what it is
+detector_config: # Schema specified by detector; this configures the detector
   perms:
     start-startup: false # Start detector on the client on startup
     lock-kds: true # Lock keyboard

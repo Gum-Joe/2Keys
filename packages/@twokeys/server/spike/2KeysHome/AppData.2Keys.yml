@@ -1,7 +1,0 @@
-# 2Keys system config
-# Stored in AppData
-name: 2Keys server 1
-version: 1.0.0
-theme: dark
-accent: "#0000ff"
-add-ons-location: C:\\Users\\Kishan\\AppData\\Roaming\\2Keys\\add-ons
