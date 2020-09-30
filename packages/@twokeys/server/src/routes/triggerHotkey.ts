@@ -66,6 +66,8 @@ async function executeHotKey(hotkey: HotkeyTypeSingle, hotkeyCode: string, keybo
  * }
  * ```
  * 
+ * NOTE: The `event` key will be ignored if the hotkey is not type multi
+ * 
  * @param detectors Loaded detector configs to use
  * @param executor Loaded executors from registry
  */
@@ -125,6 +127,7 @@ const getTriggerHotkey = (detectors: Map<string, DetectorConfig>, executors: Ext
 			let configToGive: HotkeyTypeSingle;
 			// Set the config above to the single macro being called (extract the config from a mutil type if needed)
 			if (isMultiHotkey(theHotkey)) {
+				logger.debug("Got a multi type hotkey!");
 				if (typeof theHotkey[eventType] !== "object") {
 					return next(new CodedError(`Hotkey event ${eventType} not found!`, ERR_BAD_EVENT_TYPE));
 				} else {

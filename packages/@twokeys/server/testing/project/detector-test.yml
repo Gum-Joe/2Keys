@@ -29,7 +29,7 @@ keyboards: # Specifies keybaord and hotkeys
         func: CallFunc
       ^B:
         up:
-          executor: executor-ahk
+          executor: "@twokeys/executor-ahk"
           func: CallFunc # AHK function to call
         hold:
           executor: executor-ahk
