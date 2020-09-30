@@ -216,7 +216,7 @@ export interface Keyboard {
 		 * @param executorName Name of executor being configured
 		 * Config is {@link Executor.hotkeyOptions}
 		 */
-		[executorName: string]: unknown;
+		[executorName: string]: any;
 	};
 	/**
 	 * Contains detector-specific config that is required per keyboard.

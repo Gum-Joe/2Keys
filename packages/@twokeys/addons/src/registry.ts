@@ -271,7 +271,7 @@ export default class AddOnsRegistry {
 	 * @param typeOfAddOn Add-on type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only
 	 */
-	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType): Promise<{ [name: string]: LoadedAddOn<AddOnsType> }> {
+	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType, properties: TwoKeysPropertiesForAddons = {}): Promise<{ [name: string]: LoadedAddOn<AddOnsType> }> {
 		this.logger.info(`Loading all modules of type ${typeOfAddOn}...`);
 		await this.initDB();
 		if (typeOfAddOn === TWOKEYS_ADDON_TYPE_DETECTOR) {
@@ -285,13 +285,12 @@ export default class AddOnsRegistry {
 		});
 		this.logger.debug(JSON.stringify(addOnsList));
 		const loadedAddOns: { [name: string]: LoadedAddOn<AddOnsType> } = {};
-		const defaultProps: TwoKeysProperties = {};
 		const promiseLoaders = addOnsList.map(async addOn => loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(
 			addOn,
 			typeOfAddOn,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 			// @ts-ignore
-			defaultProps
+			properties
 		));
 		await Promise.all(promiseLoaders);
 		return loadedAddOns;

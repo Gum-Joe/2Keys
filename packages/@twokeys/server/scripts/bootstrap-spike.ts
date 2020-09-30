@@ -7,7 +7,7 @@ const logger = new Logger({
 	name: "bootstrap",
 });
 
-const MOCK_ROOT = join(__dirname, "../spike");
+const MOCK_ROOT = join(__dirname, "../testing");
 const MOCK_REGISTRY = join(MOCK_ROOT, "registry");
 
 @ensureIsValidTwoKeysClass
@@ -33,4 +33,6 @@ export class TwoKeys extends BaseTwoKeysForCommands {
 	//await registry.install(join(__dirname, "../../../../executors/@twokeys/executor-ahk"), { local: true });
 	//await registry.install(join(__dirname, "../../../../detectors/detector-desktop/controller"), { local: true });
 	await registry.reindex();
+	const ahk = await registry.loadExecutor("@twokeys/executor-ahk", {});
+	await ahk.call(ahk.install, {});
 })();

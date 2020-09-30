@@ -1,0 +1,3 @@
+CallFunc() {
+	MsgBox "HELLO WORLD"
+}

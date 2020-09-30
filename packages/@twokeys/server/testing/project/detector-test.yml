@@ -12,9 +12,9 @@ detector_config: # Schema specified by detector; this configures the detector
 
 keyboards: # Specifies keybaord and hotkeys
   keyboard_1:
-    root: ./Keybaord_1 # Root folder where macro file (e.g. .ahk files) are
+    root: ./Keyboard_1 # Root folder where macro file (e.g. .ahk files) are
     executors:
-      executor-ahk:
+      "@twokeys/executor-ahk":
         root: index.ahk
         libs:
           - add-ons/libs/twokeys-ahk-core-libs # Use library twokeys-ahk-core-libs from libs
@@ -25,7 +25,7 @@ keyboards: # Specifies keybaord and hotkeys
         (G1): 103 
     hotkeys:
       ^A: # Ultmately the keycodes is up to the detector to decide
-        executor: executor-ahk # If default, don't need to give this
+        executor: "@twokeys/executor-ahk" # If default, don't need to give this
         func: CallFunc
       ^B:
         up:
