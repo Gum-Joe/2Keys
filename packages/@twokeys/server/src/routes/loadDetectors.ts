@@ -7,6 +7,7 @@ import { getClientConfigPath, getClientRootFromConfig } from "@twokeys/core";
 import { AddOnsRegistry } from "@twokeys/addons";
 import { logger } from "./api";
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export async function loadDetectors(projectConfig: ProjectConfig, projectDir: string, registry: AddOnsRegistry) {
 	logger.info("Loading detectors...");
 	const detectors = new Map<string, DetectorConfig>();
