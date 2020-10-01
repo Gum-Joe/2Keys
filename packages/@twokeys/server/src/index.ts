@@ -45,7 +45,7 @@ interface ServerArgs {
 	"pid-file"?: string;
 }
 
-const server = async (port: number = DEFAULT_PORT, argv: Arguments<ServerArgs>, projectDir: string, projectConfig: ProjectConfig): Promise<void> => {
+const server = async (port: number = DEFAULT_PORT, argv: ServerArgs, projectDir: string, projectConfig: ProjectConfig): Promise<ReturnType<typeof express>> => {
 
 	app.use(bodyParser.json());
 	app.use(helmet());
@@ -70,6 +70,8 @@ const server = async (port: number = DEFAULT_PORT, argv: Arguments<ServerArgs>, 
 			logger.info("PID file Written.");
 		});
 	}
+
+	return app;
 
 };
 

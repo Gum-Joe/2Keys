@@ -8,10 +8,13 @@ import { CONFIG_FILE, MOCK_KEYBAORD_NAME, MOCK_ROOT } from "../global/constants"
 import { join } from "path";
 import { promises as fsp } from "fs";
 import { EvDevValues, Config } from "../../src/util/interfaces";
+import { server } from "sinon";
+import { DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE } from "../../src/util/constants";
 
-const agent = request.agent(app);
+let agent;
 
-describe("/api test", () => {
+/** @depreacred new APIs */
+describe.skip("/api test", () => {
 
 	describe("/api/get/config", () => {
 		it("should send back a copy of the config", (done) => {

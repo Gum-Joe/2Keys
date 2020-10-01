@@ -10,7 +10,8 @@
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint --ext .ts .",
-    "test": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
+    "test": "cross-env NODE_ENV=test mocha test/**/*.ts",
+    "test:log": "mocha test/**/*.ts",
     "coverage": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
     "coverage:log": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
     "docs": "typedoc --ignoreCompilerErrors"

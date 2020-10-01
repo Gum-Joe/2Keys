@@ -69,7 +69,7 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 		logger.info("Sending a config copy as JSON...");
 		// We can rely on hot reload to ensure it is accurate
 		res.statusCode = 200;
-		res.json(mainConfig);
+		res.json(projectConfig);
 	});
 
 	/**

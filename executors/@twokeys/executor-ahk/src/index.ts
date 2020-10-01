@@ -25,7 +25,8 @@ import type { Executor } from "@twokeys/addons";
 import execute, { AHKExecutorConfig } from "./exec";
 import install from "./install";
 
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
 const executor: Executor<AHKExecutorConfig> = {
 	install: install, // causes compile errors
 	execute: execute,

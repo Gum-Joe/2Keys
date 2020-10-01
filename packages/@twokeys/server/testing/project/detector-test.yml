@@ -37,4 +37,3 @@ keyboards: # Specifies keybaord and hotkeys
         down:
           executor: executor-ahk
           func: add-ons/packs/essentials-pack/TestIfWorking # Use function TestIfWorking from pack essentials-pack
-      

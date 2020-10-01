@@ -1,4 +1,4 @@
-import { watchFile } from "fs";
+import { watch } from "fs";
 import { join } from "path";
 import { DetectorConfig, ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { loadClientConfig, loadDetectorConfig } from "@twokeys/core/lib/config";
@@ -20,7 +20,7 @@ export async function loadDetectors(projectConfig: ProjectConfig, projectDir: st
 		detectors.set(detector.name, detector);
 
 		logger.debug("Watching for changes");
-		watchFile(absoluteDetectorConfigPath, () => {
+		watch(absoluteDetectorConfigPath, { persistent: false }, () => {
 			logger.info(`Changes detected to detector ${detector.name}! Reloading`);
 			loadDetectorConfig(absoluteDetectorConfigPath)
 				.then((newDetector) => {

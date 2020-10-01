@@ -11,7 +11,8 @@ chai.use(require("chai-as-promised"));
 
 let config: Config | any;
 
-describe("AHK execution tests", () => {
+/** @deprecated no longer needed */
+describe.skip("AHK execution tests", () => {
 
 	before(async () => {
 		config = await config_loader();
