@@ -22,6 +22,7 @@
  * Requires config to be given
  * @packageDocumentation
  */
+// TODO: Config validation of everything
 import { promises as fs } from "fs";
 import YAML from "yaml";
 import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs, AddConfigUtils, MakeKeysOptional, ConfigUtils } from "./interfaces";

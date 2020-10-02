@@ -119,7 +119,7 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 	 * }
 	 * ```
 	 */
-	router.post("/post/:detector/:keyboard/trigger", getTriggerHotkey(detectors, executors));
+	router.post("/post/trigger/:detector/:keyboard", getTriggerHotkey(detectors, executors));
 
 	/**
 	 * Trigger a hotkey
@@ -182,6 +182,7 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 	/**
 	 * Handles keyboard path update
 	 */
+	// TODO: Update this route to use whatever new method for config updates we decide on
 	router.post("/post/update-keyboard-path", (req, res, next) => {
 		const { keyboard, path } = req.body;
 		logger.info(`Got update for ${keyboard}, path ${path}`);

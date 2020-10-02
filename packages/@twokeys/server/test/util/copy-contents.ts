@@ -13,7 +13,7 @@ const { expect } = chai;
 // Consts
 const MOCK_ROOT_COPY = join(MOCK_ROOT, "../non-mocha-copy");
 
-describe("Copy contents of folder function test", () => {
+describe.skip("Copy contents of folder function test", () => {
 
 	it("should successfully copy contents of a dir to another", async () => {
 		await copy_contents(MOCK_ROOT, MOCK_ROOT_COPY);

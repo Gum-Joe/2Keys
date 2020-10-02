@@ -54,7 +54,7 @@ const server = async (port: number = DEFAULT_PORT, argv: ServerArgs, projectDir:
 	// Error handler
 	app.use((err, req, res, next) => {
 		logger.err(`An error was encountered on router ${req.originalUrl}`);
-		logger.throw_noexit(err);
+		logger.printError(err);
 		next(err);
 	});
 

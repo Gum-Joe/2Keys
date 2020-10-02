@@ -9,7 +9,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import { constants } from "@twokeys/core";
 
-let agent;
+let agent: request.SuperAgentTest;
 
 
 describe("New API tests", () => {
@@ -75,6 +75,103 @@ describe("New API tests", () => {
 					if (err) { done(err); }
 					expect(res.body).to.deep.equal({
 						message: "Not Found"
+					});
+					done();
+				});
+		});
+	});
+
+	describe("/post/trigger/:detector/:keyboard", () => {
+		it("should return 422 when an invalid post body is sent", (done) => {
+			agent
+				.post("/api/post/trigger/someDetector/someKDB")
+				.expect(422)
+				.end((err, res) => {
+					if (err) { done(err); }
+					expect(res.body).to.deep.equal({
+						message: "Invalid POST body! Properties were missing!"
+					});
+					done();
+				});
+		});
+		it("should return 422 when  the hotkey proeprty is missing from the body", (done) => {
+			agent
+				.post("/api/post/trigger/someDetector/someKDB")
+				.send({ event: "down" })
+				.expect(422)
+				.end((err, res) => {
+					if (err) { done(err); }
+					expect(res.body).to.deep.equal({
+						message: "Invalid POST body! Properties were missing!"
+					});
+					done();
+				});
+		});
+		it("should not accept an invalid event field", (done) => {
+			agent
+				.post("/api/post/trigger/someDetector/someKDB")
+				.send({ hotkey: "^A", event: "NOT AN EVENT" })
+				.expect(422)
+				.end((err, res) => {
+					if (err) { done(err); }
+					expect(res.body).to.deep.equal({
+						message: "Bad event field given!"
+					});
+					done();
+				});
+		});
+
+		it("should return 404 when triggering a detector or hotkey that was not found", (done) => {
+			agent
+				.post("/api/post/trigger/someDetector/someKDB")
+				.send({ hotkey: "^A" })
+				.expect(404)
+				.end((err, res) => {
+					if (err) { done(err); }
+					expect(res.body).to.deep.equal({
+						message: "Detector Not Found"
+					});
+					done();
+				});
+		});
+
+		it("should return 404 when a keyboard is not found", (done) => {
+			agent
+				.post("/api/post/trigger/Test Detector/someKDB")
+				.send({ hotkey: "^A" })
+				.expect(404)
+				.end((err, res) => {
+					if (err) { done(err); }
+					expect(res.body).to.deep.equal({
+						message: "Keyboard Not Found"
+					});
+					done();
+				});
+		});
+
+		it("should return 404 when a hotkey is not found", (done) => {
+			agent
+				.post("/api/post/trigger/Test Detector/keyboard_1")
+				.send({ hotkey: "NotAHotkey" })
+				.expect(404)
+				.end((err, res) => {
+					if (err) { done(err); }
+					expect(res.body).to.deep.equal({
+						message: "Hotkey Not Found"
+					});
+					done();
+				});
+		});
+
+		it("should return 422 when a hotkey event type is not found", (done) => {
+			agent
+				.post("/api/post/trigger/Test Detector/keyboard_1")
+				.send({ hotkey: "+C", event: "hold" })
+				.expect(422)
+				.end((err, res) => {
+					if (err) { done(err); }
+					expect(res.body).to.deep.equal({
+						message: "Hotkey event type hold not found"
 					});
 					done();
 				});

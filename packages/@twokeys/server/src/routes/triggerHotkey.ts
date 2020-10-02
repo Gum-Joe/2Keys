@@ -34,6 +34,7 @@ function isMultiHotkey(hotkey: Hotkey): hotkey is HotkeyTypeKeypressValue {
  * @param executors Loaded executors
  */
 // TODO: Execute on a different thread, because the server hangs and fails any in progress runs if it is still waiting for this
+// TODO: Normalise hotkeys so they are all in lowercase, since ^A and ^a are the same key.  (might not be needed though, as detectors should read directly from config)
 async function executeHotKey(hotkey: HotkeyTypeSingle, hotkeyCode: string, keyboard: Keyboard, executors: ExtractGeneric<ReturnType<typeof loadExecutors>>): Promise<void> {
 	logger.info(`Executing hotkey ${hotkey}...`);
 	const executorToCall = hotkey.executor || keyboard.executors.default;
@@ -70,6 +71,7 @@ async function executeHotKey(hotkey: HotkeyTypeSingle, hotkeyCode: string, keybo
  * 
  * @param detectors Loaded detector configs to use
  * @param executor Loaded executors from registry
+ * @returns Exprss route handler for triggering a hotkey
  */
 const getTriggerHotkey = (detectors: Map<string, DetectorConfig>, executors: ExtractGeneric<ReturnType<typeof loadExecutors>>): RequestHandler  => {
 	return function (req, res, next): void {
@@ -111,7 +113,7 @@ const getTriggerHotkey = (detectors: Map<string, DetectorConfig>, executors: Ext
 		}
 		const detector = detectors.get(detectorName) as DetectorConfig;
 		if (hasOwnProperty(detector.keyboards, keyboardName)) { // Check the keyboard is present
-			logger.debug(`Keybaord ${keyboardName} found`);
+			logger.debug(`Keyboard ${keyboardName} found`);
 			const keyboard = detector.keyboards[keyboardName];
 
 			if (!hasOwnProperty(keyboard.hotkeys, hotkey)) { // Check hotkey is present
@@ -129,7 +131,11 @@ const getTriggerHotkey = (detectors: Map<string, DetectorConfig>, executors: Ext
 			if (isMultiHotkey(theHotkey)) {
 				logger.debug("Got a multi type hotkey!");
 				if (typeof theHotkey[eventType] !== "object") {
-					return next(new CodedError(`Hotkey event ${eventType} not found!`, ERR_BAD_EVENT_TYPE));
+					res.statusCode = 422;
+					res.json({
+						message: `Hotkey event type ${eventType} not found`
+					});
+					return;
 				} else {
 					configToGive = theHotkey[eventType] as HotkeyTypeSingle;
 				}

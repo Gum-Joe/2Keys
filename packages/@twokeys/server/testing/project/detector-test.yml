@@ -11,6 +11,9 @@ detector_config: # Schema specified by detector; this configures the detector
     cli-args: --debug # CLI args for detector
 
 keyboards: # Specifies keybaord and hotkeys
+  malformed_KD: 
+    hotkeys:
+      ^A: ""
   keyboard_1:
     root: ./Keyboard_1 # Root folder where macro file (e.g. .ahk files) are
     executors:
@@ -27,6 +30,13 @@ keyboards: # Specifies keybaord and hotkeys
       ^A: # Ultmately the keycodes is up to the detector to decide
         executor: "@twokeys/executor-ahk" # If default, don't need to give this
         func: CallFunc
+      +C:
+        up:
+          executor: "@twokeys/executor-ahk"
+          func: CallFunc # AHK function to call
+        down:
+          executor: executor-ahk
+          func: add-ons/packs/essentials-pack/TestIfWorking # Use function TestIfWorking from pack essentials-pack
       ^B:
         up:
           executor: "@twokeys/executor-ahk"
