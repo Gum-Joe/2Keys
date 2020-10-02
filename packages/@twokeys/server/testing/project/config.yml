@@ -12,3 +12,4 @@ server:
 
 detectors:
   - ./detector-test.yml
+  - ./detector-reloaded.yml

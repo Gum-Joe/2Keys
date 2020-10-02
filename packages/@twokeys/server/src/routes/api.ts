@@ -34,13 +34,14 @@ import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { loadMainConfig } from "@twokeys/core/lib/config";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
 import { AddOnsRegistry } from "@twokeys/addons";
-import { loadDetectors } from "./loadDetectors";
-import { loadExecutors } from "./loadExecutors";
+import { loadDetectors } from "../loaders/loadDetectors";
+import { loadExecutors } from "../loaders/loadExecutors";
 import getTriggerHotkey from "./triggerHotkey";
 
-export const logger: Logger = new Logger({
+const logger: Logger = new Logger({
 	name: "api",
 });
+
 const router = Router();
 
 /**

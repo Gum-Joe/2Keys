@@ -5,7 +5,7 @@ import { ERR_BAD_EVENT_TYPE } from "../util/errCodes";
 import { hasOwnProperty } from "../util/hasOwnProperty";
 import type { ExecutorExecConfig } from "@twokeys/addons";
 import type { HotkeyTypeKeypressValue, DetectorConfig, Hotkey, HotkeyTypeSingle, Keyboard } from "@twokeys/core/lib/interfaces";
-import type { loadExecutors } from "./loadExecutors";
+import type { loadExecutors } from "../loaders/loadExecutors";
 
 export const logger: Logger = new Logger({
 	name: "api:hotkeys",

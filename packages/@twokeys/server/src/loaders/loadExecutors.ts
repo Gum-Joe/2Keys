@@ -1,5 +1,9 @@
 import { AddOnsRegistry, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
-import { logger } from "./api";
+import { Logger } from "@twokeys/core";
+
+export const logger: Logger = new Logger({
+	name: "registry",
+});
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export async function loadExecutors(registry: AddOnsRegistry, projectDir: string) {

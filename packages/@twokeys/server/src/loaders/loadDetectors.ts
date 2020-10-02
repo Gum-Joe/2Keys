@@ -3,9 +3,12 @@ import { join } from "path";
 import { DetectorConfig, ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { loadClientConfig, loadDetectorConfig } from "@twokeys/core/lib/config";
 import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
-import { getClientConfigPath, getClientRootFromConfig } from "@twokeys/core";
+import { getClientConfigPath, getClientRootFromConfig, Logger } from "@twokeys/core";
 import { AddOnsRegistry } from "@twokeys/addons";
-import { logger } from "./api";
+
+export const logger: Logger = new Logger({
+	name: "config",
+});
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export async function loadDetectors(projectConfig: ProjectConfig, projectDir: string, registry: AddOnsRegistry) {

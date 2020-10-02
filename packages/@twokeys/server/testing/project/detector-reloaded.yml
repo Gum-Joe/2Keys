@@ -1,0 +1,16 @@
+name: Reloaded Detector
+client:
+  id: "00000"
+  name: CHANGED_PROP_BY_TEST0.358
+detector_config: {}
+keyboards:
+  keyboard_1:
+    root: ./Keyboard_1
+    executors:
+      "@twokeys/executor-ahk":
+        root: index.ahk
+      default: "@twokeys/executor-ahk"
+    hotkeys:
+      ^A:
+        executor: "@twokeys/executor-ahk"
+        func: CallFunc
