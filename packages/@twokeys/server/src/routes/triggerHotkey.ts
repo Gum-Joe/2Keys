@@ -35,7 +35,7 @@ function isMultiHotkey(hotkey: Hotkey): hotkey is HotkeyTypeKeypressValue {
  */
 // TODO: Execute on a different thread, because the server hangs and fails any in progress runs if it is still waiting for this
 // TODO: Normalise hotkeys so they are all in lowercase, since ^A and ^a are the same key.  (might not be needed though, as detectors should read directly from config)
-async function executeHotKey(hotkey: HotkeyTypeSingle, hotkeyCode: string, keyboard: Keyboard, executors: ExtractGeneric<ReturnType<typeof loadExecutors>>): Promise<void> {
+export async function executeHotKey(hotkey: HotkeyTypeSingle, hotkeyCode: string, keyboard: Keyboard, executors: ExtractGeneric<ReturnType<typeof loadExecutors>>): Promise<void> {
 	logger.info(`Executing hotkey ${hotkey}...`);
 	const executorToCall = hotkey.executor || keyboard.executors.default;
 	const configForExecutor: ExecutorExecConfig<{ [key: string]: any }> = {
@@ -50,7 +50,7 @@ async function executeHotKey(hotkey: HotkeyTypeSingle, hotkeyCode: string, keybo
 	logger.debug(`Providing ${JSON.stringify(configForExecutor)} to executor`);
 	if (!hasOwnProperty(executors, executorToCall)) {
 		logger.err(`Executor ${executorToCall} not found installed!`);
-		throw new CodedError("Executor to use not found!");
+		throw new CodedError("Executor to use not found!", "ENOENT");
 	}
 	await executors[executorToCall].call(executors[executorToCall].execute, configForExecutor);
 	return;

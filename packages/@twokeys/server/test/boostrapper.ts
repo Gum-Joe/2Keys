@@ -10,6 +10,8 @@ const logger = new Logger({
 export const MOCK_ROOT = join(__dirname, "../testing");
 export const MOCK_PROJECT_ROOT = join(MOCK_ROOT, "project");
 export const MOCK_REGISTRY = join(MOCK_ROOT, "registry");
+export const MOCK_KBD = "keyboard_1";
+export const MOCK_KDB_ROOT = join(MOCK_PROJECT_ROOT, "Keyboard_1");
 
 @ensureIsValidTwoKeysClass
 export class TwoKeys extends BaseTwoKeysForCommands {

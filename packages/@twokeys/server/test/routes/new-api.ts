@@ -1,15 +1,22 @@
 import request from "supertest";
+import chai from "chai";
 import { join } from "path";
-import server, { app } from "../../src";
+import server from "../../src";
 import { DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE } from "../../src/util/constants";
-import boostrapper, { MOCK_PROJECT_ROOT, MOCK_ROOT } from "../boostrapper";
+import { MOCK_KDB_ROOT, MOCK_PROJECT_ROOT, MOCK_ROOT } from "../boostrapper";
 import { loadDetectorConfig, loadProjectConfig } from "@twokeys/core/lib/config";
 import {  promises as fs } from "fs";
 import { expect } from "chai";
 import sinon from "sinon";
 import { constants } from "@twokeys/core";
+import { promisify } from "util";
+import * as triggerHotkey from "../../src/routes/triggerHotkey";
+import { HotkeyTypeSingle } from "@twokeys/core/lib/interfaces";
+import chaiAsPromised from "chai-as-promised";
 
 let agent: request.SuperAgentTest;
+
+chai.use(chaiAsPromised);
 
 
 describe("New API tests", () => {
@@ -176,7 +183,91 @@ describe("New API tests", () => {
 					done();
 				});
 		});
+
+		it("should execute", async () => {
+			await new Promise((resolve, reject) => agent
+				.post("/api/post/trigger/Test Detector/keyboard_1")
+				.send({ hotkey: "^T" })
+				.expect(200)
+				.end((err) => {
+					if (err) {
+						return reject(err);
+					}
+					resolve();
+				}));
+			// Wait some time so it executes, then check
+			await promisify(setTimeout)(100);
+			expect((await fs.readFile(join(MOCK_KDB_ROOT, "RunTestForExecution1.txt"))).toString()).to.equal("IT WORKED!");
+		});
+
+		it("should execute a hotkey of a certain event type", async () => {
+
+			await new Promise((resolve, reject) => agent
+				.post("/api/post/trigger/Test Detector/keyboard_1")
+				.send({ hotkey: "^B", event: "up" })
+				.expect(200)
+				.end((err) => {
+					if (err) {
+						return reject(err);
+					}
+					resolve();
+				}));
+			// Wait some time so it executes, then check
+			await promisify(setTimeout)(100);
+			expect((await fs.readFile(join(MOCK_KDB_ROOT, "RunTestForExecution2.txt"))).toString()).to.equal("IT WORKED!");
+			
+		});
+
+		it("should execute a hotkey, ignoring event type if none are set in config", async () => {
+			//console.log(JSON.stringify(await loadDetectorConfig(join(MOCK_PROJECT_ROOT, "detector-test.yml"))));
+			await new Promise((resolve, reject) => agent
+				.post("/api/post/trigger/Test Detector/keyboard_1")
+				.send({ hotkey: "^T3", type: "hold" })
+				.expect(200)
+				.end((err) => {
+					if (err) {
+						return reject(err);
+					}
+					resolve();
+				}));
+			// Wait some time so it executes, then check
+			await promisify(setTimeout)(100);
+			expect((await fs.readFile(join(MOCK_KDB_ROOT, "RunTestForExecution3.txt"))).toString()).to.equal("IT WORKED!");
+		});
+
+		it("should execute a hotkey and use default executor if non specified in config", async () => {
+			await new Promise((resolve, reject) => agent
+				.post("/api/post/trigger/Test Detector/keyboard_1")
+				.send({ hotkey: "^T4" })
+				.expect(200)
+				.end((err) => {
+					if (err) {
+						return reject(err);
+					}
+					resolve();
+				}));
+			// Wait some time so it executes, then check
+			await promisify(setTimeout)(100);
+			expect((await fs.readFile(join(MOCK_KDB_ROOT, "RunTestForExecution4.txt"))).toString()).to.equal("IT WORKED!");
+		});
+
+		it("should fail to execute when an executor is not present", async () => {
+			const theConfig = (await loadDetectorConfig(join(MOCK_PROJECT_ROOT, "detector-test.yml")));
+			expect(triggerHotkey.executeHotKey(
+				theConfig.keyboards.keyboard_1.hotkeys["^NOT"] as HotkeyTypeSingle,
+				"^NOT",
+				theConfig.keyboards.keyboard_1,
+				{},
+			)).to.be.rejectedWith("ENOENT");
+		});
+
 	});
 
 	after(() => sinon.restore());
+	after(async () => {
+		await fs.unlink(join(MOCK_KDB_ROOT, "RunTestForExecution1.txt"));
+		await fs.unlink(join(MOCK_KDB_ROOT, "RunTestForExecution2.txt"));
+		await fs.unlink(join(MOCK_KDB_ROOT, "RunTestForExecution3.txt"));
+		await fs.unlink(join(MOCK_KDB_ROOT, "RunTestForExecution4.txt"));
+	});
 });

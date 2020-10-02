@@ -21,7 +21,7 @@ keyboards: # Specifies keybaord and hotkeys
         root: index.ahk
         libs:
           - add-ons/libs/twokeys-ahk-core-libs # Use library twokeys-ahk-core-libs from libs
-      default: executor-ahk # Default executor
+      default: "@twokeys/executor-ahk"  # Default executor
     detector: # Custom detector config
       path: /dev/input/by-id/xxxxx
       map: # Custom scan code map
@@ -30,6 +30,13 @@ keyboards: # Specifies keybaord and hotkeys
       ^A: # Ultmately the keycodes is up to the detector to decide
         executor: "@twokeys/executor-ahk" # If default, don't need to give this
         func: CallFunc
+      ^T: # Ultmately the keycodes is up to the detector to decide
+        executor: "@twokeys/executor-ahk" # If default, don't need to give this
+        func:  RunTestForExecution1
+      ^T3: # Ultmately the keycodes is up to the detector to decide
+        func:  RunTestForExecution3
+      ^T4: # Ultmately the keycodes is up to the detector to decide
+        func:  RunTestForExecution4
       +C:
         up:
           executor: "@twokeys/executor-ahk"
@@ -37,10 +44,13 @@ keyboards: # Specifies keybaord and hotkeys
         down:
           executor: executor-ahk
           func: add-ons/packs/essentials-pack/TestIfWorking # Use function TestIfWorking from pack essentials-pack
+      ^NOT:
+        executor: DOESNOTEXIST
+        func: CallFunc
       ^B:
         up:
           executor: "@twokeys/executor-ahk"
-          func: CallFunc # AHK function to call
+          func: RunTestForExecution2 # AHK function to call
         hold:
           executor: executor-ahk
           func: CallFunc # AHK function to call
