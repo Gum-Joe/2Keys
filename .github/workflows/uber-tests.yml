@@ -41,7 +41,8 @@ jobs:
         yarn wsrun -mtc precompile
         yarn build -v
     - name: Bootstrap server
-      run: yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
+      run: yarn workspace @twokeys/server run ts-node -T ./scripts/ci-boostrap.ts
+      # run: yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
     
     # Test
     - name: Run tests

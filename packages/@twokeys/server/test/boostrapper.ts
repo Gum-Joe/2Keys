@@ -22,7 +22,7 @@ export class TwoKeys extends BaseTwoKeysForCommands {
 
 export default async (): Promise<void> => {
 	logger.info("Bootstraping test project");
-	logger.warn("Please run `/scripts/link-test-packages.sh` first.");
+	//logger.warn("Please run `/scripts/link-test-packages.sh` first.");
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const factory = new CommandFactory(TwoKeys);
 
