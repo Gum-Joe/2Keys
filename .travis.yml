@@ -16,7 +16,7 @@ before_install:
   # Convert lock file & install protoc
   - choco install protoc
 install:
-  - yarn --frozen-lockfile"
+  - yarn --frozen-lockfile
 before_script:
   - yarn wsrun -mtc precompile # precompile e.g. protobufs
   - yarn build -v
