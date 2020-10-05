@@ -6,7 +6,8 @@ import { MOCK_ROOT } from "./constants";
  */
 
 // Bootstrap setup
-before(async () => {
+before((done) => {
 	//process.chdir(MOCK_ROOT);
-	await boostrapper();
+	//await boostrapper();
+	done();
 });
