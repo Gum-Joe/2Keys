@@ -23,7 +23,7 @@ describe("Detector loading tests", () => {
 		sinon.replace(constants, "TWOKEYS_MAIN_CONFIG_DEFAULT_PATH", join(MOCK_ROOT, "2KeysHome/config.yml"));
 		sinon.replace(constants, "TWOKEYS_CLIENTS_ROOT", join(MOCK_ROOT, "2KeysHome/client"));
 		sinon.replace(constants, "TWOKEYS_CLIENTS_CONFIG_ROOT", join(MOCK_ROOT, "2KeysHome/client"));
-	});;
+	});
 
 	before(async () => {
 		projectConfig = await loadProjectConfig(MOCK_PROJECT_ROOT);

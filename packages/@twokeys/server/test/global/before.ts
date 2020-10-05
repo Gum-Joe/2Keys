@@ -1,10 +1,12 @@
+import boostrapper from "../boostrapper";
 import { MOCK_ROOT } from "./constants";
 
 /**
  * Before file to setup tests
  */
 
-// Set root dir so file are located correctly
-before(() => {
-	process.chdir(MOCK_ROOT);
+// Bootstrap setup
+before(async () => {
+	//process.chdir(MOCK_ROOT);
+	await boostrapper();
 });
