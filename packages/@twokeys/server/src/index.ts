@@ -33,6 +33,7 @@ import { join } from "path";
 import getAPI from "./routes/api";
 import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import helmet from "helmet";
+import mkdirp from "mkdirp";
 
 const packageJSON = require("../package.json");
 
@@ -63,10 +64,12 @@ const server = async (port: number = DEFAULT_PORT, argv: ServerArgs, projectDir:
 		logger.debug("PID: " + process.pid);
 	});
 
+	// FIXME: Currently ignored argv and just uses projectDir.
 	if (Object.prototype.hasOwnProperty.call(argv, "pid-file") && typeof argv["pid-file"] === "string" && argv["pid-file"]) {
-		logger.debug(`Writing pid file to ${argv["pid-file"]}...`);
-		writeFile(argv["pid-file"], process.pid.toString(), (err) => {
-			if (err) { logger.throw(err); }
+		logger.debug(`Writing pid file to ${join(projectDir, DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE)}...`);
+		mkdirp(join(projectDir, DEFAULT_LOCAL_2KEYS));
+		writeFile(join(projectDir, DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE), process.pid.toString(), (err) => {
+			if (err) { logger.printError(err); }
 			logger.info("PID file Written.");
 		});
 	}

@@ -597,6 +597,7 @@ export default class AddOnsRegistry {
 				"@entry": documentConverted.entry,
 				"@packname": options?.update ? documentConverted.name : undefined,
 			});
+			await stmt.finalize();
 			this.logger.info(`Package ${name} added to registry.`);
 			return { status: true };
 		} catch (err) {
