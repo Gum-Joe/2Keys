@@ -1,3 +1,3 @@
-export const execute = async function(twokeys, config) {
+module.exports.execute = async function(twokeys, config) {
 	return;
 };
