@@ -3,7 +3,7 @@ import chai from "chai";
 import { join } from "path";
 import server from "../../src";
 import { DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE } from "../../src/util/constants";
-import { MOCK_KDB_ROOT, MOCK_PROJECT_ROOT, MOCK_ROOT } from "../boostrapper";
+import boostrapper, { MOCK_2KEYS_HOME, MOCK_KDB_ROOT, MOCK_PROJECT_ROOT, MOCK_ROOT } from "../boostrapper";
 import { loadDetectorConfig, loadProjectConfig } from "@twokeys/core/lib/config";
 import {  promises as fs } from "fs";
 import { expect } from "chai";
@@ -21,10 +21,10 @@ chai.use(chaiAsPromised);
 
 describe("New API tests", () => {
 	before(async () => {
-		sinon.replace(constants, "TWOKEYS_MAIN_CONFIG_DEFAULT_PATH", join(MOCK_ROOT, "2KeysHome/config.yml"));
-		sinon.replace(constants, "TWOKEYS_CLIENTS_ROOT", join(MOCK_ROOT, "2KeysHome/client"));
-		sinon.replace(constants, "TWOKEYS_CLIENTS_CONFIG_ROOT", join(MOCK_ROOT, "2KeysHome/client"));
-		//await boostrapper();
+		sinon.replace(constants, "TWOKEYS_MAIN_CONFIG_DEFAULT_PATH", join(MOCK_2KEYS_HOME, "config.yml"));
+		sinon.replace(constants, "TWOKEYS_CLIENTS_ROOT", join(MOCK_2KEYS_HOME, "client"));
+		sinon.replace(constants, "TWOKEYS_CLIENTS_CONFIG_ROOT", join(MOCK_2KEYS_HOME, "client"));
+		await boostrapper();
 		agent = request.agent(await server(9198, {
 			"pid-file": join(MOCK_PROJECT_ROOT, DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE)
 		}, MOCK_PROJECT_ROOT, await loadProjectConfig(MOCK_PROJECT_ROOT)));

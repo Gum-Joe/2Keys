@@ -212,8 +212,12 @@ export default class AddOnsRegistry {
 			}
 		} catch (err) {
 			this.logger.err("Error loading add-on!");
+			this.logger.err(`Full error message: ${err.message}`);
 			if (err?.code === "MODULE_NOT_FOUND") {
-				throw new CodedError(`Entry point for type ${typeOfAddOn} from add-on ${packageToLoad.name} not found!`, errorCodes.ADDON_LOAD_FAILURE + ":NOT_FOUND");
+				throw new CodedError(
+					`Entry point for type ${typeOfAddOn} from add-on ${packageToLoad.name} not found!`,
+					errorCodes.ADDON_LOAD_FAILURE + ":NOT_FOUND"
+				);
 			} else {
 				throw new CodedError(`Error loading entry point for for type ${typeOfAddOn} from add-on ${packageToLoad.name}: ${err.message}`, `${errorCodes.ADDON_LOAD_FAILURE}${err.code ? ":" + err.code : ""}`);
 			}
