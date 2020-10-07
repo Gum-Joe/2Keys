@@ -1,6 +1,6 @@
 name: test-server-1
 version: 1.0.0
-registry_root: D:\Users\Kishan\Documents\Projects\CONFIDENTIAL\2Keys\2Keys-CI-Fixing\packages\@twokeys\server\testing\registry
+registry_root: D:\Users\Kishan\Documents\Projects\CONFIDENTIAL\2Keys\2Keys-UI\twokeys\packages\@twokeys\server\testing\registry
 oobe: true
 network:
   adapter: Network Bridge
