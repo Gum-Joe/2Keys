@@ -71,7 +71,7 @@ const createProject: PromiseCommand<Required<CreateProject.AsObject>> = async (t
 		id: config.projectUuid,
 		version: packageJSON.version,
 		server: {
-			port: config.serverInfo?.serverPort,
+			port: config.serverInfo.serverPort,
 			perms: {
 				startOnStartup: config.serverInfo.permissions.allowStartup,
 			}

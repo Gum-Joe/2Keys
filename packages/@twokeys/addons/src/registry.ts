@@ -535,7 +535,7 @@ export default class AddOnsRegistry {
 		this.logger.debug(`Package location: ${packageLocation}`);
 		this.logger.debug("Checking if package already in registry...");
 		const state = await this.getPackagesFromDB(name);
-		if (!state.status) {
+		if (!state?.status) {
 			this.logger.err("There was an error retrieving package of name ${name}.");
 			this.logger.err(state?.message || "NO MESSAGE FOUND");
 			return state;
@@ -666,7 +666,7 @@ export default class AddOnsRegistry {
 			const newDocs: Package[] = [];
 			for (const doc of docs) {
 				const newDoc = this.parsePackageFromDB(doc);
-				if (!newDoc.status || !newDoc.entry || typeof newDoc.entry === "undefined") {
+				if (!newDoc.status || !newDoc.entry) {
 					this.logger.err(`An error was encountered converting document of name ${doc.name} to a Package!`);
 					return {
 						status: false,
@@ -790,7 +790,7 @@ export default class AddOnsRegistry {
 	 * @param packageJSON Parsed package.json to validate
 	 * @returns flag of if package was added (true) or not (false) and err message if not added
 	 */
-	public static validatePackageJSON(packageJSON: Record<string, unknown> & { twokeys: TwokeysPackageInfo }, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
+	public static validatePackageJSON(packageJSON: Record<string, unknown> & { twokeys?: TwokeysPackageInfo }, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
 		const logger = new LoggerConstructor({
 			name: "add-ons:registry"
 		});
@@ -813,7 +813,7 @@ export default class AddOnsRegistry {
 			};
 		}
 		// Check if entry points present for each of twokeys.types
-		for (const addOnType of packageJSON.twokeys?.types) {
+		for (const addOnType of packageJSON.twokeys.types) {
 			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
 				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
 					logger.err(`Entry point was not found for add-on type ${addOnType}`);

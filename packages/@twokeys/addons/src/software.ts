@@ -158,7 +158,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 					this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
 					this.logger.err("Please file an issue with them.");
 					throw new Error("Error! Attempted to install a piece of software with a name already used!");
-				} else if (err.message.includes(EXECUTABLES_TABLE_NAME) + ".") {
+				} else if (err.message.includes(EXECUTABLES_TABLE_NAME + ".")) {
 					this.logger.err("Error! Attempted to register an executable with a name already used!");
 					this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
 					this.logger.err("Please file an issue with them.");
