@@ -25,7 +25,7 @@
 import type { PromisedTaskFunction, TwoKeys, TWOKEYS_ADDON_TYPE_EXECUTOR } from "@twokeys/addons";
 import { AHK_SOFTWARE_DEF } from "./constants";
 
-const install: PromisedTaskFunction<any, void, TWOKEYS_ADDON_TYPE_EXECUTOR> = async (twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>, config: any): Promise<void> => {
+const install: PromisedTaskFunction<any, void, TWOKEYS_ADDON_TYPE_EXECUTOR> = async (twokeys: TwoKeys<TWOKEYS_ADDON_TYPE_EXECUTOR>): Promise<void> => {
 	twokeys.logger.info("Installing AutoHotkey_H v2 alpha, to execute macro scripts...");
 	await twokeys.software.installSoftware(AHK_SOFTWARE_DEF);
 	twokeys.logger.info("AutoHotkey_H installed");

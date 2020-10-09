@@ -1,6 +1,3 @@
-import boostrapper from "../boostrapper";
-import { MOCK_ROOT } from "./constants";
-
 /**
  * Before file to setup tests
  */

@@ -26,8 +26,7 @@ import commands from "../commands.json";
 import globby from "globby";
 import { Logger } from "@twokeys/core";
 import { checkCommandInfo } from "../src/common/is-command";
-import { Command } from "../src/common/base-commands";
-import path, { join, relative, basename, dirname } from "path";
+import path, { join, relative, dirname } from "path";
 import { promises as fs } from "fs";
 
 const OUT_FILE = join(__dirname, "../src/commandsList.ts");
@@ -44,7 +43,7 @@ interface MappedCommand {
 
 type CommandsMap = Map<string, string>;
 
-(async () => {
+(async (): Promise<void> => {
 	logger.info("Generating commands index...");
 	const paths = await globby(commands.commands);
 

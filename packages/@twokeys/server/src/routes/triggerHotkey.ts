@@ -1,7 +1,6 @@
 import { Logger } from "@twokeys/core";
 import type { RequestHandler } from "express";
 import { CodedError } from "@twokeys/core";
-import { ERR_BAD_EVENT_TYPE } from "../util/errCodes";
 import { hasOwnProperty } from "../util/hasOwnProperty";
 import type { ExecutorExecConfig } from "@twokeys/addons";
 import type { HotkeyTypeKeypressValue, DetectorConfig, Hotkey, HotkeyTypeSingle, Keyboard } from "@twokeys/core/lib/interfaces";

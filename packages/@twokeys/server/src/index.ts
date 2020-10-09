@@ -35,8 +35,6 @@ import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import helmet from "helmet";
 import mkdirp from "mkdirp";
 
-const packageJSON = require("../package.json");
-
 const app = express();
 const logger: Logger = new Logger({
 	name: "server",
@@ -82,7 +80,7 @@ const server = async (port: number = DEFAULT_PORT, argv: ServerArgs, projectDir:
  * Eventually default starter for server
  * @param projectDir Absoluter path to project
  */
-export async function starter(projectDir: string) {
+export async function starter(projectDir: string): Promise<void> {
 	logger.info("Starting 2Keys....");
 	logger.info("Loading project...");
 	// TODO: Version checks to check config version matches this version of 2Keys

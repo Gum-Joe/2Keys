@@ -3,7 +3,7 @@ import chai from "chai";
 import { join } from "path";
 import server from "../../src";
 import { DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE } from "../../src/util/constants";
-import boostrapper, { MOCK_2KEYS_HOME, MOCK_KDB_ROOT, MOCK_PROJECT_ROOT, MOCK_ROOT } from "../boostrapper";
+import boostrapper, { MOCK_2KEYS_HOME, MOCK_KDB_ROOT, MOCK_PROJECT_ROOT } from "../boostrapper";
 import { loadDetectorConfig, loadProjectConfig } from "@twokeys/core/lib/config";
 import {  promises as fs } from "fs";
 import { expect } from "chai";

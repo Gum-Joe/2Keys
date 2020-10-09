@@ -1,6 +1,6 @@
 import { CommandFactory, BaseTwoKeysForCommands, ensureIsValidTwoKeysClass, CommandInfo }  from "@twokeys/common-hi/lib/common";
 import { Logger, TwoKeysProperties } from "@twokeys/core";
-import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons/src";
+import { AddOnsRegistry } from "@twokeys/addons/src";
 import { SOFTWARE_TABLE_NAME } from "@twokeys/addons/lib/util/constants";
 import { join } from "path";
 import { loadMainConfig, stringifyMainConfig } from "@twokeys/core/lib/config";
@@ -29,7 +29,7 @@ export default async (): Promise<void> => {
 	logger.info("Adjusting main config");
 	const mainConfig = await loadMainConfig(join(MOCK_2KEYS_HOME, "config.yml"));
 	mainConfig.registry_root = MOCK_REGISTRY;
-	await fs.writeFile(join(MOCK_2KEYS_HOME, "config.yml"), stringifyMainConfig(mainConfig))
+	await fs.writeFile(join(MOCK_2KEYS_HOME, "config.yml"), stringifyMainConfig(mainConfig));
 	//logger.warn("Please run `/scripts/link-test-packages.sh` first.");
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const factory = new CommandFactory(TwoKeys);

@@ -1,15 +1,11 @@
 // Router tests
 import { expect } from "chai";
-import request from "supertest";
-import { app } from "../../src/index";
 import fs from "fs";
 import YAML from "yaml";
 import { CONFIG_FILE, MOCK_KEYBAORD_NAME, MOCK_ROOT } from "../global/constants";
 import { join } from "path";
 import { promises as fsp } from "fs";
 import { EvDevValues, Config } from "../../src/util/interfaces";
-import { server } from "sinon";
-import { DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE } from "../../src/util/constants";
 
 let agent;
 

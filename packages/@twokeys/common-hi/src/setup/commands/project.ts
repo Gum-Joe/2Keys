@@ -25,7 +25,7 @@ import { join } from "path";
 import mkdirp from "mkdirp";
 import { promises as fs } from "fs";
 import { CreateProject } from "../protobuf/project_pb";
-import { Command, CommandFactory, PromiseCommand } from "../../common";
+import { CommandFactory, PromiseCommand } from "../../common";
 import * as errorCodes from "../util/errors";
 import packageJSON from "../../../package.json";
 import generateDaemon from "./daemon";

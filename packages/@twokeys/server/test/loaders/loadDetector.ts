@@ -1,6 +1,6 @@
 import { AddOnsRegistry } from "@twokeys/addons";
 import { constants } from "@twokeys/core";
-import { loadDetectorConfig, loadProjectConfig, stringifyDetectorConfig } from "@twokeys/core/lib/config";
+import { loadProjectConfig, stringifyDetectorConfig } from "@twokeys/core/lib/config";
 import { DetectorConfig, ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { expect } from "chai";
 import { join } from "path";

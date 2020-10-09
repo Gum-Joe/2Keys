@@ -107,6 +107,7 @@ export async function run_hotkey(file: string, func: string): Promise<void> {
 				// Check the DLL config is present
 				if (typeof userspace_config.software.ahk.paths.dll === "undefined") {
 					logger.throw_noexit(new Error("DLL config option was not found!  It may be an EXE file is only available, which isn't supported."));
+					// eslint-disable-next-line no-unsafe-finally
 					return; // STOP execution
 				}
 				// Errors handled by the code
