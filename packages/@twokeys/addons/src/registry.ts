@@ -815,7 +815,7 @@ export default class AddOnsRegistry {
 		// Check if entry points present for each of twokeys.types
 		for (const addOnType of packageJSON.twokeys.types) {
 			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
-				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
+				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys.entry, addOnType) && typeof packageJSON.twokeys.entry[addOnType] === "string")) {
 					logger.err(`Entry point was not found for add-on type ${addOnType}`);
 					return {
 						status: false,
