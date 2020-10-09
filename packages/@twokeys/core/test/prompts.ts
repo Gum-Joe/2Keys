@@ -203,6 +203,11 @@ describe("Prompts test (prompts.ts)", () => {
 			const prompts = new MockedPrompts(logger);
 			// HACK: To get prompts to show
 			prompts.nonInterative = false;
+			// Run it
+			prompts.question("Do you wish to continue?", {
+				buttons: ["option a", "option b", "option c"], // Overwrite, merge, cancel
+				defaultButton: 1
+			});
 			expect(messagePrinted).to.be.true;
 			mockedStdinStream.write("option c"); // SO as to resolve
 			done();

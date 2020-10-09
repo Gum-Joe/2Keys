@@ -1,7 +1,7 @@
 // Mocha config file
 
 module.exports = {
-	require: ["ts-node/register", "source-map-support/register"],
+	require: ["ts-node/register"],
 	recursive: true,
 	spec: ["test/**.ts", "test/**/*.ts"],
 	extension: ["ts", "js"],

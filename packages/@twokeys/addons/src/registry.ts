@@ -84,7 +84,7 @@ type GetPackageReturn = ValidatorReturn & { results?: Package[] };
  * @param package Package object of add-on that is loaded
  * @param call Function to run an add-ons task function
  */
-type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] & BaseAddon<AddOnsType> & {
+export type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] & BaseAddon<AddOnsType> & {
 	/** Package object of add-on that is loaded */
 	package: Package;
 	/**
