@@ -10,8 +10,8 @@ export const logger: Logger = new Logger({
 	name: "config",
 });
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export async function loadDetectors(projectConfig: ProjectConfig, projectDir: string, registry: AddOnsRegistry) {
+
+export async function loadDetectors(projectConfig: ProjectConfig, projectDir: string, registry: AddOnsRegistry): Promise<Map<string, DetectorConfig>> {
 	logger.info("Loading detectors...");
 	const detectors = new Map<string, DetectorConfig>();
 
