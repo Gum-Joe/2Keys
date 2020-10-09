@@ -6,8 +6,10 @@ import { CONFIG_FILE, MOCK_KEYBAORD_NAME, MOCK_ROOT } from "../global/constants"
 import { join } from "path";
 import { promises as fsp } from "fs";
 import { EvDevValues, Config } from "../../src/util/interfaces";
+import supertest from "supertest";
+import { Router } from "express";
 
-let agent;
+const agent = supertest(Router());
 
 /** @depreacred new APIs */
 describe.skip("/api test", () => {

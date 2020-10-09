@@ -145,7 +145,7 @@ export default class ContentCopier {
 	 * @param progress_bar 
 	 * @param dirs Absolute path to dirctories, which we make relative to destination
 	 */
-	public mkdirs(dirs: string[], progress_bar?: ProgressBar): Promise<{}> {
+	public mkdirs(dirs: string[], progress_bar?: ProgressBar): Promise<void> {
 		return new Promise((resolve, reject) => {
 			// MKDIR
 			for (const dir of dirs) {

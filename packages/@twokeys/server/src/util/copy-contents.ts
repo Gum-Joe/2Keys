@@ -125,7 +125,7 @@ function get_files_from_tree(tree: FileTreeNode[]): Promise<string[]> {
 /**
  * @deprecated Use content copier from addons
  */
-function mkdirs(root: string, destination: string, progress_bar: ProgressBar, dirs: string[]): Promise<{}> {
+function mkdirs(root: string, destination: string, progress_bar: ProgressBar, dirs: string[]): Promise<void> {
 	return new Promise((resolve, reject) => {
 		// MKDIR
 		for (const dir of dirs) {
@@ -155,7 +155,7 @@ function mkdirs(root: string, destination: string, progress_bar: ProgressBar, di
  * @param destination Destinatian directory (will be created if it does not exist)
  * @deprecated Use content copier from addons
  */
-export default async function copy_contents(root: string, destination: string): Promise<{}> {
+export default async function copy_contents(root: string, destination: string): Promise<void> {
 	return new Promise(async (resolve, reject) => {
 		logger.info(`Copying files from ${root} to ${destination}...`);
 		logger.debug("Generating file tree...");
