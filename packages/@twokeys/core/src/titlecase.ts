@@ -2,9 +2,9 @@
  * Util function to make things titlecase.
  * From https://www.freecodecamp.org/news/three-ways-to-title-case-a-sentence-in-javascript-676a9175eb27/
  */
-export default function titleCase(str): string {
+export default function titleCase(str: string): string {
 	// Step 1. Lowercase the string
-	str = str.toLowerCase() // str = "i'm a little tea pot";
+	const newstr = str.toLowerCase() // str = "i'm a little tea pot";
 
 		// Step 2. Split the string into an array of strings
 		.split(" ") // str = ["i'm", "a", "little", "tea", "pot"];
@@ -32,5 +32,5 @@ export default function titleCase(str): string {
 		});
 
 	// Step 4. Return the output
-	return str.join(" "); // ["I'm", "A", "Little", "Tea", "Pot"].join(' ') => "I'm A Little Tea Pot"
+	return newstr.join(" "); // ["I'm", "A", "Little", "Tea", "Pot"].join(' ') => "I'm A Little Tea Pot"
 }

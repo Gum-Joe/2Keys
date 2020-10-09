@@ -15,7 +15,7 @@ chai.use(chaiAsPromised);
  */
 function mockPrompts(prompts: typeof Prompts): [typeof Prompts, stream.Writable] {
 	const theStream = new stream.Writable();
-	prompts.getInputPromise = (question = ""): Promise<string> => {
+	prompts.getInputPromise = (): Promise<string> => {
 		// HACK: Whenever this is called, we chane the variable theStream above with the new reading stream
 		// This is bad practise as it means stream can be invalid, but it works
 		return new Promise((resolve) => {
@@ -203,10 +203,6 @@ describe("Prompts test (prompts.ts)", () => {
 			const prompts = new MockedPrompts(logger);
 			// HACK: To get prompts to show
 			prompts.nonInterative = false;
-			const promptPromise = prompts.question("Do you wish to continue?", {
-				buttons: ["Option A", "Option B", "Option C"],
-				defaultButton: 1
-			});
 			expect(messagePrinted).to.be.true;
 			mockedStdinStream.write("option c"); // SO as to resolve
 			done();

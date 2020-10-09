@@ -790,7 +790,7 @@ export default class AddOnsRegistry {
 	 * @param packageJSON Parsed package.json to validate
 	 * @returns flag of if package was added (true) or not (false) and err message if not added
 	 */
-	public static validatePackageJSON(packageJSON: any, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
+	public static validatePackageJSON(packageJSON: Record<string, unknown> & { twokeys: TwokeysPackageInfo }, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
 		const logger = new LoggerConstructor({
 			name: "add-ons:registry"
 		});

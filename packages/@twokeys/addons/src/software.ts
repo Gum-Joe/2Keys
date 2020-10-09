@@ -294,7 +294,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	}): Promise<void> {
 		this.logger.debug(`Updating software record of ${name}...`);
 		// Checks if the property is in newData
-		const objectHasProperty = (obj: object, field: string): boolean => {
+		const objectHasProperty = (obj: Record<string, unknown>, field: string): boolean => {
 			return Object.prototype.hasOwnProperty.call(obj, field) && typeof obj[field] !== "undefined";
 		};
 		const newDataHasProperty = (field: string): boolean => {
