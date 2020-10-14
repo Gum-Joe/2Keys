@@ -1,5 +1,7 @@
 CallFunc() {
 	MsgBox "HELLO WORLD"
+  ;SetWorkingDir("..")
+  MsgBox A_WorkingDir
 }
 
 TestFunc() {
@@ -21,3 +23,8 @@ RunTestForExecution3() {
 RunTestForExecution4() {
   FileAppend("IT WORKED!", TWOKEYS_CWD "\RunTestForExecution4.txt")
 }
+
+RunBenchmarkTest() {
+  Send "A"
+}
+

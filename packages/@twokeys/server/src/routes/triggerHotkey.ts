@@ -147,13 +147,19 @@ const getTriggerHotkey = (detectors: Map<string, DetectorConfig>, executors: Ext
 				.catch(next)
 				.then(() => {
 					logger.info("Execution done.");
+					// Send back to prevent timeout from long hotkeys
+					res.statusCode = 200;
+					res.json({
+						message: "Run triggered",
+					});
+					res.end();
 				});
 			// Send back to prevent timeout from long hotkeys
-			res.statusCode = 200;
+			/*res.statusCode = 200;
 			res.json({
 				message: "Run triggered",
 			});
-			res.end();
+			res.end();*/
 			return;
 
 		} else { // from the if checking if the keybaord was in the detector config

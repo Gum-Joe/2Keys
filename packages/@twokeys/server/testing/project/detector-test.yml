@@ -47,6 +47,8 @@ keyboards: # Specifies keybaord and hotkeys
       ^NOT:
         executor: DOESNOTEXIST
         func: CallFunc
+      ^BENCH:
+        func: RunBenchmarkTest
       ^B:
         up:
           executor: "@twokeys/executor-ahk"
