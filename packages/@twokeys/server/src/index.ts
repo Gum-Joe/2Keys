@@ -34,6 +34,7 @@ import getAPI from "./routes/api";
 import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import helmet from "helmet";
 import mkdirp from "mkdirp";
+import startupScripts from "./util/startup";
 
 const app = express();
 const logger: Logger = new Logger({
@@ -45,6 +46,10 @@ interface ServerArgs {
 }
 
 const server = async (port: number = DEFAULT_PORT, argv: ServerArgs, projectDir: string, projectConfig: ProjectConfig): Promise<ReturnType<typeof express>> => {
+
+	// Default start scripts
+	
+	await startupScripts();
 
 	app.use(bodyParser.json());
 	app.use(helmet());

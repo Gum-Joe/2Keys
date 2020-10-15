@@ -1,8 +1,8 @@
 import { watch } from "fs";
 import { join } from "path";
 import { DetectorConfig, ProjectConfig } from "@twokeys/core/lib/interfaces";
-import { loadClientConfig, loadDetectorConfig } from "@twokeys/core/lib/config";
-import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
+import { loadClientConfig, loadDetectorConfig, loadProjectConfig } from "@twokeys/core/lib/config";
+import { TWOKEYS_CLIENTS_CONFIG_ROOT, TWOKEYS_PROJECT_CONFIG_FILENAME } from "@twokeys/core/lib/constants";
 import { getClientConfigPath, getClientRootFromConfig, Logger } from "@twokeys/core";
 import { AddOnsRegistry } from "@twokeys/addons";
 
@@ -16,6 +16,7 @@ export async function loadDetectors(projectConfig: ProjectConfig, projectDir: st
 	const detectors = new Map<string, DetectorConfig>();
 
 	logger.info("Listing detectors & generating map...");
+	logger.info("Detector configs will auto reload on change");
 	await Promise.all(projectConfig.detectors.map(async (detectorConfigPath) => {
 		logger.debug("Loading a detector config...");
 		const absoluteDetectorConfigPath = join(projectDir, detectorConfigPath);
