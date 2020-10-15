@@ -48,7 +48,6 @@ interface ServerArgs {
 const server = async (port: number = DEFAULT_PORT, argv: ServerArgs, projectDir: string, projectConfig: ProjectConfig): Promise<ReturnType<typeof express>> => {
 
 	// Default start scripts
-	
 	await startupScripts();
 
 	app.use(bodyParser.json());

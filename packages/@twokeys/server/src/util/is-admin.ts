@@ -51,8 +51,8 @@ export default async (): Promise<boolean> => {
 	try {
 		// TODO: Convert this to not use `.shell` as it's slighly faster
 		// https://stackoverflow.com/a/21295806/1641422
-		logger.info("Checking if running as admin...");
-		await execa.shell("fsutil dirty query %systemdrive%");
+		logger.info("Checking if NOT running as admin...");
+		await execa("fsutil", ["dirty", "query", process.env.systemdrive || "C:"]);
 		return true;
 	} catch (error) {
 		if (error.code === "ENOENT") {
