@@ -17,7 +17,7 @@ export default async function startupScripts(): Promise<void> {
 	if (await isAdmin()) {
 		logger.err("Error! Detected that you're running as admin!");
 		logger.err("You can't run 2Keys as admin for security reasons!");
-		logger.err("This is because malware could adjust your (non-admin protected) config to execute malware for priverlege esculation.");
+		logger.err("This is because malware could adjust your (non-admin protected) config to execute malware for privilege esculation.");
 		logger.err("Please file an issue if you want to run 2Keys as admin.");
 		const err = new CodedError("Detected you're running as admin! 2Keys can't be ran as admin for security reasons (see above)!", ATTEMPT_AT_ADMIN);
 		logger.printError(err);

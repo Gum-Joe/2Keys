@@ -48,6 +48,22 @@ export default async (): Promise<boolean> => {
 		return false;
 	}
 
+	// Undocumented env variable that allows running as admin
+	// Leaving as undocumented because I don't think people should be using it
+	// and by putting it in the documentation it might invite users to use it
+	// NOTE: The NODE_ENV check is there so that we can run tests in CI (our CI provider runs the tests as admin)
+	// If you come accross this and decide to try it:
+	// 1: Understand the security risks of running 2Keys as admin (that being mainly that malware could adjust your (non-admin protected) config to execute malware for privilege esculation.)
+	// (this is undocumented for a reason)
+	// 2: Protect your 2Keys project config from modification by non-admin level programs
+	// 3: Set the environment varibale TWOKEYS_ALLOW_ADMIN to "true"
+	if (process.env.TWOKEYS_ALLOW_ADMIN === "true" || process.env.NODE_ENV === "test") {
+		logger.warn("WARNING! Running as admin has been permitted!");
+		logger.warn("Malware could adjust your (non-admin protected) config to execute malware for privilege esculation.");
+		logger.warn("Please ensure you understand the security risks of this before continueing.");
+		return false; // Fake not running as admin
+	}
+
 	try {
 		// https://stackoverflow.com/a/21295806/1641422
 		logger.info("Checking if NOT running as admin...");
