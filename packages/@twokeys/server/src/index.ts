@@ -25,7 +25,6 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { writeFile } from "fs";
-import Logger from "./util/logger";
 import { DEFAULT_LOCAL_2KEYS, DEFAULT_PORT, WINDOWS_SERVER_PID_FILE } from "./util/constants";
 import { Arguments } from "yargs";
 import { loadProjectConfig } from "@twokeys/core/lib/config";
@@ -35,6 +34,7 @@ import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import helmet from "helmet";
 import mkdirp from "mkdirp";
 import startupScripts from "./util/startup";
+import { Logger } from "@twokeys/core";
 
 const app = express();
 const logger: Logger = new Logger({

@@ -1,7 +1,6 @@
-import { CodedError } from "@twokeys/core";
+import { CodedError, Logger } from "@twokeys/core";
 import { ATTEMPT_AT_ADMIN } from "./errCodes";
 import isAdmin from "./is-admin";
-import Logger from "./logger";
 
 const logger: Logger = new Logger({
 	name: "security",

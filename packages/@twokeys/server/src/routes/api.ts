@@ -22,14 +22,9 @@
  * @packageDocumentation
  */
 import { Router } from "express";
-import { readFile, writeFile } from "fs";
+import { readFile } from "fs";
 import { join } from "path";
 import YAML from "yaml";
-import { config_loader } from "../util/config";
-import Logger from "../util/logger";
-import {EvDevValues } from "../util/interfaces";
-import { run_hotkey, fetch_hotkey } from "../util/ahk";
-import { CONFIG_FILE } from "../util/constants";
 import { ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { loadMainConfig } from "@twokeys/core/lib/config";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
@@ -37,6 +32,7 @@ import { AddOnsRegistry } from "@twokeys/addons";
 import { loadDetectors } from "../loaders/loadDetectors";
 import { loadExecutors } from "../loaders/loadExecutors";
 import getTriggerHotkey from "./triggerHotkey";
+import { Logger } from "@twokeys/core";
 
 const logger: Logger = new Logger({
 	name: "api",
@@ -129,13 +125,13 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 	 * - hotkey: set of keys that have been pressed
 	 * @deprecated
 	 */
-	router.post("/post/depreacted/trigger", async (req, res, next) => {
-		/**
-		 * 1: Get hotkey function from config
-		 * 2: Execute C++ bindings with #Include <root of keyboard>; function()
-		 */
-		// Get vars
-		const keyboard = req.body.keyboard;
+	/*router.post("/post/depreacted/trigger", async (req, res, next) => {*/
+	/**
+		* 1: Get hotkey function from config
+		* 2: Execute C++ bindings with #Include <root of keyboard>; function()
+		*/
+	// Get vars
+	/*const keyboard = req.body.keyboard;
 		const hotkey_code = req.body.hotkey;
 		const value: EvDevValues = Object.prototype.hasOwnProperty.call(req.body, "value") ? req.body.value : EvDevValues.Down;
 		logger.debug(`Got keyboard ${keyboard} and hotkey ${hotkey_code}, with value ${value}`);
@@ -178,13 +174,13 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 		} catch (err) {
 			next(err); // Hand off to error handler
 		}
-	});
+	});*/
 
 	/**
 	 * Handles keyboard path update
 	 */
 	// TODO: Update this route to use whatever new method for config updates we decide on
-	router.post("/post/update-keyboard-path", (req, res, next) => {
+	/*router.post("/post/update-keyboard-path", (req, res, next) => {
 		const { keyboard, path } = req.body;
 		logger.info(`Got update for ${keyboard}, path ${path}`);
 		config_loader()
@@ -203,6 +199,6 @@ export default async function getAPI(projectConfig: ProjectConfig, projectDir: s
 					res.end();
 				});
 			});
-	});
+	});*/
 	return router;
 }

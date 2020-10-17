@@ -1,8 +1,8 @@
 import { watch } from "fs";
 import { join } from "path";
 import { DetectorConfig, ProjectConfig } from "@twokeys/core/lib/interfaces";
-import { loadClientConfig, loadDetectorConfig, loadProjectConfig } from "@twokeys/core/lib/config";
-import { TWOKEYS_CLIENTS_CONFIG_ROOT, TWOKEYS_PROJECT_CONFIG_FILENAME } from "@twokeys/core/lib/constants";
+import { loadClientConfig, loadDetectorConfig } from "@twokeys/core/lib/config";
+import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
 import { getClientConfigPath, getClientRootFromConfig, Logger } from "@twokeys/core";
 import { AddOnsRegistry } from "@twokeys/addons";
 
