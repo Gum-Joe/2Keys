@@ -26,4 +26,4 @@ before_script:
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
   - yarn workspaces run coverage
-  # - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
