@@ -46,7 +46,6 @@ jobs:
     
     # Test
     - name: Run tests
-      #run: yarn workspaces run coverage
-      run: yarn workspace @twokeys/server run test:log
+      run: yarn workspaces run coverage
     - uses: codecov/codecov-action@v1
 
