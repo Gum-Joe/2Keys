@@ -19,7 +19,7 @@
  */
 import { join } from "path";
 import { homedir } from "os";
-import { AppPath, AppPaths, Keyboard, UserspaceConfig } from "./interfaces";
+import { AppPaths, UserspaceConfig } from "./interfaces";
 
 /**
  * Constants for 2Keys

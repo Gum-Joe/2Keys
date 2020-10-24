@@ -16,6 +16,10 @@
 		{
 			"path": "../addons",
 			"prepend": false
+		},
+		{
+			"path": "../../../executors/@twokeys/executor-ahk",
+			"prepend": false
 		}
 	]
 }

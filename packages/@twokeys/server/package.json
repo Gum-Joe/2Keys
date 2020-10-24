@@ -7,13 +7,16 @@
   "author": "Gum-Joe",
   "license": "GPL-3.0-or-later",
   "scripts": {
+    "start": "ts-node -T ./src/spike/launch.ts",
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint --ext .ts .",
-    "test": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
+    "test": "cross-env NODE_ENV=test mocha test/**/*.ts",
+    "test:log": "mocha test/**/*.ts",
     "coverage": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
     "coverage:log": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
-    "docs": "typedoc --ignoreCompilerErrors"
+    "docs": "typedoc --ignoreCompilerErrors",
+    "benchmark": "yarn autocannon -c 1 -a 500 -m POST -i .\\scripts\\benchmark.json -H \"Content-Type=application/json\" \"http://localhost:8080/api/post/trigger/Test Detector/keyboard_1\""
   },
   "bin": {
     "2Keys": "./bin/2Keys"
@@ -41,7 +44,9 @@
     "adm-zip": "^0.4.14",
     "body-parser": "^1.18.3",
     "chalk": "^4.0.0",
+    "execa": "^4.0.3",
     "express": "^4.16.3",
+    "helmet": "^4.1.1",
     "inquirer": "^7.0.0",
     "mkdirp": "^1.0.4",
     "mustache": "^4.0.1",
@@ -55,12 +60,16 @@
   "devDependencies": {
     "@types/adm-zip": "^0.4.32",
     "@types/chai-fs": "^2.0.2",
+    "@types/helmet": "^0.0.48",
     "@types/inquirer": "^7.3.1",
     "@types/mustache": "^4.0.1",
     "@types/node": "^14.6.4",
+    "@types/sinon": "^9.0.6",
     "@types/supertest": "^2.0.8",
+    "autocannon": "^6.5.0",
     "chai-fs": "^2.0.0",
     "rimraf": "^3.0.2",
+    "sinon": "^9.0.3",
     "supertest": "^4.0.2"
   }
 }

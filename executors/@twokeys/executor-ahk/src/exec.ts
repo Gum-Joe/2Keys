@@ -52,6 +52,9 @@ function getPrelude(twokeys: TwoKeysForAProject<"executor">, config: ThisExecuto
 	; 2KEYS EXECUTOR AHK PRELUDE
 	; CWD
 	Global TWOKEYS_CWD := "${join(twokeys.properties.projectDir, config.keyboard.root)}"
+	; Ensure consistent start directory
+	; DOES WORK
+	SetWorkingDir "${join(twokeys.properties.projectDir, config.keyboard.root)}"
 	`;
 }
 
@@ -98,11 +101,11 @@ export default async (twokeys: TwoKeys<"executor">, config: ThisExecutorConfig):
 
 	// 0: Create execution string 
 	const execString = `
-	; 2KEYS EXECUTOR AHK EXECUTION
-	${getPrelude(twokeys, config)}
-
 	; GRAB FILE
 	#Include ${join(twokeys.properties.projectDir, config.keyboard.root, config.hotkey.root)}
+	
+	; 2KEYS EXECUTOR AHK EXECUTION
+	${getPrelude(twokeys, config)}
 
 	; EXECUTE
 	${config.hotkey.func}()

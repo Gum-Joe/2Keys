@@ -1,1 +1,3 @@
-describe.skip("Native Utils Tests", () => {});
+describe.skip("Native Utils Tests", () => {
+	return;
+});

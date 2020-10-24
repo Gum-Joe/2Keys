@@ -25,41 +25,74 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { writeFile } from "fs";
-import api from "./routes/api";
-import Logger from "./util/logger";
-import { DEFAULT_PORT } from "./util/constants";
+import { DEFAULT_LOCAL_2KEYS, DEFAULT_PORT, WINDOWS_SERVER_PID_FILE } from "./util/constants";
 import { Arguments } from "yargs";
+import { loadProjectConfig } from "@twokeys/core/lib/config";
+import { join } from "path";
+import getAPI from "./routes/api";
+import { ProjectConfig } from "@twokeys/core/lib/interfaces";
+import helmet from "helmet";
+import mkdirp from "mkdirp";
+import startupScripts from "./util/startup";
+import { Logger } from "@twokeys/core";
 
 const app = express();
 const logger: Logger = new Logger({
 	name: "server",
 });
 
-app.use(bodyParser.json());
-app.use("/api", api);
+interface ServerArgs {
+	"pid-file"?: string;
+}
 
-const server = (port: number = DEFAULT_PORT, argv: Arguments) => {
+const server = async (port: number = DEFAULT_PORT, argv: ServerArgs, projectDir: string, projectConfig: ProjectConfig): Promise<ReturnType<typeof express>> => {
+
+	// Default start scripts
+	await startupScripts();
+
+	app.use(bodyParser.json());
+	app.use(helmet());
+	app.use("/api", await getAPI(projectConfig, projectDir));
+
+	// Error handler
+	app.use((err, req, res, next) => {
+		logger.err(`An error was encountered on router ${req.originalUrl}`);
+		logger.printError(err);
+		next(err);
+	});
+
 	app.listen(port, () => {
 		logger.info("Server now listenning on port " + port);
 		logger.debug("PID: " + process.pid);
 	});
 
+	// FIXME: Currently ignored argv and just uses projectDir.
 	if (Object.prototype.hasOwnProperty.call(argv, "pid-file") && typeof argv["pid-file"] === "string" && argv["pid-file"]) {
-		logger.debug(`Writing pid file to ${argv["pid-file"]}...`);
-		writeFile(argv["pid-file"], process.pid.toString(), (err) => {
-			if (err) { logger.throw(err); }
+		logger.debug(`Writing pid file to ${join(projectDir, DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE)}...`);
+		mkdirp(join(projectDir, DEFAULT_LOCAL_2KEYS));
+		writeFile(join(projectDir, DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE), process.pid.toString(), (err) => {
+			if (err) { logger.printError(err); }
 			logger.info("PID file Written.");
 		});
 	}
 
+	return app;
+
 };
 
-// Error handler
-app.use((err, req, res, next) => {
-	logger.err(`An error was encountered on router ${req.originalUrl}`);
-	logger.throw_noexit(err);
-	next(err);
-});
+/**
+ * Eventually default starter for server
+ * @param projectDir Absoluter path to project
+ */
+export async function starter(projectDir: string): Promise<void> {
+	logger.info("Starting 2Keys....");
+	logger.info("Loading project...");
+	// TODO: Version checks to check config version matches this version of 2Keys
+	const projectConfig = await loadProjectConfig(projectDir);
+	await server(projectConfig.server.port, {
+		"pid-file": join(projectDir, DEFAULT_LOCAL_2KEYS, WINDOWS_SERVER_PID_FILE)
+	} as Arguments<ServerArgs>, projectDir, projectConfig);
+}
 
 export default server;
 export { app };

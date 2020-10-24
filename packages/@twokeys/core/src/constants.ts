@@ -35,6 +35,7 @@ export const TWOKEYS_MAIN_CONFIG_DEFAULT_PATH = join(TWOKEYS_CONFIG_HOME,  "conf
 /** root dir for the storage of client stuff */
 export const TWOKEYS_CLIENTS_ROOT = join(TWOKEYS_HOME, "clients");
 /** root dir for client config */
+// TODO: Allow TWOKEYS_CLIENTS_CONFIG_ROOT to be customised by config
 export const TWOKEYS_CLIENTS_CONFIG_ROOT = join(TWOKEYS_CLIENTS_ROOT, "config");
 /**
  * Where files related to clients are stored

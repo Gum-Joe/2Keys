@@ -22,6 +22,7 @@
  * Requires config to be given
  * @packageDocumentation
  */
+// TODO: Config validation of everything
 import { promises as fs } from "fs";
 import YAML from "yaml";
 import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs, AddConfigUtils, MakeKeysOptional, ConfigUtils } from "./interfaces";
@@ -80,6 +81,23 @@ export async function loadProjectConfig(projectPath: string): ConfigLoaderReturn
 }
 
 /**
+ * Loads a detector (project-local) config
+ * @param projectPath absolute path to project to load
+ */
+export async function loadDetectorConfig(file: string): ConfigLoaderReturn<DetectorConfig> {
+	logger.debug(`Loading detector config from file ${file}...`);
+	try {
+		return await loadConfig<DetectorConfig>(file);
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			throw new CodedError("Attempted to load a project config in a directory that was not a project", "INVALID_PROJECT");
+		} else {
+			throw err;
+		}
+	}
+}
+
+/**
  * Loads a client config based on a file name
  * @param file ABsolute path to detector config
  */
@@ -128,5 +146,12 @@ export function stringifyProjectConfig(config: ProjectConfig): string {
  * Stringifies to YAML client config
  */
 export function stringifyClientConfig(config: ClientConfig): string {
+	return YAML.stringify(config);
+}
+
+/**
+ * Stringifies to YAML detector config
+ */
+export function stringifyDetectorConfig(config: DetectorConfig): string {
 	return YAML.stringify(config);
 }

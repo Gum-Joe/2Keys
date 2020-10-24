@@ -19,7 +19,7 @@
   },
   "twokeys": {
     "types": [
-      "executor"
+      "detector"
     ],
     "entry": {
       "detector": "lib/index.js"

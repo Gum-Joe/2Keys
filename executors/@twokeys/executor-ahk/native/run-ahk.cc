@@ -64,6 +64,7 @@ namespace twokeys {
     typedef BOOL (*pahkExec)(LPCWSTR script); // Co
     typedef UINT (*pahkdll)(LPTSTR script, LPTSTR p1, LPTSTR p2);
     typedef void(*pahkTerminate)(int timeout);
+    typedef void (*pahktextdll)(LPCWSTR text, LPCWSTR params, LPCWSTR title);
 
     // Load
     // HINSTANCE handle =
@@ -83,25 +84,30 @@ namespace twokeys {
       pahkReady ahkReady = (pahkReady)GetProcAddress(handle, "ahkReady");
       pahkExec ahkExec = (pahkExec)GetProcAddress(handle, "ahkExec");
       pahkTerminate ahkTerminate = (pahkTerminate)GetProcAddress(handle, "ahkTerminate");
-      // free memory
-      ahkdll(L"", L"", L"");
+      pahktextdll ahktextdll =
+        (pahktextdll)GetProcAddress(handle, "ahktextdll");
+      // start a persistent bg script
+      //ahkdll(L"", L"", L"");
 
       // debug
-      while (!ahkReady()) Sleep(10);
+      while (ahkReady()) Sleep(10);
 
+      ahktextdll(text, L"", L"2Keys");
 
-      BOOL execStatus = ahkExec(text);
+      while (ahkReady()) Sleep(10);
 
-      if (!execStatus) {
+      //BOOL execStatus = ahkExec(text/*, "", "2Keys"*/);
+
+      /*if (!execStatus) {
         // ERROR!
         error_handler->message = "Unknown error executing script!";
         error_handler->is_error = true;
         error_handler->code = 1;
         return;
-      }
+      }*/
 
       // Done, end execution
-      ahkTerminate(0);
+      //ahkTerminate(0);
 
       // Chdir back
       _chdir(cwd.c_str());

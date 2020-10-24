@@ -27,3 +27,5 @@ export * from "./error";
 export * from "./task-functions";
 export * from "./twokeys";
 export * from "./util";
+export { default as getClientConfigPath } from "./getClientConfigPath";
+export { default as getClientRootFromConfig } from "./getClientRootFromConfig";

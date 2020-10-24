@@ -1,0 +1,8 @@
+# COnfig for a device
+# Stored with AppData/2Keys.yml
+# For the pi
+id: "00000" # Id of device, used in project config to say "use this"
+name: Detector-VM # Name
+controller: "@twokeys/detector-desktop" # Controller add-on to use
+controllerConfig: {} # Schema specified by controller, i.e. config for controller and device
+  # TO DO

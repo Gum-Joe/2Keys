@@ -1,0 +1,15 @@
+# Root 2Keys config
+# Contains data about project
+name: Example
+id: 123456 # UUID
+version: 1.0.0 # 2Keys version
+sync: false
+
+server:
+  port: 8080
+  perms:
+    start-startup: false
+
+detectors:
+  - ./detector-test.yml
+  - ./detector-reloaded.yml

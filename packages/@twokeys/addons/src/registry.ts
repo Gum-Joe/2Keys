@@ -28,7 +28,7 @@ import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
 import { promises as fs, constants as fsconstants } from "fs";
 import { join } from "path";
-import { Logger, TwoKeysProperties, CodedError } from "@twokeys/core";
+import { Logger, CodedError } from "@twokeys/core";
 import { DEFAULT_REGISTRY_ROOT_PACKAGE_JSON, REGISTRY_FILE_NAME, CREATE_REGISTRY_DB_QUERY, REGISTRY_TABLE_NAME, REGISTRY_MODULE_FOLDER } from "./util/constants";
 import { Package, PackageInDB, TWOKEYS_ADDON_TYPES_ARRAY, TwokeysPackageInfo, ValidatorReturn, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_EXECUTOR, TWOKEYS_ADDON_TYPE_DETECTOR, TWOKEYS_ADDON_TYPE_SINGLE } from "./util/interfaces";
 import { AddOnModulesCollection, TaskFunction, BaseAddon } from "./module-interfaces";
@@ -58,6 +58,8 @@ interface ManagerOptions {
 	force?: boolean;
 	/** Semver version to install */
 	version?: string;
+	/** HACK: Allow using linked packages.  Please remove in final version */
+	useLink?: boolean;
 }
 
 /**
@@ -82,7 +84,7 @@ type GetPackageReturn = ValidatorReturn & { results?: Package[] };
  * @param package Package object of add-on that is loaded
  * @param call Function to run an add-ons task function
  */
-type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] & BaseAddon<AddOnsType> & {
+export type LoadedAddOn<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)> = AddOnModulesCollection[AddOnsType] & BaseAddon<AddOnsType> & {
 	/** Package object of add-on that is loaded */
 	package: Package;
 	/**
@@ -210,8 +212,12 @@ export default class AddOnsRegistry {
 			}
 		} catch (err) {
 			this.logger.err("Error loading add-on!");
+			this.logger.err(`Full error message: ${err.message}`);
 			if (err?.code === "MODULE_NOT_FOUND") {
-				throw new CodedError(`Entry point for type ${typeOfAddOn} from add-on ${packageToLoad.name} not found!`, errorCodes.ADDON_LOAD_FAILURE + ":NOT_FOUND");
+				throw new CodedError(
+					`Entry point for type ${typeOfAddOn} from add-on ${packageToLoad.name} not found!`,
+					errorCodes.ADDON_LOAD_FAILURE + ":NOT_FOUND"
+				);
 			} else {
 				throw new CodedError(`Error loading entry point for for type ${typeOfAddOn} from add-on ${packageToLoad.name}: ${err.message}`, `${errorCodes.ADDON_LOAD_FAILURE}${err.code ? ":" + err.code : ""}`);
 			}
@@ -269,8 +275,9 @@ export default class AddOnsRegistry {
 	 * @param typeOfAddOn Add-on type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only
 	 */
-	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType): Promise<{ [name: string]: LoadedAddOn<AddOnsType> }> {
+	public async loadAllOfType<AddOnsType extends (TWOKEYS_ADDON_TYPES & string)>(typeOfAddOn: AddOnsType, properties: TwoKeysPropertiesForAddons = {}): Promise<{ [name: string]: LoadedAddOn<AddOnsType> }> {
 		this.logger.info(`Loading all modules of type ${typeOfAddOn}...`);
+		await this.initDB();
 		if (typeOfAddOn === TWOKEYS_ADDON_TYPE_DETECTOR) {
 			throw new Error("Cant do a load all for detectors becasue client location is unknown");
 		}
@@ -282,13 +289,12 @@ export default class AddOnsRegistry {
 		});
 		this.logger.debug(JSON.stringify(addOnsList));
 		const loadedAddOns: { [name: string]: LoadedAddOn<AddOnsType> } = {};
-		const defaultProps: TwoKeysProperties = {};
 		const promiseLoaders = addOnsList.map(async addOn => loadedAddOns[addOn.name] = await this.loadPackage<AddOnsType>(
 			addOn,
 			typeOfAddOn,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 			// @ts-ignore
-			defaultProps
+			properties
 		));
 		await Promise.all(promiseLoaders);
 		return loadedAddOns;
@@ -305,7 +311,14 @@ export default class AddOnsRegistry {
 		this.logger.info("Installing new package...");
 		const packageString = options?.version ? packageName + "@" + options.version : packageName;
 		this.logger.info(`Package: ${packageString}`);
-		await this.runNpm(packageString, "install", options);
+		let npmCommand: keyof typeof npm["commands"] = "install";
+		// HACK: Allow the use of locally installed npm link modules in a registry. Remove this for final release as it is a hack
+		/* istanbul ignore next */
+		if (options?.useLink) {
+			this.logger.debug("Using link command.");
+			npmCommand = "link";
+		}
+		await this.runNpm(packageString, npmCommand, options);
 		this.logger.info("Adding package to registry...");
 		// If local, get Name and use that
 		let truePackageName = packageName; // packageName can be a string, hence this
@@ -375,7 +388,7 @@ export default class AddOnsRegistry {
 	 * @param command Command to run
 	 * @param options Options
 	 */
-	private runNpm(packageName: string, command: string, options?: ManagerOptions): Promise<void> {
+	private runNpm(packageName: string, command: keyof typeof npm["commands"], options?: ManagerOptions): Promise<void> {
 		return new Promise((resolve, reject) => {
 			const npmLogger = new Logger({ // For npm to log with
 				name: "add-ons:registry:npm",
@@ -522,7 +535,7 @@ export default class AddOnsRegistry {
 		this.logger.debug(`Package location: ${packageLocation}`);
 		this.logger.debug("Checking if package already in registry...");
 		const state = await this.getPackagesFromDB(name);
-		if (!state.status) {
+		if (!state?.status) {
 			this.logger.err("There was an error retrieving package of name ${name}.");
 			this.logger.err(state?.message || "NO MESSAGE FOUND");
 			return state;
@@ -588,6 +601,7 @@ export default class AddOnsRegistry {
 				"@entry": documentConverted.entry,
 				"@packname": options?.update ? documentConverted.name : undefined,
 			});
+			await stmt.finalize();
 			this.logger.info(`Package ${name} added to registry.`);
 			return { status: true };
 		} catch (err) {
@@ -652,7 +666,7 @@ export default class AddOnsRegistry {
 			const newDocs: Package[] = [];
 			for (const doc of docs) {
 				const newDoc = this.parsePackageFromDB(doc);
-				if (!newDoc.status || !newDoc.entry || typeof newDoc.entry === "undefined") {
+				if (!newDoc.status || !newDoc.entry) {
 					this.logger.err(`An error was encountered converting document of name ${doc.name} to a Package!`);
 					return {
 						status: false,
@@ -776,7 +790,7 @@ export default class AddOnsRegistry {
 	 * @param packageJSON Parsed package.json to validate
 	 * @returns flag of if package was added (true) or not (false) and err message if not added
 	 */
-	public static validatePackageJSON(packageJSON: any, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
+	public static validatePackageJSON(packageJSON: Record<string, unknown> & { twokeys?: TwokeysPackageInfo }, LoggerConstructor: typeof Logger = Logger): ValidatorReturn {
 		const logger = new LoggerConstructor({
 			name: "add-ons:registry"
 		});
@@ -799,9 +813,9 @@ export default class AddOnsRegistry {
 			};
 		}
 		// Check if entry points present for each of twokeys.types
-		for (const addOnType of packageJSON.twokeys?.types) {
+		for (const addOnType of packageJSON.twokeys.types) {
 			if (TWOKEYS_ADDON_TYPES_ARRAY.includes(addOnType)) {
-				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys?.entry, addOnType) && typeof packageJSON.twokeys?.entry[addOnType] === "string")) {
+				if (!(Object.prototype.hasOwnProperty.call(packageJSON.twokeys.entry, addOnType) && typeof packageJSON.twokeys.entry[addOnType] === "string")) {
 					logger.err(`Entry point was not found for add-on type ${addOnType}`);
 					return {
 						status: false,

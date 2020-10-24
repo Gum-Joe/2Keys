@@ -11,7 +11,7 @@ const SOURCE_DIR_RELATIVE = "src";
 const SOURCE_DIR = path.join(__dirname, SOURCE_DIR_RELATIVE);
 const SOURCE_GLOB = "**/*.proto";
 
-export async function protoc() {
+export async function protoc(): Promise<void> {
 	return gulp.src(path.join(SOURCE_DIR, SOURCE_GLOB))
 		.pipe(exec(file => {
 			const command = `

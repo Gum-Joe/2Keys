@@ -5,6 +5,16 @@ For a full setup guide, see [here](https://github.com/Gum-Joe/2Keys/blob/master/
 
 For keyboard mappings, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md)
 
+Proposed setup flow:
+```bash
+2Keys provision -f client.yml
+2Keys global kdb search --json # Search for keyboard
+2Keys global kbd link uuid /dev/input/etc # Link a passed through KDB to a /dev/input/by-id descriptor
+2Keys global kdb link uuid --by-detection # Watch all keyboards and then link whichever a key is pressed on
+2Keys add project -f config.yml --dir /vagrant/projects/project-1 --uuid 0000 --no-detect
+2Keys init --project-uuid 0000 # Create dirs, and start kdb detection
+```
+
 ### Support
 Windows is supported only as the server (where the hotkeys will run) and a raspberry pi is required to run the detector.
 

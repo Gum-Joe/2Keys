@@ -22,7 +22,7 @@
  * @packageDocumentation
  */
 
-import type { Keyboard, DetectorConfig, ClientConfig, AddConfigUtils } from "@twokeys/core/lib/interfaces";
+import type { Keyboard, DetectorConfig, ClientConfig, AddConfigUtils, ProjectConfig } from "@twokeys/core/lib/interfaces";
 import { TWOKEYS_ADDON_TYPE_DETECTOR } from "../util/interfaces";
 import { ConfigDescriptors, StepsExplainer, TaskFunction, BaseAddon, PromisedTaskFunction } from "./common";
 
@@ -110,5 +110,11 @@ export interface DetectorController extends BaseAddon<"detector"> {
 		log: string;
 		/** Time of log */
 		time: Date;
+	}>;
+	/** Optional function to run on startup of a server that uses a detector of a client of this cotroller */
+	startup?: DetectorPromisedTaskFunction<{
+		clientConfig: ClientConfig;
+		detectorConfig: DetectorConfig;
+		projectConfig: ProjectConfig;
 	}>;
 }

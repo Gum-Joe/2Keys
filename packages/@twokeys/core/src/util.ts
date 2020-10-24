@@ -41,4 +41,4 @@ export type Constructor<T> = { new(...args: any[]): T }; // From https://www.sim
  * Gets the constructor of T, where T is an abstract class
  * @template T Type to get constructor for
  */
-export type AbstractConstructor<T> = Function & { prototype: T } // From https://stackoverflow.com/questions/36886082/abstract-constructor-type-in-typescript
+export type AbstractConstructor<T> = { new(): unknown } & { prototype: T } // From https://stackoverflow.com/questions/36886082/abstract-constructor-type-in-typescript

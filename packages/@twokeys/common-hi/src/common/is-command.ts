@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { Command, StatefulCommandConstructor, CommandInfo } from "./base-commands";
+import { CommandInfo } from "./base-commands";
 
 /**
  * Makes sure commandInfo exists and is correct

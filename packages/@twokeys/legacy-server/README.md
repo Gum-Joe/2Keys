@@ -2,6 +2,7 @@
 
 Pre-v1 server, used before all the additions for 2Keys-UI.
 Originally the only package, with CLI and server included in one (and it was the root of the repo!).
+NOTE: Have added ":server" to end of test scripts to prevent CI running them.
 
 DEPREACTED, please do not use.
 

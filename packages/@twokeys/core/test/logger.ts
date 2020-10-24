@@ -18,6 +18,7 @@
  * along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
  */
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /**
  * Tests for the logger
  */

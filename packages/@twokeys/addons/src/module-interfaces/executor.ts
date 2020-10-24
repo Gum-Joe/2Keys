@@ -95,7 +95,7 @@ export type ExecutorTaskFunction<ConfigT, ReturnG = void> = PromisedTaskFunction
  * Defines the exports for an executor
  * @template THotkeyConfig Definition of the configuration of a hotkey in config files
  */
-export interface Executor<THotkeyConfig = { [key: string]: string }> extends BaseAddon<TWOKEYS_ADDON_TYPE_EXECUTOR> {
+export interface Executor<THotkeyConfig = { [key: string]: any }> extends BaseAddon<TWOKEYS_ADDON_TYPE_EXECUTOR> {
 	/** Executes a hotkey */
 	execute: ExecutorTaskFunction<ExecutorExecConfig<THotkeyConfig>>;
 	/** Options to present to user when defining a new hotkey (e.g. the function to execute) */

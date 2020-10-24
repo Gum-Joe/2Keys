@@ -11,9 +11,10 @@
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint --ext .ts .",
-    "test": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
-    "coverage": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
-    "coverage:log": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
+    "test:server": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
+    "coverage": "echo Please use coverage:server instead. This is to prevent tests running in CI.",
+    "coverage:server": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
+    "coverage:log:server": "cross-env NODE_ENV=test nyc mocha test/**/*.ts",
     "docs": "typedoc --ignoreCompilerErrors"
   },
   "bin": {

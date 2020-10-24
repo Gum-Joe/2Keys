@@ -158,7 +158,7 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 					this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
 					this.logger.err("Please file an issue with them.");
 					throw new Error("Error! Attempted to install a piece of software with a name already used!");
-				} else if (err.message.includes(EXECUTABLES_TABLE_NAME) + ".") {
+				} else if (err.message.includes(EXECUTABLES_TABLE_NAME + ".")) {
 					this.logger.err("Error! Attempted to register an executable with a name already used!");
 					this.logger.err(`This is a problem with the add-on ${this.package.name}.`);
 					this.logger.err("Please file an issue with them.");
@@ -289,12 +289,12 @@ export default class SoftwareRegistry<PackageType extends TWOKEYS_ADDON_TYPES> e
 	 */
 	protected async updateSoftwareRecord<SoftwareType extends Software = SoftwareInDB>
 	(name: string, newData: Partial<SoftwareType> & {
-			executables?: SoftwareType extends SoftwareInDB ?
+		executables?: SoftwareType extends SoftwareInDB ?
 			Array<Partial<ExecutableInDB> & { name: string }> : Array<Partial<Executable> & { name: string }>; // Name is required
 	}): Promise<void> {
 		this.logger.debug(`Updating software record of ${name}...`);
 		// Checks if the property is in newData
-		const objectHasProperty = (obj: object, field: string): boolean => {
+		const objectHasProperty = (obj: Record<string, unknown>, field: string): boolean => {
 			return Object.prototype.hasOwnProperty.call(obj, field) && typeof obj[field] !== "undefined";
 		};
 		const newDataHasProperty = (field: string): boolean => {

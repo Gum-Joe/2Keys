@@ -29,7 +29,7 @@ import { CodedError } from "@twokeys/core";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
 import { MainConfig } from "@twokeys/core/lib/interfaces";
 import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
-import { Command, BaseTwoKeysForCommands, CommandFactory, PromiseCommand } from "../../common";
+import { CommandFactory, PromiseCommand } from "../../common";
 import type { OOBEConfig } from "../protobuf/oobe_pb";
 import * as errorCodes from "../util/errors";
 import packageJSON from "../../../package.json";

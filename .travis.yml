@@ -14,14 +14,16 @@ cache:
 # Default is fine here
 before_install:
   # Convert lock file & install protoc
-  - choco install yarn protoc
+  - choco install protoc
 install:
-  - "\"/c/Program Files (x86)/Yarn/bin/yarn\" --frozen-lockfile"
+  - yarn --frozen-lockfile
 before_script:
   - yarn wsrun -mtc precompile # precompile e.g. protobufs
   - yarn build -v
-  - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
+  - yarn workspace @twokeys/server run ts-node -T ./scripts/ci-boostrap.ts
+  # - yarn workspace @twokeys/server run ts-node -T ./scripts/bootstrap-spike.ts
+  # - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
 # NB: server tests ran separately as they assume the CWD is the server package
 script:
   - yarn workspaces run coverage
-  # - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
