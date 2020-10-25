@@ -29,7 +29,7 @@ export default class TwoKeysUtilites<AddOnsType extends TWOKEYS_ADDON_TYPES = TW
 	public getSymbolLinkPath(source: string): string {
 		// Prevent OS error when testing on macOS (some tests have to run on macOS because GitHub Actions only allows Virtualbox on macOS)
 		if (platform() === "win32") {
-			const native = require("@twokeys/native-utils");
+			const native = require("@twokeys/native-utils").default;
 			return join(native.get_startup_folder(), `2Keys-add-on-${this.package.name}-${path.basename(source)}`);
 		} else {
 			throw new Error("This method is not supported on your OS platform!");
