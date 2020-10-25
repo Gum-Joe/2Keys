@@ -272,6 +272,8 @@ export default class AddOnsRegistry {
 
 	/**
 	 * Loads all add-ons of a given type
+	 * 
+	 * NOTE: Is currently unable to load detectors as a client location is required. (see {@link DetectorTwoKeysProperties})
 	 * @param typeOfAddOn Add-on type to load
 	 * @template AddOnsTypes Type of add-on to load; see {@link TWOKEYS_ADDON_TYPES}. Single one only
 	 */
@@ -279,7 +281,7 @@ export default class AddOnsRegistry {
 		this.logger.info(`Loading all modules of type ${typeOfAddOn}...`);
 		await this.initDB();
 		if (typeOfAddOn === TWOKEYS_ADDON_TYPE_DETECTOR) {
-			throw new Error("Cant do a load all for detectors becasue client location is unknown");
+			throw new Error("Can't do a load all for detectors becasue client location is unknown, and this is required for detectors");
 		}
 		this.logger.debug("Querying...");
 		const addOnsList: Package[] = (await this.registry.all(`SELECT * FROM ${REGISTRY_TABLE_NAME} WHERE types LIKE ?`, `%${typeOfAddOn}%`)).map(value => {

@@ -384,7 +384,7 @@ describe("Registry tests", () => {
 				await registry.uninstall(pkgJSON.name);
 			});
 
-			it("should successfully load all add-ons of a given type", async () => {
+			it("should successfully load all add-ons of a given type when this type is a detector", async () => {
 				// Install stuff
 				await registry.install(join(__dirname, "non-mocha", "loadTest"), { local: true });
 				await registry.install(join(__dirname, "non-mocha", "loadTest2"), { local: true });
@@ -408,6 +408,10 @@ describe("Registry tests", () => {
 				expect(testOBJ.testValue2).to.be.true;
 
 			}).timeout(50000);
+
+			it("should fail to load all detector (loadAllOfType())", async () => {
+				await expect(registry.loadAllOfType("detector")).to.be.rejectedWith("Can't do a load all for detectors");
+			});
 
 			it("createLoaderForAddonType(): should return a loader for a specific add-on type only", async () => {
 				// Install stuff

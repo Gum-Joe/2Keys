@@ -19,6 +19,8 @@
  */
 /**
  * Contains the interfaces that define the exports of a detector controller
+ * 
+ * @see DetectorTwoKeysProperties (in `twokeys.ts`) for properties field for the twokeys object for detectors.
  * @packageDocumentation
  */
 
