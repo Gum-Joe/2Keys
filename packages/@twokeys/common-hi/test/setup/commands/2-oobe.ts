@@ -13,10 +13,11 @@ import { loadMainConfig, stringifyMainConfig } from "@twokeys/core/lib/config";
 import { CodedError } from "@twokeys/core";
 import { promises as fs } from "fs";
 import { promisify } from "util";
+import { MOCK_TWOKEYS_HOME_ROOT } from "../../test-util/constants";
 
 const rimraf = promisify(rimrafCB);
 
-const MOCK_TWOKEYS_HOME_ROOT = join(__dirname, "../../non-mocha/2Keys-Home");
+
 const TEST_OOBE_CONFIG = {
 	pcName: "test-server-1",
 	didAcceptLicense: true,

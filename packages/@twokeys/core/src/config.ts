@@ -99,7 +99,7 @@ export async function loadDetectorConfig(file: string): ConfigLoaderReturn<Detec
 
 /**
  * Loads a client config based on a file name
- * @param file ABsolute path to detector config
+ * @param file Absolute path to detector config
  */
 export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<AddConfigUtils<ClientConfig>> {
 	logger.debug(`Loading client config from file ${file}...`);

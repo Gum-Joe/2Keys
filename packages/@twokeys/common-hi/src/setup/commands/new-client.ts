@@ -79,6 +79,7 @@ export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys,
 
 	logger.substatus("Handing over to controller add-on for setup");
 	await controller.call(controller.setup.setupNewClient.setup, await loadClientConfig(getClientConfigPath(TWOKEYS_CLIENTS_CONFIG_ROOT, fullConfig.id)));
+
 };
 
 export default CommandFactory.wrapCommand(newDetector, "newClient");
