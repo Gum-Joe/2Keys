@@ -7,7 +7,7 @@ import commands from "../../../src/commandsList";
 import { AddOnsRegistry, createMockTwoKeys, DetectorController, LoadedAddOn, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
 import * as addons from "@twokeys/addons/src";
 import sinon from "sinon";
-import { basename, join } from "path";
+import { basename, join, relative } from "path";
 import * as constants from "@twokeys/core/lib/constants";
 import { MOCK_TWOKEYS_HOME_ROOT } from "../../test-util/constants";
 import mkdirp from "mkdirp";
@@ -65,6 +65,8 @@ describe("New Client Creation Tests", () => {
 		sinon.replace(constants, "TWOKEYS_HOME", join(MOCK_TWOKEYS_HOME_ROOT));
 		sinon.replace(constants, "TWOKEYS_CLIENTS_ROOT", join(MOCK_TWOKEYS_HOME_ROOT, basename(constants.TWOKEYS_CLIENTS_ROOT)));
 		sinon.replace(constants, "TWOKEYS_CLIENTS_CONFIG_ROOT", join(constants.TWOKEYS_CLIENTS_ROOT, basename(constants.TWOKEYS_CLIENTS_CONFIG_ROOT)));
+		sinon.replace(constants, "TWOKEYS_CONFIG_HOME", join(MOCK_TWOKEYS_HOME_ROOT, basename(constants.TWOKEYS_CONFIG_HOME)));
+		sinon.replace(constants, "TWOKEYS_MAIN_CONFIG_DEFAULT_PATH", join(MOCK_TWOKEYS_HOME_ROOT, relative(constants.TWOKEYS_HOME, constants.TWOKEYS_MAIN_CONFIG_DEFAULT_PATH)));
 		await mkdirp(join(MOCK_TWOKEYS_HOME_ROOT, basename(constants.TWOKEYS_CLIENTS_ROOT), basename(constants.TWOKEYS_CLIENTS_CONFIG_ROOT)));
 		await rimraf(join(MOCK_TWOKEYS_HOME_ROOT, basename(constants.TWOKEYS_CLIENTS_ROOT), basename(constants.TWOKEYS_CLIENTS_CONFIG_ROOT)));
 		await mkdirp(join(MOCK_TWOKEYS_HOME_ROOT, basename(constants.TWOKEYS_CLIENTS_ROOT), basename(constants.TWOKEYS_CLIENTS_CONFIG_ROOT)));
