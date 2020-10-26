@@ -62,7 +62,7 @@ describe("New Client Creation Tests", () => {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 		// @ts-ignore
 		sinon.replaceGetter(addons, "AddOnsRegistry", () => MockRegistry);
-		sinon.replace(constants, "TWOKEYS_HOME", join(MOCK_TWOKEYS_HOME_ROOT));
+		// sinon.replace(constants, "TWOKEYS_HOME", join(MOCK_TWOKEYS_HOME_ROOT));
 		sinon.replace(constants, "TWOKEYS_CLIENTS_ROOT", join(MOCK_TWOKEYS_HOME_ROOT, basename(constants.TWOKEYS_CLIENTS_ROOT)));
 		sinon.replace(constants, "TWOKEYS_CLIENTS_CONFIG_ROOT", join(constants.TWOKEYS_CLIENTS_ROOT, basename(constants.TWOKEYS_CLIENTS_CONFIG_ROOT)));
 		sinon.replace(constants, "TWOKEYS_CONFIG_HOME", join(MOCK_TWOKEYS_HOME_ROOT, basename(constants.TWOKEYS_CONFIG_HOME)));
