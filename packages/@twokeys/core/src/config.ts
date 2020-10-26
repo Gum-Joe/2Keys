@@ -75,6 +75,7 @@ export async function loadProjectConfig(projectPath: string): ConfigLoaderReturn
 		if (err.code === "ENOENT") {
 			throw new CodedError("Attempted to load a project config in a directory that was not a project", "INVALID_PROJECT");
 		} else {
+			// Untestable code
 			throw err;
 		}
 	}
@@ -82,26 +83,18 @@ export async function loadProjectConfig(projectPath: string): ConfigLoaderReturn
 
 /**
  * Loads a detector (project-local) config
- * @param projectPath absolute path to project to load
+ * @param file absolute path to detector to load
  */
 export async function loadDetectorConfig(file: string): ConfigLoaderReturn<DetectorConfig> {
 	logger.debug(`Loading detector config from file ${file}...`);
-	try {
-		return await loadConfig<DetectorConfig>(file);
-	} catch (err) {
-		if (err.code === "ENOENT") {
-			throw new CodedError("Attempted to load a project config in a directory that was not a project", "INVALID_PROJECT");
-		} else {
-			throw err;
-		}
-	}
+	return await loadConfig<DetectorConfig>(file);
 }
 
 /**
  * Loads a client config based on a file name
  * @param file Absolute path to detector config
  */
-export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH): Promise<AddConfigUtils<ClientConfig>> {
+export async function loadClientConfig(file): Promise<AddConfigUtils<ClientConfig>> {
 	logger.debug(`Loading client config from file ${file}...`);
 	const config = await loadConfig<ClientConfig & Partial<ConfigUtils>>(file);
 	// Add methods
@@ -128,30 +121,26 @@ export async function loadClientConfig(file = TWOKEYS_MAIN_CONFIG_DEFAULT_PATH):
 	return config as AddConfigUtils<ClientConfig>;
 }
 
+export function getAStringifyer<ConfigType>(): (config: ConfigType) => string {
+	return (config: ConfigType): string => YAML.stringify(config);
+}
+
 /**
  * Stringifies to YAML the main config
  */
-export function stringifyMainConfig(config: MainConfig): string {
-	return YAML.stringify(config);
-}
+export const stringifyMainConfig = getAStringifyer<MainConfig>();
 
 /**
  * Stringifies to YAML project config
  */
-export function stringifyProjectConfig(config: ProjectConfig): string {
-	return YAML.stringify(config);
-}
+export const stringifyProjectConfig = getAStringifyer<ProjectConfig>();
 
 /**
  * Stringifies to YAML client config
  */
-export function stringifyClientConfig(config: ClientConfig): string {
-	return YAML.stringify(config);
-}
+export const stringifyClientConfig = getAStringifyer<ClientConfig>();
 
 /**
  * Stringifies to YAML detector config
  */
-export function stringifyDetectorConfig(config: DetectorConfig): string {
-	return YAML.stringify(config);
-}
+export const stringifyDetectorConfig = getAStringifyer<DetectorConfig>();
