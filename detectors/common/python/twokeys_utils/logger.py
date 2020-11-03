@@ -1,7 +1,7 @@
 # Base logger for 2Keys
 
 """
-Copyright 2018 Kishan Sambhi
+Copyright 2020 Kishan Sambhi
 
 This file is part of 2Keys.
 
