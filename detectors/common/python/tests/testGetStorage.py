@@ -12,6 +12,5 @@ class TestGetStorage(unittest.TestCase):
 			join(TEST_PROJECT, f"detectors{os.path.sep}device-" + TEST_UUID)
 		)
 
-
 if __name__ == '__main__':
     unittest.main()
