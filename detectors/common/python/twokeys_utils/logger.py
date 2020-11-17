@@ -22,26 +22,53 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 import colorful
 import sys
 import os
+import json
 # string name: Name of module logging
 class Logger:
+  """Logger class. Used for printing messages.
+  
+  The following properties can be set on a created logger object:
+  - Logger.silent: silences the logger and stops any output for printing (use --silent on CLI)
+  - Logger.isDebug: print debug output (use --debug on CLI)
+  - Logger.name: Prefix before all logging messages
+  - Logger.json: Print in JSON mode (use --json on CLI)
+  """
+
   def __init__(self, name):
+    # Define props
     self.silent = False
     self.isDebug = False
     self.name = name
+    self.useJSON = False
     if "--debug" in sys.argv or os.getenv("DEBUG", "false").lower() == "true":
       self.isDebug = True
     if "--silent" in sys.argv or os.getenv("2KEYS_TEST", "False").lower() == "true":
       self.silent = True
+    if "--json" in sys.argv or os.getenv("2KEYS_JSON", "False").lower() == "true":
+      self.useJSON = True
+  def __log(self, level: str, levelColour: str, text):
+    """
+    Logs a string to console
+    Parms:
+    - levelWithColour: Coloured string to print as the level
+    - text: Text to print
+    """
+    if not self.silent:
+      if not self.useJSON:
+        print(colorful.magenta(self.name) + " " + getattr(colorful, levelColour)(level) + " " + str(text))
+      else:
+        print(json.dumps({
+          "prefix": self.name,
+          "level": level,
+          "message": text,
+        }))
   def info(self, text):
-    if not self.silent:
-      print(colorful.magenta(self.name) + " " + colorful.green("info") + " " + str(text))
+    self.__log("info", "green", text)
   def debug(self, text):
-    if not self.silent and self.isDebug:
-      print(colorful.magenta(self.name) + " " + colorful.cyan("debug") + " " + str(text))
+    if self.isDebug:
+      self.__log("debug", "cyan", text)
   def err(self, text):
-    if not self.silent:
-      print(colorful.magenta(self.name) + " " + colorful.red("err") + " " + str(text))
+    self.__log("err", "red", text)
   def warn(self, text):
-    if not self.silent:
-      print(colorful.magenta(self.name) + " " + colorful.yellow("warn") + " " + str(text))
+    self.__log("warn", "yellow", text)
     
