@@ -2,6 +2,7 @@
 # https://python-packaging.readthedocs.io/en/latest/everything.html
 from setuptools import setup, find_packages
 
+from .twokeys.util.constants import VERSION
 
 def readme():
     with open("./README.md") as f:
@@ -17,7 +18,7 @@ def get_required():
     return packages
 
 setup(name="2Keys",
-      version="0.4.0",
+      version=VERSION,
       description="A easy to setup second keyboard, designed for everyone. ",
       long_description=readme(),
       url="https://github.com/Gum-Joe/2Keys",

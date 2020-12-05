@@ -21,6 +21,9 @@ import struct
 import os
 KEYBOARDS_PATH_BASE = "/dev/input/by-id"
 
+"""Version Number"""
+VERSION = "0.4.0"
+
 # Formatting for keyboard events
 #long int, long int, unsigned short, unsigned short, unsigned int
 KEYBOARD_EVENT_FORMAT = 'llHHI'

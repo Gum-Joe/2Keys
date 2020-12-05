@@ -101,3 +101,9 @@ def daemon_gen(keyboards):
     # Use args instead
     keyboard_list = keyboards
   generate_daemon(config["name"], config["keyboards"].keys())
+
+@cli.command("version")
+def getversion():
+  """Shows version info"""
+  print(constants.VERSION)
+
