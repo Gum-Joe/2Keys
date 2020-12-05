@@ -1,0 +1,58 @@
+{
+  "name": "twokeys",
+  "version": "1.0.0",
+  "description": "A easy to setup second keyboard, designed for everyone. ",
+  "repository": "https://github.com/Gum-Joe/2Keys",
+  "author": "Kishan <kishansambhi@hotmail.co.uk>",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b",
+    "watch": "tsc -b --watch",
+    "clean": "tsc -b --clean && yarn run build",
+    "lint": "eslint --ext .ts --ext .js .",
+    "compile:all": "yarn wsrun -tc compile",
+    "precompile:all": "yarn wsrun -mtc precompile",
+    "test:all": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true TWOKEYS_NONINTERACTIVE=true mocha && yarn workspace @twokeys/server test",
+    "coverage:all": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true TWOKEYS_NONINTERACTIVE=true nyc mocha && yarn workspace @twokeys/server coverage"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/@twokeys/*",
+      "detectors/*/controller",
+      "executors/@twokeys/*"
+    ],
+    "nohoist": [
+      "**/node-addon-api",
+      "**/node-addon-api/**",
+      "**/chalk",
+      "**/chalk/**",
+      "**/ts-protoc-gen",
+      "**/ts-protoc-gen/**"
+    ]
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/chai": "^4.2.11",
+    "@types/chai-as-promised": "^7.1.3",
+    "@types/mocha": "^8.0.3",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "codecov": "^3.6.5",
+    "cross-env": "^7.0.2",
+    "eslint": "^7.8.1",
+    "lerna": "3.22.1",
+    "mocha": "^8.1.3",
+    "mochawesome": "^6.1.1",
+    "node-gyp": "^7.1.0",
+    "nyc": "^15.1.0",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^9.0.0",
+    "typedoc": "^0.19.1",
+    "typescript": "^4.0.2",
+    "wsrun": "^5.2.1"
+  },
+  "dependencies": {
+    "chalk": "4.1.0"
+  }
+}

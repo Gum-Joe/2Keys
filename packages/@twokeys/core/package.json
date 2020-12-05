@@ -1,0 +1,30 @@
+{
+  "name": "@twokeys/core",
+  "version": "1.0.0",
+  "description": "The Core Modules that are used throughout 2Keys",
+  "main": "lib/index.js",
+  "repository": "https://github.com/Gum-Joe/2Keys",
+  "author": "Kishan <kishansambhi@hotmail.co.uk>",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch",
+    "lint": "eslint --ext .ts .",
+    "docs": "typedoc --includes src",
+    "test": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true mocha",
+    "test:log": "cross-env mocha",
+    "coverage": "cross-env NODE_ENV=test TWOKEYS_USE_COLOUR=true nyc mocha",
+    "coverage:log": "cross-env TWOKEYS_USE_COLOUR=true nyc mocha"
+  },
+  "devDependencies": {
+    "@types/mkdirp": "^1.0.1",
+    "@types/progress": "^2.0.3",
+    "mkdirp": "^1.0.4"
+  },
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "progress": "^2.0.3",
+    "yaml": "^1.9.2"
+  }
+}

@@ -1,0 +1,13 @@
+/** Config for creating a new detector, and adding it to a project */
+syntax = "proto3";
+
+message NewDetector {
+	/** UUID of detector */
+	string id = 1;
+	/** Name of detector */
+	string name = 2;
+	/** Controller to use with this detector */
+	string controller = 3;
+	/** JSON serialised config for detector controller */
+	string config = 4;
+}

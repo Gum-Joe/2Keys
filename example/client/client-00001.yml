@@ -1,0 +1,10 @@
+# COnfig for a device
+# Stored with AppData/2Keys.yml
+# For the pi
+id: 00000
+name: Detector-Interception
+controller: detector-interception
+controller-config:
+  none: true
+  perms:
+    start-startup: false

@@ -1,0 +1,17 @@
+{
+	"name": "optional-props",
+	"private": true,
+	"version": "1.0.0",
+	"description": "MEAP",
+	"author": "Kishan",
+	"entry": "app.js",
+	"twokeys": {
+		"types": ["detector", "notAType"],
+		"entry": {
+			"detector": "./app.js",
+			"notAType": "./n.js"
+		},
+		"iconURL": "./not-an-icon.svg",
+		"displayName": "THE TEST"
+	}
+}

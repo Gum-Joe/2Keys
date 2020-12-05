@@ -1,0 +1,5 @@
+node_modules
+lib
+docs
+**/*_pb.js
+**/*_pb.d.ts

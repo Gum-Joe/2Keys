@@ -1,0 +1,11 @@
+/**
+ * Protobuf for generating daemon files
+ */
+syntax = "proto2";
+
+message GenerateProjectDaemon {
+	required string project_location = 1;
+	/** Relative dir to where to put daemon files.  Defaults to .2Keys */
+	optional string relative_files_location_dir = 2;
+	required bool add_to_startup = 3;
+}

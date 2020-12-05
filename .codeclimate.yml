@@ -1,0 +1,13 @@
+plugins: 
+  eslint:
+    enabled: true
+    channel: "eslint-6"
+    extensions:
+      - .ts
+      - .js
+    config:
+      config: ./.eslintrc.yml
+  bandit:
+    enabled: true
+  fixme:
+    enabled: true

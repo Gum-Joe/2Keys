@@ -1,19 +1,29 @@
 language: node_js
 node_js:
-  - lts/*
-  - node
+  - 12
 
 os: windows
 
+# Fix build timeout. See https://travis-ci.community/t/build-timeout-but-actually-succeeded/2763
+env:
+  - YARN_GPG=no
+
+cache:
+  npm: true
+  yarn: true
 # Default is fine here
 before_install:
-  # Convery lock file
-  - cd server
-  - choco install yarn
+  # Convert lock file & install protoc
+  - choco install protoc
 install:
-  - "\"/c/Program Files (x86)/Yarn/bin/yarn\""
+  - yarn --frozen-lockfile
 before_script:
-  - npx ts-node ./scripts/bootstrap.ts
+  - yarn wsrun -mtc precompile # precompile e.g. protobufs
+  - yarn build -v
+  - yarn workspace @twokeys/server run ts-node -T ./scripts/ci-boostrap.ts
+  # - yarn workspace @twokeys/server run ts-node -T ./scripts/bootstrap-spike.ts
+  # - yarn workspace @twokeys/server run ts-node ./scripts/bootstrap.ts --debug
+# NB: server tests ran separately as they assume the CWD is the server package
 script:
-  - npm run coverage
-  - npx codecov
+  - yarn workspaces run coverage
+  - bash <(curl -s https://codecov.io/bash)

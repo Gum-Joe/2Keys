@@ -23,6 +23,7 @@
 		"mocha.coverage": {
 			"enable": false,
 		},
-		"rust-client.enableMultiProjectSetup": true
+		"rust-client.enableMultiProjectSetup": true,
+		"typescript.tsdk": "node_modules\\typescript\\lib"
 	},
 }

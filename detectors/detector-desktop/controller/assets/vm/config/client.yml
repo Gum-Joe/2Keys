@@ -1,0 +1,13 @@
+# Stored in /home/twokeys/.2Keys/client.yml
+
+# 2Keys detector-linux provision script
+twokeys:
+  version: 1.0.0
+  type: CLIENT_SETUP
+
+client:
+  name: Some name
+  id: some id
+  server:
+    ipv4: 10.0.2.2
+    port: 8080 

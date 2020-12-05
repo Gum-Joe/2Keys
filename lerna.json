@@ -1,0 +1,11 @@
+{
+  "lerna": "2.8.0",
+  "packages": [
+    "packages/*",
+    "detectors/*/controller",
+    "executors/*"
+  ],
+  "version": "1.0.0",
+  "npmClient": "yarn",
+  "useWorkspaces": true
+}

@@ -1,0 +1,19 @@
+{
+	"extends": "../../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./lib",
+		// Change "package" for actual package name
+		"tsBuildInfoFile": "../../../.build-cache/package.tsbuildinfo"
+	},
+	"include": [
+		"src"
+	],
+	"references": [
+		// Add deps here, so they are compiled
+		{
+			"path": "../core",
+			"prepend": false
+		}
+	]
+}

@@ -250,3 +250,15 @@ typings/
 
 # Serverless directories
 .serverless
+
+# Compiled Docs
+typedoc
+packages/**/*/docs
+
+# Build cache
+.build-cache
+
+# Test reports
+mochawesome-report
+
+

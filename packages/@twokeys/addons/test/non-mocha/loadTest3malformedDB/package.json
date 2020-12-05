@@ -1,0 +1,15 @@
+{
+	"name": "loading-test-3-malformed-db",
+	"private": true,
+	"version": "1.0.0",
+	"description": "MEAP",
+	"author": "Kishan",
+	"entry": "app.js",
+	"twokeys": {
+		"types": ["executor", "detector"],
+		"entry": {
+			"executor": "./executor.js",
+			"detector": "./detector.js"
+		}
+	}
+}

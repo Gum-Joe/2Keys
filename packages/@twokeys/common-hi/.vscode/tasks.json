@@ -1,0 +1,24 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "compile",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "npm: compile",
+			"detail": "yarn run compile:protobuf && tsc -b"
+		},
+		{
+			"type": "npm",
+			"script": "watch:protobuf",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: watch:protobuf",
+			"detail": "gulp protoc:watch"
+		}
+	]
+}

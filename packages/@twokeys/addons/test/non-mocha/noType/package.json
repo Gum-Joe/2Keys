@@ -1,0 +1,17 @@
+{
+	"name": "no-type",
+	"private": true,
+	"version": "1.0.0",
+	"description": "MEAP",
+	"author": "Kishan",
+	"entry": "app.js",
+	"twokeys": {
+		"types": [
+			"NOT_A_TYPE"
+		],
+		"entry": {
+			"executor": "./main.js"
+		},
+		"displayName": "NOT_E"
+	}
+}

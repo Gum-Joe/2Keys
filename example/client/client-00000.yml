@@ -1,0 +1,9 @@
+id: 0
+name: Detector-PI
+controller: detector-pi
+controller-config:
+  ipv4: 1.1.1.1
+  server-ipv4: 2.2.2.2
+  perms:
+    no-user: false
+    allow-ssh: false

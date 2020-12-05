@@ -1,0 +1,28 @@
+{
+	"extends": "../../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./lib",
+		"tsBuildInfoFile": "../../../.build-cache/common-hi.tsbuildinfo",
+		"experimentalDecorators": true,
+		// See src/types.d.ts
+		// LEAVE AS FALSE!!!!!
+		"resolveJsonModule": false,
+	},
+	"include": [
+		"src",
+	],
+	"exclude": [
+		"package.json",
+	],
+	"references": [
+		{
+			"path": "../core",
+			"prepend": false
+		},
+		{
+			"path": "../addons",
+			"prepend": false
+		}
+	]
+}

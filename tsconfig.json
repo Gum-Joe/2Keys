@@ -1,0 +1,27 @@
+{
+	"extends": "./tsconfig.base.json",
+	"files": [],
+	"references": [
+		{
+			"path": "./packages/@twokeys/core"
+		},
+		{
+			"path": "./packages/@twokeys/addons"
+		},
+		{
+			"path": "./packages/@twokeys/common-hi"
+		},
+		{
+			"path": "./packages/@twokeys/server"
+		},
+		{
+			"path": "./packages/@twokeys/native-utils"
+		},
+		{
+			"path": "./executors/@twokeys/executor-ahk"
+		},
+		{
+			"path": "./detectors/detector-desktop/controller"
+		}
+	]
+}

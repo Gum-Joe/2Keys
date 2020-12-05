@@ -1,0 +1,40 @@
+{
+  "name": "@twokeys/detector-desktop",
+  "version": "1.0.0",
+  "description": "NULL",
+  "main": "lib/index.js",
+  "repository": "https://github.com/Gum-Joe/2Keys",
+  "author": "Kishan <kishansambhi@hotmail.co.uk>",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "compile": "tsc -b",
+    "lint": "eslint --ext .ts .",
+    "watch": "tsc -b --watch",
+    "docs": "typedoc",
+    "test": "cross-env NODE_ENV=test mocha",
+    "test:isolated": "cross-env mocha test-isolated/**/*.ts --exclude test/**/*.ts --timeout 600000",
+    "coverage": "cross-env NODE_ENV=test nyc mocha",
+    "coverage:log": "cross-env nyc mocha",
+    "coverage:isolated": "cross-env nyc mocha test-isolated/**/*.ts --exclude test/**/*.ts --timeout 600000"
+  },
+  "twokeys": {
+    "types": [
+      "detector"
+    ],
+    "entry": {
+      "detector": "lib/index.js"
+    }
+  },
+  "dependencies": {
+    "@twokeys/addons": "^1.0.0",
+    "@twokeys/core": "^1.0.0",
+    "handlebars": "^4.7.6",
+    "rimraf": "^3.0.2",
+    "which": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/mock-fs": "^4.10.0",
+    "@types/which": "^1.3.2",
+    "mock-fs": "^4.13.0"
+  }
+}

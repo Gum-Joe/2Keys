@@ -1,0 +1,36 @@
+name: "@twokeys/common-hi: isolated tests"
+
+on: push
+
+jobs:
+  build:
+    runs-on: windows-latest
+    name: "@twokeys/common-hi: isolated tests"
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+    
+    env:
+     TWOKEYS_OOBE_NET_TEST_INTERFACE: vEthernet (nat)
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install protoc
+      run: choco install protoc
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    # - name: Setup native modules
+    #   run: yarn global add windows-build-tools
+    - name: Install packages
+      run: yarn
+    - name: Compile
+      run: |
+        yarn wsrun -mtc precompile
+        yarn build -v
+    - name: Run tests
+      run: yarn workspace @twokeys/common-hi coverage:isolated
+    - uses: codecov/codecov-action@v1
+

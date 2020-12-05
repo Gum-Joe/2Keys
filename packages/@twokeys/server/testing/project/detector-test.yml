@@ -1,0 +1,61 @@
+# Controls config for a given detector
+name: Test Detector
+client: # Idetifies the device this detector config is for
+  id: "00000" # See devices/device-00000.yml
+  name: Detector-VM # So the user knows what it is
+detector_config: # Schema specified by detector; this configures the detector
+  perms:
+    start-startup: false # Start detector on the client on startup
+    lock-kds: true # Lock keyboard
+    storage-path: /home/2Keys/project666666 # Place where config files are on client
+    cli-args: --debug # CLI args for detector
+
+keyboards: # Specifies keybaord and hotkeys
+  malformed_KD: 
+    hotkeys:
+      ^A: ""
+  keyboard_1:
+    root: ./Keyboard_1 # Root folder where macro file (e.g. .ahk files) are
+    executors:
+      "@twokeys/executor-ahk":
+        root: index.ahk
+        libs:
+          - add-ons/libs/twokeys-ahk-core-libs # Use library twokeys-ahk-core-libs from libs
+      default: "@twokeys/executor-ahk"  # Default executor
+    detector: # Custom detector config
+      path: /dev/input/by-id/xxxxx
+      map: # Custom scan code map
+        (G1): 103 
+    hotkeys:
+      ^A: # Ultmately the keycodes is up to the detector to decide
+        executor: "@twokeys/executor-ahk" # If default, don't need to give this
+        func: CallFunc
+      ^T: # Ultmately the keycodes is up to the detector to decide
+        executor: "@twokeys/executor-ahk" # If default, don't need to give this
+        func:  RunTestForExecution1
+      ^T3: # Ultmately the keycodes is up to the detector to decide
+        func:  RunTestForExecution3
+      ^T4: # Ultmately the keycodes is up to the detector to decide
+        func:  RunTestForExecution4
+      +C:
+        up:
+          executor: "@twokeys/executor-ahk"
+          func: CallFunc # AHK function to call
+        down:
+          executor: executor-ahk
+          func: add-ons/packs/essentials-pack/TestIfWorking # Use function TestIfWorking from pack essentials-pack
+      ^NOT:
+        executor: DOESNOTEXIST
+        func: CallFunc
+      ^BENCH:
+        func: RunBenchmarkTest
+      ^B:
+        up:
+          executor: "@twokeys/executor-ahk"
+          func: RunTestForExecution2 # AHK function to call
+        hold:
+          executor: executor-ahk
+          func: CallFunc # AHK function to call
+        down:
+          executor: executor-ahk
+          func: add-ons/packs/essentials-pack/TestIfWorking # Use function TestIfWorking from pack essentials-pack

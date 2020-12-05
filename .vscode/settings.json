@@ -1,6 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "python.pythonPath": "/usr/bin/python3.5",
     "files.associations": {
         "*.jsx": "javascriptreact",
         "iostream": "cpp",
