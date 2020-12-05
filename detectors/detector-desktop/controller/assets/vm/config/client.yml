@@ -1,4 +1,7 @@
 # Stored in /home/twokeys/.2Keys/client.yml
+# or /vagrant/config/client.yml (so easily linked back to server)
+# Config for the detector, created from the server side config
+# This is because certain properties are needed by the detector but not by the controller
 
 # 2Keys detector-linux provision script
 twokeys:
@@ -8,6 +11,9 @@ twokeys:
 client:
   name: Some name
   id: some id
+  roots: # Important directories
+    config: /vagrant/config
+    project: /vagrant/project
   server:
     ipv4: 10.0.2.2
-    port: 8080 
+    port: 8080

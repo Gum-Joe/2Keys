@@ -89,6 +89,27 @@ def watch(keyboard, no_lock):
       exit(0)
   else:
     keyboard.watch_keyboard()
+  
+@cli.command("provision")
+@click.option("-f", "--file", is_flag=True, help="Config file to use. Must specify all options.")
+def provisionClient(file):
+  """Provisions a new client, creating the files so it can then be added to a project as a detector.
+  Works by creating index for keyboards (/dev/input -> client config keyboards) and projects and a directory structure to store files in.
+
+  Only config files are supported at this time.  These config files are created by the controller from the main server-side config
+
+  The follow structure is created (assume / is the set root, usually /vagrant):
+  ```
+  /
+  |--/config
+    |--client.yml (provided by 2Keys)
+    |--keyboard-index.yml
+  |--/projects
+    |--project-map.yml
+  ```
+  """
+
+  
 
 # Command to generate daemons
 @cli.command()
