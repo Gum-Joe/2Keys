@@ -7,7 +7,7 @@
   "author": "Kishan <kishansambhi@hotmail.co.uk>",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "precompile": "gulp compileSchemas",
+    "precompile": "gulp buildSchemas",
     "compile": "tsc -b",
     "lint": "eslint --ext .ts .",
     "watch": "tsc -b --watch",
