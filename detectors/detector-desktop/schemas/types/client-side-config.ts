@@ -9,55 +9,55 @@ export interface ClientSideConfig {
   /**
    * Contains information about the 2Keys install that provisioned this client
    */
-  twokeys?: {
+  twokeys: {
     /**
      * Version of 2Keys
      */
-    version?: string;
+    version: string;
     /**
      * Tells us this is a CLIENT_SETUP config.  CLIENT_SETUP must be given for this value so we know we are parsing the right config
      */
-    type?: string;
+    type: string;
     [k: string]: unknown;
   };
   /**
    * Actual client config
    */
-  client?: {
+  client: {
     /**
      * Client name (from client side config)
      */
-    name?: string;
+    name: string;
     /**
      * Client UUID (from client side config)
      */
-    id?: string;
+    id: string;
     /**
      * Important directories on the client that the client needs to know about
      */
-    roots?: {
+    roots: {
       /**
        * Directory to store config files such as this config and the keyboard map
        */
-      config?: string;
+      config: string;
       /**
        * Directory where projects will be stored (sub-folder for each project), with a project index in the root
        */
-      projects?: string;
+      projects: string;
       [k: string]: unknown;
     };
     /**
      * Information about the 2Keys server this client is for
      */
-    server?: {
+    server: {
       /**
        * ipv4 address of server
        */
-      ipv4?: string;
+      ipv4: string;
       /**
        * Server port
        */
-      port?: number;
+      port: number;
       [k: string]: unknown;
     };
     [k: string]: unknown;

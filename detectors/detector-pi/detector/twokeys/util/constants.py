@@ -53,3 +53,7 @@ LOCAL_ROOT = os.getcwd() + "/.2Keys"
 
 # Module name
 MODULE_NAME = "twokeys"
+
+# SCHEMAS
+SCHEMA_ROOT = os.path.join(SCRIPTS_ROOT, "./assets/schemas")
+SCHEMA_PROVISIONING = os.path.join(SCHEMA_ROOT, "client-side-config.json")

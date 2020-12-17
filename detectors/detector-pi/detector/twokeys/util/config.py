@@ -22,9 +22,13 @@ from .constants import CONFIG_FILE
 from ..util.logger import Logger
 logger = Logger("config")
 
-def load_config():
-	logger.debug("Loading config...")
-	config_file = open(CONFIG_FILE, "r")
+def load_config_from_file(fileName: str):
+	logger.debug(f"Loading config from file {fileName}...")
+	config_file = open(fileName, "r")
 	contents = yaml.load(config_file.read(), Loader=yaml.FullLoader)
 	config_file.close()
 	return contents
+
+def load_config():
+	logger.debug("Loading config...")
+	return load_config_from_file(CONFIG_FILE)

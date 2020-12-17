@@ -1,1 +1,1 @@
-from .provision import provision
+from .provision import provision, FatalProvisioningException
