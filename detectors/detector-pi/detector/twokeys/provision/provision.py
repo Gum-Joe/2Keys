@@ -1,7 +1,8 @@
 
 from os import makedirs, mkdir
 import os
-from ..util.constants import SCHEMA_PROVISIONING
+from os.path import join
+from ..util.constants import BLANK_KEYBOARD_MAP, KEYBOARD_MAP_FILENAME, SCHEMA_PROVISIONING
 from twokeys_utils import Logger
 from ..util.config import load_config, load_config_from_file
 from jsonschema import validate
@@ -13,7 +14,6 @@ logger = Logger("provision")
 
 class FatalProvisioningException(Exception):
 	"""Used to tell caller (CLI) there was an error and to quit with non-exit code"""
-
 
 def validateConfig(configFile: Union[str, None]) -> Dict[str, Any]:
 	"""Ensures the config provided to us exists and is valid. Returns the parsed config."""
@@ -90,10 +90,19 @@ def provision(**kargs):
 	logger.info("============================")
 	logger.info("	BEGIN PROVISION")
 	logger.info("============================")
-	logger.info("Creating directories...")
+	logger.info("STEP 1: Creating directories...")
 	if not os.path.exists(config["client"]["roots"]["config"]):
 		makedirs(config["client"]["roots"]["config"])  # For configs
 		logger.info("Created directory " + config["client"]["roots"]["config"] + " to store configs in.", )
 
 	if not os.path.exists(config["client"]["roots"]["projects"]):  # For projects storage
 		logger.info("Created directory " + config["client"]["roots"]["projects"] + " to store configs in.", )
+	
+	# STEP 2: Create index
+	logger.info("STEP 2: Creating keyboard and project indexes...")
+	# Create keyboard index
+	logger.info("Generating a blank keyboard index...")
+	logger.debug("Generating JSON...")
+	keyboardMap = open(join(config["client"]["roots"]["config"], KEYBOARD_MAP_FILENAME), "w")
+	jsonKDBIndex = json.dump(BLANK_KEYBOARD_MAP, keyboardMap) # TODO: Validate all props are there against JSON schema in tests!
+	logger.info("Keyboard index generated.")

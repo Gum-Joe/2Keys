@@ -57,3 +57,16 @@ MODULE_NAME = "twokeys"
 # SCHEMAS
 SCHEMA_ROOT = os.path.join(SCRIPTS_ROOT, "./assets/schemas")
 SCHEMA_PROVISIONING = os.path.join(SCHEMA_ROOT, "client-side-config.json")
+
+# Blank keyboard
+# NOTE: Must match schema in assets/schemas/client-side-keyboard-map.json
+BLANK_KEYBOARD_MAP = {
+	"twokeys": {
+		"version": VERSION,
+		"createdBy": "DETECTOR",
+		"type": "KEYBOARD_MAP"
+	},
+	"keyboards": {}
+}
+"""File name of keyboard map, stored in config root"""
+KEYBOARD_MAP_FILENAME = "keyboard-map.json"

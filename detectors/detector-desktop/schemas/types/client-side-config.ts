@@ -17,8 +17,11 @@ export interface ClientSideConfig {
     /**
      * Tells us this is a CLIENT_SETUP config.  CLIENT_SETUP must be given for this value so we know we are parsing the right config
      */
-    type: string;
-    [k: string]: unknown;
+    type: "CLIENT_SETUP";
+    /**
+     * Tells us who created this config: CONTROLLER means server side, DETECTOR means the detector that runs on the client created this config
+     */
+    createdBy: "CONTROLLER" | "DETECTOR";
   };
   /**
    * Actual client config
@@ -40,6 +43,10 @@ export interface ClientSideConfig {
        * Directory to store config files such as this config and the keyboard map
        */
       config: string;
+      /**
+       * File name in roots.config with a copy of the config for the client stored on the server
+       */
+      clientConfigName?: string;
       /**
        * Directory where projects will be stored (sub-folder for each project), with a project index in the root
        */

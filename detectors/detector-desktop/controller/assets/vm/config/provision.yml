@@ -1,11 +1,13 @@
-# Stored in /home/twokeys/.2Keys/client.yml
-# or /vagrant/config/client.yml (so easily linked back to server)
+# Stored in /home/twokeys/.2Keys/provision.yml
+# or /vagrant/config/provision.yml (so easily linked back to server)
 # Config for the detector, created from the server side config
+# Used to configure it.  Actual config that is linked in from the server is stored as config.yml
 # This is because certain properties are needed by the detector but not by the controller
 
 # 2Keys detector-linux provision script
 twokeys:
   version: 1.0.0
+  createdBy: CONTROLLER
   type: CLIENT_SETUP
 
 client:
@@ -13,6 +15,7 @@ client:
   id: some id
   roots: # Important directories
     config: /vagrant/config
+    clientConfigName: config.yml
     project: /vagrant/project
   server:
     ipv4: 10.0.2.2

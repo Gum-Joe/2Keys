@@ -1,0 +1,47 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$comment": "Config created by the server and stored in the config root (usually /vagrant/config/) to match keyboards in config.yml (from the server) that are passed through to /dev/input devices",
+	"required": ["twokeys", "keyboards"],
+	"properties": {
+		"twokeys": {
+			"type": "object",
+			"description": "Contains information about what this config is for",
+			"required": ["version", "type"],
+			"properties": {
+				"version": {
+					"type": "string",
+					"description": "Version of 2Keys"
+				},
+				"type": {
+					"type": "string",
+					"enum": ["KEYBOARD_MAP"],
+					"description": "Tells us this is a KEYBOARD_MAP config.  KEYBOARD_MAP must be given for this value so we know we are parsing the right config"
+				},
+				"createdBy": {
+					"type": "string",
+					"enum": [
+						"CONTROLLER",
+						"DETECTOR"
+					],
+					"description": "Tells us who created this config: CONTROLLER means server side, DETECTOR means the detector that runs on the client created this config"
+				}
+			},
+			"additionalProperties": false
+		},
+
+		"keyboards": {
+			"description": "Contains a map of keyboard UUIDs to /dev/input devices",
+			"patternProperties": {
+				"^.*$": {
+					"anyOf": [
+						{
+							"type": "string",
+							"description": "The /dev/input path"
+						}
+					]
+				}
+			},
+			"additionalProperties": false
+		}
+	}
+}

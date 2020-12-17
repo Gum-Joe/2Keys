@@ -4,6 +4,7 @@
 twokeys:
   version: 1.0.0
   type: CLIENT_SETUP
+  createdBy: CONTROLLER
 
 client:
   name: Example

@@ -6,7 +6,7 @@
 		"twokeys": {
 			"type": "object",
 			"description": "Contains information about the 2Keys install that provisioned this client",
-			"required": ["version", "type"],
+			"required": ["version", "type", "createdBy"],
 			"properties": {
 				"version": {
 					"type": "string",
@@ -14,9 +14,16 @@
 				},
 				"type": {
 					"type": "string",
+					"enum": ["CLIENT_SETUP"],
 					"description": "Tells us this is a CLIENT_SETUP config.  CLIENT_SETUP must be given for this value so we know we are parsing the right config"
+				},
+				"createdBy": {
+					"type": "string",
+					"enum": ["CONTROLLER", "DETECTOR"],
+					"description": "Tells us who created this config: CONTROLLER means server side, DETECTOR means the detector that runs on the client created this config"
 				}
-			}
+			},
+			"additionalProperties": false
 		},
 
 		"client": {
@@ -42,6 +49,10 @@
 						"config": {
 							"type": "string",
 							"description": "Directory to store config files such as this config and the keyboard map"
+						},
+						"clientConfigName": {
+							"type": "string",
+							"description": "File name in roots.config with a copy of the config for the client stored on the server"
 						},
 						"projects": {
 							"type": "string",

@@ -30,7 +30,7 @@ const clientConfig: ClientConfig<ClientConfigHere> = {
 			filterName: "Filter1",
 			vendorID: "0x1a86",
 			productID: "0x7523",
-			uuid: "UNKNOWN",
+			uuid: "UNKNOWN", // Will be included
 			address: "UNKNOWN2",
 		}], // TODO
 		projects: [{
