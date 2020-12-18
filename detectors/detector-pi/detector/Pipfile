@@ -28,3 +28,5 @@ python_version = "3.8"
 
 [scripts]
 twokeys = "python -m twokeys"
+test = "unittest discover -s ./tests -p test*.py"
+test_coverage = "coverage run --source twokeys -m unittest discover -s ./tests -p test*.py"
