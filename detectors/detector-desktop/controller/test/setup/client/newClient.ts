@@ -7,7 +7,7 @@ import sinon from "sinon";
 import { ClientConfigHere } from "../../../src/config";
 import newClient from "../../../src/setup/client/newClient";
 import * as vmCode from "../../../src/setup/client/vm";
-import { MOCK_CLIENT_LOCATION, twokeys } from "../../constants";
+import { MOCK_2KEYS_HOME_CONFIG, MOCK_CLIENT_LOCATION, twokeys } from "../../constants";
 import { promises as fs } from "fs";
 import { PROVISION_CONFIG_STORAGE, VAGRANT_FILE_DEST, VM_LAUNCH_BAT_FILE_DEST, VM_LAUNCH_VBS_FILE_DEST } from "../../../src/constants";
 
@@ -18,6 +18,8 @@ chai.use(chaiFS);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import detectorFull from "../../../src/index";
 import { loadConfig } from "@twokeys/core/lib/config";
+
+const coreConstants = require("@twokeys/core/lib/constants");
 
 // Property access check
 detectorFull.install;
@@ -53,6 +55,9 @@ const checkForAnsible = "ansible.playbook = \"/vagrant/ansible/base/provision.ym
 describe("Client creation tests", () => {
 	before(() => {
 		sinon.replace(vmCode, "startVM", async () => {return;});
+
+		// REPLACE 2KeysHOME
+		sinon.replace(coreConstants, "TWOKEYS_MAIN_CONFIG_DEFAULT_PATH", MOCK_2KEYS_HOME_CONFIG);
 	});
 
 	it("should successfully generate a client, with created configs matching schemas", async () => {
