@@ -68,5 +68,15 @@ BLANK_KEYBOARD_MAP = {
 	},
 	"keyboards": {}
 }
+BLANK_PROJECT_MAP = {
+	"twokeys": {
+		"version": VERSION,
+		"createdBy": "DETECTOR",
+		"type": "PROJECT_MAP"
+	},
+	"projects": {}
+}
 """File name of keyboard map, stored in config root"""
 KEYBOARD_MAP_FILENAME = "keyboard-map.json"
+"""File name of projects map, stored in projects root"""
+PROJECT_MAP_FILENAME = "projects.json"

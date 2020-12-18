@@ -2,7 +2,7 @@
 from os import makedirs, mkdir
 import os
 from os.path import join
-from ..util.constants import BLANK_KEYBOARD_MAP, KEYBOARD_MAP_FILENAME, SCHEMA_PROVISIONING
+from ..util.constants import BLANK_KEYBOARD_MAP, BLANK_PROJECT_MAP, KEYBOARD_MAP_FILENAME, PROJECT_MAP_FILENAME, SCHEMA_PROVISIONING
 from twokeys_utils import Logger
 from ..util.config import load_config, load_config_from_file
 from jsonschema import validate
@@ -100,9 +100,20 @@ def provision(**kargs):
 	
 	# STEP 2: Create index
 	logger.info("STEP 2: Creating keyboard and project indexes...")
+
 	# Create keyboard index
 	logger.info("Generating a blank keyboard index...")
 	logger.debug("Generating JSON...")
 	keyboardMap = open(join(config["client"]["roots"]["config"], KEYBOARD_MAP_FILENAME), "w")
-	jsonKDBIndex = json.dump(BLANK_KEYBOARD_MAP, keyboardMap) # TODO: Validate all props are there against JSON schema in tests!
+	json.dump(BLANK_KEYBOARD_MAP, keyboardMap) # TODO: Validate all props are there against JSON schema in tests!
 	logger.info("Keyboard index generated.")
+
+	# Create projects index
+	logger.info("Generating projects index...")
+	logger.debug("Generating JSON...")
+	keyboardMap = open(
+		join(config["client"]["roots"]["projects"], PROJECT_MAP_FILENAME), "w")
+	# TODO: Validate all props are there against JSON schema in tests!
+	json.dump(BLANK_PROJECT_MAP, keyboardMap)
+	logger.info("Projects index generated.")
+	logger.info("Provisioning complete.")
