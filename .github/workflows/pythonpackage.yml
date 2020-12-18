@@ -36,7 +36,7 @@ jobs:
         pipenv run coverage run -m unittest discover -s ./tests -p "test*.py"
       
     - name: Install dependencies for detector
-      working-directory: /detectors/detector-pi/detector/
+      working-directory: ./detectors/detector-pi/detector/
       run: |
         pipenv install --dev
     - name: Test with unittest
