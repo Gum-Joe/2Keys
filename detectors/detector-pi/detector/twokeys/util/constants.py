@@ -57,6 +57,8 @@ MODULE_NAME = "twokeys"
 # SCHEMAS
 SCHEMA_ROOT = os.path.join(SCRIPTS_ROOT, "./assets/schemas")
 SCHEMA_PROVISIONING = os.path.join(SCHEMA_ROOT, "client-side-config.json")
+SCHEMA_KDB_MAP = os.path.join(SCHEMA_ROOT, "client-side-keyboard-map.json")
+SCHEMA_PROJECTS_MAP = os.path.join(SCHEMA_ROOT, "client-side-projects-map.json")
 
 # Blank keyboard
 # NOTE: Must match schema in assets/schemas/client-side-keyboard-map.json

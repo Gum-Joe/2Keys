@@ -11,7 +11,7 @@
 			"module": "twokeys",
 			"envFile": "${workspaceFolder}/.env",
 			"env": {
-				"PYTHONPATH": "../../common/python",
+				"PYTHONPATH": "${env:PYTONPATH}:${workspaceFolder}/../../common/python",
 				"DEBUG": "true"
 			},
 			"args": ["provision", "-f", "./mock/client-provision.yml"]

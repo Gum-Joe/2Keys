@@ -68,6 +68,10 @@ def validateConfig(configFile: Union[str, None]) -> Dict[str, Any]:
 
 def provision(**kargs):
 	"""Provisions a new client, creating the files so it can then be added to a project as a detector.
+
+	Usage:
+	provision(file="provision.yml")
+
   Works by creating index for keyboards (/dev/input -> client config keyboards) and projects and a directory structure to store files in.
 
   Only config files are supported at this time.  These config files are created by the controller from the main server-side config

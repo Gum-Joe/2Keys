@@ -15,9 +15,9 @@ export interface ClientSideProjectsMap {
      */
     version: string;
     /**
-     * Tells us this is a PROJECTS_MAP config.  PROJECTS_MAP must be given for this value so we know we are parsing the right config
+     * Tells us this is a PROJECT_MAP config.  PROJECT_MAP must be given for this value so we know we are parsing the right config
      */
-    type: "PROJECTS_MAP";
+    type: "PROJECT_MAP";
     /**
      * Tells us who created this config: CONTROLLER means server side, DETECTOR means the detector that runs on the client created this config
      */

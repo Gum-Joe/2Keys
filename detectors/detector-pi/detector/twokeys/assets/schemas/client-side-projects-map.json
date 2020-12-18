@@ -14,8 +14,8 @@
 				},
 				"type": {
 					"type": "string",
-					"enum": ["PROJECTS_MAP"],
-					"description": "Tells us this is a PROJECTS_MAP config.  PROJECTS_MAP must be given for this value so we know we are parsing the right config"
+					"enum": ["PROJECT_MAP"],
+					"description": "Tells us this is a PROJECT_MAP config.  PROJECT_MAP must be given for this value so we know we are parsing the right config"
 				},
 				"createdBy": {
 					"type": "string",
