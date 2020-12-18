@@ -28,13 +28,16 @@
   "dependencies": {
     "@twokeys/addons": "^1.0.0",
     "@twokeys/core": "^1.0.0",
+    "@twokeys/detector-desktop-schemas": "^1.0.0",
     "handlebars": "^4.7.6",
     "rimraf": "^3.0.2",
     "which": "^2.0.2"
   },
   "devDependencies": {
+    "@types/chai-json-schema": "^1.4.6",
     "@types/mock-fs": "^4.10.0",
     "@types/which": "^1.3.2",
+    "chai-json-schema": "^1.5.1",
     "mock-fs": "^4.13.0"
   }
 }

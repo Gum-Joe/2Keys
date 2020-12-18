@@ -5,7 +5,7 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface ClientSideConfig {
+export interface ClientSideProvisioningConfig {
   /**
    * Contains information about the 2Keys install that provisioned this client
    */
@@ -54,17 +54,13 @@ export interface ClientSideConfig {
       [k: string]: unknown;
     };
     /**
-     * Information about the 2Keys server this client is for
+     * Information about the 2Keys server this client is for. Contain address of server, but not port, as port is project specific
      */
     server: {
       /**
        * ipv4 address of server
        */
       ipv4: string;
-      /**
-       * Server port
-       */
-      port: number;
       [k: string]: unknown;
     };
     [k: string]: unknown;

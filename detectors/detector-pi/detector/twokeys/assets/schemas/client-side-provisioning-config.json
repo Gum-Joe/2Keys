@@ -61,7 +61,7 @@
 					}
 				},
 				"server": {
-					"description": "Information about the 2Keys server this client is for",
+					"description": "Information about the 2Keys server this client is for. Contain address of server, but not port, as port is project specific",
 					"required": [
 						"ipv4",
 						"port"
@@ -70,10 +70,6 @@
 						"ipv4": {
 							"type": "string",
 							"description": "ipv4 address of server"
-						},
-						"port": {
-							"type": "number",
-							"description": "Server port"
 						}
 					}
 				}

@@ -10,8 +10,7 @@ client:
   name: Example
   # id: UUIDv4 # MISSING!
   server:
-    # ipv4: 10.0.2.2 # MISSING!
-    port: "badtype"
+    ipv4: 1000 # Bad type!
   roots:
     # config: ./tests/mock/provision/config # NOTE: Should be absolute paths # MISSING!
     projects: ./tests/mock/provision/projects # NOTE: Should be absolute paths

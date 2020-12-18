@@ -23,6 +23,7 @@ import ContentCopier from "@twokeys/addons/lib/util/copy-contents";
 import { ClientConfig } from "@twokeys/core/lib/interfaces";
 import { ClientConfigHere } from "../../config";
 import { VM_ASSETS_ROOT } from "../../constants";
+import { generateProvisionScript, PROVISION_CONFIG_TEMPLATE } from "./provision";
 import { updateVagrantFile, updateVMLaunchFiles } from "./template-updates";
 import { startVM } from "./vm";
 
@@ -42,6 +43,10 @@ export const newClient: DetectorPromisedTaskFunction<ClientConfig<ClientConfigHe
 	twokeys.logger.substatus("Filling out templates");
 	await updateVagrantFile(twokeys, config.controllerConfig);
 	await updateVMLaunchFiles(twokeys, config.controllerConfig);
+
+	// 1.1: Create provision config, which is fed into twokeys on the client to set the software up
+	await generateProvisionScript(twokeys, config);
+
 	// TODO: Add to startup (once certain issues are fixed)
 	// if (config.controllerConfig.perms.addToStartup) {
 	// 	twokeys.logger.substatus("Adding startup script launch.vbs to startup");

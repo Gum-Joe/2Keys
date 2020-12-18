@@ -9,7 +9,7 @@
 			],
 			"group": {
 				"kind": "build",
-				"isDefault": true
+				"isDefault": true,
 			},
 			"label": "tsc: build - tsconfig.json"
 		},
