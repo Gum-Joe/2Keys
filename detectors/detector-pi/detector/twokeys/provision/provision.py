@@ -19,7 +19,7 @@ def validateConfig(configFile: Union[str, None]) -> Dict[str, Any]:
 	"""Ensures the config provided to us exists and is valid. Returns the parsed config."""
 	logger.info("Validating config...")
 	logger.debug(configFile)
-	if configFile == False:
+	if configFile == None:
 		logger.err("Error: You must provide a file with all options as input to this command.  Rerun this command with the --help option for more information.")
 		raise FatalProvisioningException("Error: You must provide a file with all options as input to this command.")
 	# READ!logger.debug("Reading config")
