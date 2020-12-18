@@ -5,7 +5,7 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface ClientSideKeyboardMap {
+export interface ClientSideProjectsMap {
   /**
    * Contains information about what this config is for
    */
@@ -15,27 +15,27 @@ export interface ClientSideKeyboardMap {
      */
     version: string;
     /**
-     * Tells us this is a KEYBOARD_MAP config.  KEYBOARD_MAP must be given for this value so we know we are parsing the right config
+     * Tells us this is a PROJECTS_MAP config.  PROJECTS_MAP must be given for this value so we know we are parsing the right config
      */
-    type: "KEYBOARD_MAP";
+    type: "PROJECTS_MAP";
     /**
      * Tells us who created this config: CONTROLLER means server side, DETECTOR means the detector that runs on the client created this config
      */
     createdBy: "CONTROLLER" | "DETECTOR";
   };
   /**
-   * Contains a map of keyboard UUIDs to /dev/input devices
+   * Contains a map of project UUIDs to directories on the detectpr
    */
-  keyboards: {
+  projects: {
     /**
      * This interface was referenced by `undefined`'s JSON-Schema definition
      * via the `patternProperty` "^.*$".
      */
     [k: string]: {
       /**
-       * Path to file that represents the keyboard, usually in /dev/input
+       * Local path to project, relative to the projects root (which is set in configs/client-side-config)
        */
-      deviceFilePath: string;
+      localPath: string;
       [k: string]: unknown;
     };
   };

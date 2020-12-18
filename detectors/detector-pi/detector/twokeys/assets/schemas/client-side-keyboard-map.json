@@ -6,7 +6,7 @@
 		"twokeys": {
 			"type": "object",
 			"description": "Contains information about what this config is for",
-			"required": ["version", "type"],
+			"required": ["version", "type", "createdBy"],
 			"properties": {
 				"version": {
 					"type": "string",
@@ -35,8 +35,15 @@
 				"^.*$": {
 					"anyOf": [
 						{
-							"type": "string",
-							"description": "The /dev/input path"
+							"type": "object",
+							"description": "Information about the keyboard",
+							"required": ["deviceFilePath"],
+							"properties": {
+								"deviceFilePath": {
+									"type": "string",
+									"description": "Path to file that represents the keyboard, usually in /dev/input"
+								}
+							}
 						}
 					]
 				}

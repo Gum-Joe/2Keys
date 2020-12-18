@@ -6,8 +6,12 @@ twokeys:
   type: CLIENT_SETUP
 
 client:
-  name: Some name
-  id: some id
+  name: Example
+  id: UUIDv4
   server:
     ipv4: 10.0.2.2
-    port: 8080 
+    port: 8080
+  roots:
+      config: /vagrant/config
+      clientConfigName: config.yml
+      projects: /vagrant/projects
