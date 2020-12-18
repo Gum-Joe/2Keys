@@ -96,6 +96,7 @@ def provision(**kargs):
 		logger.info("Created directory " + config["client"]["roots"]["config"] + " to store configs in.", )
 
 	if not os.path.exists(config["client"]["roots"]["projects"]):  # For projects storage
+		makedirs(config["client"]["roots"]["projects"])
 		logger.info("Created directory " + config["client"]["roots"]["projects"] + " to store configs in.", )
 	
 	# STEP 2: Create index
