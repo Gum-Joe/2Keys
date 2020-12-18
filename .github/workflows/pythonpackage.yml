@@ -42,7 +42,8 @@ jobs:
     - name: Test with unittest
       working-directory: ./detectors/detector-pi/detector/
       run: |
-        . .env
+        ls
+        . ./.env
         pipenv run coverage run -m unittest discover -s ./tests -p "test*.py"
 
     - uses: codecov/codecov-action@v1
