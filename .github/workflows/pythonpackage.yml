@@ -39,6 +39,7 @@ jobs:
       working-directory: ./detectors/detector-pi/detector/
       run: |
         pipenv install --dev
+        pipenv install -e ../../common/python
     - name: Test with unittest
       working-directory: ./detectors/detector-pi/detector/
       run: |
