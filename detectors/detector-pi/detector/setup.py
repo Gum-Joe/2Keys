@@ -2,7 +2,7 @@
 # https://python-packaging.readthedocs.io/en/latest/everything.html
 from setuptools import setup, find_packages
 
-from .twokeys.util.constants import VERSION
+from twokeys.util.constants import VERSION
 
 def readme():
     with open("./README.md") as f:
