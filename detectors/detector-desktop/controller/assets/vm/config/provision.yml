@@ -1,5 +1,5 @@
-# Stored in /home/twokeys/.2Keys/provision.yml
-# or /vagrant/config/provision.yml (so easily linked back to server)
+# Stored in /vagrant/config/provision.yml (so easily linked back to server)
+# But copied to /home/twokeys/.2Keys/config.yml for reference
 # Config for the detector, created from the server side config
 # Used to configure it.  Actual config that is linked in from the server is stored as config.yml
 # This is because certain properties are needed by the detector but not by the controller

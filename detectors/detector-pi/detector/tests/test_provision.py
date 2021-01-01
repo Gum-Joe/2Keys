@@ -2,7 +2,7 @@
 Tests provisioning of client
 """
 import json
-from twokeys.util.constants import KEYBOARD_MAP_FILENAME, PROJECT_MAP_FILENAME, SCHEMA_KDB_MAP, SCHEMA_PROJECTS_MAP
+from twokeys.util.constants import KEYBOARD_MAP_FILENAME, PROJECT_MAP_FILENAME, SCHEMA_KDB_MAP, SCHEMA_PROJECTS_MAP, TWOKEYS_FIXED_HOME_CONFIG
 from twokeys.provision import provision, FatalProvisioningException
 from jsonschema import validate
 import unittest
@@ -39,6 +39,15 @@ class TestProvisioning(unittest.TestCase):
 					projectMap
 				)
 			)
+			# Also check for home fixed config
+			self.assertTrue(
+				os.path.exists(
+					TWOKEYS_FIXED_HOME_CONFIG
+				)
+			)
+			# Check content
+			self.assertEqual(open(TWOKEYS_FIXED_HOME_CONFIG, "r").read(),
+			                 open(MOCK_PROVISION_CONFIG, "r").read())
 			# Validate against schemas
 			# Validate KDB map
 			keyboardMapLoaded = json.load(open(keyboardMap, "r"))

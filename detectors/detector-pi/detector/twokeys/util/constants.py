@@ -19,6 +19,7 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 # Constants
 import struct
 import os
+from pathlib import Path
 KEYBOARDS_PATH_BASE = "/dev/input/by-id"
 
 """Version Number"""
@@ -83,3 +84,8 @@ BLANK_PROJECT_MAP = {
 KEYBOARD_MAP_FILENAME = "keyboard-map.json"
 """File name of projects map, stored in projects root"""
 PROJECT_MAP_FILENAME = "projects.json"
+
+"""Fixed root to put important files in so that 2Keys can find all the other config files (such as keyboard map).  Allows us to make 2Keys platform-agnostic"""
+TWOKEYS_FIXED_HOME = os.path.join(Path.home(), ".2Keys")
+"""Fixed location of a copy of the provision config as it contain all the information we need to find the other config."""
+TWOKEYS_FIXED_HOME_CONFIG = os.path.join(TWOKEYS_FIXED_HOME, "config.yml")

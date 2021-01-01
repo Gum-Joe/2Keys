@@ -2,7 +2,7 @@
 from os import makedirs, mkdir
 import os
 from os.path import join
-from ..util.constants import BLANK_KEYBOARD_MAP, BLANK_PROJECT_MAP, KEYBOARD_MAP_FILENAME, PROJECT_MAP_FILENAME, SCHEMA_PROVISIONING
+from ..util.constants import BLANK_KEYBOARD_MAP, BLANK_PROJECT_MAP, KEYBOARD_MAP_FILENAME, PROJECT_MAP_FILENAME, SCHEMA_PROVISIONING, TWOKEYS_FIXED_HOME, TWOKEYS_FIXED_HOME_CONFIG
 from twokeys_utils import Logger
 from ..util.config import load_config, load_config_from_file
 from jsonschema import validate
@@ -85,6 +85,10 @@ def provision(**kargs):
   |--/projects
     |--project-map.yml
   ```
+
+	It also copies the provision config to /home/twokeys/.2Keys/config.yml
+	so that there is a central, fixed point of reference to find the config whenever twokeys boots up.
+	It can then trawl that config to find the main config, projects etc
   """
 	logger.info("Provisioning a new client")
 	config = validateConfig(kargs["file"])
@@ -94,6 +98,8 @@ def provision(**kargs):
 	logger.info("============================")
 	logger.info("	BEGIN PROVISION")
 	logger.info("============================")
+
+
 	logger.info("STEP 1: Creating directories...")
 	if not os.path.exists(config["client"]["roots"]["config"]):
 		makedirs(config["client"]["roots"]["config"])  # For configs
@@ -102,9 +108,22 @@ def provision(**kargs):
 	if not os.path.exists(config["client"]["roots"]["projects"]):  # For projects storage
 		makedirs(config["client"]["roots"]["projects"])
 		logger.info("Created directory " + config["client"]["roots"]["projects"] + " to store configs in.", )
-	
-	# STEP 2: Create index
-	logger.info("STEP 2: Creating keyboard and project indexes...")
+
+	# Fixed 2Keys Home
+	if not os.path.exists(TWOKEYS_FIXED_HOME):
+		makedirs(TWOKEYS_FIXED_HOME)
+		logger.info("Created 2Keys fixed home directory " +
+		            TWOKEYS_FIXED_HOME + " to store configs in to we can get to the other configs.", )
+
+	# STEP 2: Copy provision config to fixed home so we can use to it get to the other configs on next boot
+	logger.info(
+		f"STEP 0: Create a copy of the provision config (i.e. this client) at {TWOKEYS_FIXED_HOME_CONFIG}...")
+	configFile = open(TWOKEYS_FIXED_HOME_CONFIG, "w+")
+	configFile.write(open(kargs["file"], "r").read())
+	logger.info("Config written")
+
+	# STEP 3: Create index
+	logger.info("STEP 3: Creating keyboard and project indexes...")
 
 	# Create keyboard index
 	logger.info("Generating a blank keyboard index...")
