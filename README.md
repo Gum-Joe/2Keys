@@ -8,8 +8,8 @@ For a full setup guide, see [here](https://github.com/Gum-Joe/2Keys/blob/master/
 For keyboard mappings, see [here](https://github.com/Gum-Joe/2Keys/blob/master/docs/MAPPINGS.md)
 
 ### DEVELOPMENT NOTICE
-I'm now working on a new version of 2Keys that is more modular.
-Please see the `v1` branch
+I'm now working on a new version of 2Keys that is more modular & will be designed for the upcoming 2Keys Studio GUI.
+Please see the `v1` branch.
 
 ### Support
 Windows is supported only as the server (where the hotkeys will run) and a raspberry pi is required to run the detector.
