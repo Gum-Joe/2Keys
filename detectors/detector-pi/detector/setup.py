@@ -26,7 +26,7 @@ setup(name="2Keys",
       author_email="kishansambhi@hotmail.co.uk",
       keywords="hid ahk autohotkey macros 2cdkeyboard keyboards",
       license="GPLv3",
-      packages=find_packages(),
+      packages=find_packages(exclude=["tests"]),
       install_requires=get_required(),
       classifiers=[
           "Development Status :: 2 - Pre-Alpha",

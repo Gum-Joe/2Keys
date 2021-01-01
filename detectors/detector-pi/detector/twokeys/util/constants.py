@@ -22,7 +22,7 @@ import os
 KEYBOARDS_PATH_BASE = "/dev/input/by-id"
 
 """Version Number"""
-VERSION = "0.4.0"
+VERSION = "1.0.0a1"
 
 # Formatting for keyboard events
 #long int, long int, unsigned short, unsigned short, unsigned int
