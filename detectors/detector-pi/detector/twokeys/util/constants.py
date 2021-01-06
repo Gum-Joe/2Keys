@@ -89,3 +89,12 @@ PROJECT_MAP_FILENAME = "projects.json"
 TWOKEYS_FIXED_HOME = os.path.join(Path.home(), ".2Keys")
 """Fixed location of a copy of the provision config as it contain all the information we need to find the other config."""
 TWOKEYS_FIXED_HOME_CONFIG = os.path.join(TWOKEYS_FIXED_HOME, "config.yml")
+
+
+# Key input constants
+"""Key pressed down"""
+KEY_VALUE_DOWN = 1 
+"""Key unpressed (i.e. went up)"""
+KEY_VALUE_UP = 0
+"""Key held (held down)"""
+KEY_VALUE_HOLD = 2
