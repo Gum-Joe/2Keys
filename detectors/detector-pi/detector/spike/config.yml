@@ -1,6 +1,17 @@
 # Config for 2Keys
 # ONLY FOR USE BY THE PROGRAM
 # To change the config, update it on the client and run "2Keys config-update" here
+name: Name of detector
+client: # Idetifies the device this detector config is for
+  id: device-00000 # See devices/device-00000.yml
+  name: Detector-PI # So the user knows what it is
+detector_config: # Schema specified by detector; this configures the detector
+  perms:
+    startStartup: false # Start detector on the client on startup
+    lockKBDs: true # Lock keyboard
+    # storage-path: /home/2Keys/project666666 # Place where config files are on client - DEPRECATED in favour of central project storage location
+    cliArgs:
+      - --debug # CLI args for detector
 addresses:
   detector: 192.168.0.100
   server:

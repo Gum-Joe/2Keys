@@ -80,7 +80,7 @@ def watch(keyboard, no_lock):
   
   # Keyboard specified, watch it
   config = load_config()
-  keyboard = Keyboard(config["keyboards"][keyboard], keyboard)
+  keyboard = Keyboard(config["keyboards"][keyboard], keyboard, config, no_lock=no_lock)
   if not no_lock:
     keyboard.watch_keyboard()
     """try: # Now handled by the watcher

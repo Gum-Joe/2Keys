@@ -48,14 +48,21 @@ class Keyboard:
     NOTE: key states are tracker accross devices - so if e.g. 2 devices that both have an "A" key
     are registered under the same keyboard in config, pressing "A" on one keyboard is indistinghable from "A" on the other,
 
-    keyboard: Keyboard config
-    name: Name of keyboard
+    :param keyboard: Keyboard config
+    :param name: Name of keyboard
+    :param full_config: Full config (so we get to e.g perms)
+    
+    kwargs:
+    - no_lock: CLI option that says "dont lock KBD"
     """
-    def __init__(self, keyboard, name):
+    def __init__(self, keyboard, name, full_config, **kwargs):
         self.config = load_config()
         logger.debug("Got keyboard: " + str(keyboard))
         self.keyboard = keyboard
         self.name = name
+        self.full_config = full_config
+        self.detector_config_project = full_config["detector_config"]
+        self.cli_args = kwargs
         # Generate input devices from the list of related paths!
         self.keyboard_devices = [ InputDevice(keyboardPath) for keyboardPath in self.keyboard["detector"]["paths"] ]
         # Array of pressed keys
@@ -75,6 +82,7 @@ class Keyboard:
         # current hotkey, used for when watching for an up event
         self.current_hotkey_up = None
         self.last_hotkey = None
+        
     
     
     def apply_mappings(self, maps):
@@ -99,8 +107,14 @@ class Keyboard:
         logger.info(f"Cancelling {len(tasks)} outstanding tasks")
         await asyncio.gather(*tasks, return_exceptions=True)
 
-        logger.debug("Unlocking KDB to finish shutdown...")
-        self.unlock()
+        try:
+            logger.debug("Unlocking KDB to finish shutdown...")
+            self.unlock()
+        except Exception as err:
+            logger.err("Error encountered during cleanup!")
+            logger.err(err)
+            logger.err("The program will now exit.")
+            loop.stop()
         loop.stop()
 
     def handle_exception(self, loop, context):
@@ -312,12 +326,22 @@ class Keyboard:
 
     # Locks (grabs) keyboard
     def lock(self):
+        # Check if this is allowed
+        if not self.detector_config_project["perms"]["lockKBDs"] or self.cli_args["no_lock"]:
+            # Either the lockKBd option is false, or the cli arg to not lock has been passed
+            logger.warn("Not locking as keyboard locking disabled.")
+            return
         logger.info("Locking keyboards....")
         for keyboard_device in self.keyboard_devices:
             logger.info("Locking " + keyboard_device.path + "...")
             keyboard_device.grab()
     # Unlocks (ungrabs) keyboard
     def unlock(self):
+        # Check if this is allowed
+        if not self.detector_config_project["perms"]["lockKBDs"] or self.cli_args["no_lock"]:
+            # Either the lockKBd option is false, or the cli arg to not lock has been passed
+            logger.warn("Not unlocking as keyboard locking disabled.")
+            return
         logger.info("Unlocking keyboards...")
         for keyboard_device in self.keyboard_devices:
             logger.info("Unlocking " + keyboard_device.path + "...")
