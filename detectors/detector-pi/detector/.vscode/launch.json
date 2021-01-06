@@ -10,11 +10,12 @@
 			"request": "launch",
 			"module": "twokeys",
 			"envFile": "${workspaceFolder}/.env",
+			"cwd": "${workspaceFolder}/spike",
 			"env": {
-				"PYTHONPATH": "${env:PYTONPATH}:${workspaceFolder}/../../common/python",
+				"PYTHONPATH": "${env:PYTONPATH}:${workspaceFolder}/../../common/python:${workspaceFolder}",
 				"DEBUG": "true"
 			},
-			"args": ["provision", "-f", "./mock/client-provision.yml"]
+			"args": ["watch", "numpad_apps"]
 		}
 	]
 }
