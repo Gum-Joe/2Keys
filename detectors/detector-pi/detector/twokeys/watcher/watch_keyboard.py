@@ -290,7 +290,7 @@ class Keyboard:
         return False
     
     def send_hotkey(self, hotkey, value):
-        """Hotkey sender
+        """Hotkey sender.
 
         Send hotkey runner command -> server
         
