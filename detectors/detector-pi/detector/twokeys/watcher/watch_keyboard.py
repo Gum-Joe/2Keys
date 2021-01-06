@@ -24,6 +24,8 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 import struct
 import time
 import sys
+import signal
+import asyncio
 import aiofiles
 import evdev
 from evdev.util import categorize
@@ -81,14 +83,49 @@ class Keyboard:
             logger.debug("Mapped " + key + " as (" + key + ") to code " + str(code))
             self.map[code] = "(" + key + ")"
     
+    async def shutdown(self, loop, signal=None):
+        logger.info("Shutting down...")
+        tasks = [t for t in asyncio.all_tasks() if t is not
+                asyncio.current_task()]
+
+        [task.cancel() for task in tasks]
+
+        logger.info(f"Cancelling {len(tasks)} outstanding tasks")
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+        logger.debug("Unlocking KDB to finish shutdown...")
+        self.unlock()
+        loop.stop()
+
+    def handle_exception(self, loop, context):
+        # context["message"] will always be there; but context["exception"] may not
+        msg = context.get("exception", context["message"])
+        logger.err(f"Caught exception: {msg}")
+        print(context)
+        logger.debug("Shutting down due to error...")
+        asyncio.create_task(self.shutdown(loop))
+
     def watch_keyboard(self):
+        """Starts the async watcher to watch the keyboard. Also locks the keyboard so nothing else can use it"""
+        self.lock()
+        loop = asyncio.get_event_loop()
+        signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+        for s in signals:
+            loop.add_signal_handler(
+                s, lambda s=s: asyncio.create_task(self.shutdown(loop, signal=s)))
+        loop.set_exception_handler(self.handle_exception)
+        loop.create_task(self.watch_keyboard_handler())
+        loop.create_task(self.watch_keyboard_handler())
+        loop.run_forever()
+
+    async def watch_keyboard_handler(self):
         """
         Keyboard watcher - watches keyboard for events and triggers hotkeys by sending events to server according to config
 
         # TODO: Use const from evdev instead of manually checking for cleaner code and no magic numbers
         """
-        logger.info("Watching for key presses on " + self.name + "...")
-        for event in self.keyboard_device.read_loop():
+        logger.info("Watching async for key presses on " + self.name + "...")
+        async for event in self.keyboard_device.async_read_loop():
             # print(categorize(event))
             type = event.type # Event type - only interested in key event (EV_KEY)
             code = event.code # KDB Scan Code

@@ -82,12 +82,15 @@ def watch(keyboard, no_lock):
   config = load_config()
   keyboard = Keyboard(config["keyboards"][keyboard], keyboard)
   if not no_lock:
-    try:
-      keyboard.lock() # Grabs keyboard
+    keyboard.watch_keyboard()
+    """try: # Now handled by the watcher
+      #keyboard.lock() # Grabs keyboard
       keyboard.watch_keyboard()
-    except (KeyboardInterrupt, SystemExit, OSError):
+    except (KeyboardInterrupt, SystemExit, OSError) as err:
+      logger.err("Error encountered. Exiting...")
+      logger.err(str(err))
       keyboard.unlock()
-      exit(0)
+      exit(0)"""
   else:
     keyboard.watch_keyboard()
   
