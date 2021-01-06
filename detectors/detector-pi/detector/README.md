@@ -28,6 +28,12 @@ $ cd server
 $ yarn
 ```
 
+Before building the detector, compile and copy JSON schemas:
+```
+$ cd packages/@twokeys/schemas
+$ yarn gulp buildSchema
+```
+
 To build the detector:
 ```
 $ cd detector

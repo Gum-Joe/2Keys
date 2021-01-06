@@ -1,0 +1,8 @@
+id: "101011"
+name: Test
+controller: "@twokeys/detector-desktop"
+controllerConfig:
+  perms:
+    addToStartup: false
+    allowAutoUpdate: true
+  keyboards: []

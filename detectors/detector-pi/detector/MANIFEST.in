@@ -1,3 +1,4 @@
 include ./LICENSE
 include twokeys/assets/*
-include ./required.txt
+include twokeys/assets/schemas/*
+include ./requirements.txt

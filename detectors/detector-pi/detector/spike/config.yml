@@ -1,0 +1,93 @@
+# Config for 2Keys
+# ONLY FOR USE BY THE PROGRAM
+# To change the config, update it on the client and run "2Keys config-update" here
+addresses:
+  detector: 192.168.0.100
+  server:
+    ipv4: 192.168.0.50
+    port: 8181
+keyboards:
+  logitech_g810:
+    dir: ./logitech_g810
+    hotkeys:
+      $#$: InstantVFXScale
+      $DOWN$: InstantVFXPositionVert
+      $ESC$: TerminateGCClient
+      $LEFT$: InstantVFXPosition
+      $RIGHT$: InstantVFXPosition
+      $UP$: InstantVFXPositionVert
+      +$ESC$: TerminatePremiere
+      +F1G: GotoHomeworkGerman
+      +O: OpenCurrentProjectEditingApp
+      ',': AudioTransitionConstantPower
+      '1': Trigger1
+      '2': Trigger2
+      '3': Trigger3
+      '4': Trigger4
+      '5': Trigger5
+      A: RemoveUnusedMergedTracks
+      B: TransitionDipToBlack
+      C: InstantVFXOpacity
+      D: TriggerD
+      E: GraphicsCenterAlign
+      F: EffectHorizontalFlip
+      F1: GotoHomework
+      F2: GotoYTAssets
+      F3: GotoYTCoreAssets
+      G: GetGraphicsTemplate
+      H: EssentialAudioPresetBlueYeti
+      I: InsertAndAutoResize
+      J: AudioTransitionExponetialFade
+      K: EffectColorKey
+      L: TriggerL
+      M: GoToMasterEffects
+      N: EffectCrop
+      O: OpenCurrentProjectFolderEditing
+      P: TriggerP
+      Q: DrapCopyEffects
+      R: EffectCameraBlur
+      S: CaptureAndSave
+      T: TemplateOpenSans
+      U: EffectUltraKey
+      V: BinChangeView
+      W: AutoResize
+      X: InstantVFXAnchorPointVert
+      Y: OpenInAudition
+      Z: InstantVFXAnchorPoint
+      ^!+S: SSHPi
+      ^!+T: TestIfRunning
+      ^+$ESC$: RestartPremiere
+      ^E: AutoExportAudacityAudio
+      ^N: GenerateNewPremiereProject
+      ^O: OpenCurrentProjectFolderProgramming
+    path: /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-kbd
+    root: index.ahk
+  numpad_apps:
+    dir: ./numpad_apps
+    hotkeys:
+      $BACKSPACE$: Slack
+      $NUM_+$: Firefox
+      $NUM_-$: VSCode
+      $NUM_/$: TestIfRunning
+      NUM0$BACKSPACE$: Slack
+      NUM0$NUM_+$: FirefoxLaunch
+      NUM0$NUM_-$: VSCodeLaunch
+      NUM0NUM1: ExcelLaunch
+      NUM0NUM2: PowerpointLaunch
+      NUM0NUM5: TerminalLaunch
+      NUM0NUM6: ExplorerLaunch
+      NUM0NUM8: PremiereLaunch
+      NUM0NUM9: DiscordLaunch
+      NUM1: Excel
+      NUM2: Powerpoint
+      NUM3: Teams
+      NUM5: Terminal
+      NUM6: Explorer
+      NUM7: Teams
+      NUM8: Premiere
+      NUM9: Discord
+    path: /dev/input/by-id/usb-04d9_1203-event-kbd
+    root: index.ahk
+name: KeyboardOfMacros
+perms:
+  ssh: true

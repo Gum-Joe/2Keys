@@ -1,0 +1,21 @@
+{
+	"python.testing.unittestArgs": [
+		"-v",
+		"-s",
+		"./tests",
+		"-p",
+		"test_*.py",
+	],
+	"python.testing.pytestEnabled": false,
+	"python.testing.nosetestsEnabled": false,
+	"python.testing.unittestEnabled": true,
+	"terminal.integrated.env.linux": {
+		"PYTHONPATH": "${workspaceFolder}/../../common/python",
+		"DEBUG": "true"
+	},
+	//"terminal.integrated.env.windows": {
+	//	"PYTHONPATH": "../../common/python",
+	//	"DEBUG": "true"
+	//},
+	"python.envFile": "${workspaceFolder}/vscode.env",
+}

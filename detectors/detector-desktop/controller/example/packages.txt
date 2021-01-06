@@ -1,0 +1,9 @@
+#### FOR DEV PUPOSES ONLY ###
+1. Get python 3 from apk
+2. Get pip from URL
+3. use pip to get pipenv
+The following packages from apk were then required
+udev - see https://wiki.alpinelinux.org/wiki/Gnome_Setup#Setting_up_udev
+linux-headers
+build-base
+python3-dev

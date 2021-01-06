@@ -2,18 +2,18 @@
 # https://python-packaging.readthedocs.io/en/latest/everything.html
 from setuptools import setup, find_packages
 
-from .twokeys.util.constants import VERSION
+from twokeys.util.constants import VERSION
 
 def readme():
     with open("./README.md") as f:
         return f.read()
 
 def get_required():
-  with open("./required.txt") as f:
+  with open("./requirements.txt") as f:
     packages = []
     for line in f:
-      if not line[0] == "#" and not line == "":
-        packages.append(line.rstrip("\n"))
+      if not line[0] == "#" and not line == "" and not line[0:2] == "-i" and not line == "\n":
+        packages.append(line.rstrip("\n").split("==")[0])
     
     return packages
 
@@ -26,7 +26,7 @@ setup(name="2Keys",
       author_email="kishansambhi@hotmail.co.uk",
       keywords="hid ahk autohotkey macros 2cdkeyboard keyboards",
       license="GPLv3",
-      packages=find_packages(),
+      packages=find_packages(exclude=["tests"]),
       install_requires=get_required(),
       classifiers=[
           "Development Status :: 2 - Pre-Alpha",
@@ -42,6 +42,6 @@ setup(name="2Keys",
 
       # For bdist
       package_data={
-        "package": ["assets/*"]
+        "package": ["assets/*", "assets/schemas/*"]
       }
 )

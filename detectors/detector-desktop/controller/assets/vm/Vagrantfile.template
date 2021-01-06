@@ -109,10 +109,18 @@ Vagrant.configure("2") do |config|
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "ansible/base/provision.yml"
   end
+
+  # Installs 2Keys from source!
+  # TODO: Remove this once PyPi package published and before closing #72
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "ansible/base/twokeys-oss.yml"
+  end
+
   ## PROVISIONING SCRIPT TO SETUP CLIENT ##
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "ansible/client/provision.yml"
   end
+
   # 2KEYS BEGIN CUSTOM ANSIBLE PROVISING SCRIPTS
   ## PROVISING SCRIPTS TO SETUPP PROJECTS, KEYBOARDS ETC
 {{{ twokeys_insert_ansible_provising }}}

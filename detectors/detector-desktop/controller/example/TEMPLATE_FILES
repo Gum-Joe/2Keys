@@ -1,0 +1,4 @@
+Please render these files
+template.launch.bat -> launch.bat
+template.launch.vbs -> launch.vbs
+Vagrantfile.template -> Vagrantfile

@@ -2,10 +2,9 @@
 ---
 - hosts: all
   tasks:
-    # TODO: Reenable when it works
-    # - name: Provision 2Keys client
-    #   become: true
-    #   command: 2Keys provision -f /vagrant/config/client.yml
-    - name: Is 2Keys there?
+    # Provisions 2Keys detector software
+    # TODO: Publish detector module/install locally to ensure this works, and then prevent ansible ignoring errors here
+    - name: Provision 2Keys client
       become: true
-      command: 2Keys --help
+      ignore_errors: yes # Remove this when provision works
+      command: 2Keys provision -f /vagrant/config/provision.yml #

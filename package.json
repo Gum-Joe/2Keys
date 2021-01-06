@@ -20,6 +20,7 @@
     "packages": [
       "packages/@twokeys/*",
       "detectors/*/controller",
+      "detectors/*/schemas",
       "executors/@twokeys/*"
     ],
     "nohoist": [

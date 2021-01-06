@@ -25,11 +25,13 @@ import struct
 import time
 import sys
 import aiofiles
+import evdev
+from evdev.util import categorize
 import requests
 import json
 from evdev import InputDevice
 from os import path
-from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, MAX_KEY_MAPS
+from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, KEY_VALUE_DOWN, KEY_VALUE_UP, MAX_KEY_MAPS
 from ..util.keyboard_map import keys as KEY_MAP
 from ..util.config import load_config
 from ..util.logger import Logger
@@ -37,8 +39,8 @@ from ..util.logger import Logger
 logger = Logger("detect")
 
 class Keyboard:
-    # keyboard: Keyboard config
-    # name: Name of keyboard
+    """keyboard: Keyboard config
+       name: Name of keyboard"""
     def __init__(self, keyboard, name):
         self.config = load_config()
         logger.debug("Got keyboard: " + str(keyboard))
@@ -66,36 +68,46 @@ class Keyboard:
         self.current_hotkey_up = None
         self.last_hotkey = None
     
-    # Custom mapping
-    # Takes in key/value of key: code and adds to map array
+    
     def apply_mappings(self, maps):
+        """
+        Applies custom mappings.
+
+        Takes in key/value of key to code and adds to map array.
+
+        NB: The map array hold the mapping of all key codes to the strings used to denoted them in configs.
+        """
         for key, code in maps.items():
             logger.debug("Mapped " + key + " as (" + key + ") to code " + str(code))
             self.map[code] = "(" + key + ")"
     
-    # Keyboard watcher
-    # TODO: Use const from evdev instead of manually checking for cleaner code and no magic numbers
     def watch_keyboard(self):
+        """
+        Keyboard watcher - watches keyboard for events and triggers hotkeys by sending events to server according to config
+
+        # TODO: Use const from evdev instead of manually checking for cleaner code and no magic numbers
+        """
         logger.info("Watching for key presses on " + self.name + "...")
         for event in self.keyboard_device.read_loop():
-            type = event.type
-            code = event.code
-            value = event.value
+            # print(categorize(event))
+            type = event.type # Event type - only interested in key event (EV_KEY)
+            code = event.code # KDB Scan Code
+            value = event.value # Value - up, down, hold.
             # We only want event type 1, as that is a key press
             # If key is already pressed, ignore event provided value not 0 (key unpressed)
-            if (type == 1 or type == 0x1):
+            if type == evdev.ecodes.EV_KEY:
                 logger.info("Key pressed. Code %u, value %u. Mapping: %s" %
                         (code, value, self.map[code]))
     
                 # Set key in array
-                # Only done if value 1 so as to not conflict with ups
-                if value == 1:
+                # Only done if value 1 (down) so as to not conflict with ups
+                if value == KEY_VALUE_DOWN:
                     self.change_key_state(code, value)
                     logger.debug(self.keys)
 
                 # Run alogrithm to check keys against hotkey
-                # Only run though if value is 0 or 1 to prevent duplicate hotkeys
-                if value < 2:
+                # Only run though if value is 0  (down) or 1 (up) to prevent duplicate hotkeys
+                if value == KEY_VALUE_DOWN or value == KEY_VALUE_UP:
                     # Proceed with regular hotkey logic
                     checked_hotkey = self.check_for_hotkey(self.keys)
                     if checked_hotkey != False:
@@ -115,8 +127,8 @@ class Keyboard:
                             logger.warn("Hotkey not send as it's type " + hotkey["type"])
                 
                 # Set key in array
-                # Only done if value 0 so as to not conflict with downs
-                if value == 0:
+                # Only done if value 0 (up) so as to not conflict with downs
+                if value == KEY_VALUE_UP:
                     self.change_key_state(code, value)
                     logger.debug(self.keys)
 
@@ -127,16 +139,27 @@ class Keyboard:
                 # Events with code, type and value == 0 are "separator" events
                  print("===========================================")
     
-    # Handle change of state (down/up) of key code
-    # down = True
-    # Up (as in not pressed) = False
     def change_key_state(self, code, value):
-        if value == 1:
-            # Key not yet pressed
-            self.pressed_or_not[code] = True
+        """Handle change of state (down/up) of key code.
+        
+        down, as in has been detected recently as down/up/held = True
+        Up (as in not pressed and so has no state - this does NOT mean unpressed) = False
+
+        Args:
+            code: int key code (that is an index in self.map, the key map) of key that's state has been modified
+            value: int Value to set the key code to (one of KEY_VALUE<DOWN|UP|HOLD>)
+        """
+
+        """Constant for this function of a key having a state, i.e. has been detected recently as down/up/held"""
+        KEY_HAS_SATE = True
+        """Constant for this function of a key NOT having a state, i.e. has NOT been detected recently as down/up/held"""
+        KEY_HAS_NO_SATE = False
+        if value == KEY_VALUE_DOWN: 
+            # Key not yet pressed, or just pressed, and so now has state
+            self.pressed_or_not[code] = KEY_HAS_SATE
             # Add to self.keys string
             if isinstance(self.map[code], str):
-                self.keys = [combo + self.map[code] for combo in self.keys] # Add to each candidate combo                  
+                self.keys = [combo + self.map[code] for combo in self.keys] # Add to each candidate combo - these are the possible combos of key strings that have been pressed and need to be searched for                 
             else:
                 # Array in use
                 # Add as different candidates
@@ -145,9 +168,9 @@ class Keyboard:
                     for mapping in self.map[code]:
                         new_keys.append(combo + mapping)
                 self.keys = new_keys   
-        elif value == 0:
+        elif value == KEY_VALUE_UP: # Key unpressed, and so no longer has a state to us
             # Key unpressed, remove
-            self.pressed_or_not[code] = False
+            self.pressed_or_not[code] = KEY_HAS_NO_SATE
             # Remove from combos
             if isinstance(self.map[code], str):
                 self.keys = [combo.replace(self.map[code], "") for combo in self.keys] # Remove from each combo
@@ -169,12 +192,17 @@ class Keyboard:
                 if len(self.keys) < 1:
                     self.keys = [""]
     
-    # Standardise hotkey config
-    # hotkey = hotkeys mappings
-    # Standard config:
-    #   type: down
-    #   func: Function
+
     def standardise_hotkeys(self, hotkeys):
+        """
+        Standardise (user's) hotkey config so we only have to deal with one type of config when looping through the user's config
+
+        hotkey = hotkeys mappings
+        
+        Standard config:
+          type: down
+          func: Function
+        """
         new_hotkeys = hotkeys
         for key, value in new_hotkeys.items():
             if isinstance(value, str):
@@ -190,10 +218,13 @@ class Keyboard:
                 new_hotkeys[key]["type"] = ("down" if isinstance(value["func"], str) else "multi") # If func is str, use down, if not, use "multi"
         return new_hotkeys
     
-    # Hotkey detector algorithm
-    # Return the key of the hotkey if hotkey
-    # candidate = array of hotkey strings to check
     def check_for_hotkey(self, candidates):
+        """
+        Hotkey detector algorithm.
+        Returns the key of the hotkey in the user's config if hotkey
+
+        :param candidates: array of hotkey strings to check
+        """
         # Check each candidate
         for combo in candidates:
             logger.debug("Checking hotkey in combo " + combo)
@@ -211,11 +242,14 @@ class Keyboard:
         # If none are true, then this isn't the right one (function yet to return)
         return False
     
-    # Hotkey sender
-    # Send hotkey runner command -> server
-    # hotkey = hotkey ref in config
-    # value = Value of event type (up, down) from evdev
     def send_hotkey(self, hotkey, value):
+        """Hotkey sender
+
+        Send hotkey runner command -> server
+        
+        :param hotkey: hotkey ref in config
+        :param value: Value of event type (up, down) from evdev
+        """
         logger.info("Sending hotkey %s to server..." % hotkey)
         try:
             data_hotkey = { "keyboard": self.name, "hotkey": hotkey, "value": value }

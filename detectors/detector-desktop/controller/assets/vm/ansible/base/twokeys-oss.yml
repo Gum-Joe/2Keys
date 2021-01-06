@@ -1,0 +1,54 @@
+# Ansible provisioning for alpine
+# used to install 2Keys from the Open Source repo (useful for testing new feratures without publishing to PyPi)
+# MUST RUN IN TANDEM WITH PROVISION.YML
+---
+- hosts: all
+  vars:
+    oss_branch: "v1.0.0-detector-improvements-1" # TODO: Change this variable when switching branch (and before merging #148)
+    oss_root: /support
+    oss_dirname: "{{ oss_root }}/twokeys"
+    oss_python_location: "{{ oss_dirname }}/detectors/detector-pi/detector"
+    oss_python_common_location: "{{ oss_dirname }}/detectors/common/python"
+  tasks:
+    - name: Update package index
+      become: true
+      apk:
+        update_cache: yes
+    - name: Install Git
+      become: true
+      apk:
+        name: git
+        state: present
+    - name: Install Pipenv
+      become: true
+      pip:
+        name: pipenv
+    - name: Create source directory
+      become: true
+      file:
+        path: "{{ oss_root }}" # We install all support sofwtare code here
+        state: directory
+    - name: Clone 2Keys
+      become: true
+      git:
+        repo: "https://github.com/Gum-Joe/2Keys"
+        dest: "{{ oss_dirname }}"
+        version: "{{ oss_branch }}"
+    
+    - name: Install Dependencies for 2Keys Common 
+      become: true
+      command: "chdir={{ oss_python_common_location }} pipenv install --system --dev"
+    - name: Install 2Keys Common
+      become: true
+      command: "chdir={{ oss_python_common_location }} pip install ."
+  
+    - name: Install 2Keys dependencies
+      become: true
+      command: "chdir={{ oss_python_location }} pipenv install --system --dev"
+    - name: Install 2Keys
+      become: true
+      command: "chdir={{ oss_python_location }} pip install ."
+
+    - name: Validate
+      become: true
+      command: 2Keys --help

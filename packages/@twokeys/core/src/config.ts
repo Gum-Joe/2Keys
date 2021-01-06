@@ -144,3 +144,10 @@ export const stringifyClientConfig = getAStringifyer<ClientConfig>();
  * Stringifies to YAML detector config
  */
 export const stringifyDetectorConfig = getAStringifyer<DetectorConfig>();
+
+/**
+ * Stringifies to YAML any config
+ */
+export function stringifyAnyConfig<ConfigType>(config: ConfigType) {
+	return getAStringifyer<ConfigType>()(config);
+}

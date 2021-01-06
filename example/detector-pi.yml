@@ -5,10 +5,11 @@ client: # Idetifies the device this detector config is for
   name: Detector-PI # So the user knows what it is
 detector-config: # Schema specified by detector; this configures the detector
   perms:
-    start-startup: false # Start detector on the client on startup
-    lock-kds: true # Lock keyboard
-    storage-path: /home/2Keys/project666666 # Place where config files are on client
-    cli-args: --debug # CLI args for detector
+    startStartup: false # Start detector on the client on startup
+    lockKds: true # Lock keyboard
+    # storage-path: /home/2Keys/project666666 # Place where config files are on client - DEPRECATED in favour of central project storage location
+    cliArgs:
+      - --debug # CLI args for detector
 
 keyboards: # Specifies keybaord and hotkeys
   keyboard_1:
@@ -20,7 +21,8 @@ keyboards: # Specifies keybaord and hotkeys
           - add-ons/libs/twokeys-ahk-core-libs # Use library twokeys-ahk-core-libs from libs
       default: executor-ahk # Default executor
     detector: # Custom detector config
-      path: /dev/input/by-id/xxxxx
+      paths: # Some keyboard have multiple devices
+        - /dev/input/by-id/xxxxx
       map: # Custom scan code map
         (G1): 103 
     hotkeys:

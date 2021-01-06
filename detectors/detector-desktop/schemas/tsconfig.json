@@ -1,0 +1,15 @@
+{
+	"extends": "../../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "./types",
+		"outDir": "./lib",
+		// Change "package" for actual package name
+		"tsBuildInfoFile": "../../../.build-cache/package.tsbuildinfo"
+	},
+	"include": [
+		"types" // Typescript source
+	],
+	"references": [
+		// Add deps here, so they are compiled
+	]
+}

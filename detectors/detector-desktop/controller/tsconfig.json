@@ -23,6 +23,10 @@
 		{
 			"path": "../../../packages/@twokeys/addons",
 			"prepend": false
+		},
+		{
+			"path": "../schemas",
+			"prepend": false
 		}
 	]
 }
