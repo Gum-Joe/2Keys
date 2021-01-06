@@ -41,19 +41,23 @@ from ..util.logger import Logger
 logger = Logger("detect")
 
 class Keyboard:
-    """keyboard: Keyboard config
-       name: Name of keyboard"""
+    """Class to watch the input devices for a keyboard (i.e. the files for it in /dev/input - there can be multiple!)
+
+    Watches for changes asyncroneously on all the files, and triggers hotkeys as needed
+
+    NOTE: key states are tracker accross devices - so if e.g. 2 devices that both have an "A" key
+    are registered under the same keyboard in config, pressing "A" on one keyboard is indistinghable from "A" on the other,
+
+    keyboard: Keyboard config
+    name: Name of keyboard
+    """
     def __init__(self, keyboard, name):
         self.config = load_config()
         logger.debug("Got keyboard: " + str(keyboard))
         self.keyboard = keyboard
         self.name = name
-        # File for input that corresponds to the keyboard.
-        self.keyboard_path = keyboard["path"]
         # Generate input devices from the list of related paths!
         self.keyboard_devices = [ InputDevice(keyboardPath) for keyboardPath in self.keyboard["detector"]["paths"] ]
-        # Device from evdev storage
-        # self.keyboard_device = self.keyboard_devices[0]
         # Array of pressed keys
         # is array of booleans, with the index = key code
         # i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
@@ -130,7 +134,7 @@ class Keyboard:
 
         # TODO: Use const from evdev instead of manually checking for cleaner code and no magic numbers
         """
-        logger.info("Watching async for key presses on " + self.name + "...")
+        logger.info("Watching async for key presses on " + self.name + ", path " + device_handler.path + "...")
         async for event in device_handler.async_read_loop():
             # print(categorize(event))
             type = event.type # Event type - only interested in key event (EV_KEY)
