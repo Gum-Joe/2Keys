@@ -24,7 +24,7 @@ export interface ClientSideKeyboardMap {
     createdBy: "CONTROLLER" | "DETECTOR";
   };
   /**
-   * Contains a map of keyboard UUIDs to /dev/input devices
+   * Contains a map of keyboard UUIDs to /dev/input devices, with multiple allowed for each keyboard
    */
   keyboards: {
     /**
@@ -35,7 +35,7 @@ export interface ClientSideKeyboardMap {
       /**
        * Path to file that represents the keyboard, usually in /dev/input
        */
-      deviceFilePath: string;
+      deviceFilePaths: string[];
       [k: string]: unknown;
     };
   };
