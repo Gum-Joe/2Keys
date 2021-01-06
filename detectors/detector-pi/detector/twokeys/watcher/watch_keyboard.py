@@ -50,8 +50,10 @@ class Keyboard:
         self.name = name
         # File for input that corresponds to the keyboard.
         self.keyboard_path = keyboard["path"]
+        # Generate input devices from the list of related paths!
+        self.keyboard_devices = [ InputDevice(keyboardPath) for keyboardPath in self.keyboard["detector"]["paths"] ]
         # Device from evdev storage
-        self.keyboard_device = InputDevice(self.keyboard_path)
+        # self.keyboard_device = self.keyboard_devices[0]
         # Array of pressed keys
         # is array of booleans, with the index = key code
         # i.e. if pressed_or_not[2] == true, then 2 has been pressed down.  Once set to false, the key has been 'unpressed'
@@ -114,18 +116,22 @@ class Keyboard:
             loop.add_signal_handler(
                 s, lambda s=s: asyncio.create_task(self.shutdown(loop, signal=s)))
         loop.set_exception_handler(self.handle_exception)
-        loop.create_task(self.watch_keyboard_handler())
-        loop.create_task(self.watch_keyboard_handler())
+
+        logger.info("Starting watchers...")
+        for keyboard_device in self.keyboard_devices:
+            loop.create_task(self.watch_keyboard_handler(keyboard_device))
+        #loop.create_task(self.watch_keyboard_handler())
         loop.run_forever()
 
-    async def watch_keyboard_handler(self):
+    async def watch_keyboard_handler(self, device_handler: InputDevice):
         """
         Keyboard watcher - watches keyboard for events and triggers hotkeys by sending events to server according to config
+        :param device_hander: EvDev InputDevice object.
 
         # TODO: Use const from evdev instead of manually checking for cleaner code and no magic numbers
         """
         logger.info("Watching async for key presses on " + self.name + "...")
-        async for event in self.keyboard_device.async_read_loop():
+        async for event in device_handler.async_read_loop():
             # print(categorize(event))
             type = event.type # Event type - only interested in key event (EV_KEY)
             code = event.code # KDB Scan Code
@@ -302,12 +308,16 @@ class Keyboard:
 
     # Locks (grabs) keyboard
     def lock(self):
-        logger.info("Locking keyboard....")
-        self.keyboard_device.grab()
+        logger.info("Locking keyboards....")
+        for keyboard_device in self.keyboard_devices:
+            logger.info("Locking " + keyboard_device.path + "...")
+            keyboard_device.grab()
     # Unlocks (ungrabs) keyboard
     def unlock(self):
-        logger.info("Unlocking keyboard...")
-        self.keyboard_device.ungrab()
+        logger.info("Unlocking keyboards...")
+        for keyboard_device in self.keyboard_devices:
+            logger.info("Unlocking " + keyboard_device.path + "...")
+            keyboard_device.ungrab()
 
 
 # str keyboard: Keyboard file in /dev/input/by-id

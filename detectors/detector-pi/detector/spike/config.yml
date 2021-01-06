@@ -8,62 +8,27 @@ addresses:
     port: 8181
 keyboards:
   logitech_g810:
-    dir: ./logitech_g810
+    path: /dev/input/by-id/usb-04d9_1203-event-kbd
+    executors:
+      executor-ahk:
+        root: index.ahk
+    root: ./logitech_g810
+    detector:
+      paths:
+      - /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-if01
+      - /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-kbd
+      - /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-if01-event-kbd
     hotkeys:
-      $#$: InstantVFXScale
-      $DOWN$: InstantVFXPositionVert
-      $ESC$: TerminateGCClient
-      $LEFT$: InstantVFXPosition
-      $RIGHT$: InstantVFXPosition
-      $UP$: InstantVFXPositionVert
-      +$ESC$: TerminatePremiere
-      +F1G: GotoHomeworkGerman
-      +O: OpenCurrentProjectEditingApp
-      ',': AudioTransitionConstantPower
-      '1': Trigger1
-      '2': Trigger2
-      '3': Trigger3
-      '4': Trigger4
-      '5': Trigger5
-      A: RemoveUnusedMergedTracks
-      B: TransitionDipToBlack
-      C: InstantVFXOpacity
-      D: TriggerD
-      E: GraphicsCenterAlign
-      F: EffectHorizontalFlip
-      F1: GotoHomework
-      F2: GotoYTAssets
-      F3: GotoYTCoreAssets
-      G: GetGraphicsTemplate
-      H: EssentialAudioPresetBlueYeti
-      I: InsertAndAutoResize
-      J: AudioTransitionExponetialFade
-      K: EffectColorKey
-      L: TriggerL
-      M: GoToMasterEffects
-      N: EffectCrop
-      O: OpenCurrentProjectFolderEditing
-      P: TriggerP
-      Q: DrapCopyEffects
-      R: EffectCameraBlur
-      S: CaptureAndSave
-      T: TemplateOpenSans
-      U: EffectUltraKey
-      V: BinChangeView
-      W: AutoResize
-      X: InstantVFXAnchorPointVert
-      Y: OpenInAudition
-      Z: InstantVFXAnchorPoint
-      ^!+S: SSHPi
       ^!+T: TestIfRunning
-      ^+$ESC$: RestartPremiere
-      ^E: AutoExportAudacityAudio
-      ^N: GenerateNewPremiereProject
-      ^O: OpenCurrentProjectFolderProgramming
-    path: /dev/input/by-id/usb-Logitech_Gaming_Keyboard_G810_166A37573236-event-kbd
-    root: index.ahk
   numpad_apps:
-    dir: ./numpad_apps
+    path: /dev/input/by-id/usb-04d9_1203-event-kbd
+    executors:
+      executor-ahk:
+        root: index.ahk
+    root: ./numpad_apps
+    detector:
+      paths:
+      - /dev/input/by-id/usb-04d9_1203-event-kbd
     hotkeys:
       $BACKSPACE$: Slack
       $NUM_+$: Firefox
@@ -86,8 +51,6 @@ keyboards:
       NUM7: Teams
       NUM8: Premiere
       NUM9: Discord
-    path: /dev/input/by-id/usb-04d9_1203-event-kbd
-    root: index.ahk
 name: KeyboardOfMacros
 perms:
   ssh: true
