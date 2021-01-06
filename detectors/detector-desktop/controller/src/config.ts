@@ -21,6 +21,7 @@
  * Types for config
  * @packageDocumentation
  */
+import type { Keyboard } from "@twokeys/core/lib/interfaces";
 
 /**
  * Keyboard identifyers
@@ -33,7 +34,10 @@ export interface KeyboardIdentifyer {
 	/** Optional serial number (not present on some devices) */
 	serialNumber?: string;
 	uuid: string;
-	/** Path to USB device */
+	/**
+	 * Path to USB device
+	 * @deprecated Now stored in keyboard-map.json in VMRoot/config/keyboard-map.json
+	 */
 	address: string;
 }
 
@@ -67,4 +71,33 @@ export interface ClientConfigHere {
 	executables: Partial<{
 		vagrant: string;
 	}>;
+}
+
+/**
+ * Config for detectors, for the detectir prop of a keyboard
+ * @see Keyboard.detector
+ */
+export interface DetectorConfigForKeyboard {
+	/**
+	 * Signifies the /dev/input paths to use for this keyboard.
+	 * This is because evdev (which we use for detecion) can watch multiple keyboards at once.
+	 */
+	paths: string[];
+	/**
+	 * Used to map scan codes to custom strings that can be used to references them in the `hotkeys` section of config
+	 * @see Keyboard.hotkeys
+	 */
+	map: Record<string, number>;
+}
+
+/**
+ * Project-wide config for this detector
+ */
+export interface DetectorConfigForProject {
+	/** Start detector on the client on startup? Default: true */
+	startStartup: boolean;
+	/** Lock keyboard when in use so only detector-desktop can use them? Default: true */
+	lockKds: boolean;
+	/** Arguments to the detector CLI on the client. */
+	cliArgs: string[];
 }

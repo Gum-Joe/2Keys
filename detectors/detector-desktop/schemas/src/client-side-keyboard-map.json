@@ -30,17 +30,20 @@
 		},
 
 		"keyboards": {
-			"description": "Contains a map of keyboard UUIDs to /dev/input devices",
+			"description": "Contains a map of keyboard UUIDs to /dev/input devices, with multiple allowed for each keyboard",
 			"patternProperties": {
 				"^.*$": {
 					"anyOf": [
 						{
 							"type": "object",
 							"description": "Information about the keyboard",
-							"required": ["deviceFilePath"],
+							"required": ["deviceFilePaths"],
 							"properties": {
-								"deviceFilePath": {
-									"type": "string",
+								"deviceFilePaths": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									},
 									"description": "Path to file that represents the keyboard, usually in /dev/input"
 								}
 							}

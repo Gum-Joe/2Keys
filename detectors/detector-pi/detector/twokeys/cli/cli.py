@@ -97,17 +97,7 @@ def provisionClient(file):
   """Provisions a new client, creating the files so it can then be added to a project as a detector.
   Works by creating index for keyboards (/dev/input -> client config keyboards) and projects and a directory structure to store files in.
 
-  Only config files are supported at this time.  These config files are created by the controller from the main server-side config
-
-  The follow structure is created (assume / is the set root, usually /vagrant):
-  ```
-  /
-  |--/config
-    |--client.yml (provided by 2Keys)
-    |--keyboard-index.yml
-  |--/projects
-    |--project-map.yml
-  ```
+  See provision() docs for more info.
   """
   # Run provision
   try:

@@ -25,6 +25,8 @@ import struct
 import time
 import sys
 import aiofiles
+import evdev
+from evdev.util import categorize
 import requests
 import json
 from evdev import InputDevice
@@ -83,7 +85,7 @@ class Keyboard:
             value = event.value
             # We only want event type 1, as that is a key press
             # If key is already pressed, ignore event provided value not 0 (key unpressed)
-            if (type == 1 or type == 0x1):
+            if type == evdev.ecodes.EV_KEY:
                 logger.info("Key pressed. Code %u, value %u. Mapping: %s" %
                         (code, value, self.map[code]))
     
