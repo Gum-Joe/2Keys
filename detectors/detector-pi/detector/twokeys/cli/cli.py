@@ -23,7 +23,7 @@ import click
 import sys
 from ..watcher import Keyboard
 from ..util import Logger, load_project_config, constants
-from ..add_keyboard import gen_async_handler, add_keyboard
+from ..add_keyboard import gen_async_handler, add_keyboard, link_keyboard
 from ..init import init as init_cli
 from ..sync import sync_config
 from ..daemon import generate_daemon
@@ -69,6 +69,23 @@ def sync(yes):
 )
 def add(keyboard, inputs_path):
   add_keyboard(keyboard, gen_async_handler, inputs_path)
+
+@cli.command("link")
+@click.argument("uuid", required=True)
+#@click.argument("path", default="")
+@click.option(
+  "--by-detection",
+  is_flag=True,
+  help="Link the UUID of a keyboard in the config to a physical input device by detecting a keypress on the right device"
+)
+@click.option(
+  "--inputs-path",
+  "-i",
+  help="Provide an alternative path to use as the source of keyboard input 'files' (default: /dev/input/by-id)",
+  default=constants.KEYBOARDS_PATH_BASE
+)
+def linkKeyboard(uuid, by_detection, inputs_path):
+  link_keyboard(uuid, None, inputs_path, by_detection=by_detection)
 
 @cli.command()
 @click.argument("keyboard")

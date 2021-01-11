@@ -10,12 +10,12 @@
 			"request": "launch",
 			"module": "twokeys",
 			"envFile": "${workspaceFolder}/.env",
-			"cwd": "${workspaceFolder}/spike",
+			//"cwd": "${workspaceFolder}/spike",
 			"env": {
 				"PYTHONPATH": "${env:PYTONPATH}:${workspaceFolder}/../../common/python:${workspaceFolder}",
 				"DEBUG": "true"
 			},
-			"args": ["watch", "numpad_apps"]
+			"args": ["link", "3577fa1e-87dc-493f-a94d-af0e065942ca", "--by-detection"]
 		}
 	]
 }

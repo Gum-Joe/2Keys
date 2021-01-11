@@ -1,0 +1,18 @@
+# NOTE: SEE interfaces.ts:ClientConfigHere for more info
+
+id: sodkfhakjshdf
+name: test
+controller: "@twokeys/detector-desktop"
+controllerConfig:
+  perms:
+    addToStartup: false
+    allowAutoUpdate: false
+  keyboards:
+    - filterName: string
+      vendorID: "0x04d9"
+      productID: "0x1203"
+      # Optional serial number (not present on some devices) 
+      # serialNumber: string
+      uuid: 3577fa1e-87dc-493f-a94d-af0e065942ca
+  projects: []
+  executables: {}
