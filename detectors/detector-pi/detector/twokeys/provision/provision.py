@@ -2,9 +2,9 @@
 from os import makedirs, mkdir
 import os
 from os.path import join
-from ..util.constants import BLANK_KEYBOARD_MAP, BLANK_PROJECT_MAP, KEYBOARD_MAP_FILENAME, PROJECT_MAP_FILENAME, SCHEMA_PROVISIONING, TWOKEYS_FIXED_HOME, TWOKEYS_FIXED_HOME_CONFIG
+from ..util.constants import BLANK_KEYBOARD_MAP, BLANK_PROJECT_MAP, Fatal2KeysError, KEYBOARD_MAP_FILENAME, PROJECT_MAP_FILENAME, SCHEMA_PROVISIONING, TWOKEYS_FIXED_HOME, TWOKEYS_FIXED_HOME_CONFIG
 from twokeys_utils import Logger
-from ..util.config import load_config, load_config_from_file
+from ..util.config import load_project_config, load_config_from_file
 from jsonschema import validate
 from jsonschema.exceptions import SchemaError, ValidationError
 import json
@@ -12,7 +12,7 @@ from typing import Any, Union, Dict
 
 logger = Logger("provision")
 
-class FatalProvisioningException(Exception):
+class FatalProvisioningException(Fatal2KeysError):
 	"""Used to tell caller (CLI) there was an error and to quit with non-exit code"""
 
 def validateConfig(configFile: Union[str, None]) -> Dict[str, Any]:

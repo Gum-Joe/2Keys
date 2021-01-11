@@ -23,7 +23,7 @@ import asyncio
 import os
 import yaml
 import logging
-from ..util import load_config, Logger
+from ..util import load_project_config, Logger
 from ..util.constants import UPDATE_KEYBOARD_PATH
 
 logger = Logger("sync")

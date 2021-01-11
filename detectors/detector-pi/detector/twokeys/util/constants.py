@@ -36,8 +36,8 @@ MAX_KEY_MAPS = 250
 # Script root
 SCRIPTS_ROOT = os.path.dirname(os.path.realpath(__file__)) + "/.."
 
-# Config file
-CONFIG_FILE = "config.yml"
+# Project Config file, relative to project root
+PROJECT_CONFIG_FILE = "config.yml"
 
 # REquest dir for sync
 UPDATE_KEYBOARD_PATH = "/api/post/update-keyboard-path"
@@ -104,3 +104,7 @@ KEY_VALUE_DOWN = 1
 KEY_VALUE_UP = 0
 """Key held (held down)"""
 KEY_VALUE_HOLD = 2
+
+
+class Fatal2KeysError(Exception):
+	"""Base class for all fatal 2Keys errors that require an exit"""

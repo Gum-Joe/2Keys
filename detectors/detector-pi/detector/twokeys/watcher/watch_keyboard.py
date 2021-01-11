@@ -35,7 +35,7 @@ from evdev import InputDevice
 from os import path
 from ..util.constants import KEYBOARDS_PATH_BASE, KEYBOARD_EVENT_FORMAT, KEYBOARD_EVENT_SIZE, KEY_VALUE_DOWN, KEY_VALUE_UP, MAX_KEY_MAPS
 from ..util.keyboard_map import keys as KEY_MAP
-from ..util.config import load_config
+from ..util.config import load_project_config
 from ..util.logger import Logger
 
 logger = Logger("detect")
@@ -56,7 +56,7 @@ class Keyboard:
     - no_lock: CLI option that says "dont lock KBD"
     """
     def __init__(self, keyboard, name, full_config, **kwargs):
-        self.config = load_config()
+        self.config = load_project_config()
         logger.debug("Got keyboard: " + str(keyboard))
         self.keyboard = keyboard
         self.name = name

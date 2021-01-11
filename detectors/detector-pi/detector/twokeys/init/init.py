@@ -25,7 +25,7 @@ import yaml
 import colorful
 from ..util.constants import SCRIPTS_ROOT, DEFAULT_PORT, MODULE_NAME
 from ..util.logger import Logger
-from ..util.config import load_config
+from ..util.config import load_project_config
 from ..daemon import generate_daemon
 from ..add_keyboard import add_keyboards
 

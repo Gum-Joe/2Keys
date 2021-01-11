@@ -17,4 +17,4 @@ You should have received a copy of the GNU General Public License
 along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .logger import Logger
-from .config import load_config
+from .config import load_project_config

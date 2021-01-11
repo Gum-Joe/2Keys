@@ -22,7 +22,7 @@ along with 2Keys.  If not, see <https://www.gnu.org/licenses/>.
 import click
 import sys
 from ..watcher import Keyboard
-from ..util import Logger, load_config, constants
+from ..util import Logger, load_project_config, constants
 from ..add_keyboard import gen_async_handler, add_keyboard
 from ..init import init as init_cli
 from ..sync import sync_config
@@ -79,7 +79,7 @@ def watch(keyboard, no_lock):
     exit()
   
   # Keyboard specified, watch it
-  config = load_config()
+  config = load_project_config()
   keyboard = Keyboard(config["keyboards"][keyboard], keyboard, config, no_lock=no_lock)
   if not no_lock:
     keyboard.watch_keyboard()
@@ -116,7 +116,7 @@ def provisionClient(file):
 @click.argument("keyboards", nargs=-1, required=False)
 def daemon_gen(keyboards):
   logger.info("Generating daemon files...")
-  config = load_config()
+  config = load_project_config()
   keyboard_list = config["keyboards"].keys()
   if keyboards != ():
     # Use args instead

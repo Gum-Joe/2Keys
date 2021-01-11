@@ -22,14 +22,14 @@ import json
 import yaml
 import os
 from ..util.logger import Logger
-from ..util.config import load_config
-from ..util.constants import CONFIG_FILE
+from ..util.config import load_project_config
+from ..util.constants import PROJECT_CONFIG_FILE
 
 logger = Logger("sync")
 
 def sync_config():
   logger.info("Syncing config...")
-  config = load_config()
+  config = load_project_config()
   address = "http://" + config["addresses"]["server"]["ipv4"] + ":" + str(config["addresses"]["server"]["port"]) + "/api/get/config"
   logger.debug("GET " + address)
   try:
@@ -51,7 +51,7 @@ def sync_config():
   logger.info("Saving config to " + os.getcwd() + "...")
   # Add IP to config
   logger.debug("Opening config...")
-  config_file = open(CONFIG_FILE, "w")
+  config_file = open(PROJECT_CONFIG_FILE, "w")
   logger.debug("Writing config...")
   config_file.write("# Config for 2Keys\n# ONLY FOR USE BY THE PROGRAM\n# To change the config, update it on the client and run \"2Keys config-update\" here\n" +
                     yaml.dump(config, default_flow_style=False))
