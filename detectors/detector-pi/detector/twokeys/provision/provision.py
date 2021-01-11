@@ -89,6 +89,9 @@ def provision(**kargs):
 	It also copies the provision config to /home/twokeys/.2Keys/config.yml
 	so that there is a central, fixed point of reference to find the config whenever twokeys boots up.
 	It can then trawl that config to find the main config, projects etc
+
+	Args:
+		**file Provision script (file the specifies options to this command)
   """
 	logger.info("Provisioning a new client")
 	config = validateConfig(kargs["file"])
@@ -123,7 +126,7 @@ def provision(**kargs):
 	logger.info("Config written")
 
 	# STEP 3: Create index
-	logger.info("STEP 3: Creating keyboard and project indexes...")
+	logger.info("STEP 1: Creating keyboard and project indexes...")
 
 	# Create keyboard index
 	logger.info("Generating a blank keyboard index...")

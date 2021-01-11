@@ -34,8 +34,25 @@ def add_keyboards(config):
       system("cd " + getcwd() + " && python3 -m " + MODULE_NAME + " add " + key)
       print("")  # Padding
 
+def link_keyboard(uuid, path = None, **kwargs):
+  """Links a keyboard to a UUID in the keyboard map
+
+  Links a keyboard to a UUID in the keyboard map so that we can watch it for presses.
+
+  Args:
+    uuid: UUID of the keyboard to map in the 2Keys config
+    path: Optional path of the device the keyboard is being mapped to
+    **by_detection: Detect the keyboard by watching for a keypress on the right keyboard
+  """
+
+  logger.info("Linking a new keyboard...")
+  logger.info("Loading config...")
+  
+  # STEP 1: Load fixed config
 
 def add_keyboard(name, gen_handler, inputs_path):
+  """Adds a new keyboard.  DEPRECATED."""
+  logger.warn("DEPRECATED. Please use the new link command instead.")
   # Check if paths not given
   config = load_config()
   if name == "" or name not in config["keyboards"]:

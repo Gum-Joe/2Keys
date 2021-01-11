@@ -84,11 +84,17 @@ BLANK_PROJECT_MAP = {
 KEYBOARD_MAP_FILENAME = "keyboard-map.json"
 """File name of projects map, stored in projects root"""
 PROJECT_MAP_FILENAME = "projects.json"
+"""
+Assumed location of controller config.
+This is the one generated on the server by the controller.
+It is stored in the config root.
+"""
+ASSUMED_CONTROLLER_CONFIG_FILENAME = "config.yml"
 
 """Fixed root to put important files in so that 2Keys can find all the other config files (such as keyboard map).  Allows us to make 2Keys platform-agnostic"""
 TWOKEYS_FIXED_HOME = os.path.join(Path.home(), ".2Keys")
 """Fixed location of a copy of the provision config as it contain all the information we need to find the other config."""
-TWOKEYS_FIXED_HOME_CONFIG = os.path.join(TWOKEYS_FIXED_HOME, "config.yml")
+TWOKEYS_FIXED_HOME_CONFIG = os.path.join(TWOKEYS_FIXED_HOME, "config-provision.yml")
 
 
 # Key input constants
