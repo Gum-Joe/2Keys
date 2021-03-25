@@ -13,7 +13,7 @@ codecov = "*"
 [packages]
 colorful = "*"
 requests = "*"
-pyyaml = "==5.3.1"
+pyyaml = "==5.4"
 aiofiles = "*"
 aiohttp = "*"
 pystache = "*"
