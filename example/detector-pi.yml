@@ -3,10 +3,10 @@ name: Name of detector
 client: # Idetifies the device this detector config is for
   id: device-00000 # See devices/device-00000.yml
   name: Detector-PI # So the user knows what it is
-detector-config: # Schema specified by detector; this configures the detector
+detector_config: # Schema specified by detector; this configures the detector
   perms:
     startStartup: false # Start detector on the client on startup
-    lockKds: true # Lock keyboard
+    lockKBDs: true # Lock keyboards
     # storage-path: /home/2Keys/project666666 # Place where config files are on client - DEPRECATED in favour of central project storage location
     cliArgs:
       - --debug # CLI args for detector

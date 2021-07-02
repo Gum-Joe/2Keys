@@ -10,6 +10,7 @@
   "scripts": {
     "compile": "tsc -b",
     "watch": "tsc -b -w",
+    "test": "echo NONE",
     "lint": "eslint --ext .ts .",
     "test:server": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.ts",
     "coverage": "echo Please use coverage:server instead. This is to prevent tests running in CI.",
