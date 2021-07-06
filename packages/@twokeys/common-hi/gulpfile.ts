@@ -8,11 +8,12 @@ import path from "path";
 const PROTOC_GEN_TS_PATH = ".\\node_modules\\.bin\\protoc-gen-ts.cmd";
 const OUT_DIR = "src";
 const SOURCE_DIR_RELATIVE = "src";
+const LIB_OUT_DIR = "lib";
 const SOURCE_DIR = path.join(__dirname, SOURCE_DIR_RELATIVE);
 const SOURCE_GLOB = "**/*.proto";
 
-export async function protoc(): Promise<void> {
-	return gulp.src(path.join(SOURCE_DIR, SOURCE_GLOB))
+export async function protoc(): Promise<any> {
+	await gulp.src(path.join(SOURCE_DIR, SOURCE_GLOB))
 		.pipe(exec(file => {
 			const command = `
 			protoc
@@ -25,6 +26,10 @@ export async function protoc(): Promise<void> {
 			return command.split("\n").join(" ").replace(/\t/g, "");
 		}))
 		.pipe(exec.reporter());
+	
+	// Due to compile issues where exports aren't retained by TS, we than have to manually copy to lib
+	await gulp.src(path.join(SOURCE_DIR, "**/*_pb*"), { base: OUT_DIR }) // copy .d.ts
+		.pipe(gulp.dest(LIB_OUT_DIR));
 }
 
 

@@ -24,7 +24,7 @@
  */
 // TODO: Config validation of everything
 import { promises as fs } from "fs";
-import YAML from "yaml";
+import YAML from "yaml/dist";
 import { MainConfig, DetectorConfig, ClientConfig, ProjectConfig, CombinedConfigs, AddConfigUtils, MakeKeysOptional, ConfigUtils } from "./interfaces";
 import Logger from "./logger";
 import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH, TWOKEYS_PROJECT_CONFIG_FILENAME } from "./constants";
