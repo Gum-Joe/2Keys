@@ -25,6 +25,9 @@ import { Logger, TwoKeys as BaseTwoKeys, AllTwoKeysProperties } from "@twokeys/c
 import { Package, TWOKEYS_ADDON_TYPES, TWOKEYS_ADDON_TYPE_DETECTOR } from "../util/interfaces";
 import SoftwareRegistry from "../software";
 import TwoKeysUtilites from "./twokeys-utils";
+import { MainConfig } from "@twokeys/core/lib/interfaces";
+import { loadMainConfig } from "@twokeys/core/lib/config";
+import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
 
 /** Interface twokeys must implement */
 interface TwoKeysI<AddOnsType extends TWOKEYS_ADDON_TYPES> {
@@ -58,6 +61,14 @@ export type TwoKeysPropertiesForAddons<AddOnsType extends TWOKEYS_ADDON_TYPES = 
 	AddOnsType extends TWOKEYS_ADDON_TYPE_DETECTOR & string ? DetectorTwoKeysProperties : Partial<BaseTwoKeysPropertiesForAddons>;
 
 /**
+ * Stores accessors to important configs for access by add-ons
+ */
+export interface TwoKeysConfigs {
+	/** Access to main config for e.g. add-ons to get ipv4 address */
+	readonly getMainConfig: () => Promise<MainConfig>;
+}
+
+/**
  * Type to use to say that a function wants a twokeys with {@link AllTwoKeysProperties} -> i.e. all properties present
  */
 export type TwoKeysForAProject<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_ADDON_TYPES> = TwoKeys<AddOnsType> & { properties: BaseTwoKeysPropertiesForAddons };
@@ -76,12 +87,26 @@ export default class TwoKeys<AddOnsType extends TWOKEYS_ADDON_TYPES = TWOKEYS_AD
 	public readonly utils: TwoKeysUtilites<AddOnsType>;
 
 	/**
+	 * @see TwoKeysConfigs
+	 */
+	public readonly configs: TwoKeysConfigs = {
+		getMainConfig: async (): Promise<MainConfig> => {
+			return loadMainConfig(TWOKEYS_MAIN_CONFIG_DEFAULT_PATH);
+		}
+	}
+
+	/**
 	 * Class provided to add-on function that allows them to interact with 2Keys
 	 * @param packageObject Object containing info on add-on
 	 * @param registryDB Path to add-ons registry DB, where software table is stored (see {@link SoftwareRegistry})
 	 * @param properties Properties related to execution - **please see {@link TwoKeysProperties}**
 	 */
-	constructor(packageObject: Package<AddOnsType>, registryDB: string, CustomLogger: typeof Logger = Logger, public readonly properties: TwoKeysPropertiesForAddons<AddOnsType>) {
+	constructor(
+		packageObject: Package<AddOnsType>,
+		registryDB: string,
+		CustomLogger: typeof Logger = Logger,
+		public readonly properties: TwoKeysPropertiesForAddons<AddOnsType>,
+	) {
 		super(CustomLogger, ":", properties);
 		this.package = packageObject;
 		this.software = new SoftwareRegistry<AddOnsType>({

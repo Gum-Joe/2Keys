@@ -27,6 +27,7 @@ from ..add_keyboard import gen_async_handler, add_keyboard
 from ..init import init as init_cli
 from ..sync import sync_config
 from ..daemon import generate_daemon
+from ..provision import provision, FatalProvisioningException
 
 logger = Logger("cli")
 
@@ -89,6 +90,23 @@ def watch(keyboard, no_lock):
       exit(0)
   else:
     keyboard.watch_keyboard()
+  
+@cli.command("provision")
+@click.option("-f", "--file", type=str, help="Config file to use. Must specify all options.")
+def provisionClient(file):
+  """Provisions a new client, creating the files so it can then be added to a project as a detector.
+  Works by creating index for keyboards (/dev/input -> client config keyboards) and projects and a directory structure to store files in.
+
+  See provision() docs for more info.
+  """
+  # Run provision
+  try:
+    provision(file=file)
+  except FatalProvisioningException:
+    #logger.err("2Keys command failed: see above for why.")
+    exit(1)
+
+  
 
 # Command to generate daemons
 @cli.command()

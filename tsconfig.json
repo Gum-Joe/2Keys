@@ -21,6 +21,9 @@
 			"path": "./executors/@twokeys/executor-ahk"
 		},
 		{
+			"path": "./detectors/detector-desktop/schemas"
+		},
+		{
 			"path": "./detectors/detector-desktop/controller"
 		}
 	]

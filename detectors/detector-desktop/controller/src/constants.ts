@@ -8,6 +8,29 @@ export const VIRTUALBOX_NAME = "VirtualBox";
 export const VIRTUALBOX_EXECUTABLE_NAME = "VirtualBox Install Folder";
 export const VAGRANT_NAME = "Vagrant";
 export const VAGRANT_EXECUTABLE_NAME = "Vagrant Install Folder";
+/** Controls the root mount point for stuff into the VM, i.e. where configs, Vagrantfile and ansible scripts will all be mounted.  MUST NOT END IN A SLASH (`/`) */
+export const VAGRANT_MOUNT_POINT = "/vagrant";
+/**
+ * Where configs will be stored on the client
+ */
+// TODO: Move to shared folder so python can also access this
+export const VM_MOUNT_CONFIGS = VAGRANT_MOUNT_POINT + "/config";
+/**
+ * Where projects will be stored on the client
+ */
+// TODO: Move to shared folder so python can also access this
+export const VM_MOUNT_PROJECTS = VAGRANT_MOUNT_POINT + "/projects";
+/**
+ * VM Mount location of client config from controller ({@link ClientConfigHere}).
+ * 
+ * Not to be confused with the client provisioning config
+ */
+export const VM_MOUNT_CLIENT_CONFIG = VM_MOUNT_CONFIGS + "/client.yml";
+/**
+ * Storage path for provision script, relative to root.
+ */
+// TODO: Move to a common package so Python also can access this
+export const PROVISION_CONFIG_STORAGE = "config/provision.yml";
 
 /** Root where assets are stored */
 export const ASSETS_ROOT = join(__dirname, "../assets");

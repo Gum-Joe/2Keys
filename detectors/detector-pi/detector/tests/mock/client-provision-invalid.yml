@@ -1,0 +1,16 @@
+# Stored in /home/twokeys/.2Keys/client.yml
+
+# 2Keys detector-linux provision script
+twokeys:
+  version: 1.0.0
+  type: CLIENT_SETUP
+  createdBy: ME
+
+client:
+  name: Example
+  # id: UUIDv4 # MISSING!
+  server:
+    ipv4: 1000 # Bad type!
+  roots:
+    # config: ./tests/mock/provision/config # NOTE: Should be absolute paths # MISSING!
+    projects: ./tests/mock/provision/projects # NOTE: Should be absolute paths

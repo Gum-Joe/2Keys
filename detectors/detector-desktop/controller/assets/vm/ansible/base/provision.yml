@@ -64,7 +64,8 @@
       apk:
         name: linux-headers,build-base,python3-dev
         state: present
-    - name: Install 2Keys
-      become: true
-      pip:
-        name: 2Keys
+    # TODO: Reenable once PyPi package published and don't want to build from source anymore
+    #- name: Install 2Keys
+    #  become: true
+    #  pip:
+    #    name: 2Keys

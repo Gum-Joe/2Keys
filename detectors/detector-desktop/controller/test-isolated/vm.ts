@@ -7,13 +7,16 @@ import { join } from "path";
 import rimrafCB from "rimraf";
 import { ClientConfigHere } from "../src/config";
 import newClient from "../src/setup/client/newClient";
-import { MOCK_REGISTRY_LOCATION, MOCK_ROOT } from "../test/constants";
+import { MOCK_2KEYS_HOME_CONFIG, MOCK_REGISTRY_LOCATION, MOCK_ROOT } from "../test/constants";
 import packageJSON from "../package.json";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { BAD_VAGRANT_EXIT_CODE } from "../src/errorCodes";
 import { startVM } from "../src/setup/client/vm";
 import install from "../src/install";
+import sinon from "sinon";
+
+const coreConstants = require("@twokeys/core/lib/constants");
 
 chai.use(chaiAsPromised);
 
@@ -44,6 +47,7 @@ const rimraf = promisify(rimrafCB);
 
 describe("VM Startup tests", () => {
 	before(async () => {
+		sinon.replace(coreConstants, "TWOKEYS_MAIN_CONFIG_DEFAULT_PATH", MOCK_2KEYS_HOME_CONFIG);
 		try { await rimraf(MOCK_REGISTRY_LOCATION); } catch (err) { if (err.code !== "ENOENT") throw err; }
 		await AddOnsRegistry.createNewRegistry(MOCK_REGISTRY_LOCATION);
 		await SoftwareRegistry.createSoftwareRegistry(MOCK_REGISTRY_LOCATION);

@@ -1,5 +1,6 @@
 import unittest
 import os
+import sys
 
 # Setup ENV
 os.environ["2KEYS_TEST"] = "true"

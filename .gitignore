@@ -62,7 +62,7 @@ build
 *.app
 
 # Python virtual env
-.env
+#.env
 
 # Python stuff
 # Byte-compiled / optimized / DLL files
@@ -153,7 +153,7 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-.env
+#.env
 .venv
 env/
 venv/
@@ -234,7 +234,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+#.env
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

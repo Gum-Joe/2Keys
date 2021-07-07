@@ -9,6 +9,7 @@ wheel = "*"
 twine = "*"
 coverage = "*"
 codecov = "*"
+autopep8 = "*"
 
 [packages]
 colorful = "*"
@@ -19,9 +20,13 @@ aiohttp = "*"
 pystache = "*"
 evdev = "==1.3.0"
 click = "*"
+jsonschema = "*"
+#typing-extensions = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
 
 [scripts]
 twokeys = "python -m twokeys"
+test = "unittest discover -s ./tests -p test*.py"
+test_coverage = "coverage run --source twokeys -m unittest discover -s ./tests -p test*.py"

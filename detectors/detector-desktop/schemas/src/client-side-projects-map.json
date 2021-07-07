@@ -1,0 +1,55 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$comment": "Config created by the server and stored in the projects root (usually /vagrant/projects/) to index projects with the projects directory.",
+	"required": ["twokeys", "projects"],
+	"properties": {
+		"twokeys": {
+			"type": "object",
+			"description": "Contains information about what this config is for",
+			"required": ["version", "type", "createdBy"],
+			"properties": {
+				"version": {
+					"type": "string",
+					"description": "Version of 2Keys"
+				},
+				"type": {
+					"type": "string",
+					"enum": ["PROJECT_MAP"],
+					"description": "Tells us this is a PROJECT_MAP config.  PROJECT_MAP must be given for this value so we know we are parsing the right config"
+				},
+				"createdBy": {
+					"type": "string",
+					"enum": [
+						"CONTROLLER",
+						"DETECTOR"
+					],
+					"description": "Tells us who created this config: CONTROLLER means server side, DETECTOR means the detector that runs on the client created this config"
+				}
+			},
+			"additionalProperties": false
+		},
+
+		"projects": {
+			"description": "Contains a map of project UUIDs to directories on the detectpr",
+			"patternProperties": {
+				"^.*$": {
+					"anyOf": [
+						{
+							"type": "object",
+							"description": "Information about the projects",
+							"required": [
+								"localPath"
+							],
+							"properties": {
+								"localPath": {
+									"type": "string",
+									"description": "Local path to project, relative to the projects root (which is set in configs/client-side-config)"
+								}
+							}
+						}
+					]
+				}
+			}
+		}
+	}
+}

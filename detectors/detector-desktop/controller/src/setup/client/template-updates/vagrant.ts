@@ -26,7 +26,7 @@ import { TwoKeys, TWOKEYS_ADDON_TYPE_DETECTOR } from "@twokeys/addons";
 import { promises as fs } from "fs";
 import { join } from "path";
 import { ClientConfigHere } from "../../../config";
-import { VAGRANT_FILE_TEMPLATE, VAGRANT_FILE_DEST } from "../../../constants";
+import { VAGRANT_FILE_TEMPLATE, VAGRANT_FILE_DEST, VAGRANT_MOUNT_POINT } from "../../../constants";
 import Handlebars from "handlebars";
 
 /** Parameters for the Vagrantfile template */
@@ -59,7 +59,7 @@ export interface UsbPassthroughParams {
 // TODO: Adjust script param to be relative
 export const ANSIBLE_SCRIPT_TEMPLATE = 
 `	config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "/vagrant/{{ script }}"
+    ansible.playbook = "${VAGRANT_MOUNT_POINT}/{{ script }}"
   end`;
 
 /** @see ANSIBLE_SCRIPT_TEMPLATE */

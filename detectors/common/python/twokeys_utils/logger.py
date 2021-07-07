@@ -60,7 +60,7 @@ class Logger:
         print(json.dumps({
           "prefix": self.name,
           "level": level,
-          "message": text,
+          "message": str(text),
         }))
   def info(self, text):
     self.__log("info", "green", text)

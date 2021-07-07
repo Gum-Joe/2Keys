@@ -1,0 +1,14 @@
+{
+	"inputFiles": [
+		"./src"
+	],
+	"mode": "modules",
+	"out": "docs",
+	"exclude": [
+		"lib/**/*",
+		"spike/**/*",
+		"coverage/**/*",
+		"docs/**/*"
+	],
+	"ignoreCompilerErrors": true
+}

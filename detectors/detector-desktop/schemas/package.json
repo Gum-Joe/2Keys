@@ -1,0 +1,28 @@
+{
+  "name": "@twokeys/detector-desktop-schemas",
+  "version": "1.0.0",
+  "description": "Contains JSON schemas that define the configs shared between controller and detector as well as scripts to copy them to the modules and TS compiled interfaces",
+  "main": "lib/index.js",
+  "repository": "https://github.com/Gum-Joe/2Keys",
+  "author": "Kishan <kishansambhi@hotmail.co.uk>",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "precompile": "gulp buildSchemas",
+    "compile": "tsc -b",
+    "lint": "eslint --ext .ts .",
+    "watch": "tsc -b --watch",
+    "docs": "typedoc",
+    "test": "echo NONE",
+    "coverage": "echo NONE"
+  },
+  "dependencies": {
+    "@twokeys/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/gulp": "^4.0.7",
+    "fast-glob": "^3.2.4",
+    "gulp": "^4.0.2",
+    "gulp-cli": "^2.3.0",
+    "json-schema-to-typescript": "^10.0.0"
+  }
+}
