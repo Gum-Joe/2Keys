@@ -1,3 +1,5 @@
 test/non-mocha
 **/protobuf/*.js
 **/protobuf/*.d.ts
+bundled/protobuf/*.js
+bundled/protobuf/*.d.ts

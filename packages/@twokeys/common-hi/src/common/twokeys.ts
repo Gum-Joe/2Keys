@@ -42,7 +42,7 @@ import { CommandInfo } from "./base-commands";
  * @see TwoKeys
  */
 export default class BaseTwoKeysForCommands extends TwoKeys {
-	constructor(logger: typeof Logger, commandInfo: CommandInfo, properties: TwoKeysProperties) {
+	constructor(logger: typeof Logger, commandInfo: Omit<CommandInfo, "protobufConfig">, properties: TwoKeysProperties) {
 		super(logger, commandInfo.commandName, properties);
 	}
 }
@@ -63,7 +63,7 @@ export default class BaseTwoKeysForCommands extends TwoKeys {
  * ```
  */
 export interface FinalTwoKeysConstructor<TwokeysClass extends BaseTwoKeysForCommands = BaseTwoKeysForCommands> {
-	new(commandInfo: CommandInfo, properties: TwoKeysProperties): TwokeysClass;
+	new(commandInfo: Omit<CommandInfo, "protobufConfig">, properties: TwoKeysProperties): TwokeysClass;
 }
 
 /**

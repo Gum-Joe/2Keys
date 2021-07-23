@@ -23,7 +23,7 @@
  */
 import { promises as fs } from "fs";
 import { PromiseCommand, CommandFactory } from "../../common";
-import { NewDetector } from "../protobuf/detector_pb";
+import { INewDetector, NewDetector } from "../../../bundled/protobuf/compiled";
 import { AddOnsRegistry } from "@twokeys/addons/src";
 import { loadClientConfig, loadMainConfig, stringifyClientConfig } from "@twokeys/core/lib/config";
 import { TWOKEYS_CLIENTS_CONFIG_ROOT } from "@twokeys/core/lib/constants";
@@ -44,7 +44,7 @@ export function writeClientConfig(twokeys: TwoKeysForCommands, uuid: string, con
 	return fs.writeFile(filename, configYAML);
 }
 
-export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys, config) => {
+export const newDetector: PromiseCommand<INewDetector> = async (twokeys, config) => {
 	const { logger } = twokeys;
 	logger.status("Creating new detector");
 	logger.info(`Creating new detector of name ${config.name}`);
@@ -82,6 +82,6 @@ export const newDetector: PromiseCommand<NewDetector.AsObject> = async (twokeys,
 
 };
 
-export default CommandFactory.wrapCommand(newDetector, "newClient");
+export default CommandFactory.wrapCommand(newDetector, "newClient", NewDetector);
 
 

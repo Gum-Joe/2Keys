@@ -29,8 +29,8 @@ $ yarn link
 To build all packages:
 ```shell
 $ yarn
-$ yarn wsrun -mtc precompile # compiles protobuf definiton files
-$ yarn build # use yarn build -v to display more detailed output -> this builds the TS files
+$ yarn workspace @twokeys/common-hi run tsc -b # need to compile this initially for bootstrapping purposes
+$ yarn run compile:all # use yarn build -v to display more detailed output -> this builds the TS files
 ```
 
 To test everything:

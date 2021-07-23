@@ -1,22 +1,22 @@
-syntax = "proto3";
+syntax = "proto2";
 
 /** Config for project creation **/
 message CreateProject {
-	string project_name = 1;
+	required string project_name = 1;
 	/** Abolsute path to project */
-	string project_location = 2;
-	string project_uuid = 3;
+	required string project_location = 2;
+	required string project_uuid = 3;
 	message Permissions {
 		/** RESERVED FOR FURURE USE - defaults to false */
-		bool allow_sync = 2;
+		required bool allow_sync = 2;
 	}
-	Permissions permissions = 4;
+	required Permissions permissions = 4;
 	message ServerInfo {
 		message ServerPermissions {
-			bool allow_startup = 1;
+			required bool allow_startup = 1;
 		}
-		uint32 server_port = 1;
-		ServerPermissions permissions = 2;
+		required uint32 server_port = 1;
+		required ServerPermissions permissions = 2;
 	}
-	ServerInfo server_info = 5;
+	required ServerInfo server_info = 5;
 }

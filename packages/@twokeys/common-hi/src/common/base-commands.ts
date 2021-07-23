@@ -47,14 +47,20 @@
  * @packageDocumentation
  */
 import { implementsStaticProperties } from "@twokeys/core";
+import type { Message } from "../../bundled/protobuf-message";
 import TwoKeysForCommands from "./twokeys";
 import BaseTwoKeysForCommands from "./twokeys";
+
+/** How protobufs are passed around by the API */
+export type ProtobufType = typeof Message;
 
 /**
  * Defines information about a command, used for e.g. creating the logger
  */
 export interface CommandInfo {
 	commandName: string;
+	/** Protobuf metaClass that allows us to serialise and deserialise protobuf configs for commands */
+	protobufConfig: typeof Message;
 }
 
 /**

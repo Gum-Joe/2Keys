@@ -38,14 +38,14 @@ describe("Command factory tests", () => {
 			function theCommand() {
 				// Empty
 			}
-			const wrapped = CommandFactory.wrapCommand(theCommand, "someCommand");
+			const wrapped = CommandFactory.wrapCommand(theCommand, "someCommand", {});
 			expect(wrapped).to.haveOwnProperty("commandInfo");
 			expect(wrapped.commandInfo?.commandName).to.equal("someCommand");
 		});
 
 		it("should add commandInfo property to a stateful command class (as a static property", () => {
 			const commandName = "someStatefulCommandName";
-			@CommandFactory.wrapStatefulCommand(commandName)
+			@CommandFactory.wrapStatefulCommand(commandName, {})
 			class TheCommand extends BaseStatefulCommand {
 				public async run(config: boolean): Promise<void> {
 					console.log(config);
@@ -77,7 +77,7 @@ describe("Command factory tests", () => {
 				expect(config.isHere).to.be.true;
 				done();
 			};
-			factory.callCommand(CommandFactory.wrapCommand(someCommand, "commandName"), { isHere: true });
+			factory.callCommand(CommandFactory.wrapCommand(someCommand, "commandName", {}), { isHere: true });
 		});
 	});
 
@@ -102,7 +102,7 @@ describe("Command factory tests", () => {
 		});
 		it("should succesfully execute a command, with the right props", (done) => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			@CommandFactory.wrapStatefulCommand("someStatefulCommand")
+			@CommandFactory.wrapStatefulCommand("someStatefulCommand", {})
 			class SomeProperCommand extends BaseStatefulCommand {
 				public run(): void {
 					expect(this.twokeys).to.be.instanceOf(TwoKeys);

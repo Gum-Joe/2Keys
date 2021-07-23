@@ -7,7 +7,7 @@ import commands from "../commandsList";
 
 @ensureIsValidTwoKeysClass
 class Twokeys extends BaseTwoKeysForCommands {
-	constructor(commandInfo: CommandInfo, properties: TwoKeysProperties) {
+	constructor(commandInfo: Pick<CommandInfo, "commandName">, properties: TwoKeysProperties) {
 		super(Logger, commandInfo, properties);
 	}
 }

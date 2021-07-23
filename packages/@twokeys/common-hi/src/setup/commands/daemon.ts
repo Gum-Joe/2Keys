@@ -34,7 +34,7 @@ import {
 	WINDOWS_SERVER_PID_FILE } from "../util/constants";
 import { promises as fs } from "fs";
 import { CommandFactory, PromiseCommand } from "../../common";
-import { GenerateProjectDaemon } from "../protobuf/daemon_pb";
+import { GenerateProjectDaemon, IGenerateProjectDaemon } from "../../../bundled/protobuf/compiled";
 import { CodedError } from "@twokeys/core";
 import * as errorCodes from "../../util/errors";
 import { loadProjectConfig } from "@twokeys/core/lib/config";
@@ -75,14 +75,14 @@ async function gen_startup_vbs(name: string, filesDir: string): Promise<string> 
 	return output;
 }
 
-const generateDaemon: PromiseCommand<GenerateProjectDaemon.AsObject, void> = async function (twokeys, config) {
+const generateDaemon: PromiseCommand<IGenerateProjectDaemon, void> = async function (twokeys, config) {
 	const { logger } = twokeys;
 	logger.status("Generating files for startup");
 	logger.substatus("Validating project");
 	if (typeof config.projectLocation === "undefined") {
 		throw new CodedError("Project to use not specificed.", errorCodes.PROJECT_DIR_MISSING);
 	}
-	if (typeof config.relativeFilesLocationDir === "undefined") {
+	if (typeof config.relativeFilesLocationDir === "undefined" || !config.relativeFilesLocationDir) {
 		config.relativeFilesLocationDir = DEFAULT_LOCAL_2KEYS;
 	}
 	// Check is project
@@ -137,7 +137,7 @@ const generateDaemon: PromiseCommand<GenerateProjectDaemon.AsObject, void> = asy
 	}
 };
 
-export default CommandFactory.wrapCommand(generateDaemon, "generateProjectDaemon");
+export default CommandFactory.wrapCommand(generateDaemon, "generateProjectDaemon", GenerateProjectDaemon);
 
 /**
  * Stop 2Keys daemon

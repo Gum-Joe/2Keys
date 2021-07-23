@@ -1,6 +1,8 @@
 # @twokeys/common-hi
 Encompasses things shared by the GUI and CLI, such as interfaces defining Setup UI, as well as the code for these.
 
+**NB:** Use proto2 syntax for protobufs, as otherwise the compiled types will all be optional
+
 File structure:
 ```
 src

@@ -22,8 +22,10 @@
  * @packageDocumentation
  */
 
+import type * as jspb from "google-protobuf";
+import type { Message } from "protobufjs";
 import { FinalTwoKeysConstructor } from "./twokeys";
-import { Command, CommandInfo, BaseStatefulCommand, StatefulCommandConstructor } from "./base-commands";
+import { Command, CommandInfo, BaseStatefulCommand, StatefulCommandConstructor, ProtobufType } from "./base-commands";
 import { TwoKeysProperties } from "@twokeys/core/src";
 import { checkCommandInfo } from "./is-command";
 
@@ -103,31 +105,36 @@ export default class CommandFactory {
 	 * This function is used internally by {@link CommandFactory.wrapStatefulCommand} - use {@link CommandFactory.wrapStatefulCommand} instead as a decorator when wrapping stateful commands
 	 * @param command Command (stateful) to wrap
 	 * @param name Name of command, particularly useful for the logger's prefix
+	 * @param protobuf Protobuf metaclass (e.g. `CompileProtoc`) for the command's config. Needed so we can retrieve it.
 	 * @template T Command class that is being wrapped (inferred from type of {@link StatefulCommandConstructor})
 	 * @private
 	 */
-	public static wrapCommand<T extends BaseStatefulCommand>(command: StatefulCommandConstructor<T>, name: string): StatefulCommandConstructor<T>
+	public static wrapCommand<T extends BaseStatefulCommand>(command: StatefulCommandConstructor<T>, name: string, protobuf: ProtobufType): StatefulCommandConstructor<T>
 	/**
 	 * Overload for stateless commands - wraps a stateless command so it can be used as a command, adding commandInfo ({@link CommandInfo})
 	 * @template T Config type for {@link Command}
 	 * @template U Return type for {@link Command}
 	 * @public
 	 */
-	public static wrapCommand<T, U>(command: Command<T, U>, name: string): Command<T, U>
+	public static wrapCommand<T, U>(command: Command<T, U>, name: string, protobuf: ProtobufType): Command<T, U>
 	/**
 	 * Actual implementation of {@link CommandFactory.wrapCommand}, that takes either a stateful or stateless command and add commandInfo, so it can be used as a command.
 	 * 
 	 * Please only call this with stateless commands; use {@link CommandFactory.wrapStatefulCommand} as a decorator for stateful commands (it uses this function internally)
 	 * 
 	 * Generics should be autoinferred by the compiler.
+	 * @param command Command (stateful) to wrap
+	 * @param name Name of command, particularly useful for the logger's prefix
+	 * @param protobuf Protobuf metaclass (e.g. `CompileProtoc`) for the command's config. Needed so we can retrieve it.
 	 * @template T Config type for {@link Command} (only used for stateless commands)
 	 * @template U Return type for {@link Command} (only used for stateless commands)
 	 * @template V The class that the stateful class constructor will return (only used for stateful commands)
 	 * @public
 	 */
-	public static wrapCommand<T, U, V extends BaseStatefulCommand>(command: Command<T, U> | StatefulCommandConstructor<V>, name: string): Command<T, U> | StatefulCommandConstructor<V> {
+	public static wrapCommand<T, U, V extends BaseStatefulCommand>(command: Command<T, U> | StatefulCommandConstructor<V>, name: string, protobuf: ProtobufType): Command<T, U> | StatefulCommandConstructor<V> {
 		const info: CommandInfo = {
 			commandName: name,
+			protobufConfig: protobuf,
 		};
 		Object.defineProperty(command, "commandInfo", { value: info });
 		return command;
@@ -147,8 +154,8 @@ export default class CommandFactory {
 	 * }
 	 * ```
 	 */
-	public static wrapStatefulCommand(name: string) {
+	public static wrapStatefulCommand(name: string, protobuf: ProtobufType) {
 		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-		return <StatefulCommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<StatefulCommandClass>) => CommandFactory.wrapCommand(command, name);
+		return <StatefulCommandClass extends BaseStatefulCommand>(command: StatefulCommandConstructor<StatefulCommandClass>) => CommandFactory.wrapCommand(command, name, protobuf);
 	}
 }

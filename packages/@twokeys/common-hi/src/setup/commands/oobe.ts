@@ -30,7 +30,7 @@ import { TWOKEYS_MAIN_CONFIG_DEFAULT_PATH } from "@twokeys/core/lib/constants";
 import { MainConfig } from "@twokeys/core/lib/interfaces";
 import { AddOnsRegistry, SoftwareRegistry } from "@twokeys/addons";
 import { CommandFactory, PromiseCommand } from "../../common";
-import type { OOBEConfig } from "../protobuf/oobe_pb";
+import { IOOBEConfig, OOBEConfig } from "../../../bundled/protobuf/compiled";
 import * as errorCodes from "../util/errors";
 import packageJSON from "../../../package.json";
 import setStaticIPv4Address from "../util/setIPv4";
@@ -40,7 +40,7 @@ import setStaticIPv4Address from "../util/setIPv4";
  * @see TWOKEYS_MAIN_CONFIG_DEFAULT_PATH for the path to config
  * @see MainConfig for config schema
  */
-const oobe: PromiseCommand<OOBEConfig.AsObject> = async (twokeys, config): Promise<void> => {
+const oobe: PromiseCommand<IOOBEConfig> = async (twokeys, config): Promise<void> => {
 	twokeys.logger.info("Starting OOBE....");
 	twokeys.logger.status("Setting up 2Keys");
 	if (!config.didAcceptLicense) {
@@ -100,7 +100,7 @@ const oobe: PromiseCommand<OOBEConfig.AsObject> = async (twokeys, config): Promi
 
 	// Set IP address
 	// Provided noIpv4set is false
-	if (!(config.options?.noIpv4Set)) {
+	if (!(config.options?.no_IPv4Set)) {
 		await setStaticIPv4Address(twokeys, {
 			networkAdapter: config.networkAdapter,
 			ipv4: config.ipv4Address,
@@ -123,7 +123,7 @@ const oobe: PromiseCommand<OOBEConfig.AsObject> = async (twokeys, config): Promi
 	const registry = new AddOnsRegistry(configToWrite.registry_root, {
 		Logger: twokeys.LoggerConstructor,
 	});
-	for (const addOn of config.addonInstallListList) {
+	for (const addOn of config.addonInstallList || []) {
 		logger.substatus(`Installing add-on ${addOn}...`);
 		await registry.install(addOn);
 	}
@@ -134,4 +134,4 @@ const oobe: PromiseCommand<OOBEConfig.AsObject> = async (twokeys, config): Promi
 	logger.info("Done.");
 };
 
-export default CommandFactory.wrapCommand(oobe, "oobe");
+export default CommandFactory.wrapCommand(oobe, "oobe", OOBEConfig);

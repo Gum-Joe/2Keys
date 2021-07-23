@@ -8,9 +8,10 @@
 		// See src/types.d.ts
 		// LEAVE AS FALSE!!!!!
 		"resolveJsonModule": false,
+		"allowJs": true
 	},
 	"include": [
-		"src",
+		"src", "bundled/protobuf-message.d.ts",
 	],
 	"exclude": [
 		"package.json",

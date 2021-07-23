@@ -52,7 +52,7 @@ const someCommand: Command<ConfigType> = (twokeys: TwoKeys, config: ConfigType) 
 };
 
 // Next, wrap it to create a command
-const wrappedCommand = CommandFactory.wrapCommand(someCommand, "someCommand");
+const wrappedCommand = CommandFactory.wrapCommand(someCommand, "someCommand", {}); // 3rd arg is prototbuf metaclass
 
 // And now we call it
 commandFactory.callCommand(wrappedCommand, { name: "someName" });	
@@ -60,7 +60,7 @@ commandFactory.callCommand(wrappedCommand, { name: "someName" });
 // STATEFUL COMMANDS
 // Define the command itself
 // And also wrap
-@CommandFactory.wrapStatefulCommand("someStatefulCommand")
+@CommandFactory.wrapStatefulCommand("someStatefulCommand", {}) // 3rd arg is prototbuf metaclass
 class SomeStatefulCommand extends BaseStatefulCommand {
 	public run(config: ConfigType): void {
 		this.twokeys.logger.info("IT worked!");
